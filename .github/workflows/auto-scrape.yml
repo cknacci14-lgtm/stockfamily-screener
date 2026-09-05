@@ -2,7 +2,7 @@ name: Auto Scrape Yahoo Finance
 
 on:
   schedule:
-    - cron: '0 16 * * *'  # Setiap hari jam 16:00 WIB
+    - cron: '0 16 * * *'
   workflow_dispatch:
 
 jobs:
@@ -22,6 +22,12 @@ jobs:
 
       - name: Run auto scraper
         run: node src/scrapers/autoScraper.js
+
+      - name: Run notifier
+        run: node src/notifier.js
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
 
       - name: Upload daily data artifact
         uses: actions/upload-artifact@v4
