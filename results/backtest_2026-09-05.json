@@ -1,0 +1,98 @@
+{
+  "date": "2026-09-05T03:24:03.147Z",
+  "summary": {
+    "total": 831,
+    "accumulation": 22,
+    "oversold": 119,
+    "trusted": 132,
+    "grandSlam": 10
+  },
+  "grandSlams": [
+    {
+      "code": "CMNT",
+      "price": 730,
+      "powerScore": 91,
+      "pilarA": 100,
+      "pilarB": 70,
+      "pilarC": 100
+    },
+    {
+      "code": "JGLE",
+      "price": 84,
+      "powerScore": 91,
+      "pilarA": 100,
+      "pilarB": 70,
+      "pilarC": 100
+    },
+    {
+      "code": "SGER",
+      "price": 645,
+      "powerScore": 91,
+      "pilarA": 100,
+      "pilarB": 70,
+      "pilarC": 100
+    },
+    {
+      "code": "BBRI",
+      "price": 3390,
+      "powerScore": 90,
+      "pilarA": 98,
+      "pilarB": 70,
+      "pilarC": 100
+    },
+    {
+      "code": "BNBR",
+      "price": 100,
+      "powerScore": 88,
+      "pilarA": 100,
+      "pilarB": 60,
+      "pilarC": 100
+    },
+    {
+      "code": "CDIA",
+      "price": 710,
+      "powerScore": 88,
+      "pilarA": 100,
+      "pilarB": 60,
+      "pilarC": 100
+    },
+    {
+      "code": "BBNI",
+      "price": 3940,
+      "powerScore": 82,
+      "pilarA": 82,
+      "pilarB": 70,
+      "pilarC": 100
+    },
+    {
+      "code": "PTBA",
+      "price": 2880,
+      "powerScore": 79.5,
+      "pilarA": 83,
+      "pilarB": 60,
+      "pilarC": 100
+    },
+    {
+      "code": "KIJA",
+      "price": 196,
+      "powerScore": 79,
+      "pilarA": 76,
+      "pilarB": 70,
+      "pilarC": 100
+    },
+    {
+      "code": "KLBF",
+      "price": 775,
+      "powerScore": 72.5,
+      "pilarA": 73,
+      "pilarB": 60,
+      "pilarC": 90
+    }
+  ],
+  "performance": {
+    "winRate": "10.0",
+    "avgReturn": -1.7132940243893535,
+    "totalReturn": -17.132940243893536,
+    "alpha": -22.132940243893536
+  }
+}

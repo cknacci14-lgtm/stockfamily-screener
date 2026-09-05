@@ -1,0 +1,534 @@
+{
+  "dates": [
+    "20260602",
+    "20260603",
+    "20260604",
+    "20260605",
+    "20260608",
+    "20260609",
+    "20260610",
+    "20260611",
+    "20260612",
+    "20260615",
+    "20260617",
+    "20260618",
+    "20260619",
+    "20260622",
+    "20260623",
+    "20260624",
+    "20260625",
+    "20260626",
+    "20260629",
+    "20260630",
+    "20260701",
+    "20260702",
+    "20260703",
+    "20260706",
+    "20260707",
+    "20260708",
+    "20260709",
+    "20260710",
+    "20260713",
+    "20260714",
+    "20260715",
+    "20260716",
+    "20260717",
+    "20260720",
+    "20260721",
+    "20260722",
+    "20260723",
+    "20260724",
+    "20260727",
+    "20260728",
+    "20260729",
+    "20260730",
+    "20260731",
+    "20260803",
+    "20260804",
+    "20260805",
+    "20260806",
+    "20260807",
+    "20260810",
+    "20260811",
+    "20260812",
+    "20260813",
+    "20260814",
+    "20260818",
+    "20260819",
+    "20260820",
+    "20260821",
+    "20260824",
+    "20260826",
+    "20260827",
+    "20260828",
+    "20260831",
+    "20260901",
+    "20260902",
+    "20260903",
+    "20260904"
+  ],
+  "results": [
+    {
+      "date": "20260602",
+      "grandSlams": 9,
+      "avgReturn": -10.19129560976603,
+      "winRate": 0,
+      "winCount": 0
+    },
+    {
+      "date": "20260603",
+      "grandSlams": 42,
+      "avgReturn": -1.744901547369571,
+      "winRate": 35.714285714285715,
+      "winCount": 15
+    },
+    {
+      "date": "20260604",
+      "grandSlams": 15,
+      "avgReturn": -6.952201907609856,
+      "winRate": 6.666666666666667,
+      "winCount": 1
+    },
+    {
+      "date": "20260605",
+      "grandSlams": 23,
+      "avgReturn": -5.445359127097582,
+      "winRate": 4.3478260869565215,
+      "winCount": 1
+    },
+    {
+      "date": "20260608",
+      "grandSlams": 31,
+      "avgReturn": 13.230909717881337,
+      "winRate": 100,
+      "winCount": 31
+    },
+    {
+      "date": "20260609",
+      "grandSlams": 3,
+      "avgReturn": -3.0968757485542207,
+      "winRate": 0,
+      "winCount": 0
+    },
+    {
+      "date": "20260610",
+      "grandSlams": 2,
+      "avgReturn": 1.5822784810126582,
+      "winRate": 50,
+      "winCount": 1
+    },
+    {
+      "date": "20260611",
+      "grandSlams": 17,
+      "avgReturn": 5.820790757020348,
+      "winRate": 94.11764705882352,
+      "winCount": 16
+    },
+    {
+      "date": "20260612",
+      "grandSlams": 5,
+      "avgReturn": 6.685250242344584,
+      "winRate": 100,
+      "winCount": 5
+    },
+    {
+      "date": "20260615",
+      "grandSlams": 9,
+      "avgReturn": -1.9818467256787744,
+      "winRate": 11.11111111111111,
+      "winCount": 1
+    },
+    {
+      "date": "20260617",
+      "grandSlams": 12,
+      "avgReturn": 0.1381278569827773,
+      "winRate": 41.66666666666667,
+      "winCount": 5
+    },
+    {
+      "date": "20260618",
+      "grandSlams": 2,
+      "avgReturn": 2.4119715000094,
+      "winRate": 50,
+      "winCount": 1
+    },
+    {
+      "date": "20260619",
+      "grandSlams": 4,
+      "avgReturn": -1.9118088627545702,
+      "winRate": 50,
+      "winCount": 2
+    },
+    {
+      "date": "20260622",
+      "grandSlams": 4,
+      "avgReturn": -0.3689626033245019,
+      "winRate": 50,
+      "winCount": 2
+    },
+    {
+      "date": "20260623",
+      "grandSlams": 6,
+      "avgReturn": -5.107349205912608,
+      "winRate": 0,
+      "winCount": 0
+    },
+    {
+      "date": "20260624",
+      "grandSlams": 8,
+      "avgReturn": 2.9456936311976687,
+      "winRate": 62.5,
+      "winCount": 5
+    },
+    {
+      "date": "20260625",
+      "grandSlams": 6,
+      "avgReturn": -0.6616300366300366,
+      "winRate": 16.666666666666664,
+      "winCount": 1
+    },
+    {
+      "date": "20260626",
+      "grandSlams": 6,
+      "avgReturn": 1.261987658663551,
+      "winRate": 66.66666666666666,
+      "winCount": 4
+    },
+    {
+      "date": "20260629",
+      "grandSlams": 8,
+      "avgReturn": -4.088789596347445,
+      "winRate": 12.5,
+      "winCount": 1
+    },
+    {
+      "date": "20260630",
+      "grandSlams": 22,
+      "avgReturn": 3.5535181069178194,
+      "winRate": 81.81818181818183,
+      "winCount": 18
+    },
+    {
+      "date": "20260701",
+      "grandSlams": 3,
+      "avgReturn": 2.6410949802177783,
+      "winRate": 66.66666666666666,
+      "winCount": 2
+    },
+    {
+      "date": "20260702",
+      "grandSlams": 2,
+      "avgReturn": 8.215906376880822,
+      "winRate": 100,
+      "winCount": 2
+    },
+    {
+      "date": "20260703",
+      "grandSlams": 7,
+      "avgReturn": 1.8692320313229978,
+      "winRate": 71.42857142857143,
+      "winCount": 5
+    },
+    {
+      "date": "20260706",
+      "grandSlams": 1,
+      "avgReturn": 6.25,
+      "winRate": 100,
+      "winCount": 1
+    },
+    {
+      "date": "20260707",
+      "grandSlams": 3,
+      "avgReturn": -3.1099152529007026,
+      "winRate": 0,
+      "winCount": 0
+    },
+    {
+      "date": "20260708",
+      "grandSlams": 13,
+      "avgReturn": 2.498914186750668,
+      "winRate": 61.53846153846154,
+      "winCount": 8
+    },
+    {
+      "date": "20260709",
+      "grandSlams": 2,
+      "avgReturn": 3.5214285714285714,
+      "winRate": 100,
+      "winCount": 2
+    },
+    {
+      "date": "20260710",
+      "grandSlams": 4,
+      "avgReturn": 1.7491150785154272,
+      "winRate": 75,
+      "winCount": 3
+    },
+    {
+      "date": "20260713",
+      "grandSlams": 4,
+      "avgReturn": 2.2979532163742693,
+      "winRate": 50,
+      "winCount": 2
+    },
+    {
+      "date": "20260714",
+      "grandSlams": 9,
+      "avgReturn": -0.29274615537948695,
+      "winRate": 44.44444444444444,
+      "winCount": 4
+    },
+    {
+      "date": "20260715",
+      "grandSlams": 8,
+      "avgReturn": -0.1282071818296631,
+      "winRate": 62.5,
+      "winCount": 5
+    },
+    {
+      "date": "20260716",
+      "grandSlams": 3,
+      "avgReturn": -0.6197311460469356,
+      "winRate": 33.33333333333333,
+      "winCount": 1
+    },
+    {
+      "date": "20260717",
+      "grandSlams": 3,
+      "avgReturn": 1.2161353090854663,
+      "winRate": 33.33333333333333,
+      "winCount": 1
+    },
+    {
+      "date": "20260720",
+      "grandSlams": 4,
+      "avgReturn": 2.8853756755091853,
+      "winRate": 100,
+      "winCount": 4
+    },
+    {
+      "date": "20260721",
+      "grandSlams": 7,
+      "avgReturn": 2.302693021019782,
+      "winRate": 42.857142857142854,
+      "winCount": 3
+    },
+    {
+      "date": "20260722",
+      "grandSlams": 2,
+      "avgReturn": -0.3832936822627544,
+      "winRate": 50,
+      "winCount": 1
+    },
+    {
+      "date": "20260723",
+      "grandSlams": 32,
+      "avgReturn": -4.1309462426995545,
+      "winRate": 9.375,
+      "winCount": 3
+    },
+    {
+      "date": "20260724",
+      "grandSlams": 11,
+      "avgReturn": -0.44903511663767565,
+      "winRate": 18.181818181818183,
+      "winCount": 2
+    },
+    {
+      "date": "20260727",
+      "grandSlams": 5,
+      "avgReturn": -0.9075899854782143,
+      "winRate": 20,
+      "winCount": 1
+    },
+    {
+      "date": "20260728",
+      "grandSlams": 6,
+      "avgReturn": -0.523230873956647,
+      "winRate": 16.666666666666664,
+      "winCount": 1
+    },
+    {
+      "date": "20260729",
+      "grandSlams": 12,
+      "avgReturn": 5.953077143174778,
+      "winRate": 83.33333333333334,
+      "winCount": 10
+    },
+    {
+      "date": "20260730",
+      "grandSlams": 3,
+      "avgReturn": 3.6919421813210778,
+      "winRate": 100,
+      "winCount": 3
+    },
+    {
+      "date": "20260731",
+      "grandSlams": 6,
+      "avgReturn": 0.3510330284045919,
+      "winRate": 33.33333333333333,
+      "winCount": 2
+    },
+    {
+      "date": "20260803",
+      "grandSlams": 7,
+      "avgReturn": 5.517285193590189,
+      "winRate": 100,
+      "winCount": 7
+    },
+    {
+      "date": "20260804",
+      "grandSlams": 3,
+      "avgReturn": 1.2688063068885937,
+      "winRate": 66.66666666666666,
+      "winCount": 2
+    },
+    {
+      "date": "20260805",
+      "grandSlams": 6,
+      "avgReturn": 0.8324184560180857,
+      "winRate": 50,
+      "winCount": 3
+    },
+    {
+      "date": "20260806",
+      "grandSlams": 9,
+      "avgReturn": 1.7131294462434088,
+      "winRate": 88.88888888888889,
+      "winCount": 8
+    },
+    {
+      "date": "20260807",
+      "grandSlams": 2,
+      "avgReturn": 1.421911421911422,
+      "winRate": 100,
+      "winCount": 2
+    },
+    {
+      "date": "20260810",
+      "grandSlams": 7,
+      "avgReturn": -2.5252487153183725,
+      "winRate": 14.285714285714285,
+      "winCount": 1
+    },
+    {
+      "date": "20260811",
+      "grandSlams": 23,
+      "avgReturn": 3.7534949293627147,
+      "winRate": 78.26086956521739,
+      "winCount": 18
+    },
+    {
+      "date": "20260812",
+      "grandSlams": 1,
+      "avgReturn": -2.7027027027027026,
+      "winRate": 0,
+      "winCount": 0
+    },
+    {
+      "date": "20260813",
+      "grandSlams": 7,
+      "avgReturn": -1.0482227179305295,
+      "winRate": 28.57142857142857,
+      "winCount": 2
+    },
+    {
+      "date": "20260814",
+      "grandSlams": 3,
+      "avgReturn": 0.613823729917559,
+      "winRate": 66.66666666666666,
+      "winCount": 2
+    },
+    {
+      "date": "20260818",
+      "grandSlams": 12,
+      "avgReturn": 1.9302540161641113,
+      "winRate": 50,
+      "winCount": 6
+    },
+    {
+      "date": "20260819",
+      "grandSlams": 4,
+      "avgReturn": 1.193836604795509,
+      "winRate": 75,
+      "winCount": 3
+    },
+    {
+      "date": "20260820",
+      "grandSlams": 6,
+      "avgReturn": 1.0293362533210166,
+      "winRate": 83.33333333333334,
+      "winCount": 5
+    },
+    {
+      "date": "20260821",
+      "grandSlams": 5,
+      "avgReturn": -0.17964288975176737,
+      "winRate": 20,
+      "winCount": 1
+    },
+    {
+      "date": "20260824",
+      "grandSlams": 4,
+      "avgReturn": -4.653875336984425,
+      "winRate": 25,
+      "winCount": 1
+    },
+    {
+      "date": "20260826",
+      "grandSlams": 25,
+      "avgReturn": 7.0342774219007485,
+      "winRate": 100,
+      "winCount": 25
+    },
+    {
+      "date": "20260827",
+      "grandSlams": 1,
+      "avgReturn": 0.6756756756756757,
+      "winRate": 100,
+      "winCount": 1
+    },
+    {
+      "date": "20260828",
+      "grandSlams": 5,
+      "avgReturn": 2.9063663648558538,
+      "winRate": 60,
+      "winCount": 3
+    },
+    {
+      "date": "20260831",
+      "grandSlams": 7,
+      "avgReturn": -0.6808007149858163,
+      "winRate": 71.42857142857143,
+      "winCount": 5
+    },
+    {
+      "date": "20260901",
+      "grandSlams": 3,
+      "avgReturn": 7.569710268881956,
+      "winRate": 66.66666666666666,
+      "winCount": 2
+    },
+    {
+      "date": "20260902",
+      "grandSlams": 4,
+      "avgReturn": 4.216838963308096,
+      "winRate": 100,
+      "winCount": 4
+    },
+    {
+      "date": "20260903",
+      "grandSlams": 8,
+      "avgReturn": 2.121725974639875,
+      "winRate": 25,
+      "winCount": 2
+    }
+  ],
+  "summary": {
+    "totalDays": 65,
+    "avgReturn": 0.9690324629784606,
+    "avgWinRate": 53.46979430225052,
+    "totalReturn": 62.98711009359994,
+    "alpha": 56.48711009359994
+  }
+}

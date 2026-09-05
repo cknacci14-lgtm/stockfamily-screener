@@ -1,0 +1,35 @@
+{
+  "name": "stockfamily-screener",
+  "version": "1.0.0",
+  "description": "Screener saham IDX dengan logika The Holy Trinity",
+  "main": "src/scrapers/idxScraper.js",
+  "scripts": {
+    "scrape": "node src/scrapers/idxScraper.js",
+    "scrape:ts": "npx ts-node src/scrapers/idxScraper.ts",
+    "build": "tsc",
+    "start": "node dist/scrapers/idxScraper.js"
+  },
+  "keywords": [
+    "screener",
+    "idx",
+    "stock",
+    "trading",
+    "technical-analysis"
+  ],
+  "author": "StockFamily",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^16.3.1",
+    "puppeteer": "^21.6.0"
+  },
+  "devDependencies": {
+    "@types/cheerio": "^0.22.35",
+    "@types/node": "^20.10.0",
+    "@types/puppeteer": "^7.0.4",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.2"
+  }
+}

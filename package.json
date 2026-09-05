@@ -1,0 +1,48 @@
+{
+    "name":  "stockfamily-screener",
+    "version":  "1.0.0",
+    "description":  "Screener saham IDX dengan logika The Holy Trinity",
+    "main":  "src/scrapers/idxScraper.js",
+    "scripts":  {
+                    "screener:auto":  "node src/runAuto.js",
+                    "backtest":  "node src/backtest.js",
+                    "backtest:real":  "node src/backtestReal.js",
+                    "server":  "node src/server.js",
+                    "build":  "tsc",
+                    "start":  "node dist/scrapers/idxScraper.js",
+                    "scrape":  "node src/scrapers/idxScraper.js",
+                    "screener":  "node src/run.js",
+                    "scrape:auto":  "node src/scrapers/autoScraper.js",
+                    "scrape:excel":  "node src/scrapers/idxExcel.js",
+                    "notify":  "node src/notifier.js"
+                },
+    "keywords":  [
+                     "screener",
+                     "idx",
+                     "stock",
+                     "trading",
+                     "technical-analysis"
+                 ],
+    "author":  "StockFamily",
+    "license":  "ISC",
+    "dependencies":  {
+                         "@supabase/supabase-js":  "^2.39.0",
+                         "axios":  "^1.6.0",
+                         "cheerio":  "^1.0.0-rc.12",
+                         "csv-writer":  "^1.6.0",
+                         "dotenv":  "^16.3.1",
+                         "express":  "^5.2.1",
+                         "puppeteer":  "^21.6.0",
+                         "puppeteer-extra":  "^3.3.6",
+                         "puppeteer-extra-plugin-stealth":  "^2.11.2",
+                         "xlsx":  "^0.18.5",
+                         "yahoo-finance2":  "^4.0.2"
+                     },
+    "devDependencies":  {
+                            "@types/cheerio":  "^0.22.35",
+                            "@types/node":  "^20.10.0",
+                            "@types/puppeteer":  "^7.0.4",
+                            "ts-node":  "^10.9.1",
+                            "typescript":  "^5.3.2"
+                        }
+}
