@@ -34,6 +34,16 @@ async function main() {
       return;
     }
     
+    // Sinkronkan ke data/database.json — sumber yang sama yang dibaca
+    // server.js untuk /api/grandslams (lihat catatan yang sama di run.js).
+    const dbPath = path.join(__dirname, '../data/database.json');
+    fs.writeFileSync(dbPath, JSON.stringify({
+      lastUpdated: new Date().toISOString(),
+      totalStocks: stocks.length,
+      source: 'runAuto.js (auto scraper)',
+      stocks
+    }, null, 2));
+
     const result = await runScreener(stocks);
     
     console.log('\n📊 SUMMARY:');

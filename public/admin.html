@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StockFamily - Admin Panel</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0e17;
+      color: #e0e0e0;
+      display: flex;
+      min-height: 100vh;
+    }
+    .sidebar {
+      width: 220px;
+      background: #111827;
+      border-right: 1px solid #1f2937;
+      padding: 20px 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+    }
+    .sidebar .brand {
+      font-size: 20px;
+      font-weight: 700;
+      padding: 0 20px 24px;
+      background: linear-gradient(135deg, #f7971e, #ffd200);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .sidebar .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 20px;
+      color: #9ca3af;
+      text-decoration: none;
+      font-size: 14px;
+      transition: 0.2s;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+    }
+    .sidebar .nav-item:hover { background: #1f2937; color: #fff; }
+    .sidebar .nav-item.active { background: #1f2937; color: #f7971e; border-left-color: #f7971e; }
+    .sidebar .nav-item .icon { font-size: 18px; width: 24px; text-align: center; }
+    .main { flex: 1; padding: 24px 32px; }
+    .admin-card {
+      background: #1a1f2e;
+      border-radius: 12px;
+      border: 1px solid #2a2f3e;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+    }
+    .admin-card h2 { font-size: 18px; margin-bottom: 12px; }
+    .admin-card .row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; align-items: center; }
+    .admin-card .row label { min-width: 140px; color: #888; }
+    .admin-card .row input, .admin-card .row select {
+      background: #0a0e17;
+      border: 1px solid #2a2f3e;
+      color: #e0e0e0;
+      padding: 6px 12px;
+      border-radius: 6px;
+      flex: 1;
+      min-width: 150px;
+    }
+    .btn {
+      background: #f7971e;
+      color: #0a0e17;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn:hover { background: #ffb84d; }
+    .btn-secondary { background: #2a2f3e; color: #fff; }
+    .btn-secondary:hover { background: #3a3f4e; }
+    .btn-danger { background: #ea4335; color: #fff; }
+    .btn-danger:hover { background: #c62828; }
+    .btn-success { 
+      background: #1a5a3a; 
+      color: #34a853; 
+      border: 1px solid #34a853;
+    }
+    .btn-success:hover { 
+      background: #2a7a4a; 
+      color: #fff; 
+    }
+    .btn-success:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 2px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .status-badge.green { background: #1a5a3a; color: #34a853; }
+    .status-badge.yellow { background: #5a4a1a; color: #fbbc04; }
+    .status-badge.red { background: #5a1a1a; color: #ea4335; }
+    .status-badge.blue { background: #1a2a5a; color: #8ab4f8; }
+    .log-area {
+      background: #0a0e17;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #2a2f3e;
+    }
+    .log-area .time { color: #888; }
+    .log-area .info { color: #8ab4f8; }
+    .log-area .success { color: #34a853; }
+    .log-area .error { color: #ea4335; }
+    .upload-area {
+      border: 2px dashed #2a2f3e;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .upload-area:hover { border-color: #f7971e; background: #1a1f2e; }
+    .upload-area.dragover { border-color: #f7971e; background: #1a2a3a; }
+    .upload-area .icon { font-size: 48px; margin-bottom: 8px; }
+    .upload-area .text { color: #888; font-size: 14px; }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .stat-box {
+      background: #111827;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+    .stat-box .number { font-size: 22px; font-weight: 700; color: #f7971e; }
+    .stat-box .label { font-size: 11px; color: #888; }
+    .preview-table { overflow-x: auto; max-height: 400px; overflow-y: auto; }
+    .preview-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .preview-table th { background: #252b3e; padding: 8px 10px; text-align: left; color: #aaa; font-size: 10px; text-transform: uppercase; position: sticky; top: 0; z-index: 1; }
+    .preview-table td { padding: 6px 10px; border-bottom: 1px solid #2a2f3e; }
+    .preview-table tr:hover td { background: #1a2230; }
+    .file-tag {
+      display: inline-block;
+      background: #1a2a3a;
+      padding: 2px 10px;
+      border-radius: 12px;
+      margin: 2px;
+      font-size: 12px;
+    }
+    .file-tag .remove { color: #ea4335; cursor: pointer; margin-left: 4px; }
+    .file-tag .remove:hover { color: #ff6b6b; }
+    @media (max-width:768px) {
+      .sidebar { width: 60px; padding: 12px 0; }
+      .sidebar .brand { font-size: 14px; padding: 0 12px 16px; }
+      .sidebar .nav-item span:not(.icon) { display: none; }
+      .main { padding: 16px; }
+      .admin-card .row { flex-direction: column; align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="brand">📈 StockFamily</div>
+    <a class="nav-item" href="/"><span class="icon">🏠</span> <span>Dashboard</span></a>
+    <a class="nav-item" href="/screener.html"><span class="icon">📊</span> <span>Screener</span></a>
+    <a class="nav-item" href="/backtest.html"><span class="icon">📈</span> <span>Backtest</span></a>
+    <a class="nav-item" href="/watchlist.html"><span class="icon">⭐</span> <span>Watchlist</span></a>
+    <a class="nav-item active" href="/admin.html"><span class="icon">⚙️</span> <span>Admin</span></a>
+  </nav>
+
+  <div class="main">
+    <h1 style="margin-bottom:20px;">⚙️ Admin Panel</h1>
+
+    <!-- System Status -->
+    <div class="admin-card">
+      <h2>📡 System Status</h2>
+      <div class="row">
+        <label>Server:</label>
+        <span class="status-badge green">● Online</span>
+      </div>
+      <div class="row">
+        <label>Data Source:</label>
+        <span>Excel Upload + Database</span>
+      </div>
+      <div class="row">
+        <label>Last Update:</label>
+        <span id="lastUpdate">Belum ada data</span>
+      </div>
+      <div class="row">
+        <label>Total Stocks:</label>
+        <span id="totalStocks">-</span>
+      </div>
+    </div>
+
+    <!-- Upload Multiple Excel -->
+    <div class="admin-card">
+      <h2>📤 Upload Multiple Excel Files</h2>
+      <p style="color:#888;font-size:13px;margin-bottom:12px;">
+        Upload <strong>beberapa file Excel sekaligus</strong> dari IDX (format: Ringkasan Saham-YYYYMMDD.xlsx)
+      </p>
+      
+      <div class="upload-area" id="uploadArea">
+        <div class="icon">📂</div>
+        <div class="text">Drag & drop file Excel di sini, atau klik untuk memilih file</div>
+        <div class="text" style="font-size:12px;color:#555;margin-top:4px;">Support: .xlsx • Bisa pilih banyak file sekaligus</div>
+        <div id="fileList" style="margin-top:8px;font-size:13px;color:#8ab4f8;">Belum ada file dipilih</div>
+      </div>
+      <input type="file" id="fileInput" accept=".xlsx" multiple style="display:none;">
+      
+      <div class="row" style="margin-top:12px;">
+        <button class="btn btn-success" id="uploadBtn" disabled>⬆ Upload All Files</button>
+        <button class="btn btn-secondary" onclick="refreshData()">⟳ Refresh Data</button>
+        <button class="btn btn-secondary" onclick="clearFileList()">🗑 Clear List</button>
+      </div>
+      <div id="uploadStatus" style="margin-top:8px;font-size:13px;"></div>
+    </div>
+
+    <!-- Daily Summary -->
+    <div class="admin-card">
+      <h2>📊 Daily Summary</h2>
+      <div id="summaryStats" class="stat-grid">
+        <div class="stat-box"><div class="number" id="previewTotal">-</div><div class="label">Total Saham</div></div>
+        <div class="stat-box"><div class="number" id="previewActive">-</div><div class="label">Aktif</div></div>
+        <div class="stat-box"><div class="number" id="previewValue">-</div><div class="label">Nilai (Rp)</div></div>
+        <div class="stat-box"><div class="number" id="previewVolume">-</div><div class="label">Volume</div></div>
+      </div>
+      <div id="fileHistory" style="font-size:12px;color:#888;margin-bottom:8px;"></div>
+      <div class="preview-table" id="previewTable">
+        <p style="color:#888;text-align:center;padding:20px;">Belum ada data. Upload file Excel terlebih dahulu.</p>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="admin-card">
+      <h2>🔄 Actions</h2>
+      <div class="row">
+        <button class="btn" onclick="runScraper()">⟳ Run Scraper</button>
+        <button class="btn btn-secondary" onclick="refreshData()">⟳ Refresh Data</button>
+        <button class="btn btn-danger" onclick="clearCache()">🗑 Clear Cache</button>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="admin-card">
+      <h2>⚙️ Screener Settings</h2>
+      <div class="row">
+        <label>Threshold Pilar A:</label>
+        <input type="number" id="thresholdA" value="70" min="0" max="100">
+      </div>
+      <div class="row">
+        <label>Threshold Pilar B:</label>
+        <input type="number" id="thresholdB" value="60" min="0" max="100">
+      </div>
+      <div class="row">
+        <label>Threshold Pilar C:</label>
+        <input type="number" id="thresholdC" value="70" min="0" max="100">
+      </div>
+      <div class="row">
+        <button class="btn" onclick="saveSettings()">💾 Save Settings</button>
+      </div>
+    </div>
+
+    <!-- Logs -->
+    <div class="admin-card">
+      <h2>📋 Activity Log</h2>
+      <div class="log-area" id="logArea">
+        <div><span class="time">[System]</span> <span class="info">Admin panel loaded</span></div>
+        <div><span class="time">[System]</span> <span class="info">Ready to manage data</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    // ADMIN TOKEN — diminta sekali, disimpan di sessionStorage,
+    // dikirim sebagai header X-Admin-Token di setiap panggilan /api/admin/*
+    // ============================================================
+    function getAdminToken() {
+      var token = sessionStorage.getItem('adminToken');
+      if (!token) {
+        token = 'no-token' || '';
+        sessionStorage.setItem('adminToken', token);
+      }
+      return token;
+    }
+
+    function adminFetch(url, options) {
+      options = options || {};
+      options.headers = Object.assign({}, options.headers, { 'X-Admin-Token': getAdminToken() });
+      return fetch(url, options).then(function(r) {
+        if (r.status === 401) {
+          sessionStorage.removeItem('adminToken');
+          alert('Token admin salah. Silakan reload halaman dan coba lagi.');
+        }
+        return r;
+      });
+    }
+
+    // ============================================================
+    // DOM REFS
+    // ============================================================
+    var uploadArea = document.getElementById('uploadArea');
+    var fileInput = document.getElementById('fileInput');
+    var uploadBtn = document.getElementById('uploadBtn');
+    var fileList = document.getElementById('fileList');
+    var selectedFiles = [];
+
+    // ============================================================
+    // UPLOAD EVENTS
+    // ============================================================
+    uploadArea.addEventListener('click', function() {
+      fileInput.click();
+    });
+
+    uploadArea.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      this.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      this.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', function(e) {
+      e.preventDefault();
+      this.classList.remove('dragover');
+      if (e.dataTransfer.files.length) {
+        handleFiles(e.dataTransfer.files);
+      }
+    });
+
+    fileInput.addEventListener('change', function() {
+      if (this.files.length) {
+        handleFiles(this.files);
+      }
+    });
+
+    // ============================================================
+    // HANDLE FILES
+    // ============================================================
+    function handleFiles(files) {
+      var validFiles = 0;
+      var invalidFiles = 0;
+      
+      for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        var ext = file.name.split('.').pop().toLowerCase();
+        if (ext === 'xlsx') {
+          var exists = false;
+          for (var j = 0; j < selectedFiles.length; j++) {
+            if (selectedFiles[j].name === file.name && selectedFiles[j].size === file.size) {
+              exists = true;
+              break;
+            }
+          }
+          if (!exists) {
+            selectedFiles.push(file);
+            validFiles++;
+          }
+        } else {
+          invalidFiles++;
+        }
+      }
+      
+      updateFileList();
+      
+      if (validFiles > 0) {
+        addLog('📤 ' + validFiles + ' file siap diupload', 'info');
+        uploadBtn.disabled = false;
+        uploadBtn.style.opacity = '1';
+        uploadBtn.style.cursor = 'pointer';
+      }
+      
+      if (invalidFiles > 0) {
+        addLog('⚠️ ' + invalidFiles + ' file tidak valid (bukan .xlsx)', 'error');
+      }
+    }
+
+    // ============================================================
+    // UPDATE FILE LIST
+    // ============================================================
+    function updateFileList() {
+      if (selectedFiles.length === 0) {
+        fileList.innerHTML = 'Belum ada file dipilih';
+        uploadBtn.disabled = true;
+        uploadBtn.style.opacity = '0.4';
+        uploadBtn.style.cursor = 'not-allowed';
+        return;
+      }
+      
+      var html = '';
+      var totalSize = 0;
+      for (var i = 0; i < selectedFiles.length; i++) {
+        var f = selectedFiles[i];
+        totalSize += f.size;
+        var sizeKB = (f.size / 1024).toFixed(1);
+        html += '<span class="file-tag">' + f.name + ' (' + sizeKB + ' KB) <span class="remove" onclick="removeFile(' + i + ')">✕</span></span>';
+      }
+      fileList.innerHTML = html + 
+        '<div style="margin-top:4px;font-size:12px;color:#888;">Total: ' + selectedFiles.length + ' file (' + (totalSize / 1024 / 1024).toFixed(1) + ' MB)</div>';
+      
+      uploadBtn.disabled = false;
+      uploadBtn.style.opacity = '1';
+      uploadBtn.style.cursor = 'pointer';
+    }
+
+    // ============================================================
+    // REMOVE FILE
+    // ============================================================
+    function removeFile(index) {
+      selectedFiles.splice(index, 1);
+      updateFileList();
+      if (selectedFiles.length === 0) {
+        uploadBtn.disabled = true;
+        uploadBtn.style.opacity = '0.4';
+        uploadBtn.style.cursor = 'not-allowed';
+      }
+    }
+
+    // ============================================================
+    // CLEAR FILE LIST
+    // ============================================================
+    function clearFileList() {
+      selectedFiles = [];
+      updateFileList();
+      uploadBtn.disabled = true;
+      uploadBtn.style.opacity = '0.4';
+      uploadBtn.style.cursor = 'not-allowed';
+      fileInput.value = '';
+      addLog('🗑 File list cleared', 'info');
+    }
+
+    // ============================================================
+    // UPLOAD BUTTON
+    // ============================================================
+    document.getElementById('uploadBtn').addEventListener('click', function() {
+      if (selectedFiles.length === 0) return;
+      
+      var formData = new FormData();
+      for (var i = 0; i < selectedFiles.length; i++) {
+        formData.append('excelFiles', selectedFiles[i]);
+      }
+      
+      uploadBtn.disabled = true;
+      uploadBtn.textContent = '⏳ Uploading ' + selectedFiles.length + ' files...';
+      addLog('⏳ Uploading ' + selectedFiles.length + ' files...', 'info');
+
+      adminFetch('/api/admin/upload-multiple', {
+        method: 'POST',
+        body: formData
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.success) {
+          addLog('✅ ' + data.files.length + ' file berhasil diupload! Total ' + data.totalStocks + ' saham', 'success');
+          uploadBtn.textContent = '✅ Selesai!';
+          uploadBtn.style.background = '#1a5a3a';
+          uploadBtn.style.color = '#34a853';
+          selectedFiles = [];
+          updateFileList();
+          loadDailySummary();
+          setTimeout(function() {
+            uploadBtn.textContent = '⬆ Upload All Files';
+            uploadBtn.style.background = '#1a5a3a';
+            uploadBtn.style.color = '#34a853';
+            uploadBtn.disabled = false;
+          }, 3000);
+        } else {
+          addLog('❌ Upload gagal: ' + data.error, 'error');
+          uploadBtn.textContent = '⬆ Upload All Files';
+          uploadBtn.disabled = false;
+        }
+      })
+      .catch(function(err) {
+        addLog('❌ Error: ' + err.message, 'error');
+        uploadBtn.textContent = '⬆ Upload All Files';
+        uploadBtn.disabled = false;
+      });
+    });
+
+    // ============================================================
+    // DAILY SUMMARY
+    // ============================================================
+    function loadDailySummary() {
+      adminFetch('/api/admin/daily-summary')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (!data.success) throw new Error(data.error);
+          
+          if (data.hasData) {
+            document.getElementById('lastUpdate').textContent = new Date(data.lastUpdated).toLocaleString('id-ID');
+            document.getElementById('totalStocks').textContent = data.totalStocks;
+            document.getElementById('previewTotal').textContent = data.totalStocks;
+            document.getElementById('previewActive').textContent = data.activeStocks;
+            document.getElementById('previewValue').textContent = (data.totalValue / 1e9).toFixed(1) + 'B';
+            document.getElementById('previewVolume').textContent = (data.totalVolume / 1e6).toFixed(1) + 'M';
+
+            if (data.files && data.files.length > 0) {
+              var fileHtml = '📁 Files processed: ';
+              for (var i = 0; i < data.files.length; i++) {
+                var f = data.files[i];
+                fileHtml += '<span style="display:inline-block;background:#1a2a3a;padding:2px 8px;border-radius:10px;margin:2px;font-size:11px;">' + f.name + ' (' + f.count + ')</span>';
+              }
+              document.getElementById('fileHistory').innerHTML = fileHtml;
+            }
+
+            var stocks = data.stocks || [];
+            var html = '<table><thead><tr><th>Kode</th><th>Harga</th><th>Volume</th><th>Nilai</th></tr></thead><tbody>';
+            for (var i = 0; i < Math.min(stocks.length, 30); i++) {
+              var s = stocks[i];
+              html += '<tr><td><strong>' + s.code + '</strong></td><td>' + (s.close || 0) + '</td><td>' + (s.volume || 0).toLocaleString() + '</td><td>' + (s.value || 0).toLocaleString() + '</td></tr>';
+            }
+            html += '</tbody></table>';
+            document.getElementById('previewTable').innerHTML = html;
+          }
+        })
+        .catch(function(err) {
+          addLog('❌ Gagal load summary: ' + err.message, 'error');
+        });
+    }
+
+    // ============================================================
+    // ACTIONS
+    // ============================================================
+    function runScraper() {
+      addLog('⏳ Running scraper...', 'info');
+      adminFetch('/api/admin/scrape', { method: 'POST' })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.success) {
+            addLog('✅ Scraper finished: ' + data.message, 'success');
+          } else {
+            addLog('❌ Scraper error: ' + data.message, 'error');
+          }
+        })
+        .catch(function(err) { addLog('❌ Error: ' + err.message, 'error'); });
+    }
+
+    function refreshData() {
+      addLog('⟳ Refreshing data...', 'info');
+      loadDailySummary();
+      addLog('✅ Data refreshed', 'success');
+    }
+
+    function clearCache() {
+      if (!confirm('Yakin ingin menghapus cache?')) return;
+      addLog('⏳ Clearing cache...', 'info');
+      adminFetch('/api/admin/cache', { method: 'DELETE' })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.success) {
+            addLog('✅ Cache cleared: ' + data.message, 'success');
+            document.getElementById('previewTable').innerHTML = '<p style="color:#888;text-align:center;padding:20px;">Belum ada data.</p>';
+            document.getElementById('lastUpdate').textContent = 'Belum ada data';
+            document.getElementById('totalStocks').textContent = '-';
+          } else {
+            addLog('❌ Error: ' + data.message, 'error');
+          }
+        })
+        .catch(function(err) { addLog('❌ Error: ' + err.message, 'error'); });
+    }
+
+    // ============================================================
+    // SETTINGS
+    // ============================================================
+    function loadSettings() {
+      adminFetch('/api/admin/settings')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.success && data.settings) {
+            document.getElementById('thresholdA').value = data.settings.thresholdA || 70;
+            document.getElementById('thresholdB').value = data.settings.thresholdB || 60;
+            document.getElementById('thresholdC').value = data.settings.thresholdC || 70;
+          }
+        });
+    }
+
+    function saveSettings() {
+      var settings = {
+        thresholdA: parseInt(document.getElementById('thresholdA').value),
+        thresholdB: parseInt(document.getElementById('thresholdB').value),
+        thresholdC: parseInt(document.getElementById('thresholdC').value)
+      };
+      addLog('💾 Saving settings: A=' + settings.thresholdA + ', B=' + settings.thresholdB + ', C=' + settings.thresholdC, 'info');
+      adminFetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings)
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.success) {
+          addLog('✅ Settings saved', 'success');
+        } else {
+          addLog('❌ Error saving settings', 'error');
+        }
+      })
+      .catch(function(err) { addLog('❌ Error: ' + err.message, 'error'); });
+    }
+
+    // ============================================================
+    // LOG
+    // ============================================================
+    function addLog(msg, type) {
+      var area = document.getElementById('logArea');
+      var time = new Date().toLocaleTimeString('id-ID');
+      var cls = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+      area.innerHTML = '<div><span class="time">[' + time + ']</span> <span class="' + cls + '">' + msg + '</span></div>' + area.innerHTML;
+    }
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    loadSettings();
+    loadDailySummary();
+  </script>
+<script src="/assets/stockfamily-sidebar.js"></script>
+</body>
+</html>

@@ -1,0 +1,1257 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>StockFamily — QBS Screener</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap");
+
+    :root {
+      --bg: #050607;
+      --surface: #0b0d0f;
+      --surface-2: #101315;
+      --border: #1c2227;
+      --text: #f5f7f8;
+      --muted: #8c969e;
+      --muted-2: #626b72;
+      --green: #00d084;
+      --red: #ff4d4d;
+      --yellow: #f5b700;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(
+          circle at 50% -20%,
+          rgba(0, 208, 132, 0.07),
+          transparent 38%
+        ),
+        var(--bg);
+      color: var(--text);
+      font-family: "Plus Jakarta Sans", sans-serif;
+    }
+
+    .mono {
+      font-family: "JetBrains Mono", monospace;
+    }
+
+    .topbar {
+      background: rgba(5, 6, 7, 0.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel {
+      background: rgba(11, 13, 15, 0.92);
+      border: 1px solid var(--border);
+    }
+
+    .signal-card {
+      background:
+        linear-gradient(
+          145deg,
+          rgba(16, 19, 21, 0.98),
+          rgba(9, 11, 13, 0.98)
+        );
+      border: 1px solid var(--border);
+      transition:
+        transform 160ms ease,
+        border-color 160ms ease,
+        box-shadow 160ms ease;
+    }
+
+    .signal-card:hover {
+      transform: translateY(-2px);
+      border-color: #303940;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    .qbs-badge {
+      color: var(--green);
+      background: rgba(0, 208, 132, 0.07);
+      border: 1px solid rgba(0, 208, 132, 0.2);
+    }
+
+    .metric {
+      background: #0b0e10;
+      border: 1px solid #171d21;
+    }
+
+    .bar-track {
+      height: 4px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #1a2024;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 8px rgba(0, 208, 132, 0.2);
+    }
+
+    .refresh-btn {
+      border: 1px solid rgba(0, 208, 132, 0.24);
+      color: var(--green);
+      background: rgba(0, 208, 132, 0.055);
+    }
+
+    .refresh-btn:hover {
+      background: rgba(0, 208, 132, 0.11);
+      border-color: rgba(0, 208, 132, 0.42);
+    }
+
+    .refresh-btn:disabled {
+      opacity: 0.55;
+      cursor: wait;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 10px rgba(0, 208, 132, 0.55);
+    }
+
+    .empty-state {
+      border: 1px dashed #252c31;
+      background: rgba(11, 13, 15, 0.72);
+    }
+
+    .research-note {
+      border-left: 2px solid rgba(245, 183, 0, 0.65);
+    }
+
+    .positive {
+      color: var(--green);
+    }
+
+    .negative {
+      color: var(--red);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .muted-2 {
+      color: var(--muted-2);
+    }
+
+    .scan-line {
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(0, 208, 132, 0.28),
+        transparent
+      );
+      animation: scan 2.2s ease-in-out infinite;
+    }
+
+    @keyframes scan {
+      0%, 100% {
+        opacity: 0.2;
+        transform: scaleX(0.55);
+      }
+      50% {
+        opacity: 1;
+        transform: scaleX(1);
+      }
+    }
+  </style>
+<style id="research-detail-css">
+.research-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.78);backdrop-filter:blur(14px)}
+.research-panel{width:min(920px,100%);max-height:88vh;overflow-y:auto;background:#090b0d;border:1px solid #20272c;border-radius:18px;box-shadow:0 30px 100px rgba(0,0,0,.65)}
+.research-close{width:34px;height:34px;border-radius:9px;border:1px solid #20272c;background:#101416;color:#8c969e;cursor:pointer}
+.research-close:hover{color:#f5f7f8;border-color:#00d084}
+.research-gate{border:1px solid #1b2227;background:#0d1012;border-radius:12px;padding:14px}
+.research-card-clickable{cursor:pointer;transition:.15s}
+.research-card-clickable:hover{border-color:#273238;transform:translateY(-1px)}
+</style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="topbar sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-5 h-14 flex items-center justify-between">
+
+      <div class="flex items-center gap-3">
+        <div class="font-extrabold tracking-tight text-sm">
+          <span class="positive">STOCK</span>FAMILY
+        </div>
+
+        <div class="hidden sm:block w-px h-4 bg-[#1c2227]"></div>
+
+        <div class="hidden sm:block text-[10px] mono uppercase tracking-[0.14em] muted-2">
+          QBS Screener
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+
+        <a
+          href="/"
+          class="hidden sm:block text-[11px] muted hover:text-white transition px-2 py-2"
+        >
+          Dashboard
+        </a>
+
+        <button
+          id="refreshButton"
+          onclick="fetchLiveData(true)"
+          class="refresh-btn rounded-lg px-3 py-2 text-[10px] mono font-bold flex items-center gap-1.5 transition"
+        >
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+          REFRESH
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+
+  <!-- MAIN -->
+  <main class="max-w-7xl mx-auto px-5 py-8">
+
+    <!-- HERO -->
+    <section class="mb-8">
+
+      <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
+
+        <div>
+
+          <div class="flex items-center gap-2 mb-3">
+
+            <span class="status-dot"></span>
+
+            <span class="text-[9px] mono uppercase tracking-[0.18em] muted-2">
+              Canonical Research Engine
+            </span>
+
+            <span class="qbs-badge rounded-md px-2 py-1 text-[9px] mono font-bold">
+              QBS V1.0.0
+            </span>
+
+          </div>
+
+          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
+            Quiet Before Storm
+          </h1>
+
+          <p class="mt-2 text-sm muted max-w-2xl leading-relaxed">
+            Deteksi kondisi ekspansi setelah periode konsolidasi
+            menggunakan formula QBS canonical yang telah dikunci.
+          </p>
+
+        </div>
+
+        <div class="lg:text-right">
+
+          <div class="text-[9px] mono uppercase tracking-[0.18em] muted-2">
+            Last Sync
+          </div>
+
+          <div
+            id="lastUpdated"
+            class="mt-1 text-xs mono text-[#c7cdd1]"
+          >
+            —
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="scan-line mt-7"></div>
+
+    </section>
+
+
+    <!-- SUMMARY -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+
+      <div class="panel rounded-xl p-4">
+        <div class="text-[9px] mono uppercase tracking-[0.16em] muted-2">
+          Signals
+        </div>
+
+        <div
+          id="signalCount"
+          class="mt-2 text-2xl font-bold mono"
+        >
+          —
+        </div>
+
+        <div class="mt-1 text-[10px] muted-2">
+          QBS detected
+        </div>
+      </div>
+
+
+      <div class="panel rounded-xl p-4">
+        <div class="text-[9px] mono uppercase tracking-[0.16em] muted-2">
+          Scan Date
+        </div>
+
+        <div
+          id="scanDate"
+          class="mt-2 text-sm font-semibold mono"
+        >
+          —
+        </div>
+
+        <div class="mt-1 text-[10px] muted-2">
+          Latest trading session
+        </div>
+      </div>
+
+
+      <div class="panel rounded-xl p-4">
+        <div class="text-[9px] mono uppercase tracking-[0.16em] muted-2">
+          Universe
+        </div>
+
+        <div class="mt-2 text-2xl font-bold mono">
+          965
+        </div>
+
+        <div class="mt-1 text-[10px] muted-2">
+          IDX stocks
+        </div>
+      </div>
+
+
+      <div class="panel rounded-xl p-4">
+        <div class="text-[9px] mono uppercase tracking-[0.16em] muted-2">
+          Engine
+        </div>
+
+        <div class="mt-2 text-sm font-bold positive mono">
+          CANONICAL
+        </div>
+
+        <div class="mt-1 text-[10px] muted-2">
+          V4.9.1
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- SIGNAL HEADER -->
+    <section class="flex items-end justify-between mb-3">
+
+      <div>
+        <h2 class="text-sm font-bold">
+          Detected Signals
+        </h2>
+
+        <p class="text-[10px] muted-2 mt-1">
+          Latest qualifying QBS events
+        </p>
+      </div>
+
+      <div
+        id="dataStatus"
+        class="text-[9px] mono uppercase tracking-wider muted-2"
+      >
+        SCANNING
+      </div>
+
+    </section>
+
+
+    <!-- SIGNALS -->
+    <section
+      id="signalGrid"
+      class="grid grid-cols-1 xl:grid-cols-2 gap-4"
+    >
+
+      <div class="panel rounded-xl p-10 text-center col-span-full">
+
+        <i
+          data-lucide="loader-2"
+          class="w-6 h-6 animate-spin mx-auto positive mb-3"
+        ></i>
+
+        <div class="text-xs muted">
+          Menghubungkan ke QBS dataset...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- EMPTY -->
+    <section
+      id="emptyState"
+      class="empty-state hidden rounded-xl p-10 text-center mt-4"
+    >
+
+      <i
+        data-lucide="scan-search"
+        class="w-7 h-7 mx-auto muted-2 mb-3"
+      ></i>
+
+      <div
+        id="emptyTitle"
+        class="text-sm font-semibold"
+      >
+        Tidak ada QBS signal
+      </div>
+
+      <div
+        id="emptyMessage"
+        class="mt-2 text-[11px] muted-2"
+      >
+        Tidak ada event QBS pada scan terakhir.
+      </div>
+
+    </section>
+
+
+    <!-- RESEARCH NOTE -->
+    <section class="panel research-note rounded-xl mt-7 p-5">
+
+      <div class="flex items-start gap-3">
+
+        <div class="text-[#f5b700] mt-0.5">
+          ◆
+        </div>
+
+        <div>
+
+          <div class="text-xs font-bold">
+            Research Signal
+          </div>
+
+          <p class="mt-2 text-[11px] muted leading-relaxed max-w-4xl">
+            QBS mendeteksi pola berdasarkan historical market structure.
+            Output ini merupakan signal dari research engine dan bukan
+            rekomendasi beli atau jual. Threshold canonical tidak diubah
+            oleh layer UI.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <footer class="mt-8 pb-8 text-[9px] mono muted-2">
+      STOCKFAMILY · QBS V1.0.0 · CANONICAL ENGINE V4.9.1
+    </footer>
+
+  </main>
+
+
+  <script>
+    lucide.createIcons();
+
+    function number(value) {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function formatNumber(value, decimals = 2) {
+      const n = number(value);
+
+      if (n === null) return "—";
+
+      return n.toLocaleString("id-ID", {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      });
+    }
+
+    function formatPrice(value) {
+      const n = number(value);
+
+      if (n === null) return "Rp —";
+
+      return "Rp " + n.toLocaleString("id-ID", {
+        maximumFractionDigits: 0
+      });
+    }
+
+    function formatDate(value) {
+      if (!value) return "—";
+
+      const text = String(value);
+
+      if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+        const [year, month, day] = text.split("-");
+
+        const months = [
+          "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
+          "Jul", "Agu", "Sep", "Okt", "Nov", "Des"
+        ];
+
+        return `${day} ${months[Number(month) - 1]} ${year}`;
+      }
+
+      return text;
+    }
+
+    function changeText(value) {
+      const n = number(value);
+
+      if (n === null) return "—";
+
+      return `${n > 0 ? "+" : ""}${formatNumber(n, 2)}%`;
+    }
+
+    function changeClass(value) {
+      const n = number(value);
+
+      if (n === null || n === 0) {
+        return "muted";
+      }
+
+      return n > 0 ? "positive" : "negative";
+    }
+
+    function surgeWidth(value, max = 60) {
+      const n = number(value);
+
+      if (n === null) return 0;
+
+      return Math.min(
+        100,
+        Math.max(4, (n / max) * 100)
+      );
+    }
+
+    function metric(label, value, suffix = "") {
+      return `
+        <div class="metric rounded-lg p-3">
+          <div class="text-[8px] mono uppercase tracking-[0.14em] muted-2">
+            ${label}
+          </div>
+
+          <div class="mt-1.5 text-sm font-bold mono">
+            ${value}${suffix}
+          </div>
+        </div>
+      `;
+    }
+
+    function surgeMetric(label, value) {
+      return `
+        <div>
+
+          <div class="flex items-center justify-between mb-1.5">
+
+            <span class="text-[8px] mono uppercase tracking-[0.14em] muted-2">
+              ${label}
+            </span>
+
+            <span class="text-[10px] mono text-[#c8ced2]">
+              ${formatNumber(value, 2)}×
+            </span>
+
+          </div>
+
+          <div class="bar-track">
+            <div
+              class="bar-fill"
+              style="width:${surgeWidth(value)}%"
+            ></div>
+          </div>
+
+        </div>
+      `;
+    }
+
+    function renderSignal(stock, index) {
+  const detailPayload = encodeURIComponent(JSON.stringify(stock));
+      const ticker = stock.ticker || stock.symbol || "—";
+
+      const close = stock.close ?? stock.h0?.close;
+
+      const change = stock.changePct ?? stock.h0?.changePct ?? stock.features?.changePct;
+
+      const volumeSurge =
+        stock.volumeSurge ??
+        stock.features?.volumeSurge;
+
+      const frequencySurge =
+        stock.frequencySurge ??
+        stock.features?.frequencySurge;
+
+      const bbWidth =
+        stock.bbWidthPct ??
+        (Number.isFinite(Number(stock.features?.bbWidth))
+          ? Number(stock.features.bbWidth) * 100
+          : null);
+
+      const range20 =
+        stock.priceRange20Pct ??
+        (Number.isFinite(Number(stock.features?.priceRange20))
+          ? Number(stock.features.priceRange20) * 100
+          : null);
+
+      const closePosition =
+        stock.closePositionPct ??
+        (Number.isFinite(Number(stock.features?.closePosition))
+          ? Number(stock.features.closePosition) * 100
+          : null);
+
+      return `
+        <article class="signal-card rounded-xl overflow-hidden research-card-clickable" data-research="${detailPayload}" onclick="openResearchDetail(this.dataset.research)">
+
+          <!-- TOP -->
+          <div class="p-5 border-b border-[#171d21]">
+
+            <div class="flex items-start justify-between gap-4">
+
+              <div class="flex items-center gap-3">
+
+                <div class="w-8 h-8 rounded-lg bg-[#101416] border border-[#20272c] flex items-center justify-center text-[9px] mono muted-2">
+                  ${String(index + 1).padStart(2, "0")}
+                </div>
+
+                <div>
+
+                  <div class="flex items-center gap-2">
+
+                    <div class="text-xl font-extrabold tracking-tight">
+                      ${ticker}
+                    </div>
+
+                    <span class="qbs-badge rounded px-2 py-1 text-[8px] mono font-bold">
+                      QBS
+                    </span>
+
+                  </div>
+
+                  <div class="mt-1 text-[9px] mono muted-2">
+                    ${formatDate(stock.date || stock.eventDate)}
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div class="text-right">
+
+                <div class="text-lg font-bold mono">
+                  ${formatPrice(close)}
+                </div>
+
+                <div class="mt-1 text-xs font-bold mono ${changeClass(change)}">
+                  ${changeText(change)}
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- CORE EVIDENCE -->
+          <div class="p-5">
+
+            <div class="grid grid-cols-2 gap-2">
+
+              ${metric(
+                "Volume Surge",
+                formatNumber(volumeSurge, 2),
+                "×"
+              )}
+
+              ${metric(
+                "Frequency Surge",
+                formatNumber(frequencySurge, 2),
+                "×"
+              )}
+
+              ${metric(
+                "BB Width",
+                formatNumber(bbWidth, 2),
+                "%"
+              )}
+
+              ${metric(
+                "Range 20",
+                formatNumber(range20, 2),
+                "%"
+              )}
+
+            </div>
+
+
+            <div class="mt-5 space-y-4">
+
+              ${surgeMetric(
+                "Volume Expansion",
+                volumeSurge
+              )}
+
+              ${surgeMetric(
+                "Frequency Expansion",
+                frequencySurge
+              )}
+
+            </div>
+
+
+            <!-- FOOTER -->
+            <div class="mt-5 pt-4 border-t border-[#171d21] flex items-center justify-between">
+
+              <div>
+
+                <div class="text-[8px] mono uppercase tracking-[0.14em] muted-2">
+                  Close Position
+                </div>
+
+                <div class="mt-1 text-[11px] mono text-[#c6cdd1]">
+                  ${formatNumber(closePosition, 2)}%
+                </div>
+
+              </div>
+
+
+              <div class="text-right">
+
+                <div class="text-[8px] mono uppercase tracking-[0.14em] muted-2">
+                  Status
+                </div>
+
+                <div class="mt-1 text-[9px] mono positive font-bold">
+                  QBS DETECTED
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </article>
+      `;
+    }
+
+    function showEmpty(title, message) {
+      const empty =
+        document.getElementById("emptyState");
+
+      document.getElementById(
+        "emptyTitle"
+      ).textContent = title;
+
+      document.getElementById(
+        "emptyMessage"
+      ).textContent = message;
+
+      empty.classList.remove("hidden");
+    }
+
+    function hideEmpty() {
+      document
+        .getElementById("emptyState")
+        .classList.add("hidden");
+    }
+
+    async function fetchLiveData(force = false) {
+      const grid =
+        document.getElementById("signalGrid");
+
+      const status =
+        document.getElementById("dataStatus");
+
+      const refresh =
+        document.getElementById("refreshButton");
+
+      refresh.disabled = true;
+
+      if (force) {
+        refresh.innerHTML = `
+          <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i>
+          LOADING
+        `;
+
+        lucide.createIcons();
+      }
+
+      status.textContent = "SCANNING";
+
+      try {
+
+        let res;
+
+        // Force canonical QBS V4.9.1 refresh when user clicks REFRESH.
+        if (force) {
+          const refreshRes =
+            await fetch(
+              "/api/qbs/refresh",
+              {
+                method: "POST",
+                cache: "no-store",
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                }
+              }
+            );
+
+          if (!refreshRes.ok) {
+            const body =
+              await refreshRes.json()
+                .catch(() => ({}));
+
+            throw new Error(
+              body.error ||
+              "QBS refresh gagal."
+            );
+          }
+        }
+
+        // Read fresh canonical QBS snapshot.
+        res =
+          await fetch(
+            "/api/qbs/production",
+            {
+              cache: "no-store"
+            }
+          );
+
+        if (!res.ok) {
+          throw new Error(
+            "Backend screener belum dijalankan atau file JSON belum tersedia."
+          );
+        }
+
+        const rawData =
+          await res.json();
+        // ----------------------------------------------------
+        // CANONICAL QBS -> UI ADAPTER
+        // QBS V4.9.1 keeps calculated metrics inside
+        // event.features. The legacy card renderer expects
+        // those fields at event top-level.
+        // ----------------------------------------------------
+
+        const rawStocks =
+          Array.isArray(rawData)
+            ? rawData
+            : (
+                rawData.events ||
+                rawData.stocks ||
+                rawData.results ||
+                rawData.data ||
+                []
+              );
+
+        const stocks = rawStocks.map((event) => {
+          const f = event?.features || {};
+          const bar =
+            event?.bar ||
+            event?.snapshot ||
+            event?.ohlc ||
+            event?.data ||
+            {};
+
+          return {
+            ...event,
+
+            // Identity
+            symbol:
+              event.symbol ||
+              event.code ||
+              event.ticker ||
+              "—",
+
+            date:
+              event.eventDate ||
+              event.date ||
+              event.tradeDate ||
+              "",
+
+            // Price aliases used by legacy renderer
+            price:
+              event.price ??
+              event.currentPrice ??
+              event.lastPrice ??
+              event.close ??
+              bar.price ??
+              bar.close ??
+              f.price ??
+              f.close,
+
+            close:
+              event.close ??
+              event.lastPrice ??
+              event.currentPrice ??
+              bar.close ??
+              f.close,
+
+            lastPrice:
+              event.lastPrice ??
+              event.price ??
+              event.currentPrice ??
+              event.close ??
+              bar.close ??
+              f.close,
+
+            currentPrice:
+              event.currentPrice ??
+              event.price ??
+              event.lastPrice ??
+              event.close ??
+              bar.close ??
+              f.close,
+
+            // Change aliases
+            changePct:
+              event.changePct ??
+              event.changePercent ??
+              event.change ??
+              f.changePct ??
+              f.changePercent ??
+              f.change,
+
+            changePercent:
+              event.changePercent ??
+              event.changePct ??
+              event.change ??
+              f.changePct ??
+              f.changePercent ??
+              f.change,
+
+            change:
+              event.change ??
+              event.changePct ??
+              event.changePercent ??
+              f.change ??
+              f.changePct ??
+              f.changePercent,
+
+            // Canonical QBS features
+            volumeSurge:
+              event.volumeSurge ??
+              f.volumeSurge,
+
+            frequencySurge:
+              event.frequencySurge ??
+              f.frequencySurge,
+
+            bbWidth:
+              event.bbWidth ??
+              f.bbWidth,
+
+            priceRange20:
+              event.priceRange20 ??
+              f.priceRange20,
+
+            range20:
+              event.range20 ??
+              event.priceRange20 ??
+              f.range20 ??
+              f.priceRange20,
+
+            closePosition:
+              event.closePosition ??
+              f.closePosition,
+
+            candleRangePct:
+              event.candleRangePct ??
+              f.candleRangePct,
+
+            upperWickPct:
+              event.upperWickPct ??
+              f.upperWickPct,
+
+            lowerWickPct:
+              event.lowerWickPct ??
+              f.lowerWickPct,
+
+            // Raw market fields, when available
+            open:
+              event.open ??
+              bar.open ??
+              f.open,
+
+            high:
+              event.high ??
+              bar.high ??
+              f.high,
+
+            low:
+              event.low ??
+              bar.low ??
+              f.low,
+
+            volume:
+              event.volume ??
+              bar.volume ??
+              f.volume,
+
+            value:
+              event.value ??
+              bar.value ??
+              f.value,
+
+            frequency:
+              event.frequency ??
+              bar.frequency ??
+              f.frequency,
+
+            // Keep canonical nested structure intact
+            features: f,
+          };
+        });
+
+        document.getElementById("lastUpdated").textContent =
+          (rawData.generatedAt ? new Date(rawData.generatedAt).toLocaleString("id-ID") : "—");
+
+        document.getElementById(
+          "signalCount"
+        ).textContent =
+          stocks.length;
+
+        if (
+          !stocks ||
+          stocks.length === 0
+        ) {
+
+          grid.innerHTML = "";
+
+          showEmpty(
+            "Tidak ada QBS signal",
+            "Tidak ada event QBS pada scan terakhir."
+          );
+
+          document.getElementById(
+            "scanDate"
+          ).textContent = "—";
+
+          status.textContent =
+            "NO SIGNAL";
+
+          return;
+        }
+
+        hideEmpty();
+
+        const scanDate =
+          rawData.targetDate ||
+          stocks.reduce(
+            (latest, stock) => {
+              const date =
+                stock.eventDate ||
+                stock.date ||
+                "";
+
+              return date > latest
+                ? date
+                : latest;
+            },
+            ""
+          );
+
+        document.getElementById(
+          "scanDate"
+        ).textContent =
+          formatDate(scanDate);
+
+        grid.innerHTML =
+          stocks
+            .map(renderSignal)
+            .join("");
+
+        status.textContent =
+          `${stocks.length} SIGNAL${stocks.length === 1 ? "" : "S"} DETECTED`;
+
+      } catch (error) {
+
+        console.error(
+          "StockFamily QBS Screener:",
+          error
+        );
+
+        grid.innerHTML = "";
+
+        document.getElementById(
+          "signalCount"
+        ).textContent = "—";
+
+        document.getElementById(
+          "scanDate"
+        ).textContent = "—";
+
+        showEmpty(
+          "Data tidak dapat dimuat",
+          "Pastikan backend QBS berjalan dan endpoint /api/qbs/production tersedia."
+        );
+
+        status.textContent =
+          "BACKEND ERROR";
+
+      } finally {
+
+        refresh.disabled = false;
+
+        refresh.innerHTML = `
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+          REFRESH
+        `;
+
+        lucide.createIcons();
+      }
+    }
+
+    fetchLiveData();
+  </script>
+
+<script id="research-detail-js">
+function qbsGate(label,value,pass,detail){
+  return `<div class="research-gate flex items-center justify-between gap-4">
+    <div>
+      <div class="text-[8px] mono uppercase tracking-[.12em] muted-2">${label}</div>
+      <div class="mt-1 text-sm mono">${detail}</div>
+    </div>
+    <div class="text-[9px] mono font-bold ${pass?"positive":"negative"}">${pass?"PASS":"FAIL"}</div>
+  </div>`;
+}
+
+function qbsEvidence(label,value,unit=""){
+  return `<div class="research-gate">
+    <div class="text-[8px] mono uppercase tracking-[.12em] muted-2">${label}</div>
+    <div class="mt-2 text-lg mono font-bold">${value}${unit}</div>
+  </div>`;
+}
+
+function openResearchDetail(encoded){
+  const s=JSON.parse(decodeURIComponent(encoded));
+  const close=number(s.close);
+  const change=number(s.changePct);
+  const vol=number(s.volumeSurge);
+  const freq=number(s.frequencySurge);
+  const bb=number(s.bbWidthPct);
+  const range=number(s.priceRange20Pct);
+  const cp=number(s.closePositionPct);
+  const value=number(s.value);
+
+  const old=document.getElementById("researchDetailOverlay");
+  if(old) old.remove();
+
+  const overlay=document.createElement("div");
+  overlay.id="researchDetailOverlay";
+  overlay.className="research-overlay";
+
+  overlay.innerHTML=`
+  <div class="research-panel">
+    <div class="p-6 border-b border-[#171d21]">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-3">
+            <div class="text-2xl font-extrabold">${s.ticker||"—"}</div>
+            <span class="qbs-badge rounded px-2 py-1 text-[8px] mono font-bold">QBS</span>
+          </div>
+          <div class="mt-2 text-[9px] mono muted-2">
+            ${formatDate(s.date)} · QBS V1.0.0 · CANONICAL V4.9.1
+          </div>
+        </div>
+        <button class="research-close" onclick="closeResearchDetail()">×</button>
+      </div>
+
+      <div class="mt-6 flex justify-between items-end">
+        <div>
+          <div class="text-[8px] mono uppercase muted-2">Last Price</div>
+          <div class="mt-1 text-3xl mono font-bold">${formatPrice(close)}</div>
+        </div>
+        <div class="text-right">
+          <div class="text-[8px] mono uppercase muted-2">Change</div>
+          <div class="mt-1 text-lg mono font-bold ${changeClass(change)}">${changeText(change)}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-6">
+      <div class="text-[9px] mono uppercase tracking-[.16em] positive font-bold">WHY DETECTED</div>
+      <div class="mt-1 mb-4 text-xs muted">Evidence yang membuat event memenuhi QBS V1.0.0.</div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        ${qbsEvidence("Volume Surge",formatNumber(vol,2),"×")}
+        ${qbsEvidence("Frequency Surge",formatNumber(freq,2),"×")}
+        ${qbsEvidence("BB Width",formatNumber(bb,2),"%")}
+        ${qbsEvidence("20D Price Range",formatNumber(range,2),"%")}
+        ${qbsEvidence("Close Position",formatNumber(cp,2),"%")}
+        ${qbsEvidence("Change",formatNumber(change,2),"%")}
+      </div>
+
+      <div class="mt-8">
+        <div class="text-[9px] mono uppercase tracking-[.16em] positive font-bold">CANONICAL GATES</div>
+        <div class="mt-1 mb-4 text-xs muted">Threshold QBS tidak dimodifikasi oleh UI.</div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          ${qbsGate("Close Price",close,close!==null&&close>=100,close!==null?formatPrice(close)+" ≥ Rp 100":"—")}
+          ${qbsGate("Transaction Value",value,value!==null&&value>=2000000000,value!==null?formatNumber(value/1000000000,2)+"B ≥ 2B":"—")}
+          ${qbsGate("BB Width",bb,bb!==null&&bb<6,bb!==null?formatNumber(bb,2)+"% < 6%":"—")}
+          ${qbsGate("20D Price Range",range,range!==null&&range<15,range!==null?formatNumber(range,2)+"% < 15%":"—")}
+          ${qbsGate("Volume Surge",vol,vol!==null&&vol>=6,vol!==null?formatNumber(vol,2)+"× ≥ 6×":"—")}
+          ${qbsGate("Frequency Surge",freq,freq!==null&&freq>=5,freq!==null?formatNumber(freq,2)+"× ≥ 5×":"—")}
+        </div>
+      </div>
+
+      <div class="mt-8 p-5 rounded-xl border border-[#273229] bg-[#0c1210]">
+        <div class="text-[9px] mono uppercase tracking-[.14em] positive font-bold">RESEARCH STATUS</div>
+        <div class="mt-1 text-sm font-bold">QBS DETECTED</div>
+        <div class="mt-3 text-[10px] leading-5 muted">
+          Ini adalah signal riset berbasis struktur pasar historis, bukan rekomendasi beli/jual.
+        </div>
+      </div>
+    </div>
+
+    <div class="px-6 py-4 border-t border-[#171d21] flex justify-between">
+      <span class="text-[8px] mono muted-2">STOCKFAMILY · QBS V1.0.0</span>
+      <button onclick="closeResearchDetail()" class="text-[9px] mono positive font-bold">CLOSE</button>
+    </div>
+  </div>`;
+
+  overlay.onclick=e=>{if(e.target===overlay)closeResearchDetail()};
+  document.body.appendChild(overlay);
+  document.body.style.overflow="hidden";
+}
+
+function closeResearchDetail(){
+  const el=document.getElementById("researchDetailOverlay");
+  if(el)el.remove();
+  document.body.style.overflow="";
+}
+</script>
+<script src="/assets/stockfamily-sidebar.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

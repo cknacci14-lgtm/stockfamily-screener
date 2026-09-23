@@ -1,4 +1,4 @@
-﻿// src/server.js - FIX V2.4 - Express v5 Safe Routing
+// src/server.js - FIX V2.4 - Express v5 Safe Routing
 const express = require('express');
 const path = require('path');
 const multer = require('multer');
@@ -23,9 +23,9 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 
 let backtestEngine = null;
 try {
   backtestEngine = require('./engine/backtestEngine');
-  console.log('[OK] Backtest Engine loaded');
+  console.log('✅ Backtest Engine loaded');
 } catch (e) { 
-  console.error('âŒ Backtest Engine:', e.message); 
+  console.error('❌ Backtest Engine:', e.message); 
 }
 
 app.use((req, res, next) => {
@@ -595,37 +595,4 @@ app.get(/^(?!\/api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-
-// ============================================================
-// GEM Score Auto Refresh (setiap hari jam 18:30 WIB)
-// ============================================================
-const { computeAndCacheAllGemScores } = require('./services/gemScoreService');
-
-function scheduleGemRefresh() {
-  const run = async () => {
-    try {
-      console.log('[GEM Auto] Mulai refresh harian...');
-      const result = await computeAndCacheAllGemScores();
-      console.log(`[GEM Auto] Selesai. ${result.count} saham di-update @ ${result.updated_at}`);
-    } catch (err) {
-      console.error('[GEM Auto] Gagal:', err.message);
-    }
-  };
-
-  // Cek setiap 1 menit apakah sudah jam 18:30 WIB
-  setInterval(() => {
-    const now = new Date();
-    // WIB = UTC+7
-    const wibHour = (now.getUTCHours() + 7) % 24;
-    const wibMin = now.getUTCMinutes();
-    if (wibHour === 18 && wibMin === 30) {
-      run();
-    }
-  }, 60 * 1000);
-
-  console.log('[GEM Auto] Scheduler aktif — refresh setiap hari jam 18:30 WIB');
-}
-
-scheduleGemRefresh();
-app.listen(PORT, () => console.log(`[START] FIX V2.4 running http://localhost:${PORT}`));
-
+app.listen(PORT, () => console.log(`🚀 FIX V2.4 running http://localhost:${PORT}`));

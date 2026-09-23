@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StockFamily - Watchlist</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0e17;
+      color: #e0e0e0;
+      display: flex;
+      min-height: 100vh;
+    }
+    .sidebar { width: 220px; background: #111827; border-right: 1px solid #1f2937; padding: 20px 0; display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; }
+    .sidebar .brand { font-size: 20px; font-weight: 700; padding: 0 20px 24px; background: linear-gradient(135deg, #f7971e, #ffd200); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .sidebar .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 20px; color: #9ca3af; text-decoration: none; font-size: 14px; transition: 0.2s; cursor: pointer; border-left: 3px solid transparent; }
+    .sidebar .nav-item:hover { background: #1f2937; color: #fff; }
+    .sidebar .nav-item.active { background: #1f2937; color: #f7971e; border-left-color: #f7971e; }
+    .sidebar .nav-item .icon { font-size: 18px; width: 24px; text-align: center; }
+    .main { flex: 1; padding: 24px 32px; }
+    .card { background: #1a1f2e; border-radius: 12px; border: 1px solid #2a2f3e; padding: 20px 24px; margin-bottom: 20px; }
+    .card h2 { font-size: 18px; margin-bottom: 12px; }
+    .watchlist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+    .watch-item {
+      background: #111827;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      border: 1px solid #2a2f3e;
+    }
+    .watch-item .code { font-size: 18px; font-weight: 700; }
+    .watch-item .price { font-size: 16px; color: #8ab4f8; }
+    .watch-item .score { font-size: 14px; color: #f7971e; }
+    .watch-item .remove { background: none; border: none; color: #ea4335; cursor: pointer; font-size: 12px; margin-top: 6px; }
+    .empty { color: #888; text-align: center; padding: 30px; }
+    @media (max-width:768px) {
+      .sidebar { width: 60px; padding: 12px 0; }
+      .sidebar .brand { font-size: 14px; padding: 0 12px 16px; }
+      .sidebar .nav-item span:not(.icon) { display: none; }
+      .main { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="brand">📈 StockFamily</div>
+    <a class="nav-item" href="/"><span class="icon">🏠</span> <span>Dashboard</span></a>
+    <a class="nav-item" href="#"><span class="icon">📊</span> <span>Screener</span></a>
+    <a class="nav-item" href="/backtest.html"><span class="icon">📈</span> <span>Backtest</span></a>
+    <a class="nav-item active" href="/watchlist.html"><span class="icon">⭐</span> <span>Watchlist</span></a>
+    <a class="nav-item" href="/admin.html"><span class="icon">⚙️</span> <span>Admin</span></a>
+  </nav>
+
+  <div class="main">
+    <h1 style="margin-bottom:20px;">⭐ Watchlist</h1>
+    <div class="card">
+      <h2>Your Saved Stocks</h2>
+      <div id="watchlistContainer" class="watchlist-grid">
+        <div class="empty">No stocks in watchlist yet. Add from Dashboard or Screener.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function loadWatchlist() {
+      const watchlist = JSON.parse(localStorage.getItem('watchlist') || '[]');
+      const container = document.getElementById('watchlistContainer');
+      if (watchlist.length === 0) {
+        container.innerHTML = '<div class="empty">⭐ No stocks in watchlist yet. Add from Dashboard or Screener.</div>';
+        return;
+      }
+      container.innerHTML = watchlist.map(code => `
+        <div class="watch-item">
+          <div class="code">${code}</div>
+          <div class="price">Loading...</div>
+          <div class="score">Score: -</div>
+          <button class="remove" onclick="removeFromWatchlist('${code}')">✕ Remove</button>
+        </div>
+      `).join('');
+
+      fetch('/api/grandslams')
+        .then(r => r.json())
+        .then(data => {
+          const stocks = data.grandSlams || [];
+          watchlist.forEach(code => {
+            const stock = stocks.find(s => s.code === code);
+            const items = container.querySelectorAll('.watch-item');
+            for (let item of items) {
+              if (item.querySelector('.code').textContent === code) {
+                item.querySelector('.price').textContent = stock ? `Rp ${stock.close || 0}` : 'N/A';
+                item.querySelector('.score').textContent = stock ? `Score: ${stock.powerScore || 0}` : 'Score: -';
+              }
+            }
+          });
+        });
+    }
+
+    function removeFromWatchlist(code) {
+      let watchlist = JSON.parse(localStorage.getItem('watchlist') || '[]');
+      watchlist = watchlist.filter(c => c !== code);
+      localStorage.setItem('watchlist', JSON.stringify(watchlist));
+      loadWatchlist();
+    }
+
+    loadWatchlist();
+  </script>
+<script src="/assets/stockfamily-sidebar.js"></script>
+</body>
+</html>

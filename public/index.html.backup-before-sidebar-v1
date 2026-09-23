@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id" class="dark">
 <head>
 <meta charset="UTF-8">
@@ -1039,10 +1039,8 @@ function togglePanel(panelId, headerEl) {
   }
 }
 </script>
-<script src="/assets/stockfamily-sidebar.js"></script>
 </body>
 </html>
-
 
 
 

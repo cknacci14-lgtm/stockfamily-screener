@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Backtest Quiet - FIXED</title>
+<style>body{background:#0a0e1a;color:#cbd5e1;font-family:Consolas,monospace;margin:0;padding:16px} .card{background:#111827;border:1px solid #1f2937;border-radius:12px;padding:16px;margin-bottom:16px} .btn{background:#10b981;color:#000;font-weight:700;padding:8px 18px;border-radius:8px;border:0;cursor:pointer} .btn:disabled{opacity:.5} .positive{color:#10b981} .negative{color:#ef4444} input,select{background:#0f172a;border:1px solid #334155;color:#fff;padding:8px 12px;border-radius:8px} table{width:100%;border-collapse:collapse;font-size:12px} th{background:#1e293b;padding:8px;text-align:left} td{padding:6px 8px;border-bottom:1px solid #1e293b} </style></head><body>
+<div style="max-width:1600px;margin:auto">
+<h2>⚡ Backtest Quiet Before Storm - FIXED KALENDER</h2>
+<div class="card" style="display:flex;gap:12px;align-items:end;flex-wrap:wrap">
+<div><label style="font-size:11px;color:#10b981;display:block;margin-bottom:4px">PILIH TANGGAL - KLIKABLE</label>
+<input id="dateInput" type="date" style="min-width:180px" onclick="this.showPicker&&this.showPicker()" onchange="doBacktest()">
+<select id="dateSelect" style="min-width:180px"><option>Loading tanggal...</option></select>
+</div>
+<button id="runBtn" class="btn" onclick="doBacktest()">▶ RUN</button>
+<button class="btn" style="background:#334155;color:#fff" onclick="loadDates()">↻ Reload Tanggal DB</button>
+<span id="loading" style="display:none;color:#10b981">⏳ Fetching Supabase 600 hari...</span>
+<span id="log" style="font-size:11px;color:#64748b"></span>
+<div style="margin-left:auto;display:flex;gap:16px;font-size:13px"><div>Avg H+1:<b id="avg1">-</b></div><div>Avg H+2:<b id="avg2">-</b></div><div>Avg H+3:<b id="avg3">-</b></div><div>Winrate:<b id="winrate">-</b></div></div>
+</div>
+<div class="card"><div id="liveLabel" style="font-size:12px;color:#10b981;margin-bottom:8px">Menunggu...</div><div style="overflow:auto"><table><thead><tr><th>#</th><th>SYM</th><th>DATE</th><th>CLOSE</th><th>SCORE</th><th>REASONS</th><th>H+1</th><th>H+2</th><th>H+3</th><th>MAX</th><th>RESULT</th></tr></thead><tbody id="tbody"><tr><td colspan="11" style="text-align:center;padding:24px">Pilih tanggal dulu</td></tr></tbody></table></div></div>
+<div class="card" style="font-size:11px;color:#475569">DB Source: <b>Supabase table via fetchHistoricalDataFromSupabase({limitDays:600})</b> | Kalau tanggal ga ada data, akan otomatis cari tanggal terdekat sebelum tanggal itu. Kalau 0 terus, berarti filter Quiet terlalu ketat, bukan DB kosong.</div>
+</div>
+<script>
+const dateInput=document.getElementById('dateInput');
+const dateSelect=document.getElementById('dateSelect');
+const tbody=document.getElementById('tbody');
+dateInput.value='2026-01-02';
+dateInput.addEventListener('click',()=>{try{dateInput.showPicker&&dateInput.showPicker();}catch(e){}});
+dateSelect.addEventListener('change',()=>{dateInput.value=dateSelect.value;doBacktest();});
+
+async function loadDates(){
+  try{
+    document.getElementById('log').innerText='Loading list tanggal...';
+    const r=await fetch('/api/backtest/dates?t='+Date.now());
+    const j=await r.json();
+    const dates=j.dates||[];
+    dateSelect.innerHTML='';
+    dates.slice().reverse().forEach(d=>{
+      const opt=document.createElement('option');
+      opt.value=d;opt.innerText=d;
+      if(d==='2026-01-02') opt.selected=true;
+      dateSelect.appendChild(opt);
+    });
+    document.getElementById('log').innerText='DB punya '+dates.length+' tanggal, terbaru: '+(dates[dates.length-1]||'-');
+    if(!dateInput.value && dates.length) dateInput.value=dates[dates.length-5];
+  }catch(e){document.getElementById('log').innerText='Gagal load dates: '+e.message;}
+}
+
+async function doBacktest(){
+  const date=dateInput.value||dateSelect.value;
+  if(!date){alert('Pilih tanggal');return;}
+  dateInput.value=date;
+  const runBtn=document.getElementById('runBtn');
+  runBtn.disabled=true;
+  document.getElementById('loading').style.display='inline';
+  tbody.innerHTML='<tr><td colspan="11" style="text-align:center;padding:24px">Loading '+date+'...</td></tr>';
+  try{
+    const res=await fetch('/api/backtest?date='+date+'&t='+Date.now());
+    const txt=await res.text();
+    let j;
+    try{j=JSON.parse(txt);}catch(e){throw new Error('API bukan JSON: '+txt.slice(0,300));}
+    if(j.error) throw new Error(j.error);
+    const data=j.results||[];
+    const stats=j.stats||{};
+    document.getElementById('liveLabel').innerText='LIVE: '+data.length+' saham lolos di '+j.date+' | fetched '+new Date().toLocaleTimeString();
+    document.getElementById('avg1').innerText=stats.avg1!=null?stats.avg1.toFixed(2)+'%':'-';
+    document.getElementById('avg2').innerText=stats.avg2!=null?stats.avg2.toFixed(2)+'%':'-';
+    document.getElementById('avg3').innerText=stats.avg3!=null?stats.avg3.toFixed(2)+'%':'-';
+    document.getElementById('winrate').innerText=stats.winrate!=null?stats.winrate.toFixed(1)+'%':'-';
+    let html='';
+    for(let i=0;i<data.length;i++){
+      const r=data[i];
+      const cls=v=>v>0?'positive':v<0?'negative':'';
+      const resTxt=r.max3_pct>5?'MELEDAK':r.max3_pct>3?'TP':r.max3_pct>0?'Naik':'Gagal';
+      html+='<tr><td>'+(i+1)+'</td><td style="font-weight:700;color:#fff">'+r.symbol+'</td><td>'+r.date+'</td><td style="text-align:right">'+r.close+'</td><td style="text-align:right;color:#10b981">'+r.quietScore+'</td><td style="font-size:10px">'+(r.reasons||[]).join(', ')+'</td><td class="'+cls(r.d1_pct)+'" style="text-align:right">'+(r.d1_pct!=null?r.d1_pct+'%':'-')+'</td><td class="'+cls(r.d2_pct)+'" style="text-align:right">'+(r.d2_pct!=null?r.d2_pct+'%':'-')+'</td><td class="'+cls(r.d3_pct)+'" style="text-align:right">'+(r.d3_pct!=null?r.d3_pct+'%':'-')+'</td><td style="text-align:right">'+(r.max3_pct!=null?r.max3_pct.toFixed(2)+'%':'-')+'</td><td>'+resTxt+'</td></tr>';
+    }
+    if(!data.length) html='<tr><td colspan="11" style="text-align:center;padding:24px">0 saham lolos di '+date+' - coba pilih tanggal lain dari dropdown (DB cuma 600 hari terakhir)</td></tr>';
+    tbody.innerHTML=html;
+  }catch(err){
+    tbody.innerHTML='<tr><td colspan="11" style="text-align:center;padding:24px;color:#ef4444">ERROR: '+err.message+'</td></tr>';
+  }finally{
+    runBtn.disabled=false;
+    document.getElementById('loading').style.display='none';
+  }
+}
+loadDates().then(()=>doBacktest());
+</script>
+</body></html>

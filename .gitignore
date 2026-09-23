@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Secrets - NEVER commit these
+.env
+.env.*
+!.env.example
+
+# Backup / scratch files
+*.bak
+*.tmp
+
+# Build output
+dist/
+
+# Uploaded / generated data (keep the folder, ignore contents)
+data/uploads/*
+!data/uploads/.gitkeep
+
+# Logs
+logs/*.json
+npm-debug.log*
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+.env.env.*
+!.env.example

@@ -1,0 +1,912 @@
+﻿(() => {
+  "use strict";
+
+  const STORAGE_KEY = "stockfamily.sidebar.collapsed";
+  const EXPANDED_DEFAULT = 268;
+  const COLLAPSED_WIDTH = 78;
+
+  function injectCSS() {
+    if (document.getElementById("sf-sidebar-style")) return;
+
+    const style = document.createElement("style");
+    style.id = "sf-sidebar-style";
+
+    style.textContent = `
+      :root {
+        --sf-sidebar-expanded: 268px;
+        --sf-sidebar-collapsed: 78px;
+        --sf-sidebar-current: 268px;
+        --sf-sidebar-ease: cubic-bezier(.22,.61,.36,1);
+      }
+
+      .sf-sidebar {
+        width: var(--sf-sidebar-current) !important;
+        min-width: var(--sf-sidebar-current) !important;
+        transition:
+          width .32s var(--sf-sidebar-ease),
+          min-width .32s var(--sf-sidebar-ease),
+          transform .32s var(--sf-sidebar-ease),
+          box-shadow .32s ease !important;
+        position: relative;
+        z-index: 50;
+        overflow: visible !important;
+      }
+
+      html.sf-sidebar-collapsed {
+        --sf-sidebar-current: var(--sf-sidebar-collapsed);
+      }
+
+      .sf-sidebar-label {
+        display: inline-block;
+        white-space: nowrap;
+        max-width: 180px;
+        opacity: 1;
+        transform: translateX(0);
+        transition:
+          opacity .18s ease,
+          max-width .28s var(--sf-sidebar-ease),
+          transform .28s var(--sf-sidebar-ease),
+          margin .28s var(--sf-sidebar-ease);
+        vertical-align: middle;
+      }
+
+      html.sf-sidebar-collapsed .sf-sidebar-label {
+        opacity: 0;
+        max-width: 0;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        transform: translateX(-8px);
+        overflow: hidden;
+      }
+
+      .sf-sidebar a {
+        position: relative;
+        transition:
+          transform .18s ease,
+          background-color .18s ease,
+          color .18s ease;
+      }
+
+      .sf-sidebar a:hover {
+        transform: translateX(3px);
+      }
+
+      html.sf-sidebar-collapsed .sf-sidebar a {
+        justify-content: center !important;
+        gap: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+
+      html.sf-sidebar-collapsed .sf-sidebar a:hover {
+        transform: translateX(0) scale(1.04);
+      }
+
+      .sf-sidebar a.sf-active {
+        position: relative;
+      }
+
+      .sf-sidebar a.sf-active::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 8px;
+        bottom: 8px;
+        width: 3px;
+        border-radius: 0 4px 4px 0;
+        background: currentColor;
+        opacity: .9;
+      }
+
+      html.sf-sidebar-collapsed .sf-sidebar a.sf-active::before {
+        left: 0;
+        top: 10px;
+        bottom: 10px;
+      }
+
+      .sf-sidebar-toggle {
+        position: absolute;
+        right: -15px;
+        top: 76px;
+        width: 30px;
+        height: 30px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,.10);
+        background: rgba(12,16,19,.96);
+        color: #d8dee2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 80;
+        box-shadow: 0 8px 24px rgba(0,0,0,.28);
+        transition:
+          transform .2s ease,
+          background-color .2s ease,
+          border-color .2s ease;
+      }
+
+      .sf-sidebar-toggle:hover {
+        transform: scale(1.08);
+        background: rgba(18,23,27,.98);
+        border-color: rgba(0,208,132,.35);
+      }
+
+      .sf-sidebar-toggle-icon {
+        font-size: 15px;
+        line-height: 1;
+        transition: transform .28s var(--sf-sidebar-ease);
+      }
+
+      html.sf-sidebar-collapsed .sf-sidebar-toggle-icon {
+        transform: rotate(180deg);
+      }
+
+      .sf-sidebar a[data-sf-tooltip]::after {
+        content: attr(data-sf-tooltip);
+        position: absolute;
+        left: calc(100% + 13px);
+        top: 50%;
+        transform: translateY(-50%) translateX(-4px);
+        opacity: 0;
+        pointer-events: none;
+        white-space: nowrap;
+        padding: 7px 10px;
+        border-radius: 7px;
+        background: #101416;
+        border: 1px solid #222a2f;
+        color: #edf2f4;
+        font: 600 11px/1.1 ui-monospace, SFMono-Regular, Menlo, monospace;
+        box-shadow: 0 10px 30px rgba(0,0,0,.28);
+        transition:
+          opacity .16s ease,
+          transform .16s ease;
+        z-index: 100;
+      }
+
+      html.sf-sidebar-collapsed .sf-sidebar a[data-sf-tooltip]:hover::after {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+      }
+
+      #sf-mobile-toggle {
+        display: none;
+      }
+
+      #sf-sidebar-backdrop {
+        display: none;
+      }
+
+      body.sf-page-enter {
+        opacity: 0;
+      }
+
+      body.sf-page-ready {
+        opacity: 1;
+        transition: opacity .2s ease;
+      }
+
+      body.sf-page-leaving {
+        opacity: 0;
+        transition: opacity .12s ease;
+      }
+
+      @media (max-width: 768px) {
+        .sf-sidebar {
+          position: fixed !important;
+          left: 0 !important;
+          top: 0 !important;
+          bottom: 0 !important;
+          height: 100dvh !important;
+          width: min(86vw, 292px) !important;
+          min-width: min(86vw, 292px) !important;
+          transform: translateX(0);
+          box-shadow: 18px 0 45px rgba(0,0,0,.28);
+        }
+
+        html.sf-sidebar-collapsed .sf-sidebar {
+          width: min(86vw, 292px) !important;
+          min-width: min(86vw, 292px) !important;
+          transform: translateX(-105%);
+        }
+
+        html.sf-sidebar-collapsed .sf-sidebar-label {
+          opacity: 1;
+          max-width: 180px;
+          transform: translateX(0);
+        }
+
+        .sf-sidebar-toggle {
+          display: none;
+        }
+
+        #sf-mobile-toggle {
+          position: fixed;
+          left: 14px;
+          top: 14px;
+          width: 42px;
+          height: 42px;
+          border-radius: 12px;
+          border: 1px solid rgba(255,255,255,.10);
+          background: rgba(10,14,17,.92);
+          color: #e7ecef;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 120;
+          box-shadow: 0 8px 24px rgba(0,0,0,.26);
+          cursor: pointer;
+        }
+
+        #sf-sidebar-backdrop {
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,.48);
+          backdrop-filter: blur(2px);
+          z-index: 40;
+          opacity: 1;
+          pointer-events: auto;
+          display: block;
+          transition: opacity .25s ease;
+        }
+
+        html.sf-sidebar-collapsed #sf-sidebar-backdrop {
+          opacity: 0;
+          pointer-events: none;
+        }
+
+        .sf-sidebar a:hover {
+          transform: translateX(0);
+        }
+      }
+    `;
+
+    document.head.appendChild(style);
+  }
+
+  function findSidebar() {
+
+    const labels = [
+      "dashboard",
+      "screener",
+      "backtest",
+      "watchlist",
+      "admin",
+    ];
+
+    const selectors = [
+      "aside",
+      "nav",
+      '[role="navigation"]',
+      '[class*="sidebar" i]',
+      '[class*="sidenav" i]',
+      '[class*="side-nav" i]',
+      '[class*="navigation" i]',
+    ];
+
+    const candidates = [];
+
+    const addCandidate = (el) => {
+
+      if (!el || el === document.body) {
+        return;
+      }
+
+      const rect =
+        el.getBoundingClientRect();
+
+      const style =
+        getComputedStyle(el);
+
+      if (
+        rect.width < 160 ||
+        rect.width > 380 ||
+        rect.height < 280 ||
+        style.display === "none" ||
+        style.visibility === "hidden"
+      ) {
+        return;
+      }
+
+      const text =
+        (el.innerText || el.textContent || "")
+          .replace(/\s+/g, " ")
+          .trim()
+          .toLowerCase();
+
+      const matched =
+        labels.filter(
+          (label) =>
+            text.includes(label)
+        );
+
+      if (matched.length < 3) {
+        return;
+      }
+
+      let score =
+        matched.length * 10;
+
+      if (rect.left <= 40) {
+        score += 8;
+      }
+
+      if (
+        rect.height >=
+        window.innerHeight * 0.65
+      ) {
+        score += 5;
+      }
+
+      if (
+        style.position === "fixed" ||
+        style.position === "sticky"
+      ) {
+        score += 7;
+      }
+
+      if (
+        rect.width >= 220 &&
+        rect.width <= 310
+      ) {
+        score += 5;
+      }
+
+      candidates.push({
+        el,
+        score,
+        matched: matched.length,
+        area: rect.width * rect.height,
+      });
+    };
+
+    // First pass: known navigation containers.
+    for (
+      const selector of selectors
+    ) {
+      document
+        .querySelectorAll(selector)
+        .forEach(addCandidate);
+    }
+
+    // Second pass: discover generic sidebar containers.
+    if (!candidates.length) {
+      document
+        .querySelectorAll(
+          "body div, body section, body header"
+        )
+        .forEach((el) => {
+
+          if (el.children.length > 80) {
+            return;
+          }
+
+          addCandidate(el);
+        });
+    }
+
+    if (!candidates.length) {
+      return null;
+    }
+
+    candidates.sort((a, b) => {
+
+      if (b.score !== a.score) {
+        return b.score - a.score;
+      }
+
+      if (b.matched !== a.matched) {
+        return b.matched - a.matched;
+      }
+
+      // Prefer the smaller container when
+      // nested containers have equal scores.
+      return a.area - b.area;
+    });
+
+    return candidates[0].el || null;
+  }
+
+  function wrapTextNodes(root) {
+    const walker = document.createTreeWalker(
+      root,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode(node) {
+          if (!node.nodeValue.trim()) {
+            return NodeFilter.FILTER_REJECT;
+          }
+
+          const parent = node.parentElement;
+
+          if (!parent) {
+            return NodeFilter.FILTER_REJECT;
+          }
+
+          if (
+            parent.closest(
+              "script,style,svg,button,.sf-sidebar-label"
+            )
+          ) {
+            return NodeFilter.FILTER_REJECT;
+          }
+
+          return NodeFilter.FILTER_ACCEPT;
+        },
+      }
+    );
+
+    const nodes = [];
+
+    while (walker.nextNode()) {
+      nodes.push(walker.currentNode);
+    }
+
+    for (const node of nodes) {
+      const text = node.nodeValue.trim();
+
+      if (!text) continue;
+
+      const span = document.createElement("span");
+      span.className = "sf-sidebar-label";
+      span.textContent = text;
+
+      node.parentNode.replaceChild(span, node);
+    }
+  }
+
+  function setupLabels(sidebar) {
+    const links = [
+      ...sidebar.querySelectorAll("a"),
+    ];
+
+    for (const link of links) {
+      const label =
+        link.querySelector(".sf-sidebar-label") ||
+        link.textContent.trim();
+
+      if (typeof label === "string" && label) {
+        link.dataset.sfTooltip = label;
+      }
+
+      wrapTextNodes(link);
+    }
+  }
+
+  function getCurrentPath() {
+    const path =
+      window.location.pathname
+        .replace(/\\/g, "/")
+        .toLowerCase();
+
+    if (
+      path === "/" ||
+      path === "" ||
+      path.endsWith("/index.html")
+    ) {
+      return "/";
+    }
+
+    return path;
+  }
+
+  function setupActiveState(sidebar) {
+    const current = getCurrentPath();
+
+    for (const link of sidebar.querySelectorAll("a[href]")) {
+      const href = link.getAttribute("href");
+
+      if (
+        !href ||
+        href.startsWith("#") ||
+        href.startsWith("javascript:")
+      ) {
+        continue;
+      }
+
+      let resolved;
+
+      try {
+        resolved = new URL(href, window.location.href);
+      } catch {
+        continue;
+      }
+
+      let path =
+        resolved.pathname
+          .replace(/\\/g, "/")
+          .toLowerCase();
+
+      if (path.endsWith("/index.html")) {
+        path = "/";
+      }
+
+      if (path === current) {
+        link.classList.add("sf-active");
+        link.setAttribute("aria-current", "page");
+      }
+    }
+  }
+
+  function setupPageTransitions(sidebar) {
+    sidebar
+      .querySelectorAll("a[href]")
+      .forEach((link) => {
+        link.addEventListener("click", (event) => {
+          if (
+            event.defaultPrevented ||
+            event.button !== 0 ||
+            event.metaKey ||
+            event.ctrlKey ||
+            event.shiftKey ||
+            event.altKey ||
+            link.target === "_blank"
+          ) {
+            return;
+          }
+
+          const href = link.getAttribute("href");
+
+          if (
+            !href ||
+            href.startsWith("#") ||
+            href.startsWith("javascript:")
+          ) {
+            return;
+          }
+
+          let next;
+
+          try {
+            next = new URL(href, window.location.href);
+          } catch {
+            return;
+          }
+
+          if (next.origin !== window.location.origin) {
+            return;
+          }
+
+          event.preventDefault();
+
+          document.body.classList.add("sf-page-leaving");
+
+          window.setTimeout(() => {
+            window.location.href = next.href;
+          }, 90);
+        });
+      });
+  }
+
+  function createToggle(sidebar) {
+    if (sidebar.querySelector(".sf-sidebar-toggle")) {
+      return;
+    }
+
+    const button = document.createElement("button");
+
+    button.type = "button";
+    button.className = "sf-sidebar-toggle";
+    button.setAttribute(
+      "aria-label",
+      "Toggle sidebar"
+    );
+    button.innerHTML =
+      '<span class="sf-sidebar-toggle-icon">◀</span>';
+
+    button.addEventListener("click", () => {
+      toggle(sidebar);
+    });
+
+    sidebar.appendChild(button);
+  }
+
+  function createMobileControls(sidebar) {
+    if (!document.getElementById("sf-mobile-toggle")) {
+      const mobile = document.createElement("button");
+
+      mobile.id = "sf-mobile-toggle";
+      mobile.type = "button";
+      mobile.setAttribute(
+        "aria-label",
+        "Open navigation"
+      );
+      mobile.textContent = "☰";
+
+      mobile.addEventListener("click", () => {
+        const root =
+          document.documentElement;
+
+        root.classList.remove(
+          "sf-sidebar-collapsed"
+        );
+
+        localStorage.setItem(
+          STORAGE_KEY,
+          "false"
+        );
+
+        updateBackdrop();
+      });
+
+      document.body.appendChild(mobile);
+    }
+
+    if (!document.getElementById("sf-sidebar-backdrop")) {
+      const backdrop =
+        document.createElement("div");
+
+      backdrop.id =
+        "sf-sidebar-backdrop";
+
+      backdrop.addEventListener("click", () => {
+        document.documentElement.classList.add(
+          "sf-sidebar-collapsed"
+        );
+
+        localStorage.setItem(
+          STORAGE_KEY,
+          "true"
+        );
+
+        updateBackdrop();
+      });
+
+      document.body.appendChild(backdrop);
+    }
+  }
+
+  function getExpandedWidth(sidebar) {
+    const measured =
+      sidebar.getBoundingClientRect().width;
+
+    if (measured >= 180 && measured <= 380) {
+      return measured;
+    }
+
+    return EXPANDED_DEFAULT;
+  }
+
+  function updateFixedContentOffset(
+    sidebar,
+    width
+  ) {
+    if (
+      window.innerWidth <= 768 ||
+      getComputedStyle(sidebar).position !== "fixed"
+    ) {
+      return;
+    }
+
+    const originalWidth =
+      Number(
+        sidebar.dataset.sfExpandedWidth ||
+        EXPANDED_DEFAULT
+      );
+
+    const candidates = [
+      ...document.querySelectorAll(
+        "main, #app, #root, .flex-1"
+      ),
+    ];
+
+    let target = null;
+
+    let bestDistance = Infinity;
+
+    for (const el of candidates) {
+      if (el === sidebar || sidebar.contains(el)) {
+        continue;
+      }
+
+      const r =
+        el.getBoundingClientRect();
+
+      if (r.width < window.innerWidth * 0.45) {
+        continue;
+      }
+
+      const distance =
+        Math.abs(r.left - originalWidth);
+
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        target = el;
+      }
+    }
+
+    if (!target || bestDistance > 45) {
+      return;
+    }
+
+    if (!target.dataset.sfOriginalMarginLeft) {
+      const cs =
+        getComputedStyle(target);
+
+      target.dataset.sfOriginalMarginLeft =
+        cs.marginLeft;
+    }
+
+    const base =
+      parseFloat(
+        target.dataset.sfOriginalMarginLeft
+      ) || 0;
+
+    target.style.transition =
+      "margin-left .32s cubic-bezier(.22,.61,.36,1)";
+
+    target.style.marginLeft =
+      `${Math.max(
+        0,
+        base - originalWidth + width
+      )}px`;
+  }
+
+  function apply(sidebar, collapsed) {
+    const root =
+      document.documentElement;
+
+    const expanded =
+      Number(
+        sidebar.dataset.sfExpandedWidth ||
+        EXPANDED_DEFAULT
+      );
+
+    sidebar.style.setProperty(
+      "--sf-sidebar-expanded",
+      `${expanded}px`
+    );
+
+    root.classList.toggle(
+      "sf-sidebar-collapsed",
+      collapsed
+    );
+
+    root.style.setProperty(
+      "--sf-sidebar-expanded",
+      `${expanded}px`
+    );
+
+    root.style.setProperty(
+      "--sf-sidebar-current",
+      `${collapsed
+        ? COLLAPSED_WIDTH
+        : expanded}px`
+    );
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      String(collapsed)
+    );
+
+    updateFixedContentOffset(
+      sidebar,
+      collapsed
+        ? COLLAPSED_WIDTH
+        : expanded
+    );
+
+    updateBackdrop();
+  }
+
+  function updateBackdrop() {
+    const collapsed =
+      document.documentElement.classList.contains(
+        "sf-sidebar-collapsed"
+      );
+
+    const backdrop =
+      document.getElementById(
+        "sf-sidebar-backdrop"
+      );
+
+    if (!backdrop) return;
+
+    if (
+      window.innerWidth <= 768 &&
+      !collapsed
+    ) {
+      backdrop.style.display = "block";
+    } else {
+      backdrop.style.display = "none";
+    }
+  }
+
+  function toggle(sidebar) {
+    const collapsed =
+      document.documentElement.classList.contains(
+        "sf-sidebar-collapsed"
+      );
+
+    apply(
+      sidebar,
+      !collapsed
+    );
+  }
+
+  function init() {
+    injectCSS();
+
+    const sidebar =
+      findSidebar();
+
+    if (!sidebar) {
+      console.warn(
+        "[StockFamily Sidebar] Sidebar tidak ditemukan di halaman ini."
+      );
+
+      document.body.classList.add(
+        "sf-page-ready"
+      );
+
+      return;
+    }
+
+    sidebar.classList.add(
+      "sf-sidebar"
+    );
+
+    const expanded =
+      getExpandedWidth(sidebar);
+
+    sidebar.dataset.sfExpandedWidth =
+      String(expanded);
+
+    sidebar.style.setProperty(
+      "--sf-sidebar-expanded",
+      `${expanded}px`
+    );
+
+    setupLabels(sidebar);
+    setupActiveState(sidebar);
+    setupPageTransitions(sidebar);
+    createToggle(sidebar);
+    createMobileControls(sidebar);
+
+    const saved =
+      localStorage.getItem(STORAGE_KEY);
+
+    const collapsed =
+      saved === null
+        ? false
+        : saved === "true";
+
+    apply(sidebar, collapsed);
+
+    window.addEventListener(
+      "resize",
+      () => {
+        updateBackdrop();
+
+        const currentCollapsed =
+          document.documentElement.classList.contains(
+            "sf-sidebar-collapsed"
+          );
+
+        updateFixedContentOffset(
+          sidebar,
+          currentCollapsed
+            ? COLLAPSED_WIDTH
+            : expanded
+        );
+      }
+    );
+
+    requestAnimationFrame(() => {
+      document.body.classList.add(
+        "sf-page-ready"
+      );
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      init,
+      { once: true }
+    );
+  } else {
+    init();
+  }
+})();
+

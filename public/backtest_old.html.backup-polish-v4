@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backtest Quiet</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>body{background:#0a0e1a;color:#cbd5e1;font-family:monospace}.card{background:#111827;border:1px solid #1f2937}.positive{color:#10b981}.negative{color:#ef4444}.loader{border:2px solid #1f2937;border-top:2px solid #10b981;border-radius:50%;width:16px;height:16px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}</style>
+</head>
+<body class="p-6">
+<div class="max-w-[1600px] mx-auto">
+<h1 class="text-xl font-bold text-white mb-2">âš¡ Backtest Quiet Before The Storm - Auto Kalender</h1>
+<div class="card rounded-xl p-4 mb-4 flex gap-4 items-end flex-wrap">
+<div><label class="text-xs text-emerald-400 block mb-1">TANGGAL - KLIK KALENDER</label><input id="dateInput" type="date" value="2026-01-02" class="bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white"></div>
+<button id="runBtn" onclick="doBacktest()" class="px-5 py-2 bg-emerald-500 text-black font-bold rounded">â–¶ RUN</button>
+<div id="loading" class="hidden text-emerald-400 text-sm">Loading...</div>
+<div class="ml-auto flex gap-4 text-sm"><div>Avg H+1: <span id="avg1">-</span></div><div>Avg H+2: <span id="avg2">-</span></div><div>Avg H+3: <span id="avg3">-</span></div><div>Winrate: <span id="winrate">-</span></div></div>
+</div>
+<div class="card rounded-xl overflow-hidden"><div class="p-3 border-b border-slate-800 text-xs text-emerald-400" id="liveLabel">Pilih tanggal</div><div class="overflow-x-auto"><table class="w-full text-xs"><thead class="bg-slate-900 text-slate-400"><tr><th class="p-2">#</th><th class="p-2">SYM</th><th class="p-2">DATE</th><th class="p-2">CLOSE</th><th class="p-2">SCORE</th><th class="p-2">REASONS</th><th class="p-2 bg-emerald-950/30">H+1</th><th class="p-2 bg-emerald-950/30">H+2</th><th class="p-2 bg-emerald-950/30">H+3</th><th class="p-2 bg-amber-950/30">MAX</th><th class="p-2">RESULT</th></tr></thead><tbody id="tbody"><tr><td colspan="11" class="p-8 text-center">Klik RUN</td></tr></tbody></table></div></div>
+</div>
+<script>
+var dateInput = document.getElementById('dateInput');
+dateInput.addEventListener('change', function(){ doBacktest(); });
+function doBacktest(){
+ var date = dateInput.value; if(!date) return;
+ document.getElementById('runBtn').disabled=true; document.getElementById('loading').classList.remove('hidden');
+ fetch('/api/backtest?date=' + date + '&t=' + Date.now()).then(function(r){ if(!r.ok) throw new Error('API belum dipasang - restart server'); return r.json(); }).then(function(j){
+   var data=j.results; var stats=j.stats;
+   document.getElementById('liveLabel').innerText='LIVE: ' + data.length + ' Saham | ' + j.date;
+   document.getElementById('avg1').innerText=stats.avg1.toFixed(2)+'%'; document.getElementById('avg2').innerText=stats.avg2.toFixed(2)+'%'; document.getElementById('avg3').innerText=stats.avg3.toFixed(2)+'%'; document.getElementById('winrate').innerText=stats.winrate.toFixed(1)+'%';
+   var html='';
+   for(var i=0;i<data.length;i++){ var r=data[i]; var cls=function(v){ return v>0?'positive':v<0?'negative':''; }; var res=r.max3_pct>5?'MELEDAK':r.max3_pct>3?'TP':r.max3_pct>0?'Naik':'Gagal'; html+='<tr class="border-b border-slate-800"><td class="p-2">'+(i+1)+'</td><td class="p-2 font-bold text-white">'+r.symbol+'</td><td class="p-2">'+r.date+'</td><td class="p-2 text-right">'+r.close+'</td><td class="p-2 text-right text-emerald-400">'+r.quietScore+'</td><td class="p-2 text-[10px]">'+(r.reasons||[]).join(', ')+'</td><td class="p-2 text-right bg-emerald-950/20 '+cls(r.d1_pct)+'">'+(r.d1_pct!=null?r.d1_pct+'%':'-')+'</td><td class="p-2 text-right bg-emerald-950/20 '+cls(r.d2_pct)+'">'+(r.d2_pct!=null?r.d2_pct+'%':'-')+'</td><td class="p-2 text-right bg-emerald-950/20 '+cls(r.d3_pct)+'">'+(r.d3_pct!=null?r.d3_pct+'%':'-')+'</td><td class="p-2 text-right bg-amber-950/20">'+(r.max3_pct!=null?r.max3_pct.toFixed(2)+'%':'-')+'</td><td class="p-2">'+res+'</td></tr>'; }
+   if(data.length==0) html='<tr><td colspan="11" class="p-8 text-center">0 saham - coba tanggal lain</td></tr>';
+   document.getElementById('tbody').innerHTML=html;
+ }).catch(function(e){ document.getElementById('tbody').innerHTML='<tr><td colspan="11" class="p-8 text-center text-red-400">'+e.message+'</td></tr>'; }).finally(function(){ document.getElementById('runBtn').disabled=false; document.getElementById('loading').classList.add('hidden'); });
+}
+</script>
+<script src="/assets/stockfamily-sidebar.js"></script>
+</body>
+</html>
+

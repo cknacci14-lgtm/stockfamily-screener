@@ -1,26 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id" class="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CHARTNALIST | IDX Pro Trading & Market Structure Terminal</title>
 
-<script src="https://cdn.tailwindcss.com">
-// ============================================================
-// COLLAPSIBLE PANELS
-// ============================================================
-function togglePanel(panelId, headerEl) {
-  const panel = document.getElementById(panelId);
-  if (!panel) return;
-  const icon = headerEl.querySelector('.fa-chevron-down, .fa-chevron-up');
-  const isHidden = panel.style.display === 'none';
-  panel.style.display = isHidden ? '' : 'none';
-  if (icon) {
-    icon.classList.toggle('fa-chevron-down', isHidden);
-    icon.classList.toggle('fa-chevron-up', !isHidden);
-  }
-}
-</script>
+<script src="https://cdn.tailwindcss.com"></script>
 <script>
   tailwind.config = {
     darkMode: 'class',
@@ -39,39 +24,9 @@ function togglePanel(panelId, headerEl) {
       }
     }
   }
-
-// ============================================================
-// COLLAPSIBLE PANELS
-// ============================================================
-function togglePanel(panelId, headerEl) {
-  const panel = document.getElementById(panelId);
-  if (!panel) return;
-  const icon = headerEl.querySelector('.fa-chevron-down, .fa-chevron-up');
-  const isHidden = panel.style.display === 'none';
-  panel.style.display = isHidden ? '' : 'none';
-  if (icon) {
-    icon.classList.toggle('fa-chevron-down', isHidden);
-    icon.classList.toggle('fa-chevron-up', !isHidden);
-  }
-}
 </script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js">
-// ============================================================
-// COLLAPSIBLE PANELS
-// ============================================================
-function togglePanel(panelId, headerEl) {
-  const panel = document.getElementById(panelId);
-  if (!panel) return;
-  const icon = headerEl.querySelector('.fa-chevron-down, .fa-chevron-up');
-  const isHidden = panel.style.display === 'none';
-  panel.style.display = isHidden ? '' : 'none';
-  if (icon) {
-    icon.classList.toggle('fa-chevron-down', isHidden);
-    icon.classList.toggle('fa-chevron-up', !isHidden);
-  }
-}
-</script>
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 
 <style>
   ::-webkit-scrollbar { width: 5px; height: 5px; }
@@ -89,46 +44,6 @@ function togglePanel(panelId, headerEl) {
   .watch-row.active { background: rgba(0, 229, 255, 0.08); border-left: 2px solid #00E5FF; }
   .watch-remove { opacity: 0; transition: opacity 0.15s; }
   .watch-row:hover .watch-remove { opacity: 1; }
-  .chart-loading {
-    position: absolute;
-    inset: 0;
-    background: rgba(11,14,20,0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-  .chart-loading.show { opacity: 1; }
-  .chart-loading .spinner {
-    width: 28px; height: 28px;
-    border: 3px solid #2A2E39;
-    border-top-color: #00E5FF;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .draw-toolbar {
-    display: flex; gap: 4px; align-items: center;
-    background: #1E222D; border: 1px solid #2A2E39;
-    border-radius: 8px; padding: 4px 6px;
-  }
-  .draw-btn {
-    width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
-    border-radius: 6px; border: none; background: transparent;
-    color: #94a3b8; cursor: pointer; font-size: 13px; transition: 0.15s;
-  }
-  .draw-btn:hover { background: #2A2E39; color: #fff; }
-  .draw-btn.active { background: #00E5FF22; color: #00E5FF; }
-  .draw-btn.danger:hover { background: #FF525222; color: #FF5252; }
-  .watermark-input {
-    background: #0B0E14; border: 1px solid #2A2E39; border-radius: 6px;
-    color: #e2e8f0; font-size: 11px; padding: 4px 8px; width: 140px;
-    font-family: inherit;
-  }
-  .watermark-input:focus { outline: none; border-color: #00E5FF; }
 </style>
 </head>
 <body class="bg-idx-bg text-slate-200 font-sans antialiased h-screen flex flex-col overflow-hidden select-none">
@@ -144,7 +59,7 @@ function togglePanel(panelId, headerEl) {
         <span class="font-extrabold text-lg tracking-wider text-white">CHART<span class="text-idx-cyan">NALIST</span></span>
         <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-idx-amber/10 text-idx-amber border border-idx-amber/30">IDX PRO v4.1</span>
       </div>
-      <span class="text-[10px] text-slate-400 font-mono -mt-1">HARGA/CHART: YAHOO (via backend) · BANDARMOLOGY: SUPABASE (EOD)</span>
+      <span class="text-[10px] text-slate-400 font-mono -mt-1">HARGA/CHART: YAHOO (via backend) Â· BANDARMOLOGY: SUPABASE (EOD)</span>
     </div>
   </div>
 
@@ -205,58 +120,31 @@ function togglePanel(panelId, headerEl) {
     <div class="h-16 border-b border-idx-border px-4 flex items-center justify-between shrink-0">
       <div>
         <div class="flex items-center gap-2">
-          <h1 id="activeTicker" class="text-2xl font-black text-white font-mono tracking-wide">BBCA</h1>
+          <h1 id="activeTicker" class="text-xl font-black text-white font-mono">BBCA</h1>
           <span id="activeName" class="text-xs text-slate-400">--</span>
         </div>
         <div class="flex items-center gap-3 mt-0.5 font-mono">
-          <span id="lastPrice" class="text-xl font-black text-white tracking-tight">---</span>
-          <span id="priceChange" class="text-sm font-bold px-1.5 py-0.5 rounded">---</span>
+          <span id="lastPrice" class="text-lg font-bold">---</span>
+          <span id="priceChange" class="text-sm font-semibold text-slate-400">---</span>
           <span id="lastUpdateLabel" class="text-[10px] text-slate-500">--</span>
         </div>
       </div>
-      <div class="flex items-center gap-3">
-        <div class="draw-toolbar">
-          <button class="draw-btn" id="btnHLine" title="Horizontal Line" onclick="setDrawMode('hline')">
-            <i class="fa-solid fa-minus"></i>
-          </button>
-          <button class="draw-btn" id="btnTrend" title="Trendline" onclick="setDrawMode('trend')">
-            <i class="fa-solid fa-chart-line"></i>
-          </button>
-          <button class="draw-btn" id="btnFib" title="Fibonacci" onclick="setDrawMode('fib')">
-            <i class="fa-solid fa-percent"></i>
-          </button>
-          <button class="draw-btn danger" id="btnClearDraw" title="Hapus semua drawing" onclick="clearAllDrawings()">
-            <i class="fa-solid fa-trash"></i>
-          </button>
-          <div class="w-px h-4 bg-idx-border mx-1"></div>
-          <input type="text" id="watermarkInput" class="watermark-input" placeholder="Watermark..." value="CHARTNALIST" onchange="updateWatermark(this.value)" onkeyup="if(event.key==='Enter')updateWatermark(this.value)">
-          <button class="draw-btn" id="btnShare" title="Bagikan / Download Chart" onclick="shareChart()">
-            <i class="fa-solid fa-share-nodes"></i>
-          </button>
-        </div>
-        <div class="flex items-center space-x-2 bg-idx-panel/80 px-3 py-1 rounded-md border border-idx-border font-mono text-xs">
-          <span class="text-idx-cyan font-bold">1D</span>
-          <span class="text-slate-500">(Daily)</span>
-        </div>
+      <div class="flex items-center space-x-2 bg-idx-panel/80 px-3 py-1 rounded-md border border-idx-border font-mono text-xs">
+        <span class="text-idx-cyan font-bold">1D</span>
+        <span class="text-slate-500">(Daily)</span>
       </div>
     </div>
-    <div class="relative flex-1 min-h-[300px]">
-      <div id="tvChart" class="w-full h-full"></div>
-      <div id="chartLoading" class="chart-loading">
-        <div class="spinner"></div>
-      </div>
-    </div>
+    <div id="tvChart" class="flex-1 min-h-[300px]"></div>
   </main>
 
   <!-- Right: Structure / Bandarmology / Order book -->
   <aside class="w-80 border-l border-idx-border bg-idx-card flex flex-col shrink-0 overflow-y-auto text-xs font-mono">
 
     <div class="p-3 border-b border-idx-border">
-      <h2 class="text-[11px] font-bold text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between cursor-pointer select-none" onclick="togglePanel('structPanel', this)">
-        <span class="flex items-center gap-1.5"><i class="fa-solid fa-microchip"></i> Market Structure <span class="text-slate-500 font-normal normal-case">(Heuristik)</span></span>
-        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+      <h2 class="text-[11px] font-bold text-idx-cyan uppercase tracking-wider mb-2 flex items-center gap-1.5">
+        <i class="fa-solid fa-microchip"></i> Market Structure <span class="text-slate-500 font-normal normal-case">(Heuristik, dari chart Yahoo)</span>
       </h2>
-      <div id="structPanel" class="space-y-1.5">
+      <div class="space-y-1.5">
         <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border">
           <span class="text-slate-400">Trend</span><span id="structTrend" class="font-bold text-slate-300">--</span>
         </div>
@@ -276,11 +164,10 @@ function togglePanel(panelId, headerEl) {
     </div>
 
     <div class="p-3 border-b border-idx-border">
-      <h2 class="text-[11px] font-bold text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between cursor-pointer select-none" onclick="togglePanel('bandarPanel', this)">
-        <span class="flex items-center gap-1.5"><i class="fa-solid fa-database"></i> Bandarmology <span id="bandarDateLabel" class="text-slate-500 font-normal normal-case">--</span></span>
-        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+      <h2 class="text-[11px] font-bold text-idx-cyan uppercase tracking-wider mb-2 flex items-center gap-1.5">
+        <i class="fa-solid fa-database"></i> Bandarmology <span id="bandarDateLabel" class="text-slate-500 font-normal normal-case">--</span>
       </h2>
-      <div id="bandarPanel" class="space-y-1.5">
+      <div class="space-y-1.5">
         <div class="flex justify-between items-center p-2 rounded bg-idx-panel/60 border border-idx-border">
           <span class="text-slate-400">Skor Akumulasi</span>
           <span id="bandarScore" class="font-bold">--</span>
@@ -299,11 +186,11 @@ function togglePanel(panelId, headerEl) {
     </div>
     <!-- GEM Score Panel -->
     <div class="p-3 border-b border-idx-border">
-      <h2 class="text-[11px] font-bold text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between cursor-pointer select-none" onclick="togglePanel('gemPanel', this)">
-        <span class="flex items-center gap-1.5"><i class="fa-solid fa-gem"></i> GEM Score <span id="gemDateLabel" class="text-slate-500 font-normal normal-case">--</span></span>
-        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+      <h2 class="text-[11px] font-bold text-idx-cyan uppercase tracking-wider mb-2 flex items-center gap-1.5">
+        <i class="fa-solid fa-gem"></i> GEM Score
+        <span id="gemDateLabel" class="text-slate-500 font-normal normal-case">--</span>
       </h2>
-      <div id="gemPanel" class="space-y-1.5">
+      <div class="space-y-1.5">
         <div class="flex justify-between items-center p-2 rounded bg-idx-panel/60 border border-idx-border">
           <span class="text-slate-400">Score</span>
           <span id="gemScoreValue" class="font-bold text-lg">--</span>
@@ -323,7 +210,7 @@ function togglePanel(panelId, headerEl) {
       </div>
       <p class="text-[10px] text-slate-500 mt-1.5 italic">Quiet Accumulation Indicator</p>
     </div>        
-    
+    </div>
 
     <div class="p-3 border-b border-idx-border">
       <h2 class="text-[11px] font-bold text-idx-cyan uppercase tracking-wider mb-2 flex items-center gap-1.5">
@@ -341,7 +228,7 @@ function togglePanel(panelId, headerEl) {
           <div id="offerVolume" class="text-[10px] text-slate-500">vol --</div>
         </div>
       </div>
-      <p class="text-[10px] text-slate-500 mt-1.5 italic">Yahoo sering tidak punya data bid/offer untuk saham IDX — tampil "--" kalau memang tidak tersedia.</p>
+      <p class="text-[10px] text-slate-500 mt-1.5 italic">Yahoo sering tidak punya data bid/offer untuk saham IDX â€” tampil "--" kalau memang tidak tersedia.</p>
     </div>
 
     <div class="p-3 border-b border-idx-border">
@@ -361,7 +248,7 @@ function togglePanel(panelId, headerEl) {
         <i class="fa-solid fa-chart-pie"></i> Rasio Fundamental
       </h2>
       <div class="p-2.5 rounded bg-idx-panel/60 border border-idx-border text-slate-500 italic text-[11px]">
-        Belum diaktifkan di versi ini — bisa ditambah dari field Yahoo quote (trailingPE, priceToBook, dll) kalau dibutuhkan.
+        Belum diaktifkan di versi ini â€” bisa ditambah dari field Yahoo quote (trailingPE, priceToBook, dll) kalau dibutuhkan.
       </div>
     </div>
 
@@ -466,43 +353,10 @@ function togglePanel(panelId, headerEl) {
   // ============================================================
   const chartContainer = document.getElementById('tvChart');
   const chart = LightweightCharts.createChart(chartContainer, {
-    layout: { 
-      background: { type: 'solid', color: '#0B0E14' }, 
-      textColor: '#94a3b8',
-      fontSize: 11,
-      attributionLogo: false
-    },
-    watermark: {
-      visible: true,
-      text: 'CHARTNALIST',
-      fontSize: 48,
-      color: 'rgba(148, 163, 184, 0.08)',
-      horzAlign: 'center',
-      vertAlign: 'center'
-    },
-    grid: { 
-      vertLines: { color: '#1E222D', visible: true }, 
-      horzLines: { color: '#1E222D', visible: true } 
-    },
-    rightPriceScale: { 
-      borderColor: '#2A2E39', 
-      autoScale: true,
-      scaleMargins: { top: 0.08, bottom: 0.22 }
-    },
-    timeScale: { 
-      borderColor: '#2A2E39', 
-      timeVisible: false,
-      rightOffset: 5,
-      barSpacing: 6,
-      minBarSpacing: 3
-    },
-    crosshair: {
-      mode: LightweightCharts.CrosshairMode.Normal,
-      vertLine: { width: 1, color: 'rgba(148,163,184,0.3)', style: 2 },
-      horzLine: { width: 1, color: 'rgba(148,163,184,0.3)', style: 2 }
-    },
-    handleScroll: { mouseWheel: true, pressedMouseMove: true },
-    handleScale: { axisPressedMouseMove: true, mouseWheel: true, pinch: true }
+    layout: { background: { type: 'solid', color: '#0B0E14' }, textColor: '#94a3b8' },
+    grid: { vertLines: { color: '#1E222D' }, horzLines: { color: '#1E222D' } },
+    rightPriceScale: { borderColor: '#2A2E39', autoScale: true },
+    timeScale: { borderColor: '#2A2E39', timeVisible: false }
   });
 
   const candleSeries = chart.addCandlestickSeries({
@@ -520,7 +374,10 @@ function togglePanel(panelId, headerEl) {
   });
 
   chart.priceScale('volume_scale').applyOptions({
-    scaleMargins: { top: 0.68, bottom: 0.18 }
+    scaleMargins: {
+      top: 0.8,
+      bottom: 0
+    }
   });
 
   const vwapSeries = chart.addLineSeries({ color: '#FFB300', lineWidth: 2, priceLineVisible: false, lastValueVisible: true });
@@ -538,23 +395,17 @@ function togglePanel(panelId, headerEl) {
   gemSeries.createPriceLine({ price: 45, color: '#FFB300', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: '45' });
   gemSeries.createPriceLine({ price: 30, color: '#FF5252', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: '30' });
   chart.priceScale('gem_scale').applyOptions({
-    scaleMargins: { top: 0.90, bottom: 0 },
+    scaleMargins: { top: 0.85, bottom: 0 },
     borderVisible: false,
   });
   chart.priceScale('volume_scale').applyOptions({
-    scaleMargins: { top: 0.68, bottom: 0.18 }
+    scaleMargins: { top: 0.7, bottom: 0.18 },
   });
 
-  let resizeTimeout = null;
   new ResizeObserver(entries => {
     if (!entries.length) return;
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-      const { width, height } = entries[0].contentRect;
-      if (width > 0 && height > 0) {
-        chart.applyOptions({ width, height });
-      }
-    }, 50);
+    const { width, height } = entries[0].contentRect;
+    chart.applyOptions({ width, height });
   }).observe(chartContainer);
 
   // ============================================================
@@ -664,13 +515,8 @@ function togglePanel(panelId, headerEl) {
       gemSeries.setData([]);
     }
   }
-  function showChartLoading(show) {
-    const el = document.getElementById('chartLoading');
-    if (el) el.classList.toggle('show', !!show);
-  }
   async function loadHistory(code) {
     setDataStatus('MEMUAT CHART...', 'busy');
-    showChartLoading(true);
     try {
       const result = await yahooChart(toSymbol(code));
       if (!result || result.candles.length === 0) {
@@ -680,7 +526,6 @@ function togglePanel(panelId, headerEl) {
         gemSeries.setData([]);
         setDataStatus('DATA KOSONG DARI YAHOO', 'error');
         document.getElementById('lastUpdateLabel').innerText = `Tidak ada data candle untuk ${code}`;
-        showChartLoading(false);
         return;
       }
 
@@ -696,11 +541,7 @@ function togglePanel(panelId, headerEl) {
       loadGemHistory(code);
 
       chart.priceScale('right').applyOptions({ autoScale: true });
-      // fitContent hanya sekali di awal, setelah itu biarkan user yang zoom
-      if (!window._chartFitted) {
-        chart.timeScale().fitContent();
-        window._chartFitted = true;
-      }
+      chart.timeScale().fitContent();
 
       const structure = calcMarketStructure(latestCandles);
       const rsi = calcRSI(latestCandles, 14);
@@ -717,7 +558,6 @@ function togglePanel(panelId, headerEl) {
       document.getElementById('lastUpdateLabel').innerText = `Candle terakhir: ${lastCandleLabel}`;
 
       setDataStatus('YAHOO DATA OK (delayed)', 'ok');
-      showChartLoading(false);
     } catch (err) {
       console.error('[loadHistory]', code, err);
       candleSeries.setData([]);
@@ -725,7 +565,6 @@ function togglePanel(panelId, headerEl) {
       vwapSeries.setData([]);
         gemSeries.setData([]);
       setDataStatus(`GAGAL: ${err.message}`, 'error');
-      showChartLoading(false);
     }
   }
 
@@ -749,7 +588,7 @@ function togglePanel(panelId, headerEl) {
       const changeEl = document.getElementById('priceChange');
       if (change != null) {
         changeEl.innerText = `${change >= 0 ? '+' : ''}${Math.round(change).toLocaleString('id-ID')} (${fmtPct(changePct)})`;
-        changeEl.className = `text-sm font-bold px-1.5 py-0.5 rounded ${change >= 0 ? 'text-idx-green bg-idx-green/10' : 'text-idx-red bg-idx-red/10'}`;
+        changeEl.className = `text-sm font-semibold ${change >= 0 ? 'text-idx-green' : 'text-idx-red'}`;
       }
 
       document.getElementById('bidPrice').innerText = q.bid ? fmtRp(q.bid) : '--';
@@ -897,7 +736,6 @@ function togglePanel(panelId, headerEl) {
 
   function selectTicker(code) {
     activeCode = code.toUpperCase();
-    window._chartFitted = false; // reset supaya fitContent jalan lagi
     loadHistory(activeCode);
     loadQuoteHeader(activeCode);
     loadBandarmology(activeCode);
@@ -1023,34 +861,9 @@ async function loadGemScore(code) {
     console.error('[GEM]', err);
   }
 }
-
-// ============================================================
-// COLLAPSIBLE PANELS
-// ============================================================
-function togglePanel(panelId, headerEl) {
-  const panel = document.getElementById(panelId);
-  if (!panel) return;
-  const icon = headerEl.querySelector('.fa-chevron-down, .fa-chevron-up');
-  const isHidden = panel.style.display === 'none';
-  panel.style.display = isHidden ? '' : 'none';
-  if (icon) {
-    icon.classList.toggle('fa-chevron-down', isHidden);
-    icon.classList.toggle('fa-chevron-up', !isHidden);
-  }
-}
 </script>
-<script src="/assets/stockfamily-sidebar.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
 
 
 

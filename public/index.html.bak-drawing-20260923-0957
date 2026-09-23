@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id" class="dark">
 <head>
 <meta charset="UTF-8">
@@ -110,25 +110,6 @@ function togglePanel(panelId, headerEl) {
     animation: spin 0.7s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .draw-toolbar {
-    display: flex; gap: 4px; align-items: center;
-    background: #1E222D; border: 1px solid #2A2E39;
-    border-radius: 8px; padding: 4px 6px;
-  }
-  .draw-btn {
-    width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
-    border-radius: 6px; border: none; background: transparent;
-    color: #94a3b8; cursor: pointer; font-size: 13px; transition: 0.15s;
-  }
-  .draw-btn:hover { background: #2A2E39; color: #fff; }
-  .draw-btn.active { background: #00E5FF22; color: #00E5FF; }
-  .draw-btn.danger:hover { background: #FF525222; color: #FF5252; }
-  .watermark-input {
-    background: #0B0E14; border: 1px solid #2A2E39; border-radius: 6px;
-    color: #e2e8f0; font-size: 11px; padding: 4px 8px; width: 140px;
-    font-family: inherit;
-  }
-  .watermark-input:focus { outline: none; border-color: #00E5FF; }
 </style>
 </head>
 <body class="bg-idx-bg text-slate-200 font-sans antialiased h-screen flex flex-col overflow-hidden select-none">
@@ -214,30 +195,9 @@ function togglePanel(panelId, headerEl) {
           <span id="lastUpdateLabel" class="text-[10px] text-slate-500">--</span>
         </div>
       </div>
-      <div class="flex items-center gap-3">
-        <div class="draw-toolbar">
-          <button class="draw-btn" id="btnHLine" title="Horizontal Line" onclick="setDrawMode('hline')">
-            <i class="fa-solid fa-minus"></i>
-          </button>
-          <button class="draw-btn" id="btnTrend" title="Trendline" onclick="setDrawMode('trend')">
-            <i class="fa-solid fa-chart-line"></i>
-          </button>
-          <button class="draw-btn" id="btnFib" title="Fibonacci" onclick="setDrawMode('fib')">
-            <i class="fa-solid fa-percent"></i>
-          </button>
-          <button class="draw-btn danger" id="btnClearDraw" title="Hapus semua drawing" onclick="clearAllDrawings()">
-            <i class="fa-solid fa-trash"></i>
-          </button>
-          <div class="w-px h-4 bg-idx-border mx-1"></div>
-          <input type="text" id="watermarkInput" class="watermark-input" placeholder="Watermark..." value="CHARTNALIST" onchange="updateWatermark(this.value)" onkeyup="if(event.key==='Enter')updateWatermark(this.value)">
-          <button class="draw-btn" id="btnShare" title="Bagikan / Download Chart" onclick="shareChart()">
-            <i class="fa-solid fa-share-nodes"></i>
-          </button>
-        </div>
-        <div class="flex items-center space-x-2 bg-idx-panel/80 px-3 py-1 rounded-md border border-idx-border font-mono text-xs">
-          <span class="text-idx-cyan font-bold">1D</span>
-          <span class="text-slate-500">(Daily)</span>
-        </div>
+      <div class="flex items-center space-x-2 bg-idx-panel/80 px-3 py-1 rounded-md border border-idx-border font-mono text-xs">
+        <span class="text-idx-cyan font-bold">1D</span>
+        <span class="text-slate-500">(Daily)</span>
       </div>
     </div>
     <div class="relative flex-1 min-h-[300px]">
@@ -469,16 +429,7 @@ function togglePanel(panelId, headerEl) {
     layout: { 
       background: { type: 'solid', color: '#0B0E14' }, 
       textColor: '#94a3b8',
-      fontSize: 11,
-      attributionLogo: false
-    },
-    watermark: {
-      visible: true,
-      text: 'CHARTNALIST',
-      fontSize: 48,
-      color: 'rgba(148, 163, 184, 0.08)',
-      horzAlign: 'center',
-      vertAlign: 'center'
+      fontSize: 11
     },
     grid: { 
       vertLines: { color: '#1E222D', visible: true }, 
@@ -1039,11 +990,8 @@ function togglePanel(panelId, headerEl) {
   }
 }
 </script>
-<script src="/assets/stockfamily-sidebar.js"></script>
 </body>
 </html>
-
-
 
 
 

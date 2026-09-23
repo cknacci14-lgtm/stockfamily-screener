@@ -1,13 +1,13 @@
-// src/run.js - VERSION 2.0 (Async)
+// src/run.js - VERSION 2.0 (dengan save JSON)
 const path = require('path');
 const xlsx = require('xlsx');
+const fs = require('fs');
 const { runScreener } = require('./screener');
 
 console.log('[Runner] Memulai screener...');
 
 function loadStocksFromExcel() {
   const dataDir = path.join(__dirname, '../data');
-  const fs = require('fs');
   
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
@@ -63,6 +63,19 @@ async function main() {
     }
     
     console.log(`[Runner] ${stocks.length} saham aktif`);
+
+    // Sinkronkan ke data/database.json — sumber yang sama yang dibaca
+    // server.js untuk /api/grandslams, supaya dashboard web ikut ter-update
+    // setiap kali screener dijalankan dari CLI (sebelumnya 3 jalur data
+    // ini terpisah dan bisa saling beda).
+    const dbPath = path.join(__dirname, '../data/database.json');
+    fs.writeFileSync(dbPath, JSON.stringify({
+      lastUpdated: new Date().toISOString(),
+      totalStocks: stocks.length,
+      source: 'run.js (Excel manual)',
+      stocks
+    }, null, 2));
+
     const result = await runScreener(stocks);
     
     console.log('\n📊 SUMMARY:');
@@ -78,6 +91,35 @@ async function main() {
         console.log(`${i+1}. ${s.code} | Power: ${s.powerScore} | A:${s.pilarA} B:${s.pilarB} C:${s.pilarC}`);
       });
     }
+
+    // ===== SAVE KE JSON =====
+    const resultsDir = path.join(__dirname, '../results');
+    if (!fs.existsSync(resultsDir)) {
+      fs.mkdirSync(resultsDir, { recursive: true });
+    }
+    const jsonPath = path.join(resultsDir, 'screener_results.json');
+    
+    // Ambil hanya grandSlams untuk dashboard
+    const exportData = {
+      summary: result.summary,
+      grandSlams: result.grandSlams.map(s => ({
+        code: s.code,
+        close: s.close,
+        volume: s.volume,
+        powerScore: s.powerScore,
+        pilarA: s.pilarA,
+        pilarB: s.pilarB,
+        pilarC: s.pilarC,
+        breakdown: s.breakdown,
+        reasons: s.reasons,
+        risks: s.risks,
+        isGrandSlam: s.isGrandSlam,
+        recommendation: s.recommendation
+      }))
+    };
+    
+    fs.writeFileSync(jsonPath, JSON.stringify(exportData, null, 2));
+    console.log(`\n💾 Data disimpan ke: ${jsonPath}`);
     
   } catch (error) {
     console.error('[Runner] Error:', error);
