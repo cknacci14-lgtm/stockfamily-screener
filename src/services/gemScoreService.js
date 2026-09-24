@@ -6,10 +6,21 @@ const {
 } = require("../engine/gemScoreEngine");
 const { fetchHistoricalDataFromSupabase } = require("../database/supabaseDataPipeline");
 
-const CACHE_DIR = path.join(__dirname, "../../data");
+const os = require("os");
+
+const LOCAL_CACHE_DIR = path.join(__dirname, "../../data");
+const SERVERLESS_CACHE_DIR = path.join(os.tmpdir(), "stockfamily-gem-cache");
+
+const IS_SERVERLESS =
+  process.env.NETLIFY === "true" ||
+  Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME);
+
+const CACHE_DIR = IS_SERVERLESS
+  ? SERVERLESS_CACHE_DIR
+  : LOCAL_CACHE_DIR;
+
 const CACHE_FILE = path.join(CACHE_DIR, "gem_score_latest.json");
 
-// Pastikan folder data ada
 if (!fs.existsSync(CACHE_DIR)) {
   fs.mkdirSync(CACHE_DIR, { recursive: true });
 }
