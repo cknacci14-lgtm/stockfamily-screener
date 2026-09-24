@@ -1,26 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id" class="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CHARTNALIST | IDX Pro Trading & Market Structure Terminal</title>
 
-<script src="https://cdn.tailwindcss.com">
-// ============================================================
-// COLLAPSIBLE PANELS
-// ============================================================
-function togglePanel(panelId, headerEl) {
-  const panel = document.getElementById(panelId);
-  if (!panel) return;
-  const icon = headerEl.querySelector('.fa-chevron-down, .fa-chevron-up');
-  const isHidden = panel.style.display === 'none';
-  panel.style.display = isHidden ? '' : 'none';
-  if (icon) {
-    icon.classList.toggle('fa-chevron-down', isHidden);
-    icon.classList.toggle('fa-chevron-up', !isHidden);
-  }
-}
-</script>
+<script src="https://cdn.tailwindcss.com"></script>
 <script>
   tailwind.config = {
     darkMode: 'class',
@@ -39,39 +24,9 @@ function togglePanel(panelId, headerEl) {
       }
     }
   }
-
-// ============================================================
-// COLLAPSIBLE PANELS
-// ============================================================
-function togglePanel(panelId, headerEl) {
-  const panel = document.getElementById(panelId);
-  if (!panel) return;
-  const icon = headerEl.querySelector('.fa-chevron-down, .fa-chevron-up');
-  const isHidden = panel.style.display === 'none';
-  panel.style.display = isHidden ? '' : 'none';
-  if (icon) {
-    icon.classList.toggle('fa-chevron-down', isHidden);
-    icon.classList.toggle('fa-chevron-up', !isHidden);
-  }
-}
 </script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js">
-// ============================================================
-// COLLAPSIBLE PANELS
-// ============================================================
-function togglePanel(panelId, headerEl) {
-  const panel = document.getElementById(panelId);
-  if (!panel) return;
-  const icon = headerEl.querySelector('.fa-chevron-down, .fa-chevron-up');
-  const isHidden = panel.style.display === 'none';
-  panel.style.display = isHidden ? '' : 'none';
-  if (icon) {
-    icon.classList.toggle('fa-chevron-down', isHidden);
-    icon.classList.toggle('fa-chevron-up', !isHidden);
-  }
-}
-</script>
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 
 <style>
   ::-webkit-scrollbar { width: 5px; height: 5px; }
@@ -130,50 +85,527 @@ function togglePanel(panelId, headerEl) {
   }
   .watermark-input:focus { outline: none; border-color: #00E5FF; }
 </style>
+<link rel="stylesheet" href="/assets/stockfamily-typography.css">
+<style id="sf-panel-title-fix">
+.sf-panel-title {
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+  letter-spacing: .04em !important;
+}
+</style>
 </head>
 <body class="bg-idx-bg text-slate-200 font-sans antialiased h-screen flex flex-col overflow-hidden select-none">
 
+<!-- StockFamily Top Header -->
+<style id="stockfamily-header-final">
+
+  #sf-top-header {
+    height: 58px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 0 14px;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(19,23,34,.96),
+        rgba(13,17,25,.96)
+      );
+    border-bottom: 1px solid #2A2E39;
+    position: relative;
+    z-index: 30;
+  }
+
+  .sf-header-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 250px;
+    flex-shrink: 0;
+  }
+
+  .sf-header-logo {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background:
+      linear-gradient(
+        135deg,
+        #00E676,
+        #00E5FF
+      );
+
+    color: #071018;
+
+    box-shadow:
+      0 8px 22px rgba(0,229,255,.12);
+  }
+
+  .sf-header-logo i {
+    font-size: 16px;
+  }
+
+  .sf-header-brand-text {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+  }
+
+  .sf-header-title {
+    font-family:
+      Inter,
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
+
+    font-size: 17px;
+    line-height: 1;
+    font-weight: 850;
+    letter-spacing: -0.035em;
+
+    color: #F5F7F8;
+    white-space: nowrap;
+  }
+
+  .sf-header-title-accent {
+    color: #00E5FF;
+  }
+
+  .sf-header-badge {
+    height: 22px;
+    padding: 0 8px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 6px;
+
+    border:
+      1px solid rgba(255,179,0,.32);
+
+    background:
+      rgba(255,179,0,.075);
+
+    color:
+      #FFB300;
+
+    font-family:
+      "SFMono-Regular",
+      "Roboto Mono",
+      ui-monospace,
+      Menlo,
+      monospace;
+
+    font-size: 8px;
+    line-height: 1;
+    font-weight: 800;
+
+    letter-spacing: .075em;
+    white-space: nowrap;
+  }
+
+  .sf-header-search {
+    flex: 1 1 420px;
+    max-width: 420px;
+    min-width: 180px;
+    margin: 0 auto;
+  }
+
+  .sf-header-search-inner {
+    position: relative;
+  }
+
+  .sf-header-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    color: #66727B;
+    font-size: 11px;
+
+    pointer-events: none;
+  }
+
+  #tickerSearchInput {
+    width: 100% !important;
+    height: 34px !important;
+
+    padding:
+      0 12px 0 33px !important;
+
+    border-radius: 9px !important;
+
+    background:
+      #0B0E14 !important;
+
+    border:
+      1px solid #2A2E39 !important;
+
+    color:
+      #E8EDF0 !important;
+
+    font-family:
+      Inter,
+      system-ui,
+      sans-serif !important;
+
+    font-size:
+      11px !important;
+
+    font-weight:
+      500 !important;
+
+    letter-spacing:
+      0 !important;
+  }
+
+  #tickerSearchInput:focus {
+    border-color:
+      rgba(0,229,255,.55) !important;
+
+    box-shadow:
+      0 0 0 3px
+      rgba(0,229,255,.055) !important;
+  }
+
+  #tickerSearchInput::placeholder {
+    color:
+      #59646C !important;
+  }
+
+  .sf-market-strip {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    flex-shrink: 0;
+  }
+
+  .sf-market-box {
+    height: 34px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 0 10px;
+
+    border-radius: 8px;
+
+    background:
+      rgba(30,34,45,.82);
+
+    border:
+      1px solid #2A2E39;
+
+    white-space: nowrap;
+  }
+
+  .sf-market-label {
+    color:
+      #68747C;
+
+    font-family:
+      "SFMono-Regular",
+      "Roboto Mono",
+      ui-monospace,
+      Menlo,
+      monospace;
+
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: .075em;
+  }
+
+  #ihsgValue,
+  #usdIdrValue {
+    color:
+      #F3F6F7 !important;
+
+    font-family:
+      "SFMono-Regular",
+      "Roboto Mono",
+      ui-monospace,
+      Menlo,
+      monospace !important;
+
+    font-size:
+      11px !important;
+
+    line-height:
+      1 !important;
+
+    font-weight:
+      800 !important;
+
+    font-variant-numeric:
+      tabular-nums !important;
+
+    letter-spacing:
+      .005em !important;
+  }
+
+  #ihsgChange {
+    font-family:
+      "SFMono-Regular",
+      "Roboto Mono",
+      ui-monospace,
+      Menlo,
+      monospace !important;
+
+    font-size:
+      10px !important;
+
+    line-height:
+      1 !important;
+
+    font-weight:
+      750 !important;
+
+    font-variant-numeric:
+      tabular-nums !important;
+  }
+
+  .sf-market-time {
+    height: 34px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding:
+      0 9px;
+
+    border-radius:
+      8px;
+
+    background:
+      rgba(30,34,45,.58);
+
+    border:
+      1px solid #242A34;
+
+    color:
+      #68747C;
+
+    font-family:
+      "SFMono-Regular",
+      "Roboto Mono",
+      ui-monospace,
+      Menlo,
+      monospace;
+
+    font-size:
+      8px;
+
+    font-weight:
+      650;
+
+    font-variant-numeric:
+      tabular-nums;
+
+    white-space:
+      nowrap;
+  }
+
+  #dataStatusDot {
+    width:
+      6px !important;
+
+    height:
+      6px !important;
+
+    flex:
+      0 0 6px;
+  }
+
+  #dataStatusLabel {
+    display:
+      none !important;
+  }
+
+  #currentTime {
+    margin:
+      0 !important;
+
+    color:
+      #68747C !important;
+  }
+
+  @media (max-width: 1250px) {
+
+    .sf-header-brand {
+      min-width:
+        220px;
+    }
+
+    .sf-header-search {
+      max-width:
+        340px;
+    }
+
+    .sf-market-box {
+      padding:
+        0 8px;
+    }
+
+    .sf-market-time {
+      display:
+        none;
+    }
+  }
+
+  @media (max-width: 950px) {
+
+    .sf-header-brand {
+      min-width:
+        auto;
+    }
+
+    .sf-header-badge {
+      display:
+        none;
+    }
+
+    .sf-header-search {
+      max-width:
+        280px;
+    }
+
+    .sf-market-strip
+    .sf-market-box {
+      gap:
+        4px;
+    }
+
+    .sf-market-label {
+      display:
+        none;
+    }
+  }
+
+</style>
+
 <!-- Top Header -->
-<header class="h-14 border-b border-idx-border bg-idx-card/90 px-4 flex items-center justify-between z-30 shrink-0">
-  <div class="flex items-center space-x-3">
-    <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-idx-cyan to-idx-green flex items-center justify-center font-bold text-idx-bg shadow-lg shadow-idx-cyan/20">
-      <i class="fa-solid fa-chart-candlestick text-lg"></i>
+<header
+  id="sf-top-header"
+  class="border-b bg-idx-card/90"
+>
+
+  <!-- Brand -->
+  <div class="sf-header-brand">
+
+    <div class="sf-header-logo">
+      <i class="fa-solid fa-chart-candlestick"></i>
     </div>
-    <div class="flex flex-col">
-      <div class="flex items-center space-x-2">
-        <span class="font-extrabold text-lg tracking-wider text-white">CHART<span class="text-idx-cyan">NALIST</span></span>
-        <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-idx-amber/10 text-idx-amber border border-idx-amber/30">IDX PRO v4.1</span>
-      </div>
-      <span class="text-[10px] text-slate-400 font-mono -mt-1">HARGA/CHART: YAHOO (via backend) · BANDARMOLOGY: SUPABASE (EOD)</span>
+
+    <div class="sf-header-brand-text">
+
+      <span class="sf-header-title">
+        CHART<span class="sf-header-title-accent">NALIST</span>
+      </span>
+
+      <span class="sf-header-badge">
+        IDX PRO 4.1
+      </span>
+
     </div>
+
   </div>
 
-  <div class="relative w-80">
-    <div class="relative flex items-center">
-      <i class="fa-solid fa-magnifying-glass absolute left-3 text-slate-400 text-xs"></i>
-      <input type="text" id="tickerSearchInput"
-        placeholder="Cari & tambah ke watchlist (cth: BBCA)..."
-        class="w-full bg-idx-bg border border-idx-border rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-idx-cyan transition-colors uppercase font-mono">
+
+  <!-- Search -->
+  <div class="sf-header-search">
+
+    <div class="sf-header-search-inner">
+
+      <i
+        class="fa-solid fa-magnifying-glass sf-header-search-icon"
+      ></i>
+
+      <input
+        type="text"
+        id="tickerSearchInput"
+        placeholder="Cari & tambah ke watchlist..."
+        autocomplete="off"
+      />
+
+      <div
+        id="searchResults"
+        class="hidden absolute left-0 right-0 top-full mt-1 bg-idx-card border border-idx-border rounded-lg shadow-2xl z-50 max-h-60 overflow-y-auto"
+      ></div>
+
     </div>
-    <div id="searchResults" class="hidden absolute left-0 right-0 top-full mt-1 bg-idx-card border border-idx-border rounded-lg shadow-2xl z-50 max-h-60 overflow-y-auto"></div>
+
   </div>
 
-  <div class="flex items-center space-x-4 text-xs font-mono">
-    <div class="hidden lg:flex items-center space-x-2 bg-idx-panel/80 px-2.5 py-1 rounded-md border border-idx-border">
-      <span class="text-slate-400">IHSG:</span>
-      <span id="ihsgValue" class="font-bold text-white">--</span>
-      <span id="ihsgChange" class="text-slate-400 font-semibold">--</span>
+
+  <!-- Market -->
+  <div class="sf-market-strip">
+
+    <div class="sf-market-box">
+
+      <span class="sf-market-label">
+        IHSG
+      </span>
+
+      <span id="ihsgValue">
+        --
+      </span>
+
+      <span id="ihsgChange">
+        --
+      </span>
+
     </div>
-    <div class="hidden lg:flex items-center space-x-2 bg-idx-panel/80 px-2.5 py-1 rounded-md border border-idx-border">
-      <span class="text-slate-400">USD/IDR:</span>
-      <span id="usdIdrValue" class="font-bold text-white">--</span>
+
+
+    <div class="sf-market-box">
+
+      <span class="sf-market-label">
+        USD/IDR
+      </span>
+
+      <span id="usdIdrValue">
+        --
+      </span>
+
     </div>
-    <div class="flex items-center space-x-2 bg-idx-panel/80 px-2.5 py-1 rounded-md border border-idx-border">
-      <span id="dataStatusDot" class="w-2 h-2 rounded-full bg-idx-amber live-dot"></span>
-      <span id="dataStatusLabel" class="text-idx-amber font-semibold">MEMUAT...</span>
-      <span id="currentTime" class="text-slate-400 ml-1">--:--:-- WIB</span>
+
+
+    <div class="sf-market-time">
+
+      <span
+        id="dataStatusDot"
+        class="rounded-full bg-idx-amber live-dot"
+      ></span>
+
+      <span id="dataStatusLabel">
+        MARKET
+      </span>
+
+      <span id="currentTime">
+        --:--:-- WIB
+      </span>
+
     </div>
+
   </div>
+
 </header>
 
 <!-- Marquee -->
@@ -251,12 +683,12 @@ function togglePanel(panelId, headerEl) {
   <!-- Right: Structure / Bandarmology / Order book -->
   <aside class="w-80 border-l border-idx-border bg-idx-card flex flex-col shrink-0 overflow-y-auto text-xs font-mono">
 
-    <div class="p-3 border-b border-idx-border">
-      <h2 class="text-[11px] font-bold text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between cursor-pointer select-none" onclick="togglePanel('structPanel', this)">
+    <div class="p-3 border-b border-idx-border shrink-0">
+      <h2 class="text-[11px] font-bold text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between cursor-pointer select-none" class="sf-panel-title" onclick="togglePanel('structPanel', this)">
         <span class="flex items-center gap-1.5"><i class="fa-solid fa-microchip"></i> Market Structure <span class="text-slate-500 font-normal normal-case">(Heuristik)</span></span>
         <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
       </h2>
-      <div id="structPanel" class="space-y-1.5">
+      <div id="structPanel" class="space-y-1.5 text-[11px]">
         <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border">
           <span class="text-slate-400">Trend</span><span id="structTrend" class="font-bold text-slate-300">--</span>
         </div>
@@ -270,13 +702,13 @@ function togglePanel(panelId, headerEl) {
           <span class="text-slate-400">RSI (14)</span><span id="structRsi" class="font-bold text-slate-300">--</span>
         </div>
         <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border">
-          <span class="text-slate-400">VWAP (anchored)</span><span id="structVwap" class="font-bold text-idx-amber">--</span>
+          <span class="text-slate-400">VWAP (window)</span><span id="structVwap" class="font-bold text-idx-amber">--</span>
         </div>
       </div>
     </div>
 
-    <div class="p-3 border-b border-idx-border">
-      <h2 class="text-[11px] font-bold text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between cursor-pointer select-none" onclick="togglePanel('bandarPanel', this)">
+    <div class="p-3 border-b border-idx-border shrink-0">
+      <h2 class="text-[11px] font-bold text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between cursor-pointer select-none" class="sf-panel-title" onclick="togglePanel('bandarPanel', this)">
         <span class="flex items-center gap-1.5"><i class="fa-solid fa-database"></i> Bandarmology <span id="bandarDateLabel" class="text-slate-500 font-normal normal-case">--</span></span>
         <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
       </h2>
@@ -298,8 +730,8 @@ function togglePanel(panelId, headerEl) {
       <p class="text-[10px] text-slate-500 mt-1.5 italic">Satu-satunya panel yang masih dari data EOD Supabase (foreign_buy/foreign_sell asli), sesuai permintaan.</p>
     </div>
     <!-- GEM Score Panel -->
-    <div class="p-3 border-b border-idx-border">
-      <h2 class="text-[11px] font-bold text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between cursor-pointer select-none" onclick="togglePanel('gemPanel', this)">
+    <div class="p-3 border-b border-idx-border shrink-0">
+      <h2 class="text-[11px] font-bold text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between cursor-pointer select-none" class="sf-panel-title" onclick="togglePanel('gemPanel', this)">
         <span class="flex items-center gap-1.5"><i class="fa-solid fa-gem"></i> GEM Score <span id="gemDateLabel" class="text-slate-500 font-normal normal-case">--</span></span>
         <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
       </h2>
@@ -325,7 +757,7 @@ function togglePanel(panelId, headerEl) {
     </div>        
     
 
-    <div class="p-3 border-b border-idx-border">
+    <div class="p-3 border-b border-idx-border shrink-0">
       <h2 class="text-[11px] font-bold text-idx-cyan uppercase tracking-wider mb-2 flex items-center gap-1.5">
         <i class="fa-solid fa-book"></i> Bid / Offer <span class="text-slate-500 font-normal normal-case">(Yahoo, delayed)</span>
       </h2>
@@ -344,9 +776,9 @@ function togglePanel(panelId, headerEl) {
       <p class="text-[10px] text-slate-500 mt-1.5 italic">Yahoo sering tidak punya data bid/offer untuk saham IDX — tampil "--" kalau memang tidak tersedia.</p>
     </div>
 
-    <div class="p-3 border-b border-idx-border">
+    <div class="p-3 border-b border-idx-border shrink-0">
       <h2 class="text-[11px] font-bold text-idx-cyan uppercase tracking-wider mb-2 flex items-center gap-1.5">
-        <i class="fa-solid fa-ruler-horizontal"></i> 52-Week Range <span class="text-slate-500 font-normal normal-case">(Yahoo)</span>
+        <i class="fa-solid fa-ruler-horizontal"></i> 52-Week Range <span class="text-slate-500 font-normal normal-case">(EOD)</span>
       </h2>
       <div class="flex justify-between text-[10px] text-slate-400 mb-1">
         <span id="low52Label">--</span><span id="high52Label">--</span>
@@ -356,7 +788,7 @@ function togglePanel(panelId, headerEl) {
       </div>
     </div>
 
-    <div class="p-3">
+    <div class="p-3 shrink-0">
       <h2 class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
         <i class="fa-solid fa-chart-pie"></i> Rasio Fundamental
       </h2>
@@ -573,14 +1005,53 @@ function togglePanel(panelId, headerEl) {
   // INDICATOR MATH
   // ============================================================
   function calcRSI(candles, period = 14) {
-    if (candles.length < period + 1) return null;
-    let gains = 0, losses = 0;
-    for (let i = candles.length - period; i < candles.length; i++) {
-      const diff = candles[i].close - candles[i - 1].close;
-      if (diff >= 0) gains += diff; else losses -= diff;
+    if (!Array.isArray(candles) || candles.length < period + 1) {
+      return null;
     }
-    if (gains + losses === 0) return 50;
-    const rs = gains / (losses || 1e-9);
+
+    const closes = candles
+      .map(c => Number(c?.close))
+      .filter(Number.isFinite);
+
+    if (closes.length < period + 1) {
+      return null;
+    }
+
+    let gainSum = 0;
+    let lossSum = 0;
+
+    for (let i = 1; i <= period; i++) {
+      const diff = closes[i] - closes[i - 1];
+
+      if (diff > 0) {
+        gainSum += diff;
+      } else if (diff < 0) {
+        lossSum -= diff;
+      }
+    }
+
+    let avgGain = gainSum / period;
+    let avgLoss = lossSum / period;
+
+    for (let i = period + 1; i < closes.length; i++) {
+      const diff = closes[i] - closes[i - 1];
+      const gain = diff > 0 ? diff : 0;
+      const loss = diff < 0 ? -diff : 0;
+
+      avgGain = ((avgGain * (period - 1)) + gain) / period;
+      avgLoss = ((avgLoss * (period - 1)) + loss) / period;
+    }
+
+    if (avgLoss === 0) {
+      return avgGain > 0 ? 100 : 50;
+    }
+
+    if (avgGain === 0) {
+      return 0;
+    }
+
+    const rs = avgGain / avgLoss;
+
     return 100 - (100 / (1 + rs));
   }
 
@@ -598,28 +1069,97 @@ function togglePanel(panelId, headerEl) {
   }
 
   function calcMarketStructure(candles) {
-    if (candles.length < 7) return null;
-    const swingHighs = [], swingLows = [];
+    if (!Array.isArray(candles) || candles.length < 7) {
+      return null;
+    }
+
+    const swingHighs = [];
+    const swingLows = [];
+
     for (let i = 2; i < candles.length - 2; i++) {
       const c = candles[i];
-      const isHigh = c.high > candles[i-1].high && c.high > candles[i-2].high &&
-                     c.high > candles[i+1].high && c.high > candles[i+2].high;
-      const isLow = c.low < candles[i-1].low && c.low < candles[i-2].low &&
-                    c.low < candles[i+1].low && c.low < candles[i+2].low;
-      if (isHigh) swingHighs.push(c.high);
-      if (isLow) swingLows.push(c.low);
+
+      if (
+        !Number.isFinite(Number(c?.high)) ||
+        !Number.isFinite(Number(c?.low))
+      ) {
+        continue;
+      }
+
+      const isHigh =
+        c.high > candles[i - 1].high &&
+        c.high > candles[i - 2].high &&
+        c.high > candles[i + 1].high &&
+        c.high > candles[i + 2].high;
+
+      const isLow =
+        c.low < candles[i - 1].low &&
+        c.low < candles[i - 2].low &&
+        c.low < candles[i + 1].low &&
+        c.low < candles[i + 2].low;
+
+      if (isHigh) {
+        swingHighs.push(c.high);
+      }
+
+      if (isLow) {
+        swingLows.push(c.low);
+      }
     }
-    const lastHigh = swingHighs.length ? swingHighs[swingHighs.length - 1] : null;
-    const prevHigh = swingHighs.length > 1 ? swingHighs[swingHighs.length - 2] : null;
-    const lastLow = swingLows.length ? swingLows[swingLows.length - 1] : null;
-    const prevLow = swingLows.length > 1 ? swingLows[swingLows.length - 2] : null;
+
+    const lastHigh =
+      swingHighs.length > 0
+        ? swingHighs[swingHighs.length - 1]
+        : null;
+
+    const prevHigh =
+      swingHighs.length > 1
+        ? swingHighs[swingHighs.length - 2]
+        : null;
+
+    const lastLow =
+      swingLows.length > 0
+        ? swingLows[swingLows.length - 1]
+        : null;
+
+    const prevLow =
+      swingLows.length > 1
+        ? swingLows[swingLows.length - 2]
+        : null;
 
     let trend = 'SIDEWAYS';
-    if (lastHigh && prevHigh && lastLow && prevLow) {
-      if (lastHigh > prevHigh && lastLow > prevLow) trend = 'BULLISH (HH/HL)';
-      else if (lastHigh < prevHigh && lastLow < prevLow) trend = 'BEARISH (LH/LL)';
+
+    if (
+      lastHigh !== null &&
+      prevHigh !== null &&
+      lastLow !== null &&
+      prevLow !== null
+    ) {
+      const higherHigh = lastHigh > prevHigh;
+      const higherLow = lastLow > prevLow;
+
+      const lowerHigh = lastHigh < prevHigh;
+      const lowerLow = lastLow < prevLow;
+
+      if (higherHigh && higherLow) {
+        trend = 'BULLISH (HH/HL)';
+      } else if (lowerHigh && lowerLow) {
+        trend = 'BEARISH (LH/LL)';
+      } else if (
+        (higherHigh && lowerLow) ||
+        (lowerHigh && higherLow)
+      ) {
+        trend = 'MIXED';
+      }
     }
-    return { trend, lastHigh, lastLow };
+
+    return {
+      trend,
+      lastHigh,
+      prevHigh,
+      lastLow,
+      prevLow
+    };
   }
 
   // ============================================================
@@ -757,12 +1297,8 @@ function togglePanel(panelId, headerEl) {
       document.getElementById('offerPrice').innerText = q.ask ? fmtRp(q.ask) : '--';
       document.getElementById('offerVolume').innerText = `vol ${fmtNum(q.askSize)}`;
 
-      if (q.fiftyTwoWeekLow != null && q.fiftyTwoWeekHigh != null && q.fiftyTwoWeekHigh > q.fiftyTwoWeekLow) {
-        document.getElementById('low52Label').innerText = fmtRp(q.fiftyTwoWeekLow);
-        document.getElementById('high52Label').innerText = fmtRp(q.fiftyTwoWeekHigh);
-        const pct = ((price - q.fiftyTwoWeekLow) / (q.fiftyTwoWeekHigh - q.fiftyTwoWeekLow)) * 100;
-        document.getElementById('range52Bar').style.width = `${Math.max(2, Math.min(100, pct))}%`;
-      }
+      // 52W range diisi oleh loadBandarmology()
+      // dari EOD Supabase agar definisinya konsisten.
     } catch (err) {
       console.error('[loadQuoteHeader]', code, err);
     }
@@ -773,8 +1309,50 @@ function togglePanel(panelId, headerEl) {
   // ============================================================
   async function loadMarketOverview() {
     try {
-      const results = await yahooQuoteBatch(['^JKSE', 'IDR=X']);
-      const ihsg = results.find(r => r.symbol === '^JKSE');
+      const results = await yahooQuoteBatch(['IDR=X']);
+
+      let ihsg = null;
+
+      try {
+        const ihsgResponse =
+          await fetch(
+            "/api/yahoo/chart/%5EJKSE?range=5d&interval=1d",
+            {
+              cache: "no-store"
+            }
+          );
+
+        if (ihsgResponse.ok) {
+
+          const ihsgPayload =
+            await ihsgResponse.json();
+
+          const meta =
+            ihsgPayload?.result?.meta;
+
+          if (meta) {
+
+            ihsg = {
+              symbol: "^JKSE",
+
+              regularMarketPrice:
+                meta.fulldayPrice ??
+                meta.regularMarketPrice,
+
+              regularMarketChangePercent:
+                meta.fulldayChangePercent ??
+                meta.regularMarketChangePercent
+            };
+          }
+        }
+
+      } catch (ihsgError) {
+
+        console.warn(
+          "[IHSG] chart endpoint failed:",
+          ihsgError
+        );
+      }
       const usd = results.find(r => r.symbol === 'IDR=X');
 
       if (ihsg) {
@@ -802,24 +1380,152 @@ function togglePanel(panelId, headerEl) {
   async function loadBandarmology(code) {
     try {
       const data = await apiGet(`/api/public/summary/${encodeURIComponent(code)}`);
+
       if (!data.success || !data.hasData) {
         document.getElementById('bandarDateLabel').innerText = 'tidak ada data';
+        document.getElementById('bandarScore').innerText = '--';
+        document.getElementById('foreignBuyToday').innerText = '--';
+        document.getElementById('foreignSellToday').innerText = '--';
+        document.getElementById('netForeign20d').innerText = '--';
+        document.getElementById('low52Label').innerText = '--';
+        document.getElementById('high52Label').innerText = '--';
+        document.getElementById('range52Bar').style.width = '2px';
         return;
       }
 
-      document.getElementById('bandarDateLabel').innerText = data.date;
-      const scoreEl = document.getElementById('bandarScore');
-      scoreEl.innerText = `${data.bandarScore}/100`;
-      scoreEl.className = `font-bold ${data.bandarScore >= 60 ? 'text-idx-green' : data.bandarScore <= 40 ? 'text-idx-red' : 'text-idx-amber'}`;
+      const current =
+        data.isCurrentSession === true &&
+        data.dataStatus === 'CURRENT';
 
-      document.getElementById('foreignBuyToday').innerText = fmtNum(data.foreignBuyToday);
-      document.getElementById('foreignSellToday').innerText = fmtNum(data.foreignSellToday);
-      const netEl = document.getElementById('netForeign20d');
-      netEl.innerText = `${data.netForeign20d >= 0 ? '+' : ''}${fmtNum(data.netForeign20d)}`;
-      netEl.className = `font-bold ${data.netForeign20d >= 0 ? 'text-idx-green' : 'text-idx-red'}`;
+      document.getElementById('bandarDateLabel').innerText =
+        current
+          ? `${data.date} · CURRENT`
+          : `${data.date} · STALE`;
+
+      const scoreEl =
+        document.getElementById('bandarScore');
+
+      scoreEl.innerText =
+        data.bandarScore != null
+          ? `${data.bandarScore}/100`
+          : '--';
+
+      scoreEl.className =
+        `font-bold ${
+          data.bandarScore >= 60
+            ? 'text-idx-green'
+            : data.bandarScore <= 40
+              ? 'text-idx-red'
+              : 'text-idx-amber'
+        }`;
+
+      const buyEl =
+        document.getElementById('foreignBuyToday');
+
+      const sellEl =
+        document.getElementById('foreignSellToday');
+
+      if (current) {
+        buyEl.innerText =
+          data.foreignBuyToday != null
+            ? fmtNum(data.foreignBuyToday)
+            : '--';
+
+        sellEl.innerText =
+          data.foreignSellToday != null
+            ? fmtNum(data.foreignSellToday)
+            : '--';
+
+        buyEl.title =
+          `EOD ${data.marketLatestDate}`;
+
+        sellEl.title =
+          `EOD ${data.marketLatestDate}`;
+      } else {
+        buyEl.innerText = '--';
+        sellEl.innerText = '--';
+
+        buyEl.title =
+          `Ticker terakhir ${data.date}; market terbaru ${data.marketLatestDate}`;
+
+        sellEl.title =
+          `Ticker terakhir ${data.date}; market terbaru ${data.marketLatestDate}`;
+      }
+
+      const netEl =
+        document.getElementById('netForeign20d');
+
+      if (data.netForeign20d != null) {
+        netEl.innerText =
+          `${data.netForeign20d >= 0 ? '+' : ''}${fmtNum(data.netForeign20d)}`;
+
+        netEl.className =
+          `font-bold ${
+            data.netForeign20d >= 0
+              ? 'text-idx-green'
+              : 'text-idx-red'
+          }`;
+      } else {
+        netEl.innerText = '--';
+        netEl.className =
+          'font-bold text-slate-400';
+      }
+
+      const low52 =
+        Number(data.low52);
+
+      const high52 =
+        Number(data.high52);
+
+      const close =
+        Number(data.close);
+
+      const lowEl =
+        document.getElementById('low52Label');
+
+      const highEl =
+        document.getElementById('high52Label');
+
+      const rangeEl =
+        document.getElementById('range52Bar');
+
+      if (
+        Number.isFinite(low52) &&
+        Number.isFinite(high52) &&
+        high52 > low52
+      ) {
+        lowEl.innerText =
+          fmtRp(low52);
+
+        highEl.innerText =
+          fmtRp(high52);
+
+        const pct =
+          Number.isFinite(close)
+            ? ((close - low52) / (high52 - low52)) * 100
+            : 0;
+
+        rangeEl.style.width =
+          `${Math.max(2, Math.min(100, pct))}%`;
+      } else {
+        lowEl.innerText = '--';
+        highEl.innerText = '--';
+        rangeEl.style.width = '2px';
+      }
+
     } catch (err) {
       console.error('[loadBandarmology]', code, err);
-      document.getElementById('bandarDateLabel').innerText = 'gagal memuat';
+
+      document.getElementById('bandarDateLabel').innerText =
+        'gagal memuat';
+
+      document.getElementById('bandarScore').innerText = '--';
+      document.getElementById('foreignBuyToday').innerText = '--';
+      document.getElementById('foreignSellToday').innerText = '--';
+      document.getElementById('netForeign20d').innerText = '--';
+      document.getElementById('low52Label').innerText = '--';
+      document.getElementById('high52Label').innerText = '--';
+      document.getElementById('range52Bar').style.width = '2px';
     }
   }
 
@@ -1040,8 +1746,15 @@ function togglePanel(panelId, headerEl) {
 }
 </script>
 <script src="/assets/stockfamily-sidebar.js"></script>
+<script src="/assets/stockfamily-typography.js"></script>
 </body>
 </html>
+
+
+
+
+
+
 
 
 

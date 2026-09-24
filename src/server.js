@@ -433,70 +433,243 @@ app.get('/api/public/summary/:code', async (req, res) => {
     const code = String(req.params.code || '').trim().toUpperCase();
 
     const { data: stock, error: sErr } = await supabase
-      .from('stocks').select('id,code,name').eq('code', code).maybeSingle();
+      .from('stocks')
+      .select('id,code,name')
+      .eq('code', code)
+      .maybeSingle();
+
     if (sErr) throw sErr;
-    if (!stock) return res.status(404).json({ success: false, error: `Ticker ${code} tidak ditemukan di database.` });
 
-    const latestDate = await getLatestTradeDate();
-    if (!latestDate) return res.json({ success: true, hasData: false, message: 'Belum ada data historis.' });
+    if (!stock) {
+      return res.status(404).json({
+        success: false,
+        error: `Ticker ${code} tidak ditemukan di database.`
+      });
+    }
 
-    const startDate = rangeToStartDate('1y', latestDate);
+    const marketLatestDate = await getLatestTradeDate();
+
+    if (!marketLatestDate) {
+      return res.json({
+        success: true,
+        hasData: false,
+        message: 'Belum ada data historis.'
+      });
+    }
+
+    const startDate = rangeToStartDate('1y', marketLatestDate);
 
     const { data: rows, error: rErr } = await supabase
       .from('daily_stock_data')
-      .select('trade_date,close,previous_price,volume,value,bid,bid_volume,offer,offer_volume,foreign_buy,foreign_sell')
+      .select(
+        'trade_date,close,previous_price,volume,value,bid,bid_volume,offer,offer_volume,foreign_buy,foreign_sell,high,low'
+      )
       .eq('stock_id', stock.id)
       .gte('trade_date', startDate)
-      .lte('trade_date', latestDate)
+      .lte('trade_date', marketLatestDate)
       .order('trade_date', { ascending: true });
+
     if (rErr) throw rErr;
 
-    if (!rows.length) return res.json({ success: true, hasData: false, message: `Belum ada data historis untuk ${code}.` });
+    if (!rows.length) {
+      return res.json({
+        success: true,
+        hasData: false,
+        message: `Belum ada data historis untuk ${code}.`
+      });
+    }
 
     const last = rows[rows.length - 1];
-    const prev = rows.length > 1 ? rows[rows.length - 2] : last;
+    const prev = rows.length > 1
+      ? rows[rows.length - 2]
+      : last;
 
-    const closes = rows.map(r => Number(r.close)).filter(v => !isNaN(v));
-    const low52 = closes.length ? Math.min(...closes) : null;
-    const high52 = closes.length ? Math.max(...closes) : null;
+    /*
+     * Freshness:
+     * ticker harus benar-benar memiliki row pada marketLatestDate
+     */
+    const isCurrentSession =
+      String(last.trade_date) === String(marketLatestDate);
 
-    const trailing = rows.slice(-20);
-    const netForeign20d = trailing.reduce(
-      (s, r) => s + ((Number(r.foreign_buy) || 0) - (Number(r.foreign_sell) || 0)), 0
+    /*
+     * 20 observasi terbaru milik ticker.
+     * Ini tetap valid meskipun ticker tidak aktif pada sesi terbaru.
+     */
+    const trailing20 = rows.slice(-20);
+
+    const netForeign20d = trailing20.reduce(
+      (sum, r) =>
+        sum +
+        ((Number(r.foreign_buy) || 0) -
+         (Number(r.foreign_sell) || 0)),
+      0
     );
-    const grossForeign20d = trailing.reduce(
-      (s, r) => s + (Number(r.foreign_buy) || 0) + (Number(r.foreign_sell) || 0), 0
+
+    const grossForeign20d = trailing20.reduce(
+      (sum, r) =>
+        sum +
+        (Number(r.foreign_buy) || 0) +
+        (Number(r.foreign_sell) || 0),
+      0
     );
-    const bandarScoreRaw = grossForeign20d > 0 ? 50 + 50 * (netForeign20d / grossForeign20d) : 50;
+
+    /*
+     * Bandar Score:
+     * tetap formula lama.
+     */
+    const bandarScoreRaw =
+      grossForeign20d > 0
+        ? 50 + 50 * (netForeign20d / grossForeign20d)
+        : 50;
+
+    /*
+     * 52-week range:
+     * gunakan high/low aktual harian, bukan close.
+     */
+    const validHighs = rows
+      .map(r => Number(r.high))
+      .filter(Number.isFinite)
+      .filter(v => v > 0);
+
+    const validLows = rows
+      .map(r => Number(r.low))
+      .filter(Number.isFinite)
+      .filter(v => v > 0);
+
+    const low52 = validLows.length
+      ? Math.min(...validLows)
+      : null;
+
+    const high52 = validHighs.length
+      ? Math.max(...validHighs)
+      : null;
+
+    /*
+     * Today's foreign data:
+     * jika ticker tidak punya data pada sesi terbaru,
+     * jangan klaim row terakhir sebagai "hari ini".
+     */
+    const foreignBuyToday = isCurrentSession
+      ? (Number(last.foreign_buy) || 0)
+      : null;
+
+    const foreignSellToday = isCurrentSession
+      ? (Number(last.foreign_sell) || 0)
+      : null;
+
+    const netForeignToday =
+      isCurrentSession
+        ? foreignBuyToday - foreignSellToday
+        : null;
+
+    /*
+     * Change/price tetap berdasarkan row terakhir ticker.
+     * Tambahkan metadata freshness agar frontend bisa membedakan
+     * CURRENT dari STALE.
+     */
+    const lastClose = Number(last.close);
+    const prevClose = Number(prev.close);
+
+    const change =
+      Number.isFinite(lastClose) && Number.isFinite(prevClose)
+        ? lastClose - prevClose
+        : null;
+
+    const changePercent =
+      Number.isFinite(change) && prevClose > 0
+        ? Number(((change / prevClose) * 100).toFixed(2))
+        : null;
 
     res.json({
       success: true,
       hasData: true,
+
       code: stock.code,
       name: stock.name,
+
+      /*
+       * Date milik ticker
+       */
       date: last.trade_date,
-      close: Number(last.close),
-      change: Number(last.close) - Number(prev.close),
-      changePercent: prev.close
-        ? Number((((Number(last.close) - Number(prev.close)) / Number(prev.close)) * 100).toFixed(2))
-        : 0,
+
+      /*
+       * Date pasar global terbaru
+       */
+      marketLatestDate,
+
+      /*
+       * Explicit freshness flag
+       */
+      isCurrentSession,
+
+      dataStatus: isCurrentSession
+        ? 'CURRENT'
+        : 'STALE',
+
+      close: Number.isFinite(lastClose)
+        ? lastClose
+        : null,
+
+      change,
+      changePercent,
+
       volume: Number(last.volume) || 0,
       value: Number(last.value) || 0,
-      bid: last.bid != null ? Number(last.bid) : null,
-      bidVolume: last.bid_volume != null ? Number(last.bid_volume) : null,
-      offer: last.offer != null ? Number(last.offer) : null,
-      offerVolume: last.offer_volume != null ? Number(last.offer_volume) : null,
-      foreignBuyToday: Number(last.foreign_buy) || 0,
-      foreignSellToday: Number(last.foreign_sell) || 0,
-      netForeignToday: (Number(last.foreign_buy) || 0) - (Number(last.foreign_sell) || 0),
+
+      bid:
+        last.bid != null
+          ? Number(last.bid)
+          : null,
+
+      bidVolume:
+        last.bid_volume != null
+          ? Number(last.bid_volume)
+          : null,
+
+      offer:
+        last.offer != null
+          ? Number(last.offer)
+          : null,
+
+      offerVolume:
+        last.offer_volume != null
+          ? Number(last.offer_volume)
+          : null,
+
+      foreignBuyToday,
+      foreignSellToday,
+      netForeignToday,
+
       netForeign20d,
-      bandarScore: Math.max(0, Math.min(100, Math.round(bandarScoreRaw))),
+
+      bandarScore:
+        Math.max(
+          0,
+          Math.min(
+            100,
+            Math.round(bandarScoreRaw)
+          )
+        ),
+
       low52,
-      high52
+      high52,
+
+      /*
+       * Audit metadata
+       */
+      trailing20Rows: trailing20.length,
+      rangeDays: rows.length,
+      rangeStart: startDate,
+      rangeEnd: marketLatestDate
     });
+
   } catch (e) {
     console.error('[Public Summary Error]', e);
-    res.status(500).json({ success: false, error: e.message });
+
+    res.status(500).json({
+      success: false,
+      error: e.message
+    });
   }
 });
 
