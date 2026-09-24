@@ -1,0 +1,508 @@
+{
+  "specification": {
+    "name": "QBS Production Specification",
+    "version": "1.0.0",
+    "status": "LOCKED_FOR_IMPLEMENTATION",
+    "purpose": "Production contract for detecting, classifying, contextualizing, and tracking QBS market events in StockFamily IDX.",
+    "scope": "IDX daily stock data",
+    "principle": "QBS is an event detector and event-intelligence framework, not a standalone buy signal or profit probability."
+  },
+
+  "pipeline": {
+    "sequence": [
+      "DATA",
+      "FEATURE_ENGINE",
+      "QBS_DETECTOR",
+      "EVENT_STATE",
+      "EVENT_QUALITY",
+      "MARKET_REGIME",
+      "EVENT_INTELLIGENCE",
+      "OUTCOME_TRACKING"
+    ]
+  },
+
+  "data_contract": {
+    "primary_source": "daily_stock_data",
+    "required_fields": [
+      "trade_date",
+      "stock_code",
+      "stock_name",
+      "previous_price",
+      "open",
+      "high",
+      "low",
+      "close",
+      "change",
+      "volume",
+      "value",
+      "frequency",
+      "bid_volume",
+      "offer_volume",
+      "foreign_buy",
+      "foreign_sell",
+      "net_foreign"
+    ],
+    "historical_window_required": 20,
+    "outcome_window": 20
+  },
+
+  "feature_engine": {
+    "lookback": 20,
+
+    "bb_width": {
+      "formula": "4 * STD(close,20) / SMA(close,20)",
+      "purpose": "Measure relative price compression."
+    },
+
+    "price_range_20": {
+      "formula": "(MAX(high,20) - MIN(low,20)) / MIN(low,20)",
+      "purpose": "Measure recent price expansion range."
+    },
+
+    "volume_surge": {
+      "formula": "H0.volume / AVG(H-1...H-20.volume)",
+      "purpose": "Measure abnormal transaction volume."
+    },
+
+    "frequency_surge": {
+      "formula": "H0.frequency / AVG(H-1...H-20.frequency)",
+      "purpose": "Measure abnormal transaction frequency."
+    },
+
+    "close_position": {
+      "formula": "(H0.close - H0.low) / (H0.high - H0.low)",
+      "purpose": "Measure where the closing price sits inside the daily range.",
+      "zero_range_behavior": "null"
+    },
+
+    "change_pct": {
+      "source": "H0.change",
+      "purpose": "Store observed daily price change."
+    }
+  },
+
+  "qbs_detector": {
+    "name": "Quiet Before Storm",
+    "role": "EVENT_DETECTOR",
+    "output": "DETECTED",
+
+    "baseline_rules": {
+      "close_min": 100,
+      "value_min": 2000000000,
+      "bb_width_max_exclusive": 0.06,
+      "price_range_20_max_exclusive": 0.15,
+      "volume_surge_min": 6,
+      "frequency_surge_min": 5
+    },
+
+    "logic": "All baseline rules must be satisfied.",
+    "minimum_history": 20,
+    "signal_date": "H0",
+    "detection_timing": "end_of_day",
+
+    "score": {
+      "type": "QBS_SCORE",
+      "role": "EVENT_INTENSITY",
+      "not_probability": true,
+      "not_buy_signal": true,
+
+      "components": {
+        "close_position": {
+          "gte_0_95": 3,
+          "gte_0_80_lt_0_95": 2,
+          "lt_0_80": 0
+        },
+
+        "volume_surge": {
+          "gte_20_lt_40": 2,
+          "gte_40_lt_80": 3,
+          "gte_80_lt_120": 1,
+          "gte_120": 0
+        },
+
+        "frequency_surge": {
+          "gte_10_lt_25": 1,
+          "gte_25_lt_60": 3,
+          "gte_60": 0
+        },
+
+        "price_range_20": {
+          "gte_0_08_lt_0_10": 1,
+          "gte_0_10_lt_0_15": 2,
+          "otherwise": 0
+        },
+
+        "bb_width": {
+          "gte_0_04_lt_0_06": 1,
+          "otherwise": 0
+        }
+      },
+
+      "bands": {
+        "0_3": "LOW",
+        "4_6": "MEDIUM",
+        "7_9": "HIGH",
+        "10_PLUS": "VERY_HIGH"
+      },
+
+      "interpretation": {
+        "0_3": "LOW_EVENT_INTENSITY",
+        "4_6": "MODERATE_EVENT_INTENSITY",
+        "7_9": "HIGH_EVENT_INTENSITY",
+        "10_PLUS": "VERY_HIGH_EVENT_INTENSITY"
+      }
+    }
+  },
+
+  "event_state_machine": {
+    "initial_state": "DETECTED",
+
+    "states": [
+      "DETECTED",
+      "EARLY_EXPANSION",
+      "SHAKEOUT",
+      "SLOW_EXPANSION",
+      "EXPANSION",
+      "FAILED",
+      "EXHAUSTION"
+    ],
+
+    "state_definitions": {
+      "DETECTED": {
+        "meaning": "QBS baseline conditions have been detected at H0."
+      },
+
+      "EARLY_EXPANSION": {
+        "meaning": "Expansion begins rapidly after detection."
+      },
+
+      "SHAKEOUT": {
+        "meaning": "Price experiences a meaningful adverse excursion before any sustained expansion."
+      },
+
+      "SLOW_EXPANSION": {
+        "meaning": "Expansion develops progressively rather than immediately."
+      },
+
+      "EXPANSION": {
+        "meaning": "Price expands after detection but does not meet the early-expansion timing pattern."
+      },
+
+      "FAILED": {
+        "meaning": "The detected event fails to produce significant expansion."
+      },
+
+      "EXHAUSTION": {
+        "meaning": "An expansion event reaches a subsequent exhaustion condition."
+      }
+    },
+
+    "allowed_primary_transitions": [
+      "DETECTED -> EARLY_EXPANSION",
+      "DETECTED -> SHAKEOUT",
+      "DETECTED -> SLOW_EXPANSION",
+      "DETECTED -> EXPANSION",
+      "DETECTED -> FAILED"
+    ],
+
+    "allowed_secondary_transitions": [
+      "EARLY_EXPANSION -> EXHAUSTION",
+      "EXPANSION -> EXHAUSTION",
+      "SLOW_EXPANSION -> EXHAUSTION"
+    ]
+  },
+
+  "event_quality": {
+    "role": "OUTCOME_CLASSIFICATION",
+
+    "classes": [
+      "TRUE_EXPANSION",
+      "PARTIAL_EXPANSION",
+      "SPIKE_REVERSAL",
+      "FAILED_EVENT",
+      "NO_SIGNIFICANT_EXPANSION"
+    ],
+
+    "definitions": {
+      "TRUE_EXPANSION": "Event demonstrates sustained significant expansion according to the locked research classification.",
+      "PARTIAL_EXPANSION": "Event expands meaningfully but does not satisfy the full true-expansion pattern.",
+      "SPIKE_REVERSAL": "Event produces an initial spike followed by reversal without sustained expansion.",
+      "FAILED_EVENT": "Detected event fails and produces insufficient expansion.",
+      "NO_SIGNIFICANT_EXPANSION": "Event remains within a low-expansion trajectory."
+    },
+
+    "important_rule": "Event quality is an outcome label and must not be used as an input when classifying the original event."
+  },
+
+  "market_regime": {
+    "role": "CONTEXT",
+
+    "regimes": [
+      "BULLISH",
+      "NORMAL",
+      "WEAK",
+      "STRESS"
+    ],
+
+    "metrics": [
+      "breadth",
+      "liquid_breadth",
+      "median_change",
+      "average_change",
+      "dispersion",
+      "aggregate_foreign_flow"
+    ],
+
+    "definitions": {
+      "BULLISH": {
+        "effective_breadth_min": 0.20,
+        "median_change_min": 0.005,
+        "foreign_flow_min": 0
+      },
+
+      "STRESS": {
+        "effective_breadth_max": -0.30,
+        "median_change_max": -0.0075,
+        "foreign_flow_max": 0
+      },
+
+      "WEAK": {
+        "effective_breadth_max": -0.10,
+        "median_change_max": -0.0025,
+        "logic": "effective_breadth <= -10% OR median_change < -0.25%"
+      },
+
+      "NORMAL": {
+        "logic": "All other conditions."
+      }
+    },
+
+    "production_rule": "Regime is contextual metadata and must not automatically suppress QBS events."
+  },
+
+  "event_intelligence": {
+    "required_components": [
+      "symbol",
+      "event_date",
+      "qbs_score",
+      "qbs_band",
+      "state",
+      "quality",
+      "market_regime",
+      "event_status"
+    ],
+
+    "event_status": [
+      "ACTIVE",
+      "COMPLETED",
+      "FAILED",
+      "EXHAUSTED",
+      "TRACKING"
+    ],
+
+    "human_interpretation": "The system describes what kind of event is occurring and how similar events have behaved historically."
+  },
+
+  "outcome_tracking": {
+    "purpose": "Measure actual event trajectory after detection.",
+    "reference": "H0 close",
+
+    "trajectory": {
+      "start": "H0",
+      "future_steps": [
+        "H+1",
+        "H+2",
+        "H+3",
+        "H+4",
+        "H+5",
+        "H+10",
+        "H+15",
+        "H+20"
+      ]
+    },
+
+    "metrics": [
+      "MFE",
+      "MAE",
+      "HIGH_5",
+      "HIGH_10",
+      "HIGH_15",
+      "HIGH_20",
+      "TIME_TO_5",
+      "TIME_TO_10",
+      "TIME_TO_15",
+      "TIME_TO_20",
+      "DRAWDOWN_3",
+      "DRAWDOWN_5",
+      "DRAWDOWN_7",
+      "DRAWDOWN_10",
+      "DRAWDOWN_15",
+      "DRAWDOWN_20"
+    ],
+
+    "completion_rule": "H+20 requires 20 valid future trading observations.",
+    "incomplete_rule": "Events without H+20 remain valid events but are marked incomplete for H+20 analysis."
+  },
+
+  "event_ledger": {
+    "unique_key": [
+      "symbol",
+      "event_date"
+    ],
+
+    "required_fields": [
+      "symbol",
+      "event_date",
+      "qbs_score",
+      "qbs_band",
+      "state",
+      "quality",
+      "market_regime",
+      "event_status",
+      "h0_close",
+      "mfe",
+      "mae"
+    ],
+
+    "integrity_rules": {
+      "duplicate_event": "INVALID",
+      "missing_symbol": "INVALID",
+      "missing_event_date": "INVALID",
+      "invalid_trajectory": "INVALID",
+      "incomplete_h20": "VALID_WITH_INCOMPLETE_STATUS"
+    }
+  },
+
+  "production_layers": {
+    "detection": {
+      "purpose": "Detect QBS event.",
+      "inputs": [
+        "features"
+      ],
+      "outputs": [
+        "qbs_score",
+        "qbs_band"
+      ]
+    },
+
+    "classification": {
+      "purpose": "Classify event trajectory.",
+      "inputs": [
+        "post_detection_trajectory"
+      ],
+      "outputs": [
+        "state"
+      ]
+    },
+
+    "context": {
+      "purpose": "Describe market environment.",
+      "inputs": [
+        "market_metrics"
+      ],
+      "outputs": [
+        "market_regime"
+      ]
+    },
+
+    "outcome": {
+      "purpose": "Measure what happened after detection.",
+      "inputs": [
+        "future_trajectory"
+      ],
+      "outputs": [
+        "event_quality",
+        "mfe",
+        "mae",
+        "target_metrics",
+        "drawdown_metrics"
+      ]
+    },
+
+    "entry_exit": {
+      "status": "SEPARATE_RESEARCH_LAYER",
+      "purpose": "Entry, stop, target and position sizing are not part of the QBS detector contract."
+    }
+  },
+
+  "research_constraints": {
+    "do_not_optimize": [
+      "QBS thresholds",
+      "state thresholds",
+      "quality thresholds",
+      "fixed stop loss",
+      "fixed take profit",
+      "holding period"
+    ],
+
+    "do_not_claim": [
+      "QBS score is probability of profit",
+      "QBS score is a guaranteed buy signal",
+      "EARLY_EXPANSION guarantees profit",
+      "historical HIGH20 rate equals future win probability",
+      "research results guarantee trading performance"
+    ],
+
+    "sample_size_warning": "Small subgroup results must remain descriptive and must not be converted into production probabilities."
+  },
+
+  "data_leakage_rules": {
+    "principle": "Only information available at or before the event timestamp may influence detection or initial classification.",
+
+    "forbidden_inputs_for_detection": [
+      "future_close",
+      "future_high",
+      "future_low",
+      "future_volume",
+      "future_frequency",
+      "future_event_quality",
+      "future_MFE",
+      "future_MAE"
+    ],
+
+    "outcome_only_fields": [
+      "event_quality",
+      "MFE",
+      "MAE",
+      "HIGH_5",
+      "HIGH_10",
+      "HIGH_15",
+      "HIGH_20",
+      "TIME_TO_TARGET"
+    ]
+  },
+
+  "versioning": {
+    "current_version": "1.0.0",
+    "formula_changes": "REQUIRE_NEW_VERSION",
+    "state_definition_changes": "REQUIRE_NEW_VERSION",
+    "quality_definition_changes": "REQUIRE_NEW_VERSION",
+    "regime_definition_changes": "REQUIRE_NEW_VERSION",
+    "historical_results_must_be_preserved": true
+  },
+
+  "audit_contract": {
+    "required_before_production": [
+      "event_integrity",
+      "duplicate_check",
+      "state_integrity",
+      "quality_integrity",
+      "trajectory_integrity",
+      "leakage_audit",
+      "outcome_reconciliation"
+    ],
+
+    "reference_audit": "Stage 9.6.1",
+    "reference_status": "PASS"
+  },
+
+  "production_principle": {
+    "core_message": "StockFamily should explain market events rather than pretend to predict guaranteed outcomes.",
+    "architecture": "Detection -> Classification -> Context -> Outcome Tracking",
+    "qbs_role": "EVENT_DETECTOR",
+    "score_role": "EVENT_INTENSITY",
+    "state_role": "EVENT_PHASE",
+    "quality_role": "EVENT_OUTCOME",
+    "regime_role": "MARKET_CONTEXT"
+  }
+}
