@@ -5,7 +5,10 @@
   directory = "netlify/functions"
   node_bundler = "esbuild"
   external_node_modules = ["express"]
-  included_files = ["qbs_production_specification.json"]
+  included_files = [
+    "qbs_production_specification.json",
+    "scripts/qbs-cross-stock-cross-sectional-v4.9.1.js"
+  ]
 
 [[redirects]]
   from = "/api/*"
