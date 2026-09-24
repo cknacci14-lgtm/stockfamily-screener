@@ -1,4 +1,4 @@
-﻿// src/server.js - FIX V2.4 - Express v5 Safe Routing
+// src/server.js - FIX V2.4 - Express v5 Safe Routing
 const express = require('express');
 const path = require('path');
 const multer = require('multer');
@@ -799,6 +799,9 @@ function scheduleGemRefresh() {
   console.log('[GEM Auto] Scheduler aktif — refresh setiap hari jam 18:30 WIB');
 }
 
-scheduleGemRefresh();
-app.listen(PORT, () => console.log(`[START] FIX V2.4 running http://localhost:${PORT}`));
+if (require.main === module) {
+  scheduleGemRefresh();
+  app.listen(PORT, () => console.log(`[START] FIX V2.4 running http://localhost:${PORT}`));
+}
 
+module.exports = app;
