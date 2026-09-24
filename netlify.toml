@@ -1,6 +1,5 @@
-﻿[build]
+[build]
   publish = "public"
-  functions = "netlify/functions"
 
 [functions]
   directory = "netlify/functions"
@@ -12,3 +11,4 @@
   from = "/api/*"
   to = "/.netlify/functions/api/:splat"
   status = 200
+  force = true
