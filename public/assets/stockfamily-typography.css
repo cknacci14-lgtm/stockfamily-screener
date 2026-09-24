@@ -1,0 +1,494 @@
+﻿:root {
+  --sf-font-ui:
+    Inter,
+    ui-sans-serif,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  --sf-font-data:
+    "SFMono-Regular",
+    "Roboto Mono",
+    "JetBrains Mono",
+    ui-monospace,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+}
+
+/*
+ * ============================================================
+ * STOCKFAMILY GLOBAL TYPE FOUNDATION
+ * ============================================================
+ */
+
+body.sf-shell {
+  font-family:
+    var(--sf-font-ui);
+
+  color:
+    #e8edef;
+
+  -webkit-font-smoothing:
+    antialiased;
+
+  text-rendering:
+    optimizeLegibility;
+}
+
+/*
+ * Normal UI text
+ */
+body.sf-shell,
+body.sf-shell input,
+body.sf-shell select,
+body.sf-shell textarea,
+body.sf-shell button {
+  font-family:
+    var(--sf-font-ui);
+}
+
+/*
+ * Data / numbers
+ */
+body.sf-shell .sf-tabular {
+  font-family:
+    var(--sf-font-data) !important;
+
+  font-variant-numeric:
+    tabular-nums !important;
+
+  font-feature-settings:
+    "tnum" 1 !important;
+
+  letter-spacing:
+    .01em !important;
+}
+
+/*
+ * ============================================================
+ * INTELLIGENCE PANEL
+ * ============================================================
+ */
+
+body.sf-shell .sf-intelligence-panel {
+  font-family:
+    var(--sf-font-ui);
+
+  overflow:
+    hidden;
+}
+
+body.sf-shell .sf-intel-heading {
+  display:
+    block !important;
+
+  width:
+    auto !important;
+
+  max-width:
+    100% !important;
+
+  margin:
+    0 !important;
+
+  padding:
+    0 !important;
+
+  white-space:
+    nowrap !important;
+
+  overflow:
+    hidden !important;
+
+  text-overflow:
+    ellipsis !important;
+
+  font-family:
+    var(--sf-font-ui) !important;
+
+  font-size:
+    13px !important;
+
+  line-height:
+    1.15 !important;
+
+  font-weight:
+    750 !important;
+
+  letter-spacing:
+    .012em !important;
+
+  color:
+    #eef2f4 !important;
+}
+
+body.sf-shell .sf-intel-meta {
+  display:
+    inline-block !important;
+
+  max-width:
+    45% !important;
+
+  margin:
+    0 !important;
+
+  padding:
+    0 !important;
+
+  white-space:
+    nowrap !important;
+
+  overflow:
+    hidden !important;
+
+  text-overflow:
+    ellipsis !important;
+
+  vertical-align:
+    middle !important;
+
+  font-family:
+    var(--sf-font-data) !important;
+
+  font-size:
+    8.5px !important;
+
+  line-height:
+    1.1 !important;
+
+  font-weight:
+    600 !important;
+
+  font-variant-numeric:
+    tabular-nums !important;
+
+  letter-spacing:
+    .018em !important;
+
+  color:
+    #68747b !important;
+}
+
+/*
+ * Description / explanatory copy
+ */
+body.sf-shell .sf-intel-description {
+  display:
+    block !important;
+
+  margin:
+    8px 0 0 !important;
+
+  max-width:
+    100% !important;
+
+  font-family:
+    var(--sf-font-ui) !important;
+
+  font-size:
+    11px !important;
+
+  line-height:
+    1.55 !important;
+
+  font-weight:
+    450 !important;
+
+  letter-spacing:
+    0 !important;
+
+  color:
+    #77838a !important;
+}
+
+/*
+ * Values inside intelligence panels
+ */
+body.sf-shell .sf-intel-value {
+  font-family:
+    var(--sf-font-data) !important;
+
+  font-size:
+    12px !important;
+
+  line-height:
+    1.2 !important;
+
+  font-weight:
+    700 !important;
+
+  font-variant-numeric:
+    tabular-nums !important;
+
+  letter-spacing:
+    .01em !important;
+}
+
+/*
+ * Larger financial values
+ */
+body.sf-shell .sf-financial-value {
+  font-family:
+    var(--sf-font-data) !important;
+
+  font-size:
+    17px !important;
+
+  line-height:
+    1 !important;
+
+  font-weight:
+    800 !important;
+
+  font-variant-numeric:
+    tabular-nums !important;
+
+  letter-spacing:
+    -.018em !important;
+}
+
+/*
+ * Intelligence rows
+ */
+body.sf-shell .sf-intel-row {
+  min-height:
+    38px !important;
+
+  display:
+    flex !important;
+
+  align-items:
+    center !important;
+
+  justify-content:
+    space-between !important;
+
+  gap:
+    12px !important;
+}
+
+/*
+ * Make metadata aligned to the right,
+ * without allowing accidental line breaks.
+ */
+body.sf-shell .sf-intel-header-meta {
+  flex:
+    0 1 auto !important;
+
+  min-width:
+    0 !important;
+
+  max-width:
+    45% !important;
+
+  white-space:
+    nowrap !important;
+
+  overflow:
+    hidden !important;
+
+  text-overflow:
+    ellipsis !important;
+
+  font-family:
+    var(--sf-font-data) !important;
+
+  font-size:
+    8.5px !important;
+
+  font-weight:
+    600 !important;
+
+  line-height:
+    1.1 !important;
+
+  color:
+    #657178 !important;
+}
+
+/*
+ * ============================================================
+ * PANEL HEADINGS: prevent oversized inherited typography
+ * ============================================================
+ */
+
+body.sf-shell .sf-intelligence-panel
+.text-2xl,
+body.sf-shell .sf-intelligence-panel
+.text-3xl,
+body.sf-shell .sf-intelligence-panel
+.text-4xl {
+
+  font-size:
+    13px !important;
+
+  line-height:
+    1.15 !important;
+
+  font-weight:
+    750 !important;
+
+  letter-spacing:
+    .01em !important;
+}
+
+/*
+ * Panel regular values
+ */
+body.sf-shell .sf-intelligence-panel
+.text-xl {
+
+  font-size:
+    15px !important;
+
+  line-height:
+    1.15 !important;
+}
+
+body.sf-shell .sf-intelligence-panel
+.text-lg {
+
+  font-size:
+    13px !important;
+
+  line-height:
+    1.2 !important;
+}
+
+/*
+ * Small labels
+ */
+body.sf-shell .sf-intelligence-panel
+.text-xs {
+
+  font-size:
+    10px !important;
+
+  line-height:
+    1.25 !important;
+}
+
+/*
+ * Long italic notes should not become oversized.
+ */
+body.sf-shell .sf-intelligence-panel
+.italic {
+
+  font-size:
+    11px !important;
+
+  line-height:
+    1.55 !important;
+
+  font-weight:
+    450 !important;
+
+  color:
+    #77838a !important;
+}
+
+/*
+ * Dates and sources
+ */
+body.sf-shell .sf-intelligence-panel
+.sf-date-meta {
+
+  font-family:
+    var(--sf-font-data) !important;
+
+  font-size:
+    8.5px !important;
+
+  line-height:
+    1.1 !important;
+
+  font-weight:
+    600 !important;
+
+  font-variant-numeric:
+    tabular-nums !important;
+
+  color:
+    #6b767d !important;
+
+  white-space:
+    nowrap !important;
+}
+
+/*
+ * ============================================================
+ * STOCK DATA GLOBAL
+ * ============================================================
+ */
+
+body.sf-shell .sf-price,
+body.sf-shell .sf-stock-price,
+body.sf-shell .sf-financial-value {
+  font-family:
+    var(--sf-font-data) !important;
+
+  font-variant-numeric:
+    tabular-nums !important;
+}
+
+body.sf-shell .sf-change,
+body.sf-shell .sf-stock-change {
+  font-family:
+    var(--sf-font-data) !important;
+
+  font-size:
+    12px !important;
+
+  font-weight:
+    750 !important;
+
+  font-variant-numeric:
+    tabular-nums !important;
+}
+
+/*
+ * ============================================================
+ * ACCESSIBILITY
+ * ============================================================
+ */
+
+@media (prefers-reduced-motion: reduce) {
+
+  body.sf-shell *,
+  body.sf-shell *::before,
+  body.sf-shell *::after {
+
+    transition-duration:
+      .01ms !important;
+
+    animation-duration:
+      .01ms !important;
+  }
+}
+
+/*
+ * MOBILE
+ */
+@media (max-width: 800px) {
+
+  body.sf-shell .sf-intel-heading {
+    font-size:
+      12px !important;
+  }
+
+  body.sf-shell .sf-intel-meta {
+    font-size:
+      8px !important;
+
+    max-width:
+      40% !important;
+  }
+
+  body.sf-shell .sf-intel-description {
+    font-size:
+      11px !important;
+  }
+}

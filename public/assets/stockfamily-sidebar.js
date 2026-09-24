@@ -1,10 +1,11 @@
 (() => {
   "use strict";
 
-  const STORAGE_KEY = "stockfamily.sidebar.collapsed";
+  const STORAGE_KEY =
+    "stockfamily.sidebar.collapsed";
 
-  const WIDTH_EXPANDED = 240;
-  const WIDTH_COLLAPSED = 72;
+  const EXPANDED = 232;
+  const COLLAPSED = 68;
 
   const NAV = [
     {
@@ -12,59 +13,59 @@
       label: "Dashboard",
       href: "/",
       icon: `
-        <svg viewBox="0 0 24 24" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
           <path d="M3 11.5 12 4l9 7.5"></path>
           <path d="M5.5 10.5V20h13v-9.5"></path>
           <path d="M9 20v-5h6v5"></path>
         </svg>
-      `,
+      `
     },
     {
       key: "screener",
       label: "Screener",
       href: "/screener.html",
       icon: `
-        <svg viewBox="0 0 24 24" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
           <path d="M4 5h16"></path>
           <path d="M7 10h10"></path>
           <path d="M10 15h4"></path>
           <path d="M12 15v5"></path>
         </svg>
-      `,
+      `
     },
     {
       key: "backtest",
       label: "Backtest",
       href: "/backtest.html",
       icon: `
-        <svg viewBox="0 0 24 24" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
           <path d="M4 19V5"></path>
           <path d="M4 19h16"></path>
           <path d="m7 15 3-4 3 2 4-6"></path>
         </svg>
-      `,
+      `
     },
     {
       key: "watchlist",
       label: "Watchlist",
       href: "/watchlist.html",
       icon: `
-        <svg viewBox="0 0 24 24" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
           <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 8.7l6.2-.9L12 3Z"></path>
         </svg>
-      `,
+      `
     },
     {
       key: "admin",
       label: "Admin",
       href: "/admin.html",
       icon: `
-        <svg viewBox="0 0 24 24" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
           <path d="M12 3 13.4 5.7l3 .5 2.2 2.2-.5 3L19.4 14l-1.3 2.7.5 3-2.2 2.1-3 .5L12 21l-2.8 1.3-2.2-2.1.5-3L6.2 14l1.3-2.6-.5-3 2.2-2.2 3-.5L12 3Z"></path>
           <circle cx="12" cy="14" r="3"></circle>
         </svg>
-      `,
-    },
+      `
+    }
   ];
 
   function currentPage() {
@@ -105,7 +106,7 @@
 
     if (
       document.getElementById(
-        "stockfamily-global-sidebar-style"
+        "stockfamily-sidebar-v6"
       )
     ) {
       return;
@@ -115,43 +116,30 @@
       document.createElement("style");
 
     style.id =
-      "stockfamily-global-sidebar-style";
+      "stockfamily-sidebar-v6";
 
     style.textContent = `
 
       :root {
-        --sf-sidebar-expanded: ${WIDTH_EXPANDED}px;
-        --sf-sidebar-collapsed: ${WIDTH_COLLAPSED}px;
-        --sf-sidebar-width: ${WIDTH_EXPANDED}px;
-
-        --sf-bg: #080b0d;
-        --sf-bg-soft: #0d1113;
-        --sf-border: #1a2227;
-        --sf-text: #f2f5f6;
-        --sf-muted: #7d878e;
-        --sf-dim: #4d575d;
-        --sf-accent: #00d084;
+        --sf-expanded: ${EXPANDED}px;
+        --sf-collapsed: ${COLLAPSED}px;
+        --sf-width: ${EXPANDED}px;
       }
 
-      /*
-       * GLOBAL SHELL
-       */
       body.sf-shell {
-        padding-left: var(--sf-sidebar-width) !important;
+        padding-left:
+          var(--sf-width) !important;
+
         transition:
           padding-left .32s
-          cubic-bezier(.22,.61,.36,1) !important;
+          cubic-bezier(.22,.61,.36,1);
       }
 
-      html.sf-sidebar-collapsed
-      body.sf-shell {
-        --sf-sidebar-width:
-          var(--sf-sidebar-collapsed);
+      html.sf-sidebar-collapsed {
+        --sf-width:
+          var(--sf-collapsed);
       }
 
-      /*
-       * Canonical sidebar
-       */
       #stockfamily-global-sidebar {
         position: fixed !important;
         left: 0 !important;
@@ -159,14 +147,14 @@
         bottom: 0 !important;
 
         width:
-          var(--sf-sidebar-width) !important;
+          var(--sf-width) !important;
 
         min-width:
-          var(--sf-sidebar-width) !important;
+          var(--sf-width) !important;
 
         height: 100dvh !important;
 
-        z-index: 99999 !important;
+        z-index: 999999 !important;
 
         background:
           linear-gradient(
@@ -176,158 +164,35 @@
           ) !important;
 
         border-right:
-          1px solid var(--sf-border) !important;
+          1px solid #182024 !important;
 
         box-shadow:
-          14px 0 38px
+          12px 0 34px
           rgba(0,0,0,.20) !important;
 
         transition:
           width .32s
           cubic-bezier(.22,.61,.36,1) !important;
 
-        overflow: visible !important;
+        overflow:
+          visible !important;
       }
 
-      .sf-sidebar-inner {
-        display: flex;
-        flex-direction: column;
+      .sf-inner {
         height: 100%;
-        padding: 22px 10px 14px;
-      }
 
-      /*
-       * Brand
-       */
-      .sf-sidebar-brand {
-        height: 46px;
-
-        display: flex;
-        align-items: center;
-
-        gap: 10px;
-
-        padding: 0 8px;
-
-        overflow: hidden;
-        white-space: nowrap;
-      }
-
-      .sf-brand-mark {
-        width: 30px;
-        height: 30px;
-
-        flex: 0 0 30px;
-
-        display: grid;
-        place-items: center;
-
-        border-radius: 9px;
-
-        background:
-          linear-gradient(
-            135deg,
-            #00d084,
-            #00a7ff
-          );
-
-        color: #06100c;
-
-        font:
-          900 11px/1
-          ui-monospace,
-          SFMono-Regular,
-          Menlo,
-          monospace;
-      }
-
-      .sf-brand-copy {
-        min-width: 0;
-
-        transition:
-          opacity .18s ease,
-          max-width .28s
-          cubic-bezier(.22,.61,.36,1),
-          transform .25s ease;
-
-        overflow: hidden;
-      }
-
-      .sf-brand-name {
-        font:
-          800 14px/1
-          Inter,
-          system-ui,
-          sans-serif;
-
-        letter-spacing: -.025em;
-
-        color: var(--sf-text);
-      }
-
-      .sf-brand-sub {
-        margin-top: 4px;
-
-        font:
-          700 7px/1
-          ui-monospace,
-          SFMono-Regular,
-          Menlo,
-          monospace;
-
-        letter-spacing: .18em;
-
-        color: var(--sf-dim);
-
-        text-transform: uppercase;
-      }
-
-      /*
-       * Section
-       */
-      .sf-sidebar-section {
-        margin:
-          30px 9px 10px;
-
-        color: #465158;
-
-        font:
-          800 7px/1
-          ui-monospace,
-          SFMono-Regular,
-          Menlo,
-          monospace;
-
-        letter-spacing: .18em;
-
-        text-transform: uppercase;
-
-        white-space: nowrap;
-
-        overflow: hidden;
-
-        transition:
-          opacity .18s ease,
-          max-width .25s ease;
-      }
-
-      /*
-       * Navigation
-       */
-      .sf-sidebar-nav {
         display:
           flex;
 
         flex-direction:
           column;
 
-        gap: 4px;
+        padding:
+          18px 9px 12px;
       }
 
-      .sf-nav-item {
-        position: relative;
-
-        height: 43px;
+      .sf-brand {
+        height: 42px;
 
         display:
           flex;
@@ -335,33 +200,193 @@
         align-items:
           center;
 
-        gap: 12px;
+        gap:
+          9px;
 
         padding:
-          0 10px;
+          0 7px;
 
-        border-radius: 10px;
+        overflow:
+          hidden;
+      }
+
+      .sf-mark {
+        width:
+          29px;
+
+        height:
+          29px;
+
+        flex:
+          0 0 29px;
+
+        display:
+          grid;
+
+        place-items:
+          center;
+
+        border-radius:
+          8px;
+
+        background:
+          linear-gradient(
+            135deg,
+            #00d084,
+            #00a8ff
+          );
+
+        color:
+          #06100c;
+
+        font:
+          900 10px/1
+          ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          monospace;
+      }
+
+      .sf-brand-copy {
+        min-width:
+          0;
+
+        max-width:
+          160px;
+
+        overflow:
+          hidden;
+
+        white-space:
+          nowrap;
+
+        transition:
+          opacity .17s ease,
+          max-width .28s ease,
+          transform .25s ease;
+      }
+
+      .sf-brand-name {
+        font:
+          800 13px/1
+          Inter,
+          system-ui,
+          sans-serif;
+
+        color:
+          #f3f6f7;
+
+        letter-spacing:
+          -.025em;
+      }
+
+      .sf-brand-sub {
+        margin-top:
+          4px;
+
+        color:
+          #556168;
+
+        font:
+          700 6.5px/1
+          ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          monospace;
+
+        letter-spacing:
+          .17em;
+
+        text-transform:
+          uppercase;
+      }
+
+      .sf-section {
+        margin:
+          27px 8px 9px;
+
+        color:
+          #4b565d;
+
+        font:
+          800 6.5px/1
+          ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          monospace;
+
+        letter-spacing:
+          .19em;
+
+        text-transform:
+          uppercase;
+
+        transition:
+          opacity .16s ease,
+          max-width .24s ease;
+
+        white-space:
+          nowrap;
+
+        overflow:
+          hidden;
+      }
+
+      .sf-nav {
+        display:
+          flex;
+
+        flex-direction:
+          column;
+
+        gap:
+          3px;
+      }
+
+      .sf-nav-link {
+        position:
+          relative;
+
+        height:
+          41px;
+
+        display:
+          flex;
+
+        align-items:
+          center;
+
+        gap:
+          11px;
+
+        padding:
+          0 9px;
 
         border:
           1px solid transparent;
 
+        border-radius:
+          9px;
+
         color:
           #8a959b;
 
-        text-decoration: none;
+        text-decoration:
+          none;
 
-        overflow: hidden;
+        overflow:
+          hidden;
 
         transition:
-          background .18s ease,
-          color .18s ease,
-          border-color .18s ease,
+          background .17s ease,
+          border-color .17s ease,
+          color .17s ease,
           transform .16s ease;
       }
 
-      .sf-nav-item:hover {
+      .sf-nav-link:hover {
         color:
-          #f5f8f9;
+          #f3f6f7;
 
         background:
           rgba(255,255,255,.035);
@@ -370,14 +395,14 @@
           translateX(2px);
       }
 
-      .sf-nav-item.sf-active {
+      .sf-nav-link.sf-active {
         color:
-          #effff8;
+          #eafff7;
 
         background:
           linear-gradient(
             90deg,
-            rgba(0,208,132,.105),
+            rgba(0,208,132,.115),
             rgba(0,208,132,.025)
           );
 
@@ -385,34 +410,45 @@
           rgba(0,208,132,.13);
       }
 
-      .sf-nav-item.sf-active::before {
-        content: "";
+      .sf-nav-link.sf-active::before {
+        content:
+          "";
 
-        position: absolute;
+        position:
+          absolute;
 
-        left: 0;
-        top: 8px;
-        bottom: 8px;
+        left:
+          0;
 
-        width: 3px;
+        top:
+          8px;
+
+        bottom:
+          8px;
+
+        width:
+          2px;
 
         border-radius:
           0 4px 4px 0;
 
         background:
-          var(--sf-accent);
+          #00d084;
 
         box-shadow:
-          0 0 9px
+          0 0 8px
           rgba(0,208,132,.32);
       }
 
-      .sf-nav-icon {
-        width: 19px;
-        height: 19px;
+      .sf-icon {
+        width:
+          18px;
+
+        height:
+          18px;
 
         flex:
-          0 0 19px;
+          0 0 18px;
 
         display:
           grid;
@@ -421,17 +457,21 @@
           center;
       }
 
-      .sf-nav-icon svg {
-        width: 18px;
-        height: 18px;
+      .sf-icon svg {
+        width:
+          17px;
 
-        fill: none;
+        height:
+          17px;
+
+        fill:
+          none;
 
         stroke:
           currentColor;
 
         stroke-width:
-          1.65;
+          1.7;
 
         stroke-linecap:
           round;
@@ -440,44 +480,37 @@
           round;
       }
 
-      .sf-nav-label {
-        font:
-          700 12px/1
-          Inter,
-          system-ui,
-          sans-serif;
-
-        white-space:
-          nowrap;
-
-        overflow:
-          hidden;
-
+      .sf-label {
         max-width:
           150px;
 
         opacity:
           1;
 
-        transform:
-          translateX(0);
+        overflow:
+          hidden;
+
+        white-space:
+          nowrap;
+
+        font:
+          700 11.5px/1
+          Inter,
+          system-ui,
+          sans-serif;
 
         transition:
           opacity .16s ease,
-          max-width .28s
-          cubic-bezier(.22,.61,.36,1),
+          max-width .28s ease,
           transform .24s ease;
       }
 
-      /*
-       * Bottom metadata
-       */
-      .sf-sidebar-footer {
+      .sf-footer {
         margin-top:
           auto;
 
         padding:
-          13px 9px 4px;
+          11px 8px 3px;
 
         border-top:
           1px solid #151c20;
@@ -486,7 +519,7 @@
           #424d53;
 
         font:
-          700 7px/1.55
+          700 6.5px/1.5
           ui-monospace,
           SFMono-Regular,
           Menlo,
@@ -499,14 +532,11 @@
           uppercase;
 
         transition:
-          opacity .18s ease,
-          max-width .25s ease;
+          opacity .16s ease,
+          max-width .24s ease;
       }
 
-      /*
-       * Toggle
-       */
-      .sf-sidebar-toggle {
+      .sf-toggle {
         position:
           absolute;
 
@@ -514,13 +544,13 @@
           -14px;
 
         top:
-          76px;
+          70px;
 
         width:
-          29px;
+          28px;
 
         height:
-          29px;
+          28px;
 
         display:
           grid;
@@ -532,7 +562,7 @@
           0;
 
         border:
-          1px solid #252f34;
+          1px solid #273137;
 
         border-radius:
           999px;
@@ -541,37 +571,36 @@
           #0d1214;
 
         color:
-          #b8c1c6;
+          #b8c2c7;
 
         cursor:
           pointer;
 
         box-shadow:
-          0 8px 24px
+          0 8px 22px
           rgba(0,0,0,.32);
 
         transition:
           transform .18s ease,
           background .18s ease,
-          color .18s ease,
           border-color .18s ease;
       }
 
-      .sf-sidebar-toggle:hover {
+      .sf-toggle:hover {
         transform:
-          scale(1.08);
+          scale(1.07);
 
         background:
-          #12191c;
-
-        color:
-          #ffffff;
+          #131a1d;
 
         border-color:
-          rgba(0,208,132,.35);
+          rgba(0,208,132,.32);
+
+        color:
+          #fff;
       }
 
-      .sf-sidebar-toggle svg {
+      .sf-toggle svg {
         width:
           14px;
 
@@ -599,31 +628,19 @@
       }
 
       html.sf-sidebar-collapsed
-      .sf-sidebar-toggle svg {
+      .sf-toggle svg {
         transform:
           rotate(180deg);
-      }
-
-      /*
-       * COLLAPSED
-       */
-      html.sf-sidebar-collapsed
-      #stockfamily-global-sidebar {
-        width:
-          var(--sf-sidebar-collapsed) !important;
-
-        min-width:
-          var(--sf-sidebar-collapsed) !important;
       }
 
       html.sf-sidebar-collapsed
       .sf-brand-copy,
       html.sf-sidebar-collapsed
-      .sf-sidebar-section,
+      .sf-section,
       html.sf-sidebar-collapsed
-      .sf-nav-label,
+      .sf-label,
       html.sf-sidebar-collapsed
-      .sf-sidebar-footer {
+      .sf-footer {
         opacity:
           0;
 
@@ -631,11 +648,11 @@
           0;
 
         transform:
-          translateX(-8px);
+          translateX(-7px);
       }
 
       html.sf-sidebar-collapsed
-      .sf-sidebar-brand {
+      .sf-brand {
         justify-content:
           center;
 
@@ -647,7 +664,7 @@
       }
 
       html.sf-sidebar-collapsed
-      .sf-nav-item {
+      .sf-nav-link {
         justify-content:
           center;
 
@@ -661,11 +678,8 @@
           0;
       }
 
-      /*
-       * Tooltip
-       */
       html.sf-sidebar-collapsed
-      .sf-nav-item[data-tooltip]::after {
+      .sf-nav-link[data-tooltip]::after {
         content:
           attr(data-tooltip);
 
@@ -673,14 +687,14 @@
           absolute;
 
         left:
-          calc(100% + 12px);
+          calc(100% + 11px);
 
         top:
           50%;
 
         transform:
           translateY(-50%)
-          translateX(-5px);
+          translateX(-4px);
 
         opacity:
           0;
@@ -688,23 +702,23 @@
         pointer-events:
           none;
 
-        white-space:
-          nowrap;
-
         padding:
           7px 9px;
 
-        border:
-          1px solid #242d32;
+        white-space:
+          nowrap;
 
-        border-radius:
-          7px;
+        color:
+          #edf3f5;
 
         background:
           #101517;
 
-        color:
-          #eef3f5;
+        border:
+          1px solid #252f34;
+
+        border-radius:
+          7px;
 
         font:
           700 10px/1
@@ -715,18 +729,18 @@
 
         box-shadow:
           0 10px 28px
-          rgba(0,0,0,.32);
+          rgba(0,0,0,.34);
 
         transition:
           opacity .15s ease,
           transform .15s ease;
 
         z-index:
-          100000;
+          1000000;
       }
 
       html.sf-sidebar-collapsed
-      .sf-nav-item[data-tooltip]:hover::after {
+      .sf-nav-link[data-tooltip]:hover::after {
         opacity:
           1;
 
@@ -736,11 +750,11 @@
       }
 
       /*
-       * Legacy sidebar removal
+       * Secondary Dashboard rail
        */
-      .sf-legacy-global-sidebar {
-        display:
-          none !important;
+      body.sf-shell .sf-secondary-watchlist {
+        left:
+          var(--sf-width) !important;
       }
 
       /*
@@ -768,10 +782,6 @@
 
           transform:
             translateX(0);
-
-          box-shadow:
-            20px 0 48px
-            rgba(0,0,0,.42) !important;
         }
 
         html.sf-sidebar-collapsed
@@ -783,11 +793,11 @@
         html.sf-sidebar-collapsed
         .sf-brand-copy,
         html.sf-sidebar-collapsed
-        .sf-sidebar-section,
+        .sf-section,
         html.sf-sidebar-collapsed
-        .sf-nav-label,
+        .sf-label,
         html.sf-sidebar-collapsed
-        .sf-sidebar-footer {
+        .sf-footer {
           opacity:
             1;
 
@@ -799,24 +809,61 @@
         }
 
         html.sf-sidebar-collapsed
-        .sf-sidebar-brand,
+        .sf-brand {
+          justify-content:
+            flex-start;
+
+          padding:
+            0 7px;
+        }
+
         html.sf-sidebar-collapsed
-        .sf-nav-item {
+        .sf-nav-link {
           justify-content:
             flex-start;
 
           gap:
-            12px;
+            11px;
 
-          padding-left:
-            10px;
-
-          padding-right:
-            10px;
+          padding:
+            0 9px;
         }
 
-        .sf-sidebar-toggle {
+        #sf-mobile-backdrop {
+          position:
+            fixed;
+
+          inset:
+            0;
+
           display:
+            block;
+
+          z-index:
+            999990;
+
+          background:
+            rgba(0,0,0,.50);
+
+          backdrop-filter:
+            blur(2px);
+
+          opacity:
+            1;
+
+          pointer-events:
+            auto;
+
+          transition:
+            opacity .2s ease;
+        }
+
+        html.sf-sidebar-collapsed
+        #sf-mobile-backdrop {
+          opacity:
+            0;
+
+          pointer-events:
             none;
         }
 
@@ -843,10 +890,10 @@
             center;
 
           z-index:
-            99998;
+            999980;
 
           border:
-            1px solid #263136;
+            1px solid #273137;
 
           border-radius:
             12px;
@@ -855,14 +902,14 @@
             rgba(10,14,16,.94);
 
           color:
-            #eef3f5;
+            #edf3f5;
 
           cursor:
             pointer;
 
           box-shadow:
             0 9px 28px
-            rgba(0,0,0,.3);
+            rgba(0,0,0,.32);
         }
 
         #sf-mobile-button svg {
@@ -884,44 +931,6 @@
           stroke-linecap:
             round;
         }
-
-        #sf-mobile-backdrop {
-          position:
-            fixed;
-
-          inset:
-            0;
-
-          display:
-            block;
-
-          z-index:
-            99990;
-
-          background:
-            rgba(0,0,0,.50);
-
-          backdrop-filter:
-            blur(2px);
-
-          opacity:
-            1;
-
-          pointer-events:
-            auto;
-
-          transition:
-            opacity .22s ease;
-        }
-
-        html.sf-sidebar-collapsed
-        #sf-mobile-backdrop {
-          opacity:
-            0;
-
-          pointer-events:
-            none;
-        }
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -934,145 +943,125 @@
 
           animation-duration:
             .01ms !important;
-
-          animation-iteration-count:
-            1 !important;
         }
       }
+
     `;
 
     document.head.appendChild(style);
   }
 
-  function findLegacyGlobalSidebar() {
+  function detectLegacyNavigation() {
 
-    const labels =
-      NAV.map(
-        (x) =>
-          x.label.toLowerCase()
-      );
+    const all =
+      [
+        ...document.querySelectorAll(
+          "aside, nav, [role='navigation'], [class*='sidebar' i]"
+        )
+      ];
 
-    const selectors = [
-      "aside",
-      "nav",
-      '[role="navigation"]',
-      '[class*="sidebar" i]',
-      '[class*="sidenav" i]',
-      '[class*="side-nav" i]',
-    ];
+    const targets = [];
 
-    const candidates = [];
+    for (const el of all) {
 
-    for (
-      const selector of selectors
-    ) {
+      if (
+        el.id ===
+        "stockfamily-global-sidebar"
+      ) {
+        continue;
+      }
 
-      document
-        .querySelectorAll(selector)
-        .forEach((el) => {
+      const links =
+        [
+          ...el.querySelectorAll(
+            "a[href]"
+          )
+        ];
 
-          if (
-            el.id ===
-            "stockfamily-global-sidebar"
-          ) {
-            return;
-          }
+      if (
+        links.length < 3
+      ) {
+        continue;
+      }
 
-          const rect =
-            el.getBoundingClientRect();
-
-          const style =
-            getComputedStyle(el);
-
-          const text =
-            (
-              el.innerText ||
-              el.textContent ||
-              ""
-            )
-              .replace(/\s+/g, " ")
-              .trim()
-              .toLowerCase();
-
-          const matches =
-            labels.filter(
-              (label) =>
-                text.includes(label)
-            ).length;
-
-          if (
-            matches < 3 ||
-            rect.width < 150 ||
-            rect.width > 380 ||
-            rect.height <
-              window.innerHeight * .45 ||
-            rect.left > 90 ||
-            style.display === "none" ||
-            style.visibility === "hidden"
-          ) {
-            return;
-          }
-
-          candidates.push({
-            el,
-            score:
-              matches * 10 +
-              (rect.left <= 20 ? 10 : 0) +
+      const hrefText =
+        links
+          .map(
+            (a) =>
               (
-                style.position === "fixed" ||
-                style.position === "sticky"
-                  ? 8
-                  : 0
-              ),
-          });
-        });
+                a.getAttribute("href") ||
+                ""
+              ).toLowerCase()
+          )
+          .join(" ");
+
+      const text =
+        (
+          el.innerText ||
+          el.textContent ||
+          ""
+        )
+          .replace(/\s+/g, " ")
+          .toLowerCase();
+
+      const navMatches =
+        [
+          hrefText.includes(
+            "screener"
+          ),
+          hrefText.includes(
+            "backtest"
+          ),
+          hrefText.includes(
+            "watchlist"
+          ),
+          hrefText.includes(
+            "admin"
+          ),
+          text.includes(
+            "dashboard"
+          )
+        ].filter(Boolean).length;
+
+      const rect =
+        el.getBoundingClientRect();
+
+      const looksGlobal =
+        navMatches >= 3 &&
+        rect.left <= 20 &&
+        rect.width >= 180 &&
+        rect.width <= 380 &&
+        rect.height >
+          window.innerHeight * .45;
+
+      if (looksGlobal) {
+        targets.push(el);
+      }
     }
 
-    candidates.sort(
-      (a, b) =>
-        b.score - a.score
-    );
-
-    return candidates.length
-      ? candidates[0].el
-      : null;
+    return targets;
   }
 
-  function removeLegacySidebar() {
+  function removeLegacyNavigation() {
 
-    const legacy =
-      findLegacyGlobalSidebar();
+    for (
+      const el of detectLegacyNavigation()
+    ) {
 
-    if (!legacy) {
-      return null;
+      el.style.setProperty(
+        "display",
+        "none",
+        "important"
+      );
+
+      el.setAttribute(
+        "aria-hidden",
+        "true"
+      );
     }
-
-    legacy.classList.add(
-      "sf-legacy-global-sidebar"
-    );
-
-    legacy.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-    // Remove after hiding so it cannot
-    // interfere with layout.
-    legacy.remove();
-
-    return legacy;
   }
 
   function createSidebar() {
-
-    const existing =
-      document.getElementById(
-        "stockfamily-global-sidebar"
-      );
-
-    if (existing) {
-      return existing;
-    }
 
     const sidebar =
       document.createElement(
@@ -1089,11 +1078,11 @@
 
     sidebar.innerHTML = `
 
-      <div class="sf-sidebar-inner">
+      <div class="sf-inner">
 
-        <div class="sf-sidebar-brand">
+        <div class="sf-brand">
 
-          <div class="sf-brand-mark">
+          <div class="sf-mark">
             SF
           </div>
 
@@ -1104,39 +1093,39 @@
             </div>
 
             <div class="sf-brand-sub">
-              IDX INTELLIGENCE
+              IDX Intelligence
             </div>
 
           </div>
 
         </div>
 
-        <div class="sf-sidebar-section">
+        <div class="sf-section">
           Navigation
         </div>
 
         <nav
-          class="sf-sidebar-nav"
+          class="sf-nav"
           aria-label="StockFamily navigation"
         >
 
           ${NAV.map(
             (item) => `
               <a
-                class="sf-nav-item"
                 href="${item.href}"
-                data-sf-key="${item.key}"
+                class="sf-nav-link"
+                data-key="${item.key}"
                 data-tooltip="${item.label}"
               >
 
                 <span
-                  class="sf-nav-icon"
+                  class="sf-icon"
                   aria-hidden="true"
                 >
                   ${item.icon}
                 </span>
 
-                <span class="sf-nav-label">
+                <span class="sf-label">
                   ${item.label}
                 </span>
 
@@ -1146,7 +1135,7 @@
 
         </nav>
 
-        <div class="sf-sidebar-footer">
+        <div class="sf-footer">
           StockFamily<br>
           Canonical Navigation
         </div>
@@ -1155,15 +1144,14 @@
 
       <button
         type="button"
-        class="sf-sidebar-toggle"
-        aria-label="Collapse sidebar"
+        class="sf-toggle"
         title="Collapse sidebar"
+        aria-label="Collapse sidebar"
       >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
           <path d="m14 6-6 6 6 6"></path>
         </svg>
       </button>
-
     `;
 
     document.body.prepend(
@@ -1180,12 +1168,12 @@
 
     sidebar
       .querySelectorAll(
-        ".sf-nav-item"
+        ".sf-nav-link"
       )
       .forEach((link) => {
 
         const active =
-          link.dataset.sfKey ===
+          link.dataset.key ===
           current;
 
         link.classList.toggle(
@@ -1194,11 +1182,14 @@
         );
 
         if (active) {
+
           link.setAttribute(
             "aria-current",
             "page"
           );
+
         } else {
+
           link.removeAttribute(
             "aria-current"
           );
@@ -1219,47 +1210,48 @@
       String(collapsed)
     );
 
-    const button =
+    const toggle =
       document.querySelector(
-        ".sf-sidebar-toggle"
+        ".sf-toggle"
       );
 
-    if (button) {
-
-      button.setAttribute(
-        "aria-label",
-        collapsed
-          ? "Expand sidebar"
-          : "Collapse sidebar"
-      );
-
-      button.setAttribute(
-        "title",
-        collapsed
-          ? "Expand sidebar"
-          : "Collapse sidebar"
-      );
+    if (!toggle) {
+      return;
     }
+
+    toggle.setAttribute(
+      "aria-label",
+      collapsed
+        ? "Expand sidebar"
+        : "Collapse sidebar"
+    );
+
+    toggle.setAttribute(
+      "title",
+      collapsed
+        ? "Expand sidebar"
+        : "Collapse sidebar"
+    );
+
+    adjustDashboardRail();
   }
 
   function setupToggle(sidebar) {
 
-    const button =
+    const toggle =
       sidebar.querySelector(
-        ".sf-sidebar-toggle"
+        ".sf-toggle"
       );
 
-    if (!button) {
+    if (!toggle) {
       return;
     }
 
-    button.addEventListener(
+    toggle.addEventListener(
       "click",
       (event) => {
 
         event.preventDefault();
-
-        event.stopPropagation();
 
         const collapsed =
           document.documentElement
@@ -1275,46 +1267,6 @@
     );
   }
 
-  function setupKeyboardShortcut() {
-
-    if (
-      window.__stockfamilySidebarShortcut
-    ) {
-      return;
-    }
-
-    window.__stockfamilySidebarShortcut =
-      true;
-
-    document.addEventListener(
-      "keydown",
-      (event) => {
-
-        if (
-          (
-            event.ctrlKey ||
-            event.metaKey
-          ) &&
-          event.key.toLowerCase() === "b"
-        ) {
-
-          event.preventDefault();
-
-          const collapsed =
-            document.documentElement
-              .classList
-              .contains(
-                "sf-sidebar-collapsed"
-              );
-
-          setState(
-            !collapsed
-          );
-        }
-      }
-    );
-  }
-
   function setupNavigation() {
 
     document
@@ -1322,15 +1274,6 @@
         "#stockfamily-global-sidebar a[href]"
       )
       .forEach((link) => {
-
-        if (
-          link.dataset.sfBound
-        ) {
-          return;
-        }
-
-        link.dataset.sfBound =
-          "true";
 
         link.addEventListener(
           "click",
@@ -1380,22 +1323,17 @@
 
             if (
               next.pathname ===
-                window.location.pathname &&
+              window.location.pathname &&
               next.search ===
-                window.location.search
+              window.location.search
             ) {
               return;
             }
 
             event.preventDefault();
 
-            document.documentElement
-              .classList.add(
-                "sf-navigating"
-              );
-
             document.body.style.opacity =
-              ".78";
+              ".82";
 
             document.body.style.transition =
               "opacity .12s ease";
@@ -1414,14 +1352,6 @@
 
   function createMobileControls() {
 
-    if (
-      document.getElementById(
-        "sf-mobile-backdrop"
-      )
-    ) {
-      return;
-    }
-
     const backdrop =
       document.createElement(
         "div"
@@ -1433,12 +1363,7 @@
     backdrop.addEventListener(
       "click",
       () => {
-
-        if (
-          window.innerWidth <= 800
-        ) {
-          setState(true);
-        }
+        setState(true);
       }
     );
 
@@ -1454,7 +1379,8 @@
     button.id =
       "sf-mobile-button";
 
-    button.type = "button";
+    button.type =
+      "button";
 
     button.setAttribute(
       "aria-label",
@@ -1462,7 +1388,7 @@
     );
 
     button.innerHTML = `
-      <svg viewBox="0 0 24 24" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
         <path d="M4 7h16"></path>
         <path d="M4 12h16"></path>
         <path d="M4 17h16"></path>
@@ -1481,101 +1407,88 @@
     );
   }
 
-  function adjustFixedSecondaryRail() {
+  function adjustDashboardRail() {
 
-    if (
-      window.innerWidth <= 800
-    ) {
+    const rail =
+      [
+        ...document.querySelectorAll(
+          "aside, section, div"
+        )
+      ]
+      .find((el) => {
+
+        if (
+          el.id ===
+          "stockfamily-global-sidebar"
+        ) {
+          return false;
+        }
+
+        const text =
+          (
+            el.innerText ||
+            ""
+          )
+            .replace(/\s+/g, " ")
+            .trim()
+            .toUpperCase();
+
+        const rect =
+          el.getBoundingClientRect();
+
+        const style =
+          getComputedStyle(el);
+
+        return (
+          text.startsWith(
+            "WATCHLIST"
+          ) &&
+          rect.width >= 240 &&
+          rect.width <= 380 &&
+          rect.height >
+            window.innerHeight * .50 &&
+          rect.left <= 20 &&
+          (
+            style.position === "fixed" ||
+            style.position === "sticky"
+          )
+        );
+      });
+
+    if (!rail) {
       return;
     }
 
-    const width =
-      document.documentElement
-        .classList
-        .contains(
-          "sf-sidebar-collapsed"
-        )
-        ? WIDTH_COLLAPSED
-        : WIDTH_EXPANDED;
-
-    const candidates =
-      [
-        ...document.querySelectorAll(
-          "body *"
-        ),
-      ];
-
-    for (
-      const el of candidates
-    ) {
-
-      if (
-        el.id ===
-        "stockfamily-global-sidebar"
-      ) {
-        continue;
-      }
-
-      const text =
-        (
-          el.innerText ||
-          ""
-        )
-          .replace(/\s+/g, " ")
-          .trim()
-          .toLowerCase();
-
-      if (
-        !text.startsWith("watchlist")
-      ) {
-        continue;
-      }
-
-      const rect =
-        el.getBoundingClientRect();
-
-      const style =
-        getComputedStyle(el);
-
-      if (
-        (
-          style.position === "fixed" ||
-          style.position === "sticky"
-        ) &&
-        rect.width >= 240 &&
-        rect.width <= 430 &&
-        rect.left <= 8 &&
-        rect.height >
-          window.innerHeight * .55
-      ) {
-
-        el.style.left =
-          `${width}px`;
-
-        break;
-      }
-    }
+    rail.classList.add(
+      "sf-secondary-watchlist"
+    );
   }
 
-  function bindResize() {
+  function setupShortcut() {
 
-    let timer = null;
+    document.addEventListener(
+      "keydown",
+      (event) => {
 
-    window.addEventListener(
-      "resize",
-      () => {
+        if (
+          (event.ctrlKey ||
+           event.metaKey) &&
+          event.key.toLowerCase() === "b"
+        ) {
 
-        window.clearTimeout(
-          timer
-        );
+          event.preventDefault();
 
-        timer =
-          window.setTimeout(
-            () => {
-              adjustFixedSecondaryRail();
-            },
-            80
+          const collapsed =
+            document.documentElement
+              .classList
+              .contains(
+                "sf-sidebar-collapsed"
+              );
+
+          setState(
+            !collapsed
           );
+        }
       }
     );
   }
@@ -1588,9 +1501,7 @@
       "sf-shell"
     );
 
-    // Replace any legacy StockFamily
-    // global navigation with canonical nav.
-    removeLegacySidebar();
+    removeLegacyNavigation();
 
     const sidebar =
       createSidebar();
@@ -1605,9 +1516,11 @@
 
     setupNavigation();
 
-    setupKeyboardShortcut();
-
     createMobileControls();
+
+    setupShortcut();
+
+    adjustDashboardRail();
 
     const saved =
       localStorage.getItem(
@@ -1618,13 +1531,15 @@
       saved === "true"
     );
 
-    adjustFixedSecondaryRail();
-
-    bindResize();
+    window.addEventListener(
+      "resize",
+      adjustDashboardRail
+    );
   }
 
   if (
-    document.readyState === "loading"
+    document.readyState ===
+    "loading"
   ) {
 
     document.addEventListener(

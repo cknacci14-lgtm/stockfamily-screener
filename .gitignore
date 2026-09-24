@@ -1,29 +1,36 @@
-# Dependencies
+﻿# Dependencies
 node_modules/
 
-# Secrets - NEVER commit these
+# Secrets - NEVER commit
 .env
 .env.*
 !.env.example
 
-# Backup / scratch files
+# Local / generated data
+data/*
+!data/.gitkeep
+
+results/*
+!results/.gitkeep
+
+# Backups / scratch
 *.bak
-*.tmp
+*.bak-*
+*.backup
+*.backup-*
+backup-*/
 
 # Build output
 dist/
 
-# Uploaded / generated data (keep the folder, ignore contents)
-data/uploads/*
-!data/uploads/.gitkeep
-
 # Logs
-logs/*.json
+logs/
 npm-debug.log*
+
+# Archives / local exports
+*.zip
+*.csv
 
 # OS junk
 .DS_Store
 Thumbs.db
-
-.env.env.*
-!.env.example
