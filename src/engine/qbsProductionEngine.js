@@ -1,12 +1,15 @@
-﻿const fs = require("fs");
+const fs = require("fs");
 const path = require("path");
 
-const SPEC_FILE = path.join(
-__dirname,
-"..",
-"..",
-"qbs_production_specification.json"
-);
+const SPEC_CANDIDATES = [
+  path.join(process.cwd(), "qbs_production_specification.json"),
+  path.join(__dirname, "..", "..", "qbs_production_specification.json"),
+  path.join(__dirname, "qbs_production_specification.json"),
+];
+
+const SPEC_FILE =
+  SPEC_CANDIDATES.find((file) => fs.existsSync(file)) ||
+  SPEC_CANDIDATES[0];
 
 function loadSpecification() {
 if (!fs.existsSync(SPEC_FILE)) {
