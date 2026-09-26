@@ -34,3 +34,6 @@ npm-debug.log*
 # OS junk
 .DS_Store
 Thumbs.db
+
+# Local Netlify folder
+.netlify

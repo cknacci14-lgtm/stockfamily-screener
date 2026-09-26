@@ -296,13 +296,22 @@ async function ingestSnapshot({ date, filename, rows }) {
     inserted += chunk.length;
   }
 
-  // 5) Catat log upload
-  await supabaseWrite('upload_batches', 'POST', [{
-    filename: filename || null,
-    trade_date: targetDate,
-    row_count: inserted,
-    uploaded_at: new Date().toISOString()
-  }], '', { Prefer: 'return=minimal' });
+  // 5) Catat log upload - TOLERATE DUPLICATE (untuk re-import scenario)
+  try {
+    await supabaseWrite('upload_batches', 'POST', [{
+      filename: filename || null,
+      trade_date: targetDate,
+      row_count: inserted,
+      uploaded_at: new Date().toISOString()
+    }], '', { Prefer: 'return=minimal' });
+  } catch (logErr) {
+    const msg = String(logErr && logErr.message || '');
+    if (msg.includes('23505') || msg.includes('duplicate') || msg.includes('already exists')) {
+      // Skip duplicate - aman untuk re-import
+    } else {
+      console.warn('[UploadLog] Non-duplicate error:', msg);
+    }
+  }
 
   return { rows: inserted };
 }

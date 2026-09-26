@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -13,18 +13,19 @@
   .filterBtn{transition:all .15s}
   .filterBtn.active{background:#10b981;color:#000;border-color:#10b981;font-weight:700}
 </style>
+<link rel="stylesheet" href="/assets/chartnalist-typography.css">
 </head>
 <body class="p-4">
 <div class="max-w-[1700px] mx-auto">
-  <h1 class="text-lg font-bold text-white mb-3">⚡ Backtest Quiet Before Storm</h1>
+  <h1 class="text-lg font-bold text-white mb-3">âš¡ Backtest Quiet Before Storm</h1>
 
   <div class="card rounded-xl p-4 mb-4 flex flex-wrap gap-4 items-center">
     <div>
       <label class="text-[10px] text-emerald-400 block mb-1 font-bold tracking-widest">PILIH TANGGAL - KLIKABLE</label>
       <input id="dateInput" type="date" class="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white min-w-[180px]">
     </div>
-    <button id="runBtn" class="px-6 py-2.5 bg-emerald-500 text-black font-bold rounded-lg text-sm">▶ RUN</button>
-    <button id="reloadBtn" class="px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-sm">↻ Reload DB</button>
+    <button id="runBtn" class="px-6 py-2.5 bg-emerald-500 text-black font-bold rounded-lg text-sm">â–¶ RUN</button>
+    <button id="reloadBtn" class="px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-sm">â†» Reload DB</button>
     <span id="dbInfo" class="text-[11px] text-slate-500 ml-2"></span>
     <div class="ml-auto flex gap-5 text-xs bg-slate-900/50 border border-slate-800 rounded-lg px-4 py-2">
       <div>H0:<b id="avg0" class="ml-1">-</b></div>
@@ -40,10 +41,10 @@
       <span id="liveLabel" class="text-xs text-emerald-400 font-bold">-</span>
       <div id="filterBar" class="flex gap-2 text-[11px]">
         <button class="filterBtn active px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800" data-filter="ALL">Semua</button>
-        <button class="filterBtn px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800" data-filter="MELEDAK">🚀 Meledak</button>
-        <button class="filterBtn px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800" data-filter="TP">✅ TP</button>
-        <button class="filterBtn px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800" data-filter="NAIK">📈 Naik</button>
-        <button class="filterBtn px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800" data-filter="GAGAL">❌ Gagal</button>
+        <button class="filterBtn px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800" data-filter="MELEDAK">ðŸš€ Meledak</button>
+        <button class="filterBtn px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800" data-filter="TP">âœ… TP</button>
+        <button class="filterBtn px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800" data-filter="NAIK">ðŸ“ˆ Naik</button>
+        <button class="filterBtn px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800" data-filter="GAGAL">âŒ Gagal</button>
       </div>
       <span id="lastSync" class="text-[10px] text-slate-500"></span>
     </div>
@@ -86,10 +87,10 @@ function cls(v){ if(v==null) return 'text-slate-500'; return v>0?'positive':v<0?
 
 // status key dipakai untuk filter; label dipakai untuk tampilan
 function statusOf(r){
-  if(r.max3_pct>5) return {key:'MELEDAK', label:'🚀 MELEDAK'};
-  if(r.max3_pct>3) return {key:'TP', label:'✅ TP'};
-  if(r.max3_pct>0) return {key:'NAIK', label:'📈 Naik'};
-  return {key:'GAGAL', label:'❌ Gagal'};
+  if(r.max3_pct>5) return {key:'MELEDAK', label:'ðŸš€ MELEDAK'};
+  if(r.max3_pct>3) return {key:'TP', label:'âœ… TP'};
+  if(r.max3_pct>0) return {key:'NAIK', label:'ðŸ“ˆ Naik'};
+  return {key:'GAGAL', label:'âŒ Gagal'};
 }
 
 async function loadDates(){
@@ -101,7 +102,7 @@ async function loadDates(){
     dateInput.min=availableDates[0];
     dateInput.max=latest;
     dateInput.value=latest;
-    document.getElementById('dbInfo').innerText=`DB ${availableDates.length} hari, ${availableDates[0]} → ${latest}`;
+    document.getElementById('dbInfo').innerText=`DB ${availableDates.length} hari, ${availableDates[0]} â†’ ${latest}`;
   }
 }
 function findNearest(d){ if(availableDates.includes(d)) return d; return availableDates.filter(x=>x<=d).pop()||availableDates[0]; }
@@ -152,7 +153,7 @@ filterBar.addEventListener('click', (e)=>{
 async function doBacktest(){
   let date=findNearest(dateInput.value);
   dateInput.value=date;
-  runBtn.disabled=true; runBtn.innerText='⏳';
+  runBtn.disabled=true; runBtn.innerText='â³';
   tbody.innerHTML='<tr><td colspan="12" class="p-8 text-center text-emerald-400">Loading...</td></tr>';
   try{
     const res=await fetch(`/api/backtest?date=${date}&t=${Date.now()}`);
@@ -173,14 +174,17 @@ async function doBacktest(){
 
     renderRows();
   }catch(e){ tbody.innerHTML=`<tr><td colspan="12" class="p-8 text-center text-red-400">${e.message}</td></tr>`; }
-  finally{ runBtn.disabled=false; runBtn.innerText='▶ RUN'; }
+  finally{ runBtn.disabled=false; runBtn.innerText='â–¶ RUN'; }
 }
 dateInput.addEventListener('change',doBacktest);
 runBtn.addEventListener('click',doBacktest);
 document.getElementById('reloadBtn').addEventListener('click',loadDates);
 window.addEventListener('load', async()=>{ await loadDates(); doBacktest(); });
 </script>
-<script src="/assets/stockfamily-sidebar.js"></script>
+<script src="/assets/chartnalist-sidebar.js"></script>
+<script src="/assets/chartnalist-typography.js"></script>
 </body>
 </html>
+
+
 

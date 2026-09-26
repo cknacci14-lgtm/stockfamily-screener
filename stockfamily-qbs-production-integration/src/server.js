@@ -1,5 +1,4 @@
 // src/server.js - FIX V2.4 - Express v5 Safe Routing
-const fs = require('fs');
 const express = require('express');
 const path = require('path');
 const multer = require('multer');
@@ -7,8 +6,6 @@ const xlsx = require('xlsx');
 require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
 const { runQbsProductionSnapshot, clearProductionCache } = require('./services/qbsProductionService');
-const gemScoreRoute = require('./routes/gemScoreRoute');
-const { buildSmartwatchlist } = require('./services/smartwatchlistService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,16 +15,15 @@ console.log('Supabase:', process.env.SUPABASE_URL ? 'OK' : 'MISSING');
 
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.json());
-app.use('/api/gem-score', gemScoreRoute);
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } });
 
 let backtestEngine = null;
 try {
   backtestEngine = require('./engine/backtestEngine');
-  console.log('[OK] Backtest Engine loaded');
+  console.log('✅ Backtest Engine loaded');
 } catch (e) { 
-  console.error('Ã¢ÂÅ’ Backtest Engine:', e.message); 
+  console.error('❌ Backtest Engine:', e.message); 
 }
 
 app.use((req, res, next) => {
@@ -41,10 +37,7 @@ app.get('/api/test', (req, res) => res.json({ ok: true }));
 // No broker orders, capital execution, or production-trading approval is performed here.
 app.get('/api/qbs/production', async (req, res) => {
   try {
-    const snapshot = await runQbsProductionSnapshot({
-      force: req.query.refresh === '1',
-      targetDate: req.query.targetDate || null,
-    });
+    const snapshot = await runQbsProductionSnapshot({ force: req.query.refresh === '1' });
     res.set('Cache-Control', 'no-store');
     res.json({ success: true, ...snapshot });
   } catch (e) {
@@ -60,10 +53,7 @@ app.get('/api/qbs/production', async (req, res) => {
 
 app.get('/api/qbs/events', async (req, res) => {
   try {
-    const snapshot = await runQbsProductionSnapshot({
-      force: req.query.refresh === '1',
-      targetDate: req.query.targetDate || null,
-    });
+    const snapshot = await runQbsProductionSnapshot({ force: req.query.refresh === '1' });
     const limit = Math.min(Math.max(Number.parseInt(req.query.limit || '100', 10) || 100, 1), 500);
     res.set('Cache-Control', 'no-store');
     res.json({
@@ -82,10 +72,7 @@ app.get('/api/qbs/events', async (req, res) => {
 app.post('/api/qbs/refresh', async (req, res) => {
   try {
     clearProductionCache();
-    const snapshot = await runQbsProductionSnapshot({
-      force: true,
-      targetDate: req.query.targetDate || req.body?.targetDate || null,
-    });
+    const snapshot = await runQbsProductionSnapshot({ force: true });
     res.set('Cache-Control', 'no-store');
     res.json({ success: true, status: snapshot.status, targetDate: snapshot.targetDate, eventsDetected: snapshot.events.length });
   } catch (e) {
@@ -223,34 +210,6 @@ app.get('/api/backtest', async (req, res) => {
   }
 });
 
-
-// === HELPER: Simpan file Excel ke folder archive ===
-function saveExcelToArchive(fileBuffer, originalName) {
-  try {
-    // Extract tanggal dari nama file (YYYYMMDD)
-    const match = originalName.match(/(\d{8})/);
-    if (!match) return { saved: false, reason: 'No date in filename' };
-    
-    const yyyymmdd = match[1];
-    const year = yyyymmdd.slice(0, 4);
-    const month = yyyymmdd.slice(4, 6);
-    
-    // Folder: data/archive/2026-09/
-    const archiveDir = path.join(__dirname, '..', 'data', 'archive', `${year}-${month}`);
-    if (!fs.existsSync(archiveDir)) {
-      fs.mkdirSync(archiveDir, { recursive: true });
-    }
-    
-    const archivePath = path.join(archiveDir, originalName);
-    fs.writeFileSync(archivePath, fileBuffer);
-    
-    return { saved: true, path: archivePath };
-  } catch (err) {
-    console.error('[Archive] Error saving:', err.message);
-    return { saved: false, reason: err.message };
-  }
-}
-
 app.post('/api/admin/upload-multiple', upload.array('excelFiles'), async (req, res) => {
   console.log(`[UPLOAD] hit ${req.files?.length || 0} files`);
   try {
@@ -270,14 +229,6 @@ app.post('/api/admin/upload-multiple', upload.array('excelFiles'), async (req, r
       let trade_date = m ? `${m[1].slice(0, 4)}-${m[1].slice(4, 6)}-${m[1].slice(6, 8)}` : new Date().toISOString().slice(0, 10);
       console.log(`[UPLOAD] process ${filename} -> ${trade_date}`);
 
-      // === AUTO-BACKUP: Simpan file ke folder archive ===
-      const archiveResult = saveExcelToArchive(file.buffer, filename);
-      if (archiveResult.saved) {
-        console.log(`[UPLOAD] ✅ Archived to: ${archiveResult.path}`);
-      } else {
-        console.warn(`[UPLOAD] ⚠️ Archive failed: ${archiveResult.reason}`);
-      }
-
       const wb = xlsx.read(file.buffer, { type: 'buffer' });
       const sheet = wb.Sheets[wb.SheetNames[0]];
       const rows = xlsx.utils.sheet_to_json(sheet);
@@ -290,39 +241,19 @@ app.post('/api/admin/upload-multiple', upload.array('excelFiles'), async (req, r
         const sid = map[code];
         if (!sid) continue;
         const previousPrice = r['Sebelumnya'] ?? r['Harga Penutupan Hari Sebelumnya'] ?? r['Previous'] ?? 0;
-        // Helper: safe number conversion (handle string dengan koma/titik)
-        const num = (v, def = 0) => {
-          if (v == null || v === '') return def;
-          const n = Number(String(v).replace(/[^0-9.-]/g, ''));
-          return isNaN(n) ? def : n;
-        };
-
         toInsert.push({
           stock_id: sid,
           trade_date: trade_date,
-          previous_price: num(previousPrice),
-          open: num(r['Open Price']),
-          first_trade: num(r['First Trade']),
-          high: num(r['Tertinggi']),
-          low: num(r['Terendah']),
-          close: num(r['Penutupan']),
-          change_price: num(r['Selisih']),
-          volume: num(r['Volume']),
-          value: num(r['Nilai']),
-          frequency: num(r['Frekuensi']),
-          index_individual: num(r['Index Individual']),
-          offer: num(r['Offer']),
-          offer_volume: num(r['Offer Volume']),
-          bid: num(r['Bid']),
-          bid_volume: num(r['Bid Volume']),
-          listed_shares: num(r['Listed Shares']),
-          tradeable_shares: num(r['Tradeble Shares']),
-          weight_for_index: num(r['Weight For Index']),
-          foreign_sell: num(r['Foreign Sell']),
-          foreign_buy: num(r['Foreign Buy']),
-          non_regular_volume: num(r['Non Regular Volume']),
-          non_regular_value: num(r['Non Regular Value']),
-          non_regular_frequency: num(r['Non Regular Frequency'])
+          previous_price: Number(previousPrice) || 0,
+          open: r['Open Price'] || 0,
+          high: r['Tertinggi'] || 0,
+          low: r['Terendah'] || 0,
+          close: r['Penutupan'] || 0,
+          volume: r['Volume'] ? parseInt(r['Volume']) : 0,
+          value: r['Nilai'] || 0,
+          frequency: r['Frekuensi'] ? parseInt(r['Frekuensi']) : 0,
+          foreign_sell: r['Foreign Sell'] ? parseInt(r['Foreign Sell']) : 0,
+          foreign_buy: r['Foreign Buy'] ? parseInt(r['Foreign Buy']) : 0
         });
       }
 
@@ -331,27 +262,11 @@ app.post('/api/admin/upload-multiple', upload.array('excelFiles'), async (req, r
         const batch = toInsert.slice(i, i + 500); 
         if (i === 0) { console.log('[DEBUG BATCH]', JSON.stringify(batch.slice(0, 3))); }
         const { error } = await supabase.from('daily_stock_data').upsert(batch, { onConflict: 'stock_id,trade_date' });
-        if (error) { 
-          console.error(`[UPLOAD] Batch upsert err ${filename} ${i}:`, error.message);
-          // Fallback: coba insert individual untuk batch yang gagal
-          console.log(`[UPLOAD] Fallback individual insert for batch ${i}...`);
-          for (const row of batch) {
-            const { error: rowErr } = await supabase.from('daily_stock_data').upsert(row, { onConflict: 'stock_id,trade_date' });
-            if (rowErr) {
-              console.error(`[UPLOAD] Row failed (stock_id=${row.stock_id}, date=${row.trade_date}):`, rowErr.message);
-            } else {
-              inserted++;
-            }
-          }
-        }
+        if (error) { console.error(`[UPLOAD] upsert err ${filename} ${i}:`, JSON.stringify(error, null, 2)); }
         else inserted += batch.length;
       }
 
-      // UPSERT upload_batches (tolerate duplicate)
-      const { error: logErr } = await supabase.from('upload_batches').upsert(
-        { filename, trade_date, row_count: inserted },
-        { onConflict: 'trade_date' }
-      );
+      const { error: logErr } = await supabase.from('upload_batches').insert({ filename, trade_date, row_count: inserted });
       if (logErr) console.error('[UPLOAD] log err', logErr.message);
 
       allResults.push({ filename, trade_date, raw: rows.length, inserted });
@@ -455,28 +370,6 @@ app.get('/api/public/watchlist', async (req, res) => {
   }
 });
 
-app.get('/api/public/smartwatchlist', async (req, res) => {
-  try {
-    const codes = (req.query.codes || '')
-      .split(',')
-      .map(c => c.trim().toUpperCase())
-      .filter(Boolean);
-
-    const result = await buildSmartwatchlist(codes);
-
-    res.json(result);
-  } catch (error) {
-    console.error('[Smartwatchlist]', error);
-
-    res.status(500).json({
-      success: false,
-      error: 'SMARTWATCHLIST_FAILED',
-      message: error?.message || 'Unable to build Smartwatchlist',
-      stocks: [],
-      count: 0,
-    });
-  }
-});
 app.get('/api/public/history/:code', async (req, res) => {
   try {
     const code = String(req.params.code || '').trim().toUpperCase();
@@ -492,7 +385,7 @@ app.get('/api/public/history/:code', async (req, res) => {
 
     let query = supabase
       .from('daily_stock_data')
-      .select('trade_date,open,high,low,close,volume,non_regular_volume,non_regular_value,non_regular_frequency')
+      .select('trade_date,open,high,low,close,volume')
       .eq('stock_id', stock.id)
       .order('trade_date', { ascending: true });
     if (startDate) query = query.gte('trade_date', startDate);
@@ -507,25 +400,16 @@ app.get('/api/public/history/:code', async (req, res) => {
         time: r.trade_date,
         open: Number(r.open), high: Number(r.high), low: Number(r.low), close: Number(r.close)
       }));
+
     const volumes = rows.map(r => ({
       time: r.trade_date,
       value: Number(r.volume) || 0,
       color: (Number(r.close) >= Number(r.open)) ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)'
     }));
 
-    // === NON-REGULAR / BLOCK TRADE DATA ===
-    const nonRegular = rows
-      .filter(r => Number(r.non_regular_volume) > 0)
-      .map(r => ({
-        time: r.trade_date,
-        volume: Number(r.non_regular_volume) || 0,
-        value: Number(r.non_regular_value) || 0,
-        frequency: Number(r.non_regular_frequency) || 0
-      }));
-
     res.json({
       success: true, code: stock.code, name: stock.name,
-      range, startDate, endDate: latestDate, candles, volumes, nonRegular
+      range, startDate, endDate: latestDate, candles, volumes
     });
   } catch (e) {
     console.error('[Public History Error]', e);
@@ -538,243 +422,70 @@ app.get('/api/public/summary/:code', async (req, res) => {
     const code = String(req.params.code || '').trim().toUpperCase();
 
     const { data: stock, error: sErr } = await supabase
-      .from('stocks')
-      .select('id,code,name')
-      .eq('code', code)
-      .maybeSingle();
-
+      .from('stocks').select('id,code,name').eq('code', code).maybeSingle();
     if (sErr) throw sErr;
+    if (!stock) return res.status(404).json({ success: false, error: `Ticker ${code} tidak ditemukan di database.` });
 
-    if (!stock) {
-      return res.status(404).json({
-        success: false,
-        error: `Ticker ${code} tidak ditemukan di database.`
-      });
-    }
+    const latestDate = await getLatestTradeDate();
+    if (!latestDate) return res.json({ success: true, hasData: false, message: 'Belum ada data historis.' });
 
-    const marketLatestDate = await getLatestTradeDate();
-
-    if (!marketLatestDate) {
-      return res.json({
-        success: true,
-        hasData: false,
-        message: 'Belum ada data historis.'
-      });
-    }
-
-    const startDate = rangeToStartDate('1y', marketLatestDate);
+    const startDate = rangeToStartDate('1y', latestDate);
 
     const { data: rows, error: rErr } = await supabase
       .from('daily_stock_data')
-      .select(
-        'trade_date,close,previous_price,volume,value,bid,bid_volume,offer,offer_volume,foreign_buy,foreign_sell,high,low,non_regular_volume,non_regular_value'
-      )
+      .select('trade_date,close,previous_price,volume,value,bid,bid_volume,offer,offer_volume,foreign_buy,foreign_sell')
       .eq('stock_id', stock.id)
       .gte('trade_date', startDate)
-      .lte('trade_date', marketLatestDate)
+      .lte('trade_date', latestDate)
       .order('trade_date', { ascending: true });
-
     if (rErr) throw rErr;
 
-    if (!rows.length) {
-      return res.json({
-        success: true,
-        hasData: false,
-        message: `Belum ada data historis untuk ${code}.`
-      });
-    }
+    if (!rows.length) return res.json({ success: true, hasData: false, message: `Belum ada data historis untuk ${code}.` });
 
     const last = rows[rows.length - 1];
-    const prev = rows.length > 1
-      ? rows[rows.length - 2]
-      : last;
+    const prev = rows.length > 1 ? rows[rows.length - 2] : last;
 
-    /*
-     * Freshness:
-     * ticker harus benar-benar memiliki row pada marketLatestDate
-     */
-    const isCurrentSession =
-      String(last.trade_date) === String(marketLatestDate);
+    const closes = rows.map(r => Number(r.close)).filter(v => !isNaN(v));
+    const low52 = closes.length ? Math.min(...closes) : null;
+    const high52 = closes.length ? Math.max(...closes) : null;
 
-    /*
-     * 20 observasi terbaru milik ticker.
-     * Ini tetap valid meskipun ticker tidak aktif pada sesi terbaru.
-     */
-    const trailing20 = rows.slice(-20);
-
-    const netForeign20d = trailing20.reduce(
-      (sum, r) =>
-        sum +
-        ((Number(r.foreign_buy) || 0) -
-         (Number(r.foreign_sell) || 0)),
-      0
+    const trailing = rows.slice(-20);
+    const netForeign20d = trailing.reduce(
+      (s, r) => s + ((Number(r.foreign_buy) || 0) - (Number(r.foreign_sell) || 0)), 0
     );
-
-    const grossForeign20d = trailing20.reduce(
-      (sum, r) =>
-        sum +
-        (Number(r.foreign_buy) || 0) +
-        (Number(r.foreign_sell) || 0),
-      0
+    const grossForeign20d = trailing.reduce(
+      (s, r) => s + (Number(r.foreign_buy) || 0) + (Number(r.foreign_sell) || 0), 0
     );
-
-    /*
-     * Bandar Score:
-     * tetap formula lama.
-     */
-    const bandarScoreRaw =
-      grossForeign20d > 0
-        ? 50 + 50 * (netForeign20d / grossForeign20d)
-        : 50;
-
-    /*
-     * 52-week range:
-     * gunakan high/low aktual harian, bukan close.
-     */
-    const validHighs = rows
-      .map(r => Number(r.high))
-      .filter(Number.isFinite)
-      .filter(v => v > 0);
-
-    const validLows = rows
-      .map(r => Number(r.low))
-      .filter(Number.isFinite)
-      .filter(v => v > 0);
-
-    const low52 = validLows.length
-      ? Math.min(...validLows)
-      : null;
-
-    const high52 = validHighs.length
-      ? Math.max(...validHighs)
-      : null;
-
-    /*
-     * Today's foreign data:
-     * jika ticker tidak punya data pada sesi terbaru,
-     * jangan klaim row terakhir sebagai "hari ini".
-     */
-    const foreignBuyToday = isCurrentSession
-      ? (Number(last.foreign_buy) || 0)
-      : null;
-
-    const foreignSellToday = isCurrentSession
-      ? (Number(last.foreign_sell) || 0)
-      : null;
-
-    const netForeignToday =
-      isCurrentSession
-        ? foreignBuyToday - foreignSellToday
-        : null;
-
-    /*
-     * Change/price tetap berdasarkan row terakhir ticker.
-     * Tambahkan metadata freshness agar frontend bisa membedakan
-     * CURRENT dari STALE.
-     */
-    const lastClose = Number(last.close);
-    const prevClose = Number(prev.close);
-
-    const change =
-      Number.isFinite(lastClose) && Number.isFinite(prevClose)
-        ? lastClose - prevClose
-        : null;
-
-    const changePercent =
-      Number.isFinite(change) && prevClose > 0
-        ? Number(((change / prevClose) * 100).toFixed(2))
-        : null;
+    const bandarScoreRaw = grossForeign20d > 0 ? 50 + 50 * (netForeign20d / grossForeign20d) : 50;
 
     res.json({
       success: true,
       hasData: true,
-
       code: stock.code,
       name: stock.name,
-
-      /*
-       * Date milik ticker
-       */
       date: last.trade_date,
-
-      /*
-       * Date pasar global terbaru
-       */
-      marketLatestDate,
-
-      /*
-       * Explicit freshness flag
-       */
-      isCurrentSession,
-
-      dataStatus: isCurrentSession
-        ? 'CURRENT'
-        : 'STALE',
-
-      close: Number.isFinite(lastClose)
-        ? lastClose
-        : null,
-
-      change,
-      changePercent,
-
+      close: Number(last.close),
+      change: Number(last.close) - Number(prev.close),
+      changePercent: prev.close
+        ? Number((((Number(last.close) - Number(prev.close)) / Number(prev.close)) * 100).toFixed(2))
+        : 0,
       volume: Number(last.volume) || 0,
       value: Number(last.value) || 0,
-
-      bid:
-        last.bid != null
-          ? Number(last.bid)
-          : null,
-
-      bidVolume:
-        last.bid_volume != null
-          ? Number(last.bid_volume)
-          : null,
-
-      offer:
-        last.offer != null
-          ? Number(last.offer)
-          : null,
-
-      offerVolume:
-        last.offer_volume != null
-          ? Number(last.offer_volume)
-          : null,
-
-      foreignBuyToday,
-      foreignSellToday,
-      netForeignToday,
-
+      bid: last.bid != null ? Number(last.bid) : null,
+      bidVolume: last.bid_volume != null ? Number(last.bid_volume) : null,
+      offer: last.offer != null ? Number(last.offer) : null,
+      offerVolume: last.offer_volume != null ? Number(last.offer_volume) : null,
+      foreignBuyToday: Number(last.foreign_buy) || 0,
+      foreignSellToday: Number(last.foreign_sell) || 0,
+      netForeignToday: (Number(last.foreign_buy) || 0) - (Number(last.foreign_sell) || 0),
       netForeign20d,
-
-      bandarScore:
-        Math.max(
-          0,
-          Math.min(
-            100,
-            Math.round(bandarScoreRaw)
-          )
-        ),
-
+      bandarScore: Math.max(0, Math.min(100, Math.round(bandarScoreRaw))),
       low52,
-      high52,
-
-      /*
-       * Audit metadata
-       */
-      trailing20Rows: trailing20.length,
-      rangeDays: rows.length,
-      rangeStart: startDate,
-      rangeEnd: marketLatestDate
+      high52
     });
-
   } catch (e) {
     console.error('[Public Summary Error]', e);
-
-    res.status(500).json({
-      success: false,
-      error: e.message
-    });
+    res.status(500).json({ success: false, error: e.message });
   }
 });
 
@@ -873,40 +584,4 @@ app.get(/^(?!\/api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-
-// ============================================================
-// GEM Score Auto Refresh (setiap hari jam 18:30 WIB)
-// ============================================================
-const { computeAndCacheAllGemScores } = require('./services/gemScoreService');
-
-function scheduleGemRefresh() {
-  const run = async () => {
-    try {
-      console.log('[GEM Auto] Mulai refresh harian...');
-      const result = await computeAndCacheAllGemScores();
-      console.log(`[GEM Auto] Selesai. ${result.count} saham di-update @ ${result.updated_at}`);
-    } catch (err) {
-      console.error('[GEM Auto] Gagal:', err.message);
-    }
-  };
-
-  // Cek setiap 1 menit apakah sudah jam 18:30 WIB
-  setInterval(() => {
-    const now = new Date();
-    // WIB = UTC+7
-    const wibHour = (now.getUTCHours() + 7) % 24;
-    const wibMin = now.getUTCMinutes();
-    if (wibHour === 18 && wibMin === 30) {
-      run();
-    }
-  }, 60 * 1000);
-
-  console.log('[GEM Auto] Scheduler aktif â€” refresh setiap hari jam 18:30 WIB');
-}
-
-if (require.main === module) {
-  scheduleGemRefresh();
-  app.listen(PORT, () => console.log(`[START] FIX V2.4 running http://localhost:${PORT}`));
-}
-
-module.exports = app;
+app.listen(PORT, () => console.log(`🚀 FIX V2.4 running http://localhost:${PORT}`));

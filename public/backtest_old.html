@@ -1,17 +1,18 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Backtest Quiet</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>body{background:#0a0e1a;color:#cbd5e1;font-family:monospace}.card{background:#111827;border:1px solid #1f2937}.positive{color:#10b981}.negative{color:#ef4444}.loader{border:2px solid #1f2937;border-top:2px solid #10b981;border-radius:50%;width:16px;height:16px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}</style>
+<link rel="stylesheet" href="/assets/stockfamily-typography.css">
 </head>
 <body class="p-6">
 <div class="max-w-[1600px] mx-auto">
-<h1 class="text-xl font-bold text-white mb-2">⚡ Backtest Quiet Before The Storm - Auto Kalender</h1>
+<h1 class="text-xl font-bold text-white mb-2">âš¡ Backtest Quiet Before The Storm - Auto Kalender</h1>
 <div class="card rounded-xl p-4 mb-4 flex gap-4 items-end flex-wrap">
 <div><label class="text-xs text-emerald-400 block mb-1">TANGGAL - KLIK KALENDER</label><input id="dateInput" type="date" value="2026-01-02" class="bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-white"></div>
-<button id="runBtn" onclick="doBacktest()" class="px-5 py-2 bg-emerald-500 text-black font-bold rounded">▶ RUN</button>
+<button id="runBtn" onclick="doBacktest()" class="px-5 py-2 bg-emerald-500 text-black font-bold rounded">â–¶ RUN</button>
 <div id="loading" class="hidden text-emerald-400 text-sm">Loading...</div>
 <div class="ml-auto flex gap-4 text-sm"><div>Avg H+1: <span id="avg1">-</span></div><div>Avg H+2: <span id="avg2">-</span></div><div>Avg H+3: <span id="avg3">-</span></div><div>Winrate: <span id="winrate">-</span></div></div>
 </div>
@@ -35,6 +36,8 @@ function doBacktest(){
 }
 </script>
 <script src="/assets/stockfamily-sidebar.js"></script>
+<script src="/assets/stockfamily-typography.js"></script>
 </body>
 </html>
+
 

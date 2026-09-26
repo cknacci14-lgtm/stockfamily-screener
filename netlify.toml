@@ -10,6 +10,14 @@
     "scripts/qbs-cross-stock-cross-sectional-v4.9.1.js"
   ]
 
+# Upload Excel endpoint (harus di atas wildcard /api/*)
+[[redirects]]
+  from = "/api/upload-excel"
+  to = "/.netlify/functions/upload-excel"
+  status = 200
+  force = true
+
+# Wildcard API lainnya (untuk backward compatibility)
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api/:splat"
