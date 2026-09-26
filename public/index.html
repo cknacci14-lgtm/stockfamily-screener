@@ -156,6 +156,172 @@
       display: flex;
       gap: 8px;
     }
+    /* === Historical BT Chart CSS === */
+    #btHistoryPanel {
+      background: #0B0E14;
+      border-top: 1px solid #2A2E39;
+      padding: 8px 12px;
+      font-family: ui-monospace, 'SF Mono', Monaco, monospace;
+      transition: height 0.3s ease;
+    }
+    #btHistoryPanel.collapsed #btHistoryBody { display: none; }
+    #btHistoryPanel.collapsed { padding: 6px 12px; }
+    #btHistoryPanel { transition: padding 0.3s ease; }
+    #btHistoryPanel.collapsed { padding: 8px 16px; }
+    .bt-history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #00E5FF;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .bt-history-header .bt-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bt-history-header button {
+      background: transparent;
+      border: 1px solid #2A2E39;
+      color: #94A3B8;
+      padding: 2px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .bt-history-header button:hover {
+      background: #1E222D;
+      color: #fff;
+    }
+    #btHistoryBody {
+      display: flex;
+      gap: 16px;
+      height: 110px;
+    }
+    .bt-chart-area {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      padding: 8px 0 20px 0;
+      position: relative;
+      border-bottom: 1px solid #2A2E39;
+    }
+    .bt-chart-area::before {
+      content: '0';
+      position: absolute;
+      left: -18px;
+      bottom: 20px;
+      font-size: 9px;
+      color: #475569;
+    }
+    .bt-bar-wrapper {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+      min-width: 20px;
+    }
+    .bt-bar-fill {
+      width: 100%;
+      border-radius: 3px 3px 0 0;
+      transition: all 0.2s ease;
+      min-height: 2px;
+    }
+    .bt-bar-fill.bull { background: linear-gradient(to top, #00E676, #00B85A); }
+    .bt-bar-fill.bear { background: linear-gradient(to top, #FF5252, #D32F2F); }
+    .bt-bar-fill.neutral { background: linear-gradient(to top, #64748B, #475569); }
+    .bt-bar-wrapper:hover .bt-bar-fill {
+      filter: brightness(1.3);
+      transform: scaleX(1.05);
+    }
+    .bt-bar-month {
+      position: absolute;
+      bottom: -16px;
+      font-size: 9px;
+      color: #64748B;
+      white-space: nowrap;
+    }
+    .bt-bar-vol {
+      position: absolute;
+      top: -14px;
+      font-size: 9px;
+      color: #94A3B8;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .bt-bar-wrapper:hover .bt-bar-vol { opacity: 1; }
+    .bt-bar-tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1E222D;
+      border: 1px solid #00E5FF;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 10px;
+      color: #E0E0E0;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 100;
+      margin-bottom: 4px;
+    }
+    .bt-bar-wrapper:hover .bt-bar-tooltip { opacity: 1; }
+    .bt-bar-tooltip .tt-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 2px 0;
+    }
+    .bt-bar-tooltip .tt-label { color: #94A3B8; }
+    .bt-bar-tooltip .tt-value { color: #E0E0E0; font-weight: bold; }
+    .bt-bar-tooltip .tt-badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .bt-summary-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      min-width: 110px;
+      align-content: center;
+    }
+    .bt-summary-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 8px;
+      background: #131722;
+      border-radius: 4px;
+      border-left: 2px solid #00E5FF;
+      font-size: 10px;
+    }
+    .bt-summary-item .label { color: #94A3B8; }
+    .bt-summary-item .value { color: #E0E0E0; font-weight: bold; }
+    .bt-loading, .bt-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #64748B;
+      font-size: 12px;
+      font-style: italic;
+    }
 </style>
 <style id="sf-chart-header-polish">
   #sf-top-header {
@@ -281,6 +447,172 @@
       display: flex;
       gap: 8px;
     }
+    /* === Historical BT Chart CSS === */
+    #btHistoryPanel {
+      background: #0B0E14;
+      border-top: 1px solid #2A2E39;
+      padding: 8px 12px;
+      font-family: ui-monospace, 'SF Mono', Monaco, monospace;
+      transition: height 0.3s ease;
+    }
+    #btHistoryPanel.collapsed #btHistoryBody { display: none; }
+    #btHistoryPanel.collapsed { padding: 6px 12px; }
+    #btHistoryPanel { transition: padding 0.3s ease; }
+    #btHistoryPanel.collapsed { padding: 8px 16px; }
+    .bt-history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #00E5FF;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .bt-history-header .bt-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bt-history-header button {
+      background: transparent;
+      border: 1px solid #2A2E39;
+      color: #94A3B8;
+      padding: 2px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .bt-history-header button:hover {
+      background: #1E222D;
+      color: #fff;
+    }
+    #btHistoryBody {
+      display: flex;
+      gap: 16px;
+      height: 110px;
+    }
+    .bt-chart-area {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      padding: 8px 0 20px 0;
+      position: relative;
+      border-bottom: 1px solid #2A2E39;
+    }
+    .bt-chart-area::before {
+      content: '0';
+      position: absolute;
+      left: -18px;
+      bottom: 20px;
+      font-size: 9px;
+      color: #475569;
+    }
+    .bt-bar-wrapper {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+      min-width: 20px;
+    }
+    .bt-bar-fill {
+      width: 100%;
+      border-radius: 3px 3px 0 0;
+      transition: all 0.2s ease;
+      min-height: 2px;
+    }
+    .bt-bar-fill.bull { background: linear-gradient(to top, #00E676, #00B85A); }
+    .bt-bar-fill.bear { background: linear-gradient(to top, #FF5252, #D32F2F); }
+    .bt-bar-fill.neutral { background: linear-gradient(to top, #64748B, #475569); }
+    .bt-bar-wrapper:hover .bt-bar-fill {
+      filter: brightness(1.3);
+      transform: scaleX(1.05);
+    }
+    .bt-bar-month {
+      position: absolute;
+      bottom: -16px;
+      font-size: 9px;
+      color: #64748B;
+      white-space: nowrap;
+    }
+    .bt-bar-vol {
+      position: absolute;
+      top: -14px;
+      font-size: 9px;
+      color: #94A3B8;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .bt-bar-wrapper:hover .bt-bar-vol { opacity: 1; }
+    .bt-bar-tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1E222D;
+      border: 1px solid #00E5FF;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 10px;
+      color: #E0E0E0;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 100;
+      margin-bottom: 4px;
+    }
+    .bt-bar-wrapper:hover .bt-bar-tooltip { opacity: 1; }
+    .bt-bar-tooltip .tt-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 2px 0;
+    }
+    .bt-bar-tooltip .tt-label { color: #94A3B8; }
+    .bt-bar-tooltip .tt-value { color: #E0E0E0; font-weight: bold; }
+    .bt-bar-tooltip .tt-badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .bt-summary-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      min-width: 110px;
+      align-content: center;
+    }
+    .bt-summary-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 8px;
+      background: #131722;
+      border-radius: 4px;
+      border-left: 2px solid #00E5FF;
+      font-size: 10px;
+    }
+    .bt-summary-item .label { color: #94A3B8; }
+    .bt-summary-item .value { color: #E0E0E0; font-weight: bold; }
+    .bt-loading, .bt-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #64748B;
+      font-size: 12px;
+      font-style: italic;
+    }
 </style>
 <style id="sf-right-sidebar-fix">
   #sf-right-sidebar {
@@ -398,6 +730,172 @@
       display: flex;
       gap: 8px;
     }
+    /* === Historical BT Chart CSS === */
+    #btHistoryPanel {
+      background: #0B0E14;
+      border-top: 1px solid #2A2E39;
+      padding: 8px 12px;
+      font-family: ui-monospace, 'SF Mono', Monaco, monospace;
+      transition: height 0.3s ease;
+    }
+    #btHistoryPanel.collapsed #btHistoryBody { display: none; }
+    #btHistoryPanel.collapsed { padding: 6px 12px; }
+    #btHistoryPanel { transition: padding 0.3s ease; }
+    #btHistoryPanel.collapsed { padding: 8px 16px; }
+    .bt-history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #00E5FF;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .bt-history-header .bt-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bt-history-header button {
+      background: transparent;
+      border: 1px solid #2A2E39;
+      color: #94A3B8;
+      padding: 2px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .bt-history-header button:hover {
+      background: #1E222D;
+      color: #fff;
+    }
+    #btHistoryBody {
+      display: flex;
+      gap: 16px;
+      height: 110px;
+    }
+    .bt-chart-area {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      padding: 8px 0 20px 0;
+      position: relative;
+      border-bottom: 1px solid #2A2E39;
+    }
+    .bt-chart-area::before {
+      content: '0';
+      position: absolute;
+      left: -18px;
+      bottom: 20px;
+      font-size: 9px;
+      color: #475569;
+    }
+    .bt-bar-wrapper {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+      min-width: 20px;
+    }
+    .bt-bar-fill {
+      width: 100%;
+      border-radius: 3px 3px 0 0;
+      transition: all 0.2s ease;
+      min-height: 2px;
+    }
+    .bt-bar-fill.bull { background: linear-gradient(to top, #00E676, #00B85A); }
+    .bt-bar-fill.bear { background: linear-gradient(to top, #FF5252, #D32F2F); }
+    .bt-bar-fill.neutral { background: linear-gradient(to top, #64748B, #475569); }
+    .bt-bar-wrapper:hover .bt-bar-fill {
+      filter: brightness(1.3);
+      transform: scaleX(1.05);
+    }
+    .bt-bar-month {
+      position: absolute;
+      bottom: -16px;
+      font-size: 9px;
+      color: #64748B;
+      white-space: nowrap;
+    }
+    .bt-bar-vol {
+      position: absolute;
+      top: -14px;
+      font-size: 9px;
+      color: #94A3B8;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .bt-bar-wrapper:hover .bt-bar-vol { opacity: 1; }
+    .bt-bar-tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1E222D;
+      border: 1px solid #00E5FF;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 10px;
+      color: #E0E0E0;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 100;
+      margin-bottom: 4px;
+    }
+    .bt-bar-wrapper:hover .bt-bar-tooltip { opacity: 1; }
+    .bt-bar-tooltip .tt-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 2px 0;
+    }
+    .bt-bar-tooltip .tt-label { color: #94A3B8; }
+    .bt-bar-tooltip .tt-value { color: #E0E0E0; font-weight: bold; }
+    .bt-bar-tooltip .tt-badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .bt-summary-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      min-width: 110px;
+      align-content: center;
+    }
+    .bt-summary-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 8px;
+      background: #131722;
+      border-radius: 4px;
+      border-left: 2px solid #00E5FF;
+      font-size: 10px;
+    }
+    .bt-summary-item .label { color: #94A3B8; }
+    .bt-summary-item .value { color: #E0E0E0; font-weight: bold; }
+    .bt-loading, .bt-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #64748B;
+      font-size: 12px;
+      font-style: italic;
+    }
 </style>
 <!-- removed: typography.css (file not found) -->
 <style id="sf-panel-title-fix">
@@ -481,6 +979,172 @@
       margin-top: 3px;
       display: flex;
       gap: 8px;
+    }
+    /* === Historical BT Chart CSS === */
+    #btHistoryPanel {
+      background: #0B0E14;
+      border-top: 1px solid #2A2E39;
+      padding: 8px 12px;
+      font-family: ui-monospace, 'SF Mono', Monaco, monospace;
+      transition: height 0.3s ease;
+    }
+    #btHistoryPanel.collapsed #btHistoryBody { display: none; }
+    #btHistoryPanel.collapsed { padding: 6px 12px; }
+    #btHistoryPanel { transition: padding 0.3s ease; }
+    #btHistoryPanel.collapsed { padding: 8px 16px; }
+    .bt-history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #00E5FF;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .bt-history-header .bt-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bt-history-header button {
+      background: transparent;
+      border: 1px solid #2A2E39;
+      color: #94A3B8;
+      padding: 2px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .bt-history-header button:hover {
+      background: #1E222D;
+      color: #fff;
+    }
+    #btHistoryBody {
+      display: flex;
+      gap: 16px;
+      height: 110px;
+    }
+    .bt-chart-area {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      padding: 8px 0 20px 0;
+      position: relative;
+      border-bottom: 1px solid #2A2E39;
+    }
+    .bt-chart-area::before {
+      content: '0';
+      position: absolute;
+      left: -18px;
+      bottom: 20px;
+      font-size: 9px;
+      color: #475569;
+    }
+    .bt-bar-wrapper {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+      min-width: 20px;
+    }
+    .bt-bar-fill {
+      width: 100%;
+      border-radius: 3px 3px 0 0;
+      transition: all 0.2s ease;
+      min-height: 2px;
+    }
+    .bt-bar-fill.bull { background: linear-gradient(to top, #00E676, #00B85A); }
+    .bt-bar-fill.bear { background: linear-gradient(to top, #FF5252, #D32F2F); }
+    .bt-bar-fill.neutral { background: linear-gradient(to top, #64748B, #475569); }
+    .bt-bar-wrapper:hover .bt-bar-fill {
+      filter: brightness(1.3);
+      transform: scaleX(1.05);
+    }
+    .bt-bar-month {
+      position: absolute;
+      bottom: -16px;
+      font-size: 9px;
+      color: #64748B;
+      white-space: nowrap;
+    }
+    .bt-bar-vol {
+      position: absolute;
+      top: -14px;
+      font-size: 9px;
+      color: #94A3B8;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .bt-bar-wrapper:hover .bt-bar-vol { opacity: 1; }
+    .bt-bar-tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1E222D;
+      border: 1px solid #00E5FF;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 10px;
+      color: #E0E0E0;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 100;
+      margin-bottom: 4px;
+    }
+    .bt-bar-wrapper:hover .bt-bar-tooltip { opacity: 1; }
+    .bt-bar-tooltip .tt-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 2px 0;
+    }
+    .bt-bar-tooltip .tt-label { color: #94A3B8; }
+    .bt-bar-tooltip .tt-value { color: #E0E0E0; font-weight: bold; }
+    .bt-bar-tooltip .tt-badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .bt-summary-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      min-width: 110px;
+      align-content: center;
+    }
+    .bt-summary-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 8px;
+      background: #131722;
+      border-radius: 4px;
+      border-left: 2px solid #00E5FF;
+      font-size: 10px;
+    }
+    .bt-summary-item .label { color: #94A3B8; }
+    .bt-summary-item .value { color: #E0E0E0; font-weight: bold; }
+    .bt-loading, .bt-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #64748B;
+      font-size: 12px;
+      font-style: italic;
     }
 </style>
 <style id="sf-right-sidebar-header-final">
@@ -600,6 +1264,172 @@
       margin-top: 3px;
       display: flex;
       gap: 8px;
+    }
+    /* === Historical BT Chart CSS === */
+    #btHistoryPanel {
+      background: #0B0E14;
+      border-top: 1px solid #2A2E39;
+      padding: 8px 12px;
+      font-family: ui-monospace, 'SF Mono', Monaco, monospace;
+      transition: height 0.3s ease;
+    }
+    #btHistoryPanel.collapsed #btHistoryBody { display: none; }
+    #btHistoryPanel.collapsed { padding: 6px 12px; }
+    #btHistoryPanel { transition: padding 0.3s ease; }
+    #btHistoryPanel.collapsed { padding: 8px 16px; }
+    .bt-history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #00E5FF;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .bt-history-header .bt-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bt-history-header button {
+      background: transparent;
+      border: 1px solid #2A2E39;
+      color: #94A3B8;
+      padding: 2px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .bt-history-header button:hover {
+      background: #1E222D;
+      color: #fff;
+    }
+    #btHistoryBody {
+      display: flex;
+      gap: 16px;
+      height: 110px;
+    }
+    .bt-chart-area {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      padding: 8px 0 20px 0;
+      position: relative;
+      border-bottom: 1px solid #2A2E39;
+    }
+    .bt-chart-area::before {
+      content: '0';
+      position: absolute;
+      left: -18px;
+      bottom: 20px;
+      font-size: 9px;
+      color: #475569;
+    }
+    .bt-bar-wrapper {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+      min-width: 20px;
+    }
+    .bt-bar-fill {
+      width: 100%;
+      border-radius: 3px 3px 0 0;
+      transition: all 0.2s ease;
+      min-height: 2px;
+    }
+    .bt-bar-fill.bull { background: linear-gradient(to top, #00E676, #00B85A); }
+    .bt-bar-fill.bear { background: linear-gradient(to top, #FF5252, #D32F2F); }
+    .bt-bar-fill.neutral { background: linear-gradient(to top, #64748B, #475569); }
+    .bt-bar-wrapper:hover .bt-bar-fill {
+      filter: brightness(1.3);
+      transform: scaleX(1.05);
+    }
+    .bt-bar-month {
+      position: absolute;
+      bottom: -16px;
+      font-size: 9px;
+      color: #64748B;
+      white-space: nowrap;
+    }
+    .bt-bar-vol {
+      position: absolute;
+      top: -14px;
+      font-size: 9px;
+      color: #94A3B8;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .bt-bar-wrapper:hover .bt-bar-vol { opacity: 1; }
+    .bt-bar-tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1E222D;
+      border: 1px solid #00E5FF;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 10px;
+      color: #E0E0E0;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 100;
+      margin-bottom: 4px;
+    }
+    .bt-bar-wrapper:hover .bt-bar-tooltip { opacity: 1; }
+    .bt-bar-tooltip .tt-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 2px 0;
+    }
+    .bt-bar-tooltip .tt-label { color: #94A3B8; }
+    .bt-bar-tooltip .tt-value { color: #E0E0E0; font-weight: bold; }
+    .bt-bar-tooltip .tt-badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .bt-summary-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      min-width: 110px;
+      align-content: center;
+    }
+    .bt-summary-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 8px;
+      background: #131722;
+      border-radius: 4px;
+      border-left: 2px solid #00E5FF;
+      font-size: 10px;
+    }
+    .bt-summary-item .label { color: #94A3B8; }
+    .bt-summary-item .value { color: #E0E0E0; font-weight: bold; }
+    .bt-loading, .bt-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #64748B;
+      font-size: 12px;
+      font-style: italic;
     }
 </style>
 <style id="chartnalist-brand-only-final">
@@ -733,6 +1563,172 @@
       margin-top: 3px;
       display: flex;
       gap: 8px;
+    }
+    /* === Historical BT Chart CSS === */
+    #btHistoryPanel {
+      background: #0B0E14;
+      border-top: 1px solid #2A2E39;
+      padding: 8px 12px;
+      font-family: ui-monospace, 'SF Mono', Monaco, monospace;
+      transition: height 0.3s ease;
+    }
+    #btHistoryPanel.collapsed #btHistoryBody { display: none; }
+    #btHistoryPanel.collapsed { padding: 6px 12px; }
+    #btHistoryPanel { transition: padding 0.3s ease; }
+    #btHistoryPanel.collapsed { padding: 8px 16px; }
+    .bt-history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #00E5FF;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .bt-history-header .bt-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bt-history-header button {
+      background: transparent;
+      border: 1px solid #2A2E39;
+      color: #94A3B8;
+      padding: 2px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .bt-history-header button:hover {
+      background: #1E222D;
+      color: #fff;
+    }
+    #btHistoryBody {
+      display: flex;
+      gap: 16px;
+      height: 110px;
+    }
+    .bt-chart-area {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      padding: 8px 0 20px 0;
+      position: relative;
+      border-bottom: 1px solid #2A2E39;
+    }
+    .bt-chart-area::before {
+      content: '0';
+      position: absolute;
+      left: -18px;
+      bottom: 20px;
+      font-size: 9px;
+      color: #475569;
+    }
+    .bt-bar-wrapper {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+      min-width: 20px;
+    }
+    .bt-bar-fill {
+      width: 100%;
+      border-radius: 3px 3px 0 0;
+      transition: all 0.2s ease;
+      min-height: 2px;
+    }
+    .bt-bar-fill.bull { background: linear-gradient(to top, #00E676, #00B85A); }
+    .bt-bar-fill.bear { background: linear-gradient(to top, #FF5252, #D32F2F); }
+    .bt-bar-fill.neutral { background: linear-gradient(to top, #64748B, #475569); }
+    .bt-bar-wrapper:hover .bt-bar-fill {
+      filter: brightness(1.3);
+      transform: scaleX(1.05);
+    }
+    .bt-bar-month {
+      position: absolute;
+      bottom: -16px;
+      font-size: 9px;
+      color: #64748B;
+      white-space: nowrap;
+    }
+    .bt-bar-vol {
+      position: absolute;
+      top: -14px;
+      font-size: 9px;
+      color: #94A3B8;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .bt-bar-wrapper:hover .bt-bar-vol { opacity: 1; }
+    .bt-bar-tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1E222D;
+      border: 1px solid #00E5FF;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 10px;
+      color: #E0E0E0;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 100;
+      margin-bottom: 4px;
+    }
+    .bt-bar-wrapper:hover .bt-bar-tooltip { opacity: 1; }
+    .bt-bar-tooltip .tt-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 2px 0;
+    }
+    .bt-bar-tooltip .tt-label { color: #94A3B8; }
+    .bt-bar-tooltip .tt-value { color: #E0E0E0; font-weight: bold; }
+    .bt-bar-tooltip .tt-badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .bt-summary-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      min-width: 110px;
+      align-content: center;
+    }
+    .bt-summary-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 8px;
+      background: #131722;
+      border-radius: 4px;
+      border-left: 2px solid #00E5FF;
+      font-size: 10px;
+    }
+    .bt-summary-item .label { color: #94A3B8; }
+    .bt-summary-item .value { color: #E0E0E0; font-weight: bold; }
+    .bt-loading, .bt-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #64748B;
+      font-size: 12px;
+      font-style: italic;
     }
 </style>
 <style id="chartnalist-toolbar-polish">
@@ -890,6 +1886,172 @@
       display: flex;
       gap: 8px;
     }
+    /* === Historical BT Chart CSS === */
+    #btHistoryPanel {
+      background: #0B0E14;
+      border-top: 1px solid #2A2E39;
+      padding: 8px 12px;
+      font-family: ui-monospace, 'SF Mono', Monaco, monospace;
+      transition: height 0.3s ease;
+    }
+    #btHistoryPanel.collapsed #btHistoryBody { display: none; }
+    #btHistoryPanel.collapsed { padding: 6px 12px; }
+    #btHistoryPanel { transition: padding 0.3s ease; }
+    #btHistoryPanel.collapsed { padding: 8px 16px; }
+    .bt-history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #00E5FF;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .bt-history-header .bt-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bt-history-header button {
+      background: transparent;
+      border: 1px solid #2A2E39;
+      color: #94A3B8;
+      padding: 2px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .bt-history-header button:hover {
+      background: #1E222D;
+      color: #fff;
+    }
+    #btHistoryBody {
+      display: flex;
+      gap: 16px;
+      height: 110px;
+    }
+    .bt-chart-area {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      padding: 8px 0 20px 0;
+      position: relative;
+      border-bottom: 1px solid #2A2E39;
+    }
+    .bt-chart-area::before {
+      content: '0';
+      position: absolute;
+      left: -18px;
+      bottom: 20px;
+      font-size: 9px;
+      color: #475569;
+    }
+    .bt-bar-wrapper {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+      min-width: 20px;
+    }
+    .bt-bar-fill {
+      width: 100%;
+      border-radius: 3px 3px 0 0;
+      transition: all 0.2s ease;
+      min-height: 2px;
+    }
+    .bt-bar-fill.bull { background: linear-gradient(to top, #00E676, #00B85A); }
+    .bt-bar-fill.bear { background: linear-gradient(to top, #FF5252, #D32F2F); }
+    .bt-bar-fill.neutral { background: linear-gradient(to top, #64748B, #475569); }
+    .bt-bar-wrapper:hover .bt-bar-fill {
+      filter: brightness(1.3);
+      transform: scaleX(1.05);
+    }
+    .bt-bar-month {
+      position: absolute;
+      bottom: -16px;
+      font-size: 9px;
+      color: #64748B;
+      white-space: nowrap;
+    }
+    .bt-bar-vol {
+      position: absolute;
+      top: -14px;
+      font-size: 9px;
+      color: #94A3B8;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .bt-bar-wrapper:hover .bt-bar-vol { opacity: 1; }
+    .bt-bar-tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1E222D;
+      border: 1px solid #00E5FF;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 10px;
+      color: #E0E0E0;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 100;
+      margin-bottom: 4px;
+    }
+    .bt-bar-wrapper:hover .bt-bar-tooltip { opacity: 1; }
+    .bt-bar-tooltip .tt-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 2px 0;
+    }
+    .bt-bar-tooltip .tt-label { color: #94A3B8; }
+    .bt-bar-tooltip .tt-value { color: #E0E0E0; font-weight: bold; }
+    .bt-bar-tooltip .tt-badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .bt-summary-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      min-width: 110px;
+      align-content: center;
+    }
+    .bt-summary-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 8px;
+      background: #131722;
+      border-radius: 4px;
+      border-left: 2px solid #00E5FF;
+      font-size: 10px;
+    }
+    .bt-summary-item .label { color: #94A3B8; }
+    .bt-summary-item .value { color: #E0E0E0; font-weight: bold; }
+    .bt-loading, .bt-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #64748B;
+      font-size: 12px;
+      font-style: italic;
+    }
 </style>
 <style id="chartnalist-drawing-final">
   #fibSettingsPanel {
@@ -983,9 +2145,175 @@
       display: flex;
       gap: 8px;
     }
+    /* === Historical BT Chart CSS === */
+    #btHistoryPanel {
+      background: #0B0E14;
+      border-top: 1px solid #2A2E39;
+      padding: 8px 12px;
+      font-family: ui-monospace, 'SF Mono', Monaco, monospace;
+      transition: height 0.3s ease;
+    }
+    #btHistoryPanel.collapsed #btHistoryBody { display: none; }
+    #btHistoryPanel.collapsed { padding: 6px 12px; }
+    #btHistoryPanel { transition: padding 0.3s ease; }
+    #btHistoryPanel.collapsed { padding: 8px 16px; }
+    .bt-history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #00E5FF;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .bt-history-header .bt-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bt-history-header button {
+      background: transparent;
+      border: 1px solid #2A2E39;
+      color: #94A3B8;
+      padding: 2px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .bt-history-header button:hover {
+      background: #1E222D;
+      color: #fff;
+    }
+    #btHistoryBody {
+      display: flex;
+      gap: 16px;
+      height: 110px;
+    }
+    .bt-chart-area {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      padding: 8px 0 20px 0;
+      position: relative;
+      border-bottom: 1px solid #2A2E39;
+    }
+    .bt-chart-area::before {
+      content: '0';
+      position: absolute;
+      left: -18px;
+      bottom: 20px;
+      font-size: 9px;
+      color: #475569;
+    }
+    .bt-bar-wrapper {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+      min-width: 20px;
+    }
+    .bt-bar-fill {
+      width: 100%;
+      border-radius: 3px 3px 0 0;
+      transition: all 0.2s ease;
+      min-height: 2px;
+    }
+    .bt-bar-fill.bull { background: linear-gradient(to top, #00E676, #00B85A); }
+    .bt-bar-fill.bear { background: linear-gradient(to top, #FF5252, #D32F2F); }
+    .bt-bar-fill.neutral { background: linear-gradient(to top, #64748B, #475569); }
+    .bt-bar-wrapper:hover .bt-bar-fill {
+      filter: brightness(1.3);
+      transform: scaleX(1.05);
+    }
+    .bt-bar-month {
+      position: absolute;
+      bottom: -16px;
+      font-size: 9px;
+      color: #64748B;
+      white-space: nowrap;
+    }
+    .bt-bar-vol {
+      position: absolute;
+      top: -14px;
+      font-size: 9px;
+      color: #94A3B8;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .bt-bar-wrapper:hover .bt-bar-vol { opacity: 1; }
+    .bt-bar-tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1E222D;
+      border: 1px solid #00E5FF;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 10px;
+      color: #E0E0E0;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 100;
+      margin-bottom: 4px;
+    }
+    .bt-bar-wrapper:hover .bt-bar-tooltip { opacity: 1; }
+    .bt-bar-tooltip .tt-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 2px 0;
+    }
+    .bt-bar-tooltip .tt-label { color: #94A3B8; }
+    .bt-bar-tooltip .tt-value { color: #E0E0E0; font-weight: bold; }
+    .bt-bar-tooltip .tt-badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .bt-summary-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      min-width: 110px;
+      align-content: center;
+    }
+    .bt-summary-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 8px;
+      background: #131722;
+      border-radius: 4px;
+      border-left: 2px solid #00E5FF;
+      font-size: 10px;
+    }
+    .bt-summary-item .label { color: #94A3B8; }
+    .bt-summary-item .value { color: #E0E0E0; font-weight: bold; }
+    .bt-loading, .bt-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #64748B;
+      font-size: 12px;
+      font-style: italic;
+    }
 </style>
 </head>
-<body class="bg-idx-bg text-slate-200 font-sans antialiased h-screen flex flex-col overflow-hidden select-none">
+<body class="bg-idx-bg text-slate-200 font-sans antialiased h-screen flex flex-col select-none">
 
 <!-- StockFamily Top Header -->
 <style id="stockfamily-header-final">
@@ -1463,6 +2791,172 @@
       display: flex;
       gap: 8px;
     }
+    /* === Historical BT Chart CSS === */
+    #btHistoryPanel {
+      background: #0B0E14;
+      border-top: 1px solid #2A2E39;
+      padding: 8px 12px;
+      font-family: ui-monospace, 'SF Mono', Monaco, monospace;
+      transition: height 0.3s ease;
+    }
+    #btHistoryPanel.collapsed #btHistoryBody { display: none; }
+    #btHistoryPanel.collapsed { padding: 6px 12px; }
+    #btHistoryPanel { transition: padding 0.3s ease; }
+    #btHistoryPanel.collapsed { padding: 8px 16px; }
+    .bt-history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #00E5FF;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .bt-history-header .bt-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bt-history-header button {
+      background: transparent;
+      border: 1px solid #2A2E39;
+      color: #94A3B8;
+      padding: 2px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .bt-history-header button:hover {
+      background: #1E222D;
+      color: #fff;
+    }
+    #btHistoryBody {
+      display: flex;
+      gap: 16px;
+      height: 110px;
+    }
+    .bt-chart-area {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      padding: 8px 0 20px 0;
+      position: relative;
+      border-bottom: 1px solid #2A2E39;
+    }
+    .bt-chart-area::before {
+      content: '0';
+      position: absolute;
+      left: -18px;
+      bottom: 20px;
+      font-size: 9px;
+      color: #475569;
+    }
+    .bt-bar-wrapper {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+      min-width: 20px;
+    }
+    .bt-bar-fill {
+      width: 100%;
+      border-radius: 3px 3px 0 0;
+      transition: all 0.2s ease;
+      min-height: 2px;
+    }
+    .bt-bar-fill.bull { background: linear-gradient(to top, #00E676, #00B85A); }
+    .bt-bar-fill.bear { background: linear-gradient(to top, #FF5252, #D32F2F); }
+    .bt-bar-fill.neutral { background: linear-gradient(to top, #64748B, #475569); }
+    .bt-bar-wrapper:hover .bt-bar-fill {
+      filter: brightness(1.3);
+      transform: scaleX(1.05);
+    }
+    .bt-bar-month {
+      position: absolute;
+      bottom: -16px;
+      font-size: 9px;
+      color: #64748B;
+      white-space: nowrap;
+    }
+    .bt-bar-vol {
+      position: absolute;
+      top: -14px;
+      font-size: 9px;
+      color: #94A3B8;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .bt-bar-wrapper:hover .bt-bar-vol { opacity: 1; }
+    .bt-bar-tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1E222D;
+      border: 1px solid #00E5FF;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 10px;
+      color: #E0E0E0;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 100;
+      margin-bottom: 4px;
+    }
+    .bt-bar-wrapper:hover .bt-bar-tooltip { opacity: 1; }
+    .bt-bar-tooltip .tt-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 2px 0;
+    }
+    .bt-bar-tooltip .tt-label { color: #94A3B8; }
+    .bt-bar-tooltip .tt-value { color: #E0E0E0; font-weight: bold; }
+    .bt-bar-tooltip .tt-badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .bt-summary-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      min-width: 110px;
+      align-content: center;
+    }
+    .bt-summary-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 8px;
+      background: #131722;
+      border-radius: 4px;
+      border-left: 2px solid #00E5FF;
+      font-size: 10px;
+    }
+    .bt-summary-item .label { color: #94A3B8; }
+    .bt-summary-item .value { color: #E0E0E0; font-weight: bold; }
+    .bt-loading, .bt-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #64748B;
+      font-size: 12px;
+      font-style: italic;
+    }
 </style>
 
 <!-- Top Header -->
@@ -1714,11 +3208,11 @@
   </div>
 </div>
 <!-- Main Workspace -->
-<div class="flex-1 min-h-0 flex overflow-hidden">
+<div class="flex-1 min-h-0 flex">
 
 
   <!-- Center: Chart -->
-  <main class="flex-1 flex flex-col overflow-hidden">
+  <main class="flex-1 flex flex-col overflow-y-auto">
     <div class="h-16 border-b border-idx-border px-4 flex items-center justify-between shrink-0">
       <div>
         <div class="flex items-center gap-2">
@@ -1756,10 +3250,27 @@
         </div>
       </div>
     </div>
-    <div class="relative flex-1 min-h-[300px]">
+    <div id="chartWrapper" class="relative w-full shrink-0" style="height: 55vh; min-height: 320px; transition: height 0.3s ease;">
       <div id="tvChart" class="w-full h-full"></div>
       <div id="chartLoading" class="chart-loading">
         <div class="spinner"></div>
+      </div>
+    </div>
+    <!-- === HISTORICAL BLOCK TRADE PANEL === -->
+    <div id="btHistoryPanel" class="shrink-0">
+      <div class="bt-history-header">
+        <div class="bt-title">
+          <i class="fa-solid fa-chart-column"></i>
+          <span>Historical Block Trade</span>
+          <span id="btHistoryCode" style="color: #64748B; font-weight: 400;">—</span>
+        </div>
+        <button onclick="toggleBTHistory()" id="btToggleBtn" title="Minimize/Maximize">−</button>
+      </div>
+      <div id="btHistoryBody">
+        <div class="bt-chart-area" id="btChartArea">
+          <div class="bt-loading">Menunggu data saham...</div>
+        </div>
+        <div class="bt-summary-grid" id="btSummaryGrid"></div>
       </div>
     </div>
   </main>
@@ -1852,8 +3363,12 @@
     
 
     <div class="p-3 border-b border-idx-border shrink-0">
-      <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mb-2 flex items-center gap-1.5">
-        <i class="fa-solid fa-book"></i> Bid / Offer <span class="text-slate-500 font-normal normal-case">(Yahoo, delayed)</span>
+      <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between gap-1.5">
+        <span class="flex items-center gap-1.5">
+          <i class="fa-solid fa-book"></i> Bid / Offer 
+          <span class="text-slate-500 font-normal normal-case" id="bidOfferSource">(IDX EOD)</span>
+        </span>
+        <span id="bidOfferDate" class="text-slate-500 font-normal normal-case text-[9px]">--</span>
       </h2>
       <div class="grid grid-cols-2 gap-1.5">
         <div class="p-2 rounded bg-idx-green/10 border border-idx-green/30">
@@ -1867,7 +3382,20 @@
           <div id="offerVolume" class="text-[10px] text-slate-500">vol --</div>
         </div>
       </div>
-      <p class="text-[10px] text-slate-500 mt-1.5 italic">Yahoo sering tidak punya data bid/offer untuk saham IDX — tampil "--" kalau memang tidak tersedia.</p>
+      <div id="bidOfferRatioContainer" class="mt-2 hidden">
+        <div class="flex justify-between text-[9px] mb-1">
+          <span id="bidPctLabel" class="text-idx-green">--</span>
+          <span id="offerPctLabel" class="text-idx-red">--</span>
+        </div>
+        <div class="h-1.5 rounded-full bg-idx-panel border border-idx-border relative overflow-hidden flex">
+          <div id="bidRatioBar" class="h-full bg-idx-green" style="width:50%"></div>
+          <div id="offerRatioBar" class="h-full bg-idx-red" style="width:50%"></div>
+        </div>
+        <div class="mt-1.5 text-center text-[10px]">
+          <span id="bidOfferPressure" class="font-bold text-slate-400">--</span>
+        </div>
+      </div>
+      <p class="text-[10px] text-slate-500 mt-1.5 italic">Data dari Excel IDX (EOD).</p>
     </div>
 
     <div class="p-3 border-b border-idx-border shrink-0">
@@ -2457,6 +3985,189 @@
 
     container.innerHTML = html;
   }
+  // === BID/OFFER FROM SUPABASE ===
+  async function loadBidOfferFromSupabase(code) {
+    try {
+      const data = await apiGet('/api/bid-offer?code=' + encodeURIComponent(code));
+      if (!data.success) throw new Error(data.error || 'Unknown error');
+
+      document.getElementById('bidPrice').textContent = 'Rp ' + Number(data.bid).toLocaleString('id-ID');
+      document.getElementById('bidVolume').textContent = 'vol ' + Number(data.bid_volume).toLocaleString('id-ID');
+      document.getElementById('offerPrice').textContent = 'Rp ' + Number(data.offer).toLocaleString('id-ID');
+      document.getElementById('offerVolume').textContent = 'vol ' + Number(data.offer_volume).toLocaleString('id-ID');
+
+      const dateEl = document.getElementById('bidOfferDate');
+      if (dateEl) dateEl.textContent = data.trade_date || '';
+
+      const ratioContainer = document.getElementById('bidOfferRatioContainer');
+      if (ratioContainer) {
+        ratioContainer.classList.remove('hidden');
+        const bidPct = data.bid_pct || 50;
+        const offerPct = data.offer_pct || 50;
+        document.getElementById('bidPctLabel').textContent = bidPct.toFixed(1) + '%';
+        document.getElementById('offerPctLabel').textContent = offerPct.toFixed(1) + '%';
+        document.getElementById('bidRatioBar').style.width = bidPct + '%';
+        document.getElementById('offerRatioBar').style.width = offerPct + '%';
+        const pressureEl = document.getElementById('bidOfferPressure');
+        pressureEl.textContent = data.pressure + ' (' + data.ratio.toFixed(2) + 'x)';
+        pressureEl.style.color = data.pressure_color;
+      }
+    } catch (err) {
+      console.error('[loadBidOfferFromSupabase]', code, err);
+      const ids = ['bidPrice', 'bidVolume', 'offerPrice', 'offerVolume'];
+      ids.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = id.includes('Volume') ? 'vol --' : '--'; });
+      const rc = document.getElementById('bidOfferRatioContainer');
+      if (rc) rc.classList.add('hidden');
+    }
+  }
+  // === HISTORICAL BLOCK TRADE CHART ===
+  async function loadHistoricalBT(code) {
+    const chartArea = document.getElementById('btChartArea');
+    const summaryGrid = document.getElementById('btSummaryGrid');
+    const codeLabel = document.getElementById('btHistoryCode');
+    
+    if (!chartArea) return;
+    
+    codeLabel.textContent = '— ' + code;
+    chartArea.innerHTML = '<div class="bt-loading">Loading data...</div>';
+    summaryGrid.innerHTML = '';
+    
+    try {
+      const data = await apiGet('/api/public/history/' + encodeURIComponent(code) + '?range=1y');
+      if (!data.success || !data.nonRegular || !data.nonRegular.length) {
+        chartArea.innerHTML = '<div class="bt-empty">Tidak ada data Block Trade untuk ' + code + '</div>';
+        return;
+      }
+      
+      // Group by month
+      const byMonth = {};
+      data.nonRegular.forEach(bt => {
+        const month = String(bt.time).slice(0, 7); // YYYY-MM
+        if (!byMonth[month]) byMonth[month] = { volume: 0, value: 0, count: 0 };
+        byMonth[month].volume += Number(bt.volume) || 0;
+        byMonth[month].value += Number(bt.value) || 0;
+        byMonth[month].count++;
+      });
+      
+      // Ambil 12 bulan terakhir
+      const allMonths = Object.keys(byMonth).sort();
+      const months = allMonths.slice(-12);
+      
+      if (!months.length) {
+        chartArea.innerHTML = '<div class="bt-empty">Tidak ada data</div>';
+        return;
+      }
+      
+      const maxVol = Math.max(...months.map(m => byMonth[m].volume));
+      
+      // Buat map harga untuk deteksi warna (bull/bear)
+      const candleMap = new Map();
+      (data.candles || []).forEach(c => candleMap.set(String(c.time), c));
+      
+      // Ambil harga awal & akhir bulan untuk tentukan warna
+      function getMonthDirection(month) {
+        const monthCandles = (data.candles || []).filter(c => String(c.time).startsWith(month));
+        if (monthCandles.length < 2) return 'neutral';
+        const first = Number(monthCandles[0].close);
+        const last = Number(monthCandles[monthCandles.length - 1].close);
+        if (last > first * 1.01) return 'bull';
+        if (last < first * 0.99) return 'bear';
+        return 'neutral';
+      }
+      
+      // Render bars
+      const barsHtml = months.map(m => {
+        const d = byMonth[m];
+        const pct = maxVol > 0 ? (d.volume / maxVol) * 100 : 0;
+        const dir = getMonthDirection(m);
+        const [year, mon] = m.split('-');
+        const monthName = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][parseInt(mon) - 1];
+        const label = monthName + ' ' + year.slice(2);
+        
+        // Format volume
+        const volText = d.volume >= 1e9 ? (d.volume/1e9).toFixed(1)+'B' 
+                       : d.volume >= 1e6 ? (d.volume/1e6).toFixed(0)+'M' 
+                       : (d.volume/1e3).toFixed(0)+'K';
+        const valText = d.value >= 1e12 ? 'Rp '+(d.value/1e12).toFixed(2)+' T'
+                       : d.value >= 1e9 ? 'Rp '+(d.value/1e9).toFixed(1)+' B'
+                       : 'Rp '+(d.value/1e6).toFixed(0)+' M';
+        
+        const dirLabel = dir === 'bull' ? '🟢 Bullish' : dir === 'bear' ? '🔴 Bearish' : '⚪ Neutral';
+        const dirColor = dir === 'bull' ? '#00E676' : dir === 'bear' ? '#FF5252' : '#64748B';
+        
+        return `
+          <div class="bt-bar-wrapper">
+            <div class="bt-bar-vol">${volText}</div>
+            <div class="bt-bar-fill ${dir}" style="height: ${pct}%"></div>
+            <div class="bt-bar-month">${label}</div>
+            <div class="bt-bar-tooltip">
+              <div class="tt-row"><span class="tt-label">Bulan</span><span class="tt-value">${label}</span></div>
+              <div class="tt-row"><span class="tt-label">Volume</span><span class="tt-value">${volText} lot</span></div>
+              <div class="tt-row"><span class="tt-label">Nilai</span><span class="tt-value">${valText}</span></div>
+              <div class="tt-row"><span class="tt-label">Transaksi</span><span class="tt-value">${d.count}x</span></div>
+              <span class="tt-badge" style="background: ${dirColor}22; color: ${dirColor};">${dirLabel}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      chartArea.innerHTML = barsHtml;
+      
+      // Summary
+      const totalBT = data.nonRegular.length;
+      const totalVol = data.nonRegular.reduce((s, b) => s + (Number(b.volume) || 0), 0);
+      const totalVal = data.nonRegular.reduce((s, b) => s + (Number(b.value) || 0), 0);
+      const peakMonth = months.reduce((a, m) => byMonth[m].volume > byMonth[a].volume ? m : a, months[0]);
+      const [py, pm] = peakMonth.split('-');
+      const peakLabel = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][parseInt(pm)-1] + ' ' + py;
+      
+      const fmtVol = (n) => n >= 1e9 ? (n/1e9).toFixed(2)+'B' : n >= 1e6 ? (n/1e6).toFixed(0)+'M' : (n/1e3).toFixed(0)+'K';
+      const fmtVal = (n) => n >= 1e12 ? (n/1e12).toFixed(2)+' T' : n >= 1e9 ? (n/1e9).toFixed(1)+' B' : (n/1e6).toFixed(0)+' M';
+      
+      summaryGrid.innerHTML = `
+        <div class="bt-summary-item"><span class="label">Total BT</span><span class="value">${totalBT}x</span></div>
+        <div class="bt-summary-item"><span class="label">Volume</span><span class="value">${fmtVol(totalVol)}</span></div>
+        <div class="bt-summary-item"><span class="label">Nilai</span><span class="value">Rp ${fmtVal(totalVal)}</span></div>
+        <div class="bt-summary-item"><span class="label">Puncak</span><span class="value">${peakLabel}</span></div>
+      `;
+      
+    } catch (err) {
+      console.error('[loadHistoricalBT]', err);
+      chartArea.innerHTML = '<div class="bt-empty">Error: ' + err.message + '</div>';
+    }
+  }
+  
+  window.toggleBTHistory = function() {
+    const panel = document.getElementById('btHistoryPanel');
+    const btn = document.getElementById('btToggleBtn');
+    const wrapper = document.getElementById('chartWrapper');
+    if (!panel || !wrapper) return;
+    
+    panel.classList.toggle('collapsed');
+    const isCollapsed = panel.classList.contains('collapsed');
+    
+    // Update button icon
+    btn.textContent = isCollapsed ? '+' : '−';
+    btn.title = isCollapsed ? 'Expand panel' : 'Collapse panel';
+    
+    // Resize chart
+    if (isCollapsed) {
+      wrapper.style.height = '85vh';  // Maximize chart
+    } else {
+      wrapper.style.height = '55vh';  // Normal
+    }
+    
+    // Trigger chart resize after transition
+    setTimeout(() => {
+      if (typeof chart !== 'undefined' && chart) {
+        const rect = wrapper.getBoundingClientRect();
+        chart.applyOptions({ 
+          width: rect.width, 
+          height: rect.height 
+        });
+      }
+    }, 320);  // Wait for transition (300ms) + buffer
+  };
   // === BLOCK TRADE MARKERS ===
   let currentMarkers = [];
   let currentBTSort = 'volume';
@@ -2633,6 +4344,8 @@
       vwapSeries.setData(vwapData);
       loadGemHistory(code);
       loadBlockTradeMarkers(code);
+      loadHistoricalBT(code);
+      loadBidOfferFromSupabase(code);
 
       chart.priceScale('right').applyOptions({ autoScale: true });
       // fitContent hanya sekali di awal, setelah itu biarkan user yang zoom

@@ -116,6 +116,30 @@
       background: rgba(0, 217, 255, .06);
     }
 
+    .filter-count {
+      display: inline-block;
+      min-width: 14px;
+      margin-left: 4px;
+      padding: 1px 4px;
+      border-radius: 3px;
+      background: rgba(255,255,255,.05);
+      font-size: 9px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .filter.active .filter-count {
+      background: rgba(0,217,255,.10);
+    }
+
+    .ticker-link {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .ticker-link:hover .ticker {
+      color: var(--cyan);
+    }
+
     .refresh {
       border: 1px solid var(--line);
       background: var(--surface);
@@ -341,7 +365,73 @@
     overflow:hidden !important;
   }
 </style>
-</head>
+<style id="chartnalist-smartwatchlist-polish">
+.filter { transition:all .16s ease; }
+.filter:hover { transform:translateY(-1px); }
+.filter-count { min-width:18px; }
+.signal-table tbody tr { transition:background .16s ease, transform .16s ease; }
+.signal-table tbody tr:hover { background:rgba(255,255,255,.025); }
+.lifecycle-badge,
+.setup-badge,
+.risk-badge {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:24px;
+  padding:4px 8px;
+  border-radius:6px;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.045em;
+  white-space:nowrap;
+}
+.lifecycle-badge.TRIGGERED,
+.lifecycle-badge.ACTIVE {
+  color:#00D084;
+  background:rgba(0,208,132,.09);
+  border:1px solid rgba(0,208,132,.24);
+}
+.lifecycle-badge.WATCH,
+.lifecycle-badge.OBSERVE {
+  color:#F5B700;
+  background:rgba(245,183,0,.08);
+  border:1px solid rgba(245,183,0,.20);
+}
+.setup-badge {
+  color:#00D9FF;
+  background:rgba(0,217,255,.07);
+  border:1px solid rgba(0,217,255,.20);
+}
+.risk-badge.LOW {
+  color:#00D084;
+  background:rgba(0,208,132,.07);
+  border:1px solid rgba(0,208,132,.18);
+}
+.risk-badge.MEDIUM {
+  color:#F5B700;
+  background:rgba(245,183,0,.07);
+  border:1px solid rgba(245,183,0,.18);
+}
+.risk-badge.HIGH {
+  color:#FF4D4D;
+  background:rgba(255,77,77,.07);
+  border:1px solid rgba(255,77,77,.18);
+}
+.rr-value {
+  font-weight:800;
+  color:#F5F7F8;
+}
+.smartwatch-freshness {
+  margin-left:8px;
+  color:#626B72;
+}
+.smartwatch-freshness.live {
+  color:#00D084;
+}
+@media (max-width:900px) {
+  .signal-table { min-width:980px; }
+}
+</style></head>
 
 <body>
   <main class="terminal">
@@ -361,11 +451,11 @@
 
     <section class="toolbar">
       <div class="filters" id="filters">
-        <button class="filter active" data-filter="ALL">ALL</button>
-        <button class="filter" data-filter="OBSERVE">OBSERVE</button>
-        <button class="filter" data-filter="WATCH">WATCH</button>
-        <button class="filter" data-filter="TRIGGERED">TRIGGERED</button>
-        <button class="filter" data-filter="ACTIVE">ACTIVE</button>
+        <button class="filter active" data-filter="ALL">ALL <span class="filter-count" data-count="ALL">0</span></button>
+        <button class="filter" data-filter="OBSERVE">OBSERVE <span class="filter-count" data-count="OBSERVE">0</span></button>
+        <button class="filter" data-filter="WATCH">WATCH <span class="filter-count" data-count="WATCH">0</span></button>
+        <button class="filter" data-filter="TRIGGERED">TRIGGERED <span class="filter-count" data-count="TRIGGERED">0</span></button>
+        <button class="filter" data-filter="ACTIVE">ACTIVE <span class="filter-count" data-count="ACTIVE">0</span></button>
       </div>
 
       <button class="refresh" id="refreshBtn">REFRESH</button>
@@ -441,7 +531,24 @@
         : "";
     }
 
+    function updateFilterCounts() {
+      const counts = {
+        ALL: state.all.length,
+        OBSERVE: state.all.filter(row => row.status === "OBSERVE").length,
+        WATCH: state.all.filter(row => row.status === "WATCH").length,
+        TRIGGERED: state.all.filter(row => row.status === "TRIGGERED").length,
+        ACTIVE: state.all.filter(row => row.status === "ACTIVE").length,
+      };
+
+      Object.entries(counts).forEach(([status, count]) => {
+        const el = document.querySelector(`[data-count="${status}"]`);
+        if (el) el.textContent = count;
+      });
+    }
+
     function render() {
+      updateFilterCounts();
+
       const visible =
         state.filter === "ALL"
           ? state.all
@@ -464,8 +571,10 @@
       rowsEl.innerHTML = visible.map(row => `
         <tr data-code="${esc(row.stockCode)}">
           <td>
-            <div class="ticker">${esc(row.stockCode)}</div>
-            <div class="name">${esc(row.stockName || "")}</div>
+            <a class="ticker-link" href="/stock.html?code=${encodeURIComponent(row.stockCode)}">
+              <div class="ticker">${esc(row.stockCode)}</div>
+              <div class="name">${esc(row.stockName || "")}</div>
+            </a>
           </td>
 
           <td>
@@ -480,12 +589,12 @@
             </span>
           </td>
 
-          <td class="num">${number(row.price)}</td>
-          <td class="num">${number(row.trigger)}</td>
-          <td class="num">${number(row.invalidation)}</td>
-          <td class="num">${number(row.target1)}</td>
-          <td class="num">${number(row.target2)}</td>
-          <td class="num ${riskClass(row.riskLevel)}">${rr(row.riskReward)}</td>
+          <td class="num">${formatPrice(row.price)}</td>
+          <td class="num">${formatPrice(row.trigger)}</td>
+          <td class="num">${formatPrice(row.invalidation)}</td>
+          <td class="num">${formatPrice(row.target1)}</td>
+          <td class="num">${formatPrice(row.target2)}</td>
+          <td class="num ${riskClass(row.riskLevel)}">${formatRR(row.riskReward)}</td>
         </tr>
       `).join("");
     }
@@ -604,8 +713,62 @@
 
     load();
   </script>
-</body>
+<script id="chartnalist-smartwatchlist-polish-js">
+(() => {
+  const originalRender = window.render;
+  const decorate = () => {
+    const rows = document.querySelectorAll(".signal-table tbody tr");
+    const byCode = new Map((state?.all || []).map(row => [String(row.stockCode || "").toUpperCase(), row]));
+    rows.forEach(tr => {
+      const cells = tr.querySelectorAll("td");
+      if (cells.length < 9) return;
+      const code = String(cells[0]?.innerText || "").trim().toUpperCase();
+      const item = byCode.get(code);
+      const setup = String(cells[1]?.innerText || "").trim();
+      const lifecycle = String(cells[2]?.innerText || "").trim();
+      if (setup && !cells[1].querySelector(".setup-badge")) {
+        cells[1].innerHTML = '<span class="setup-badge">'+setup+'</span>';
+      }
+      if (lifecycle && !cells[2].querySelector(".lifecycle-badge")) {
+        cells[2].innerHTML = '<span class="lifecycle-badge '+lifecycle+'">'+lifecycle+'</span>';
+      }
+      if (cells[8] && !cells[8].querySelector(".rr-value")) {
+        cells[8].innerHTML = '<span class="rr-value">'+cells[8].innerHTML+'</span>';
+      }
+      if (item?.riskLevel && !tr.querySelector(".risk-cell")) {
+        const td=document.createElement("td");
+        td.className="risk-cell";
+        td.innerHTML='<span class="risk-badge '+String(item.riskLevel).toUpperCase()+'">'+String(item.riskLevel).toUpperCase()+'</span>';
+        tr.appendChild(td);
+      }
+    });
+    const header=document.querySelector(".signal-table thead tr");
+    if(header && !header.querySelector(".risk-header")){
+      const th=document.createElement("th");
+      th.className="risk-header";
+      th.textContent="RISK";
+      header.appendChild(th);
+    }
+    const meta=document.getElementById("meta");
+    if(meta && !meta.querySelector(".smartwatch-freshness")){
+      const span=document.createElement("span");
+      span.className="smartwatch-freshness live";
+      span.textContent=" • LIVE";
+      meta.appendChild(span);
+    }
+  };
+  const observer=new MutationObserver(()=>requestAnimationFrame(decorate));
+  const table=document.querySelector(".signal-table");
+  if(table) observer.observe(table,{childList:true,subtree:true});
+  window.setInterval(()=>{
+    if(typeof load==="function") load();
+  },60000);
+  requestAnimationFrame(decorate);
+})();
+</script></body>
 </html>
+
+
 
 
 

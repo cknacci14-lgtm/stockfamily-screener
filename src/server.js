@@ -477,6 +477,79 @@ app.get('/api/public/smartwatchlist', async (req, res) => {
     });
   }
 });
+
+// === BID/OFFER endpoint (dari Supabase) ===
+const bidOfferCache = new Map();
+const BID_OFFER_CACHE_TTL = 5 * 60 * 1000; // 5 menit
+
+app.get('/api/bid-offer', async (req, res) => {
+  try {
+    const code = String(req.query.code || '').trim().toUpperCase();
+    if (!code) return res.status(400).json({ error: 'Code required' });
+
+    // Cek cache
+    const cached = bidOfferCache.get(code);
+    if (cached && Date.now() - cached.ts < BID_OFFER_CACHE_TTL) {
+      return res.json({ ...cached.data, cached: true });
+    }
+
+    const { data: stock, error: sErr } = await supabase
+      .from('stocks').select('id, code, name').eq('code', code).maybeSingle();
+    if (sErr) throw sErr;
+    if (!stock) return res.status(404).json({ error: 'Stock not found' });
+
+    const { data: rows, error: rErr } = await supabase
+      .from('daily_stock_data')
+      .select('trade_date, bid, bid_volume, offer, offer_volume, close, previous_price, change_price')
+      .eq('stock_id', stock.id)
+      .order('trade_date', { ascending: false })
+      .limit(1);
+    if (rErr) throw rErr;
+    if (!rows || !rows.length) return res.status(404).json({ error: 'No data' });
+
+    const row = rows[0];
+    const bidVol = Number(row.bid_volume) || 0;
+    const offerVol = Number(row.offer_volume) || 0;
+    const totalVol = bidVol + offerVol;
+    const ratio = offerVol > 0 ? bidVol / offerVol : (bidVol > 0 ? 999 : 0);
+
+    let pressure = 'BALANCED';
+    let pressureColor = '#64748B';
+    if (ratio >= 5) { pressure = 'STRONG BUY'; pressureColor = '#00E676'; }
+    else if (ratio >= 2) { pressure = 'BUY'; pressureColor = '#00E676'; }
+    else if (ratio >= 1.2) { pressure = 'SLIGHT BUY'; pressureColor = '#88E676'; }
+    else if (ratio > 0 && ratio <= 0.2) { pressure = 'STRONG SELL'; pressureColor = '#FF5252'; }
+    else if (ratio > 0 && ratio <= 0.5) { pressure = 'SELL'; pressureColor = '#FF5252'; }
+    else if (ratio > 0 && ratio <= 0.8) { pressure = 'SLIGHT SELL'; pressureColor = '#FF8888'; }
+
+    const result = {
+      success: true,
+      code: stock.code,
+      name: stock.name,
+      trade_date: row.trade_date,
+      bid: Number(row.bid) || 0,
+      bid_volume: bidVol,
+      offer: Number(row.offer) || 0,
+      offer_volume: offerVol,
+      close: Number(row.close) || 0,
+      previous_price: Number(row.previous_price) || 0,
+      change_price: Number(row.change_price) || 0,
+      bid_pct: totalVol > 0 ? (bidVol / totalVol) * 100 : 50,
+      offer_pct: totalVol > 0 ? (offerVol / totalVol) * 100 : 50,
+      ratio: ratio,
+      pressure: pressure,
+      pressure_color: pressureColor,
+      source: 'IDX EOD',
+      cached: false
+    };
+
+    bidOfferCache.set(code, { data: result, ts: Date.now() });
+    res.json(result);
+  } catch (err) {
+    console.error('[bid-offer]', err);
+    res.status(500).json({ error: err.message });
+  }
+});
 app.get('/api/public/history/:code', async (req, res) => {
   try {
     const code = String(req.params.code || '').trim().toUpperCase();

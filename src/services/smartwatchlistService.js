@@ -946,19 +946,32 @@ function normalizeRows(
     const low = Number(row.low);
     const close = Number(row.close);
 
-    const validOHLC =
-      Number.isFinite(open) &&
+    /*
+     * CHARTNALIST DATA QUALITY RULE #1
+     *
+     * Raw IDX data stays unchanged in daily_stock_data.
+     * For analytical history:
+     * - High / Low / Close must be valid.
+     * - Open <= 0 means Open is unavailable.
+     * - An unavailable Open must NOT discard an otherwise
+     *   valid trading session.
+     */
+    const validAnalyticalRow =
       Number.isFinite(high) &&
       Number.isFinite(low) &&
       Number.isFinite(close) &&
-      open > 0 &&
       high > 0 &&
       low > 0 &&
       close > 0;
 
-    if (!validOHLC) {
+    if (!validAnalyticalRow) {
       continue;
     }
+
+    const analyticalOpen =
+      Number.isFinite(open) && open > 0
+        ? open
+        : undefined;
 
     const stock =
       stockMap.get(
@@ -985,6 +998,7 @@ function normalizeRows(
       .get(code)
       .push({
         ...row,
+        open: analyticalOpen,
         code,
         name:
           stock.name,

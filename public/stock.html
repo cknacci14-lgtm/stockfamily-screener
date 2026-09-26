@@ -1,0 +1,1142 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHARTNALIST | Stock Detail</title>
+
+  <style>
+    :root {
+      --bg:#050607;
+      --surface:#0d1012;
+      --surface2:#111518;
+      --line:#20262a;
+      --text:#f5f7f8;
+      --muted:#8b959c;
+      --dim:#626b72;
+      --cyan:#00d9ff;
+      --green:#00d084;
+      --red:#ff4d4d;
+      --yellow:#f5b700;
+    }
+
+    * { box-sizing:border-box; }
+
+    html,body {
+      margin:0;
+      min-height:100%;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    }
+
+    body { overflow-x:hidden; }
+
+    .terminal {
+      min-height:100vh;
+      padding:24px 28px 42px;
+    }
+
+    .topbar {
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:24px;
+      margin-bottom:18px;
+    }
+
+    .eyebrow {
+      color:var(--cyan);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      margin-bottom:6px;
+    }
+
+    h1 {
+      margin:0;
+      font-size:26px;
+      line-height:1.05;
+      letter-spacing:-.025em;
+    }
+
+    .stock-name {
+      color:var(--muted);
+      font-size:12px;
+      margin-top:5px;
+    }
+
+    .price-row {
+      display:flex;
+      align-items:baseline;
+      gap:10px;
+      margin-top:9px;
+    }
+
+    .price {
+      font-size:25px;
+      font-weight:850;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .change {
+      font-size:11px;
+      font-weight:850;
+      padding:4px 7px;
+      border-radius:5px;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .change.up {
+      color:var(--green);
+      background:rgba(0,208,132,.09);
+    }
+
+    .change.down {
+      color:var(--red);
+      background:rgba(255,77,77,.09);
+    }
+
+    .top-actions {
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    button,
+    .link-button {
+      border:1px solid var(--line);
+      background:var(--surface);
+      color:var(--text);
+      border-radius:6px;
+      padding:8px 12px;
+      font-size:10px;
+      font-weight:850;
+      letter-spacing:.06em;
+      cursor:pointer;
+      text-decoration:none;
+    }
+
+    button:hover,
+    .link-button:hover {
+      border-color:#364047;
+      background:var(--surface2);
+    }
+
+    .layout {
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 340px;
+      gap:12px;
+    }
+
+    .panel {
+      border:1px solid var(--line);
+      background:var(--surface);
+      border-radius:8px;
+      overflow:hidden;
+    }
+
+    .chart-panel {
+      min-width:0;
+    }
+
+    .panel-head {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:11px 14px;
+      border-bottom:1px solid var(--line);
+      background:#090c0e;
+    }
+
+    .panel-title {
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.1em;
+      color:#aab3b9;
+    }
+
+    .chart-meta {
+      color:var(--dim);
+      font-size:10px;
+    }
+
+    .range-tabs {
+      display:flex;
+      gap:4px;
+    }
+
+    .range-tab {
+      padding:4px 7px;
+      font-size:9px;
+      color:var(--muted);
+      border:1px solid transparent;
+      background:transparent;
+      border-radius:4px;
+      cursor:pointer;
+    }
+
+    .range-tab.active {
+      color:var(--cyan);
+      border-color:rgba(0,217,255,.22);
+      background:rgba(0,217,255,.05);
+    }
+
+    #chart {
+      height:570px;
+      width:100%;
+    }
+
+    .chart-status {
+      min-height:26px;
+      padding:6px 12px;
+      color:var(--dim);
+      font-size:9px;
+      border-top:1px solid var(--line);
+    }
+
+    .signal-panel {
+      display:flex;
+      flex-direction:column;
+    }
+
+    .signal-head {
+      padding:14px;
+      border-bottom:1px solid var(--line);
+    }
+
+    .signal-kicker {
+      color:var(--cyan);
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.13em;
+      text-transform:uppercase;
+    }
+
+    .signal-title {
+      margin-top:5px;
+      font-size:17px;
+      font-weight:850;
+    }
+
+    .signal-subtitle {
+      color:var(--muted);
+      font-size:10px;
+      margin-top:4px;
+    }
+
+    .signal-body {
+      padding:14px;
+    }
+
+    .state-row {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:14px;
+    }
+
+    .badge {
+      display:inline-flex;
+      align-items:center;
+      min-height:24px;
+      padding:4px 8px;
+      border-radius:5px;
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.07em;
+    }
+
+    .badge.setup {
+      color:var(--cyan);
+      border:1px solid rgba(0,217,255,.22);
+      background:rgba(0,217,255,.06);
+    }
+
+    .badge.triggered,
+    .badge.active {
+      color:var(--green);
+      border:1px solid rgba(0,208,132,.22);
+      background:rgba(0,208,132,.06);
+    }
+
+    .badge.watch,
+    .badge.observe {
+      color:var(--yellow);
+      border:1px solid rgba(245,183,0,.22);
+      background:rgba(245,183,0,.06);
+    }
+
+    .badge.risk-high {
+      color:var(--red);
+      border:1px solid rgba(255,77,77,.22);
+      background:rgba(255,77,77,.06);
+    }
+
+    .badge.risk-medium {
+      color:var(--yellow);
+      border:1px solid rgba(245,183,0,.22);
+      background:rgba(245,183,0,.06);
+    }
+
+    .badge.risk-low {
+      color:var(--green);
+      border:1px solid rgba(0,208,132,.22);
+      background:rgba(0,208,132,.06);
+    }
+
+    .section-label {
+      color:#68737a;
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      margin:16px 0 8px;
+    }
+
+    .plan-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      border:1px solid var(--line);
+      border-radius:6px;
+      overflow:hidden;
+    }
+
+    .plan-item {
+      padding:10px;
+      border-right:1px solid var(--line);
+      border-bottom:1px solid var(--line);
+    }
+
+    .plan-item:nth-child(2n) { border-right:0; }
+    .plan-item:nth-last-child(-n+2) { border-bottom:0; }
+
+    .plan-label {
+      color:var(--dim);
+      font-size:8px;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .plan-value {
+      margin-top:4px;
+      color:var(--text);
+      font-size:13px;
+      font-weight:850;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .plan-value.trigger { color:var(--cyan); }
+    .plan-value.invalid { color:var(--red); }
+    .plan-value.target { color:var(--green); }
+
+    .evidence {
+      display:grid;
+      gap:6px;
+    }
+
+    .evidence-row {
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      padding:8px 9px;
+      background:#090c0e;
+      border:1px solid var(--line);
+      border-radius:5px;
+    }
+
+    .evidence-label {
+      color:var(--muted);
+      font-size:9px;
+    }
+
+    .evidence-value {
+      font-size:9px;
+      font-weight:850;
+      text-align:right;
+    }
+
+    .block-section {
+      border-top:1px solid var(--line);
+      padding:14px;
+    }
+
+    .block-list {
+      display:grid;
+      gap:6px;
+      max-height:300px;
+      overflow:auto;
+    }
+
+    .block-row {
+      padding:9px;
+      border:1px solid var(--line);
+      border-left:2px solid var(--cyan);
+      background:#090c0e;
+      border-radius:5px;
+    }
+
+    .block-date {
+      color:var(--muted);
+      font-size:9px;
+      font-weight:800;
+    }
+
+    .block-values {
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      margin-top:5px;
+      color:var(--text);
+      font-size:9px;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .empty {
+      padding:28px 12px;
+      text-align:center;
+      color:var(--muted);
+      font-size:11px;
+    }
+
+    .loading {
+      opacity:.55;
+    }
+
+    .error {
+      color:var(--red);
+    }
+
+    @media (max-width:1050px) {
+      .layout {
+        grid-template-columns:1fr;
+      }
+
+      .signal-panel {
+        min-height:0;
+      }
+
+      #chart {
+        height:500px;
+      }
+    }
+
+    @media (max-width:700px) {
+      .terminal {
+        padding:16px;
+      }
+
+      .topbar {
+        align-items:flex-start;
+        flex-direction:column;
+      }
+
+      .top-actions {
+        width:100%;
+      }
+
+      .top-actions > * {
+        flex:1;
+        text-align:center;
+      }
+
+      #chart {
+        height:420px;
+      }
+    }
+  </style>
+
+  <script src="https://unpkg.com/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
+  <script src="/assets/stockfamily-sidebar.js"></script>
+
+  <style id="chartnalist-brand-only-final">
+    .sf-header-logo { display:none !important; }
+    .sf-header-brand { gap:0 !important; }
+    .sf-header-title {
+      color:#F5F7F8 !important;
+      font-weight:800 !important;
+      letter-spacing:.045em !important;
+    }
+    .sf-header-title-accent {
+      color:#00D9FF !important;
+    }
+    #stockfamily-global-sidebar .sf-mark { display:none !important; }
+    #stockfamily-global-sidebar .sf-brand-copy { display:none !important; }
+    #stockfamily-global-sidebar .sf-brand::after {
+      content:"CHARTNALIST";
+      display:block;
+      color:#F5F7F8;
+      font-family:inherit;
+      font-size:14px;
+      font-weight:800;
+      line-height:1;
+      letter-spacing:.035em;
+      white-space:nowrap;
+    }
+    #stockfamily-global-sidebar .sf-brand {
+      gap:0 !important;
+      overflow:hidden !important;
+    }
+  </style>
+</head>
+
+<body>
+<main class="terminal">
+
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">Trading Intelligence / Stock Detail</div>
+      <h1 id="ticker">—</h1>
+      <div class="stock-name" id="stockName">Loading stock...</div>
+
+      <div class="price-row">
+        <div class="price" id="price">—</div>
+        <div class="change" id="change">—</div>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <a class="link-button" href="/watchlist.html">SMARTWATCHLIST</a>
+      <button id="refreshBtn">REFRESH</button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <section class="panel chart-panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">PRICE / VOLUME</div>
+          <div class="chart-meta" id="chartMeta">Loading market history...</div>
+        </div>
+
+        <div class="range-tabs">
+          <button class="range-tab" data-range="3mo">3M</button>
+          <button class="range-tab active" data-range="6mo">6M</button>
+          <button class="range-tab" data-range="1y">1Y</button>
+        </div>
+      </div>
+
+      <div id="chart"></div>
+      <div class="chart-status" id="chartStatus">Initializing chart...</div>
+    </section>
+
+    <aside class="panel signal-panel">
+
+      <div class="signal-head">
+        <div class="signal-kicker">Signal Context</div>
+        <div class="signal-title" id="signalTitle">No signal</div>
+        <div class="signal-subtitle" id="signalSubtitle">
+          Loading existing Signal Engine state...
+        </div>
+      </div>
+
+      <div class="signal-body">
+
+        <div class="state-row">
+          <div id="setupBadge"></div>
+          <div id="statusBadge"></div>
+        </div>
+
+        <div class="section-label">Trade Plan</div>
+
+        <div class="plan-grid">
+          <div class="plan-item">
+            <div class="plan-label">Price</div>
+            <div class="plan-value" id="planPrice">—</div>
+          </div>
+
+          <div class="plan-item">
+            <div class="plan-label">Trigger</div>
+            <div class="plan-value trigger" id="planTrigger">—</div>
+          </div>
+
+          <div class="plan-item">
+            <div class="plan-label">Invalidation</div>
+            <div class="plan-value invalid" id="planInvalidation">—</div>
+          </div>
+
+          <div class="plan-item">
+            <div class="plan-label">Risk</div>
+            <div class="plan-value" id="planRisk">—</div>
+          </div>
+
+          <div class="plan-item">
+            <div class="plan-label">Target 1</div>
+            <div class="plan-value target" id="planTarget1">—</div>
+          </div>
+
+          <div class="plan-item">
+            <div class="plan-label">Target 2</div>
+            <div class="plan-value target" id="planTarget2">—</div>
+          </div>
+
+          <div class="plan-item" style="grid-column:1 / -1;border-right:0">
+            <div class="plan-label">Risk / Reward</div>
+            <div class="plan-value" id="planRR">—</div>
+          </div>
+        </div>
+
+        <div class="section-label">Evidence</div>
+
+        <div class="evidence">
+          <div class="evidence-row">
+            <span class="evidence-label">Structure</span>
+            <span class="evidence-value" id="eStructure">—</span>
+          </div>
+
+          <div class="evidence-row">
+            <span class="evidence-label">Participation</span>
+            <span class="evidence-value" id="eParticipation">—</span>
+          </div>
+
+          <div class="evidence-row">
+            <span class="evidence-label">Flow</span>
+            <span class="evidence-value" id="eFlow">—</span>
+          </div>
+
+          <div class="evidence-row">
+            <span class="evidence-label">Liquidity</span>
+            <span class="evidence-value" id="eLiquidity">—</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="block-section">
+        <div class="section-label">Non-Regular / Block Trade</div>
+        <div class="block-list" id="blockList">
+          <div class="empty loading">Loading...</div>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+</main>
+
+<script>
+(() => {
+  const params = new URLSearchParams(window.location.search);
+  const code = String(params.get("code") || "").trim().toUpperCase();
+
+  const $ = id => document.getElementById(id);
+
+  let currentRange = "6mo";
+  let chart = null;
+  let candleSeries = null;
+  let closeSeries = null;
+  let volumeSeries = null;
+
+  const fmt = value => {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "—";
+    return n.toLocaleString("id-ID", {
+      maximumFractionDigits: 2
+    });
+  };
+
+  const fmtRR = value => {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "—";
+    return `${n.toFixed(1).replace(/\\.0$/, "")}R`;
+  };
+
+  const esc = value => String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+  const validCandle = row => {
+    const o = Number(row.open);
+    const h = Number(row.high);
+    const l = Number(row.low);
+    const c = Number(row.close);
+
+    return Number.isFinite(o) &&
+      o > 0 &&
+      Number.isFinite(h) &&
+      h > 0 &&
+      Number.isFinite(l) &&
+      l > 0 &&
+      Number.isFinite(c) &&
+      c > 0;
+  };
+
+  function setBadge(id, text, className) {
+    const el = $(id);
+    el.innerHTML = text
+      ? `<span class="badge ${className}">${esc(text)}</span>`
+      : "";
+  }
+
+  function resetSignal() {
+    $("signalTitle").textContent = "No active setup";
+    $("signalSubtitle").textContent =
+      "This stock is not currently surfaced by the Smartwatchlist Signal Engine.";
+
+    setBadge("setupBadge", "", "");
+    setBadge("statusBadge", "", "");
+
+    [
+      "planPrice",
+      "planTrigger",
+      "planInvalidation",
+      "planRisk",
+      "planTarget1",
+      "planTarget2",
+      "planRR"
+    ].forEach(id => $(id).textContent = "—");
+
+    [
+      "eStructure",
+      "eParticipation",
+      "eFlow",
+      "eLiquidity"
+    ].forEach(id => $(id).textContent = "—");
+  }
+
+  function renderSignal(signal) {
+    if (!signal) {
+      resetSignal();
+      return;
+    }
+
+    $("signalTitle").textContent =
+      `${signal.setup || "SIGNAL"} · ${signal.status || "OBSERVE"}`;
+
+    $("signalSubtitle").textContent =
+      "Existing Signal Engine output. No additional score is applied.";
+
+    setBadge(
+      "setupBadge",
+      signal.setup,
+      "setup"
+    );
+
+    const status = String(signal.status || "").toLowerCase();
+
+    setBadge(
+      "statusBadge",
+      signal.status,
+      status
+    );
+
+    $("planPrice").textContent = fmt(signal.price);
+    $("planTrigger").textContent = fmt(signal.trigger);
+    $("planInvalidation").textContent = fmt(signal.invalidation);
+    $("planRisk").textContent = signal.riskLevel || "—";
+    $("planTarget1").textContent = fmt(signal.target1);
+    $("planTarget2").textContent = fmt(signal.target2);
+    $("planRR").textContent = fmtRR(signal.riskReward);
+
+    $("eStructure").textContent =
+      signal.structure?.state ||
+      signal.evidence?.structure?.state ||
+      "—";
+
+    $("eParticipation").textContent =
+      signal.participation?.state ||
+      signal.evidence?.participation?.state ||
+      "—";
+
+    $("eFlow").textContent =
+      signal.flow?.state ||
+      signal.evidence?.flow?.state ||
+      "—";
+
+    $("eLiquidity").textContent =
+      signal.liquidity?.state ||
+      signal.evidence?.liquidity?.state ||
+      "—";
+  }
+
+  function createChart() {
+    const el = $("chart");
+
+    if (typeof LightweightCharts === "undefined") {
+      $("chartStatus").innerHTML =
+        '<span class="error">Chart library unavailable.</span>';
+      return;
+    }
+
+    chart = LightweightCharts.createChart(el, {
+      layout: {
+        background: { color: "#0a0d0f" },
+        textColor: "#7f8a91"
+      },
+
+      grid: {
+        vertLines: { color: "#151b1f" },
+        horzLines: { color: "#151b1f" }
+      },
+
+      crosshair: {
+        mode: LightweightCharts.CrosshairMode.Normal
+      },
+
+      rightPriceScale: {
+        borderColor: "#20262a"
+      },
+
+      timeScale: {
+        borderColor: "#20262a",
+        timeVisible: false,
+        secondsVisible: false
+      },
+
+      handleScroll: {
+        mouseWheel: true,
+        pressedMouseMove: true
+      },
+
+      handleScale: {
+        mouseWheel: true,
+        pinch: true
+      }
+    });
+
+    candleSeries = chart.addCandlestickSeries({
+      upColor: "#00d084",
+      downColor: "#ff4d4d",
+      borderVisible: false,
+      wickUpColor: "#00d084",
+      wickDownColor: "#ff4d4d"
+    });
+
+    closeSeries = chart.addLineSeries({
+      color: "#00d9ff",
+      lineWidth: 1,
+      visible: true
+    });
+
+    volumeSeries = chart.addHistogramSeries({
+      priceFormat: { type: "volume" },
+      priceScaleId: "",
+      scaleMargins: {
+        top: 0.82,
+        bottom: 0
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      if (!chart) return;
+      chart.applyOptions({
+        width: el.clientWidth,
+        height: el.clientHeight
+      });
+    });
+  }
+
+  function addTradePlanLines(signal) {
+    if (!chart || !signal) return;
+
+    const plans = [
+      {
+        value: Number(signal.trigger),
+        color: "#00d9ff",
+        title: "TRIGGER"
+      },
+      {
+        value: Number(signal.invalidation),
+        color: "#ff4d4d",
+        title: "INVALIDATION"
+      },
+      {
+        value: Number(signal.target1),
+        color: "#00d084",
+        title: "TARGET 1"
+      },
+      {
+        value: Number(signal.target2),
+        color: "#00d084",
+        title: "TARGET 2"
+      }
+    ];
+
+    plans.forEach(item => {
+      if (!Number.isFinite(item.value) || item.value <= 0) return;
+
+      const line = candleSeries.createPriceLine({
+        price: item.value,
+        color: item.color,
+        lineWidth: 1,
+        lineStyle: LightweightCharts.LineStyle.Dashed,
+        axisLabelVisible: true,
+        title: item.title
+      });
+
+      if (!line) return;
+    });
+  }
+
+  function renderChart(data, signal) {
+    if (!chart) return;
+
+    const rows = Array.isArray(data?.candles)
+      ? data.candles
+      : [];
+
+    const volumes = Array.isArray(data?.volumes)
+      ? data.volumes
+      : [];
+
+    const candleData = rows
+      .filter(validCandle)
+      .map(r => ({
+        time: r.time,
+        open: Number(r.open),
+        high: Number(r.high),
+        low: Number(r.low),
+        close: Number(r.close)
+      }));
+
+    const closeData = rows
+      .map(r => ({
+        time: r.time,
+        value: Number(r.close)
+      }))
+      .filter(r => Number.isFinite(r.value) && r.value > 0);
+
+    const volumeData = volumes
+      .map(r => ({
+        time: r.time,
+        value: Number(r.value) || 0,
+        color: String(r.color || "").includes("239")
+          ? "rgba(255,77,77,.35)"
+          : "rgba(0,208,132,.35)"
+      }))
+      .filter(r => r.value > 0);
+
+    candleSeries.setData(candleData);
+    closeSeries.setData(closeData);
+    volumeSeries.setData(volumeData);
+
+    /*
+     * CHARTNALIST DATA QUALITY RULE #1
+     *
+     * Open <= 0 is unavailable and must NOT be fabricated.
+     * Therefore:
+     * - valid OHLC rows become candlesticks
+     * - rows with unavailable Open remain available through Close
+     * - Close line becomes the visual fallback when no valid candles exist
+     */
+    /*
+     * CHARTNALIST DATA QUALITY RULE #1
+     *
+     * Candles require a real Open.
+     * Close remains authoritative even when Open is unavailable.
+     *
+     * Therefore:
+     * - Valid OHLC rows render as candlesticks.
+     * - Close line remains visible whenever the latest session
+     *   cannot be represented as a valid candle.
+     * - Never synthesize Open.
+     */
+    const latestRow = rows.length ? rows[rows.length - 1] : null;
+    const latestOpen = latestRow ? Number(latestRow.open) : NaN;
+    const latestClose = latestRow ? Number(latestRow.close) : NaN;
+
+    const latestHasValidOHLC =
+      Number.isFinite(latestOpen) &&
+      latestOpen > 0 &&
+      Number.isFinite(Number(latestRow.high)) &&
+      Number(latestRow.high) > 0 &&
+      Number.isFinite(Number(latestRow.low)) &&
+      Number(latestRow.low) > 0 &&
+      Number.isFinite(latestClose) &&
+      latestClose > 0;
+
+    /*
+     * If the latest session has no usable Open, keep the close line
+     * visible so the chart reaches the actual latest market close.
+     *
+     * If the latest session has a complete OHLC candle, candlesticks
+     * remain the primary visualization.
+     */
+    closeSeries.applyOptions({
+      visible: !latestHasValidOHLC
+    });
+
+    addTradePlanLines(signal);
+
+    chart.timeScale().fitContent();
+
+    const chartMode =
+      candleData.length > 0
+        ? `${candleData.length} candles`
+        : `${closeData.length} closes · Open unavailable`;
+
+    $("chartStatus").textContent =
+      `${chartMode} · ${data?.startDate || "—"} → ${data?.endDate || "—"}`;
+  }
+
+  function renderBlocks(data) {
+    const list = $("blockList");
+    const blocks = Array.isArray(data?.nonRegular)
+      ? data.nonRegular.slice().reverse()
+      : [];
+
+    if (!blocks.length) {
+      list.innerHTML =
+        '<div class="empty">No non-regular transaction data in this range.</div>';
+      return;
+    }
+
+    list.innerHTML = blocks.slice(0, 20).map(item => `
+      <div class="block-row">
+        <div class="block-date">${esc(item.time)}</div>
+        <div class="block-values">
+          <span>Vol ${fmt(item.volume)}</span>
+          <span>Value Rp ${fmt(item.value)}</span>
+        </div>
+        <div class="block-values">
+          <span>Freq ${fmt(item.frequency)}</span>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  async function load() {
+    if (!code) {
+      $("ticker").textContent = "NO TICKER";
+      $("stockName").textContent = "Use /stock.html?code=MEJA";
+      $("chartStatus").innerHTML =
+        '<span class="error">Missing ticker parameter.</span>';
+      resetSignal();
+      return;
+    }
+
+    $("ticker").textContent = code;
+    $("stockName").textContent = "Loading...";
+
+    $("refreshBtn").disabled = true;
+    $("refreshBtn").textContent = "LOADING...";
+
+    try {
+      const historyUrl =
+        `/api/public/history/${encodeURIComponent(code)}?range=${currentRange}`;
+
+      const signalUrl =
+        `/api/public/smartwatchlist?codes=${encodeURIComponent(code)}`;
+
+      const [historyResponse, signalResponse] =
+        await Promise.all([
+          fetch(historyUrl, { cache: "no-store" }),
+          fetch(signalUrl, { cache: "no-store" })
+        ]);
+
+      const history = await historyResponse.json();
+      const signals = await signalResponse.json();
+
+      if (!historyResponse.ok || !history.success) {
+        throw new Error(
+          history.error || `History API failed for ${code}`
+        );
+      }
+
+      if (!signalResponse.ok || !signals.success) {
+        throw new Error(
+          signals.error || `Signal API failed for ${code}`
+        );
+      }
+
+      $("ticker").textContent = history.code || code;
+      $("stockName").textContent = history.name || "";
+
+      const closes = Array.isArray(history.candles)
+        ? history.candles
+            .map(x => Number(x.close))
+            .filter(x => Number.isFinite(x) && x > 0)
+        : [];
+
+      const latest = closes.length
+        ? closes[closes.length - 1]
+        : null;
+
+      const previous = closes.length > 1
+        ? closes[closes.length - 2]
+        : null;
+
+      $("price").textContent = fmt(latest);
+
+      if (
+        Number.isFinite(latest) &&
+        Number.isFinite(previous) &&
+        previous !== 0
+      ) {
+        const changePct = ((latest - previous) / previous) * 100;
+
+        $("change").textContent =
+          `${changePct >= 0 ? "+" : ""}${changePct.toFixed(2)}%`;
+
+        $("change").className =
+          `change ${changePct >= 0 ? "up" : "down"}`;
+      } else {
+        $("change").textContent = "—";
+        $("change").className = "change";
+      }
+
+      const signal =
+        Array.isArray(signals.stocks) && signals.stocks.length
+          ? signals.stocks[0]
+          : null;
+
+      renderSignal(signal);
+      renderChart(history, signal);
+      renderBlocks(history);
+
+      $("chartMeta").textContent =
+        `${history.range || currentRange} · ${history.endDate || "—"}`;
+
+    } catch (error) {
+      console.error("[Stock Detail]", error);
+
+      $("stockName").textContent = "Unable to load stock detail";
+      $("chartStatus").innerHTML =
+        `<span class="error">${esc(error.message || "Unknown error")}</span>`;
+
+      $("blockList").innerHTML =
+        `<div class="empty error">${esc(error.message || "Unable to load data")}</div>`;
+
+      resetSignal();
+
+    } finally {
+      $("refreshBtn").disabled = false;
+      $("refreshBtn").textContent = "REFRESH";
+    }
+  }
+
+  document.querySelectorAll(".range-tab").forEach(button => {
+    button.addEventListener("click", () => {
+      document.querySelectorAll(".range-tab")
+        .forEach(x => x.classList.remove("active"));
+
+      button.classList.add("active");
+      currentRange = button.dataset.range || "6mo";
+
+      if (chart) {
+        candleSeries.setData([]);
+        closeSeries.setData([]);
+        volumeSeries.setData([]);
+      }
+
+      load();
+    });
+  });
+
+  $("refreshBtn").addEventListener("click", load);
+
+  createChart();
+  load();
+})();
+</script>
+
+</body>
+</html>
+
+

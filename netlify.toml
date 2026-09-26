@@ -17,6 +17,13 @@
   status = 200
   force = true
 
+# Bid/Offer endpoint (dari Supabase)
+[[redirects]]
+  from = "/api/bid-offer"
+  to = "/.netlify/functions/bid-offer"
+  status = 200
+  force = true
+
 # Wildcard API lainnya (untuk backward compatibility)
 [[redirects]]
   from = "/api/*"
