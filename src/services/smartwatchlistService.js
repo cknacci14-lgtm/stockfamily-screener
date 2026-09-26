@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 /*
  * CHARTNALIST — Smartwatchlist Adapter
@@ -26,7 +26,8 @@
  * Smartwatchlist
  */
 
-require("ts-node/register/transpile-only");
+// NOTE: .ts files di signal-engine sudah di-compile ke .js
+// Tidak perlu ts-node runtime karena Netlify Functions tidak support
 
 const { createClient } = require("@supabase/supabase-js");
 const {
