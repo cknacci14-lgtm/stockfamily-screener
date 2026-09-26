@@ -449,16 +449,32 @@
     document.getElementById('uploadBtn').addEventListener('click', function() {
       if (selectedFiles.length === 0) return;
       
+      // === SMART ENDPOINT DETECTION ===
+      var port = location.port;
+      var host = location.hostname;
+      var isNetlifyEnv = (port === '8888') || (host.includes('netlify.app')) || (port === '' && host !== 'localhost');
+      
+      var uploadEndpoint = isNetlifyEnv 
+        ? '/api/upload-excel' 
+        : '/api/admin/upload-multiple';
+      
+      var uploadField = isNetlifyEnv 
+        ? 'file' 
+        : 'excelFiles';
+
+      console.log('[Upload] Endpoint:', uploadEndpoint, '| Field:', uploadField);
+      // === END DETECTION ===
+
       var formData = new FormData();
       for (var i = 0; i < selectedFiles.length; i++) {
-        formData.append('excelFiles', selectedFiles[i]);
+        formData.append(uploadField, selectedFiles[i]);
       }
       
       uploadBtn.disabled = true;
       uploadBtn.textContent = '⏳ Uploading ' + selectedFiles.length + ' files...';
       addLog('⏳ Uploading ' + selectedFiles.length + ' files...', 'info');
 
-      adminFetch('/api/admin/upload-multiple', {
+      adminFetch(uploadEndpoint, {
         method: 'POST',
         body: formData
       })
