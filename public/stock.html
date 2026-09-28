@@ -480,6 +480,56 @@
       gap:0 !important;
       overflow:hidden !important;
     }
+  
+    .smartwatchlist-action {
+      margin: 14px 0 16px;
+    }
+
+    .watchlist-action-btn {
+      width: 100%;
+      min-height: 40px;
+      padding: 0 14px;
+      border: 1px solid rgba(0, 217, 255, .35);
+      border-radius: 8px;
+      background: rgba(0, 217, 255, .08);
+      color: #00D9FF;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      cursor: pointer;
+      transition:
+        background .16s ease,
+        border-color .16s ease,
+        color .16s ease,
+        transform .16s ease;
+    }
+
+    .watchlist-action-btn:hover {
+      background: rgba(0, 217, 255, .14);
+      border-color: rgba(0, 217, 255, .65);
+    }
+
+    .watchlist-action-btn:active {
+      transform: translateY(1px);
+    }
+
+    .watchlist-action-btn.is-added {
+      background: rgba(0, 208, 132, .10);
+      border-color: rgba(0, 208, 132, .40);
+      color: #00D084;
+    }
+
+    .watchlist-action-btn.is-added:hover {
+      background: rgba(0, 208, 132, .15);
+      border-color: rgba(0, 208, 132, .65);
+    }
+
+    .watchlist-action-btn:disabled {
+      opacity: .55;
+      cursor: default;
+    }
+
   </style>
 </head>
 
@@ -541,7 +591,19 @@
           <div id="statusBadge"></div>
         </div>
 
-        <div class="section-label">Trade Plan</div>
+        
+    <div class="smartwatchlist-action">
+      <button
+        type="button"
+        id="smartwatchlistBtn"
+        class="watchlist-action-btn"
+        aria-pressed="false"
+      >
+        ADD TO SMARTWATCHLIST
+      </button>
+    </div>
+
+    <div class="section-label">Trade Plan</div>
 
         <div class="plan-grid">
           <div class="plan-item">
@@ -1247,7 +1309,125 @@
   createChart();
   load();
 })();
-</script>
+
+    function getWatchlistCodes() {
+      try {
+        const saved = JSON.parse(
+          localStorage.getItem("watchlist") || "[]"
+        );
+
+        if (!Array.isArray(saved)) return [];
+
+        return saved
+          .map(item => {
+            if (typeof item === "string") return item;
+            return item?.code || item?.stockCode || item?.symbol;
+          })
+          .filter(Boolean)
+          .map(code => String(code).toUpperCase());
+      } catch (_) {
+        return [];
+      }
+    }
+
+    function isInSmartwatchlist(stockCode) {
+      const code = String(stockCode || "").toUpperCase();
+      return getWatchlistCodes().includes(code);
+    }
+
+    function updateSmartwatchlistButton() {
+      const button = document.getElementById("smartwatchlistBtn");
+      if (!button) return;
+
+      const code = String(
+        window.stockCode ||
+        document.getElementById("ticker")?.textContent ||
+        ""
+      ).trim().toUpperCase();
+
+      const added = isInSmartwatchlist(code);
+
+      button.classList.toggle("is-added", added);
+      button.setAttribute("aria-pressed", String(added));
+      button.textContent = added
+        ? "? IN SMARTWATCHLIST"
+        : "ADD TO SMARTWATCHLIST";
+    }
+
+    function toggleSmartwatchlist() {
+      const code = String(
+        window.stockCode ||
+        document.getElementById("ticker")?.textContent ||
+        ""
+      ).trim().toUpperCase();
+
+      if (!code || code === "?") return;
+
+      let saved = [];
+
+      try {
+        const parsed = JSON.parse(
+          localStorage.getItem("watchlist") || "[]"
+        );
+
+        saved = Array.isArray(parsed) ? parsed : [];
+      } catch (_) {
+        saved = [];
+      }
+
+      const normalized = saved
+        .map(item => {
+          if (typeof item === "string") {
+            return {
+              raw: item,
+              code: String(item).toUpperCase()
+            };
+          }
+
+          return {
+            raw: item,
+            code: String(
+              item?.code ||
+              item?.stockCode ||
+              item?.symbol ||
+              ""
+            ).toUpperCase()
+          };
+        });
+
+      const exists = normalized.some(item => item.code === code);
+
+      if (exists) {
+        saved = saved.filter(item => {
+          const itemCode =
+            typeof item === "string"
+              ? item
+              : item?.code || item?.stockCode || item?.symbol;
+
+          return String(itemCode || "").toUpperCase() !== code;
+        });
+      } else {
+        saved.push(code);
+      }
+
+      localStorage.setItem("watchlist", JSON.stringify(saved));
+      updateSmartwatchlistButton();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const button = document.getElementById("smartwatchlistBtn");
+
+      if (!button) return;
+
+      button.addEventListener(
+        "click",
+        toggleSmartwatchlist
+      );
+
+      updateSmartwatchlistButton();
+    });
+
+  </script>
 
 </body>
 </html>

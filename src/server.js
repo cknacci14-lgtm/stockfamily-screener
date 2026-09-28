@@ -550,6 +550,60 @@ app.get('/api/bid-offer', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// === FUNDAMENTAL endpoint (dari Supabase) ===
+app.get('/api/fundamental/:code', async (req, res) => {
+  try {
+    const code = String(req.params.code || '').trim().toUpperCase();
+    if (!code) return res.status(400).json({ error: 'Code required' });
+
+    const { data: stock, error: sErr } = await supabase
+      .from('stocks').select('id, code, name').eq('code', code).maybeSingle();
+    if (sErr) throw sErr;
+    if (!stock) return res.status(404).json({ error: 'Stock not found' });
+
+    const { data: rows, error: rErr } = await supabase
+      .from('daily_stock_data')
+      .select('trade_date, close, volume, value, listed_shares, tradeable_shares, weight_for_index')
+      .eq('stock_id', stock.id)
+      .order('trade_date', { ascending: false })
+      .limit(1);
+    if (rErr) throw rErr;
+    if (!rows || !rows.length) return res.status(404).json({ error: 'No data' });
+
+    const row = rows[0];
+    const close = Number(row.close) || 0;
+    const listed = Number(row.listed_shares) || 0;
+    const tradeable = Number(row.tradeable_shares) || 0;
+    const volume = Number(row.volume) || 0;
+    const value = Number(row.value) || 0;
+
+    const marketCap = close * listed;
+    const freeFloat = listed > 0 ? (tradeable / listed) * 100 : 0;
+    const turnover = listed > 0 ? (volume / listed) * 100 : 0;
+    const avgPrice = volume > 0 ? value / volume : close;
+
+    res.json({
+      success: true,
+      code: stock.code,
+      name: stock.name,
+      trade_date: row.trade_date,
+      close: close,
+      volume: volume,
+      value: value,
+      listed_shares: listed,
+      tradeable_shares: tradeable,
+      market_cap: marketCap,
+      free_float_pct: freeFloat,
+      turnover_pct: turnover,
+      avg_price: avgPrice,
+      source: 'IDX EOD'
+    });
+  } catch (err) {
+    console.error('[fundamental]', err);
+    res.status(500).json({ error: err.message });
+  }
+});
 app.get('/api/public/history/:code', async (req, res) => {
   try {
     const code = String(req.params.code || '').trim().toUpperCase();

@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>StockFamily — QBS Screener</title>
+  <title>CHARTNALIST | QBS Screener</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -458,7 +458,7 @@
 
 
     <footer class="mt-8 pb-8 text-[9px] mono muted-2">
-      STOCKFAMILY · QBS V1.0.0 · CANONICAL ENGINE V4.9.1
+      CHARTNALIST · QBS V1.0.0 · CANONICAL ENGINE V4.9.1
     </footer>
 
   </main>
@@ -634,9 +634,14 @@
 
                   <div class="flex items-center gap-2">
 
-                    <div class="text-xl font-extrabold tracking-tight">
+                    <a
+                      class="text-xl font-extrabold tracking-tight"
+                      href="/stock.html?code=${encodeURIComponent(ticker)}"
+                      onclick="event.stopPropagation()"
+                      title="Open Stock Detail"
+                    >
                       ${ticker}
-                    </div>
+                    </a>
 
                     <span class="qbs-badge rounded px-2 py-1 text-[8px] mono font-bold">
                       QBS
@@ -1225,7 +1230,7 @@ function openResearchDetail(encoded){
     </div>
 
     <div class="px-6 py-4 border-t border-[#171d21] flex justify-between">
-      <span class="text-[8px] mono muted-2">STOCKFAMILY · QBS V1.0.0</span>
+      <span class="text-[8px] mono muted-2">CHARTNALIST · QBS V1.0.0</span>
       <button onclick="closeResearchDetail()" class="text-[9px] mono positive font-bold">CLOSE</button>
     </div>
   </div>`;
@@ -1241,10 +1246,12 @@ function closeResearchDetail(){
   document.body.style.overflow="";
 }
 </script>
-<script src="/assets/chartnalist-sidebar.js"></script>
+<script src="/assets/stockfamily-sidebar.js"></script>
 <script src="/assets/chartnalist-typography.js"></script>
 </body>
 </html>
+
+
 
 
 

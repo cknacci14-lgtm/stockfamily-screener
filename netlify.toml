@@ -24,6 +24,13 @@
   status = 200
   force = true
 
+# Fundamental endpoint
+[[redirects]]
+  from = "/api/fundamental/:code"
+  to = "/.netlify/functions/fundamental/:code"
+  status = 200
+  force = true
+
 # Wildcard API lainnya (untuk backward compatibility)
 [[redirects]]
   from = "/api/*"

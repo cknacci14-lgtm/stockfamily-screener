@@ -2324,7 +2324,66 @@
     }
 </style>
 <style></style>
-</head>
+<style id="wyckoff-css">
+.bt-bars-wrapper { display:flex; align-items:flex-end; gap:3px; width:100%; height:100px; position:relative; border-bottom:1px solid #2A2E39; padding-bottom:20px; box-sizing:border-box; }
+.bt-bar-wrapper { flex:1; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; cursor:pointer; position:relative; min-width:20px; }
+.bt-bar-fill { width:100%; border-radius:3px 3px 0 0; min-height:2px; }
+.bt-bar-fill.bull { background:linear-gradient(to top,#00E676,#00B85A); }
+.bt-bar-fill.bear { background:linear-gradient(to top,#FF5252,#D32F2F); }
+.bt-bar-fill.neutral { background:linear-gradient(to top,#64748B,#475569); }
+.bt-bar-wrapper:hover .bt-bar-fill { filter:brightness(1.3); }
+.bt-bar-month { position:absolute; bottom:-16px; font-size:9px; color:#64748B; white-space:nowrap; }
+.bt-bar-vol { position:absolute; top:-14px; font-size:9px; color:#94A3B8; opacity:0; }
+.bt-bar-wrapper:hover .bt-bar-vol { opacity:1; }
+.bt-bar-tooltip { position:absolute; bottom:100%; left:50%; transform:translateX(-50%); background:#1E222D; border:1px solid #00E5FF; border-radius:6px; padding:8px 10px; font-size:10px; color:#E0E0E0; white-space:nowrap; opacity:0; z-index:100; margin-bottom:4px; }
+.bt-bar-wrapper:hover .bt-bar-tooltip { opacity:1; }
+.bt-bar-tooltip .tt-row { display:flex; justify-content:space-between; gap:10px; margin:2px 0; }
+.bt-bar-tooltip .tt-label { color:#94A3B8; }
+.bt-bar-tooltip .tt-value { color:#E0E0E0; font-weight:bold; }
+.bt-bar-tooltip .tt-badge { display:inline-block; padding:1px 6px; border-radius:3px; font-size:9px; font-weight:700; margin-top:4px; }
+.bt-summary-item { display:flex; justify-content:space-between; padding:4px 8px; background:#131722; border-radius:4px; border-left:2px solid #00E5FF; font-size:10px; }
+.bt-summary-item .label { color:#94A3B8; }
+.bt-summary-item .value { color:#E0E0E0; font-weight:bold; }
+.bt-svg-overlay { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:10; }
+.bt-price-line { fill:none; stroke:#FFD700; stroke-width:0.8; vector-effect:non-scaling-stroke; filter:drop-shadow(0 0 2px rgba(255,215,0,.5)); }
+.bt-price-dot { fill:#FFD700; }
+.bt-phase-panel { display:grid; grid-template-columns:repeat(auto-fit,minmax(80px,1fr)); gap:4px; padding:8px 0 0 0; border-top:1px solid #2A2E39; margin-top:6px; }
+.bt-phase-item { display:flex; flex-direction:column; padding:4px 6px; border-radius:4px; background:#131722; border-left:3px solid #64748B; font-size:9px; }
+.bt-phase-item.akum { border-left-color:#00E676; }
+.bt-phase-item.dist { border-left-color:#FF5252; }
+.bt-phase-item.markup { border-left-color:#00E5FF; }
+.bt-phase-item.markdown { border-left-color:#FFB300; }
+.bt-phase-item .phase-month { color:#94A3B8; font-weight:600; text-transform:uppercase; }
+.bt-phase-item .phase-name { font-weight:700; font-size:10px; margin-top:1px; }
+.bt-phase-item .phase-name.akum { color:#00E676; }
+.bt-phase-item .phase-name.dist { color:#FF5252; }
+.bt-phase-item .phase-name.markup { color:#00E5FF; }
+.bt-phase-item .phase-name.markdown { color:#FFB300; }
+.bt-phase-item .phase-detail { color:#64748B; font-size:8px; }
+</style><style id="phase-css-fix">
+/* 1. HIDE phase panel DUPLIKAT yang ada di dalam btHistoryBody (kode lama) */
+#btHistoryBody > .bt-phase-panel { 
+  display: none !important; 
+}
+
+/* 2. SHOW + STYLE phase panel KODE BARU yang ada di luar btHistoryBody */
+#btHistoryPanel > .bt-phase-panel,
+#btHistoryPanel > #btPhasePanel {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)) !important;
+  gap: 4px !important;
+  width: 100% !important;
+  margin-top: 8px !important;
+  padding: 8px 0 4px 0 !important;
+  border-top: 1px solid #2A2E39 !important;
+}
+
+/* 3. Bars wrapper tetap proporsional */
+#btHistoryPanel .bt-bars-wrapper {
+  height: 100px !important;
+  overflow: hidden !important;
+}
+</style></head>
 <body class="bg-idx-bg text-slate-200 font-sans antialiased h-screen flex flex-col select-none">
 
 <!-- StockFamily Top Header -->
@@ -3422,12 +3481,35 @@
       </div>
     </div>
 
-    <div class="p-3 shrink-0">
-      <h2 class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-        <i class="fa-solid fa-chart-pie"></i> Rasio Fundamental
+    <div class="p-3 border-b border-idx-border shrink-0">
+      <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between gap-1.5">
+        <span class="flex items-center gap-1.5">
+          <i class="fa-solid fa-chart-pie"></i> Rasio Fundamental
+          <span class="text-slate-500 font-normal normal-case text-[9px]">(IDX EOD)</span>
+        </span>
+        <span id="fundDate" class="text-slate-500 font-normal normal-case text-[9px]">--</span>
       </h2>
-      <div class="p-2.5 rounded bg-idx-panel/60 border border-idx-border text-slate-500 italic text-[11px]">
-        Belum diaktifkan di versi ini — bisa ditambah dari field Yahoo quote (trailingPE, priceToBook, dll) kalau dibutuhkan.
+      <div class="grid grid-cols-2 gap-1.5 text-[10px]">
+        <div class="p-1.5 rounded bg-idx-panel/60 border border-idx-border">
+          <div class="text-slate-500 text-[9px]">Market Cap</div>
+          <div id="fundMarketCap" class="font-bold text-idx-cyan">--</div>
+        </div>
+        <div class="p-1.5 rounded bg-idx-panel/60 border border-idx-border">
+          <div class="text-slate-500 text-[9px]">Free Float</div>
+          <div id="fundFreeFloat" class="font-bold">--</div>
+        </div>
+        <div class="p-1.5 rounded bg-idx-panel/60 border border-idx-border">
+          <div class="text-slate-500 text-[9px]">Listed Shares</div>
+          <div id="fundListed" class="font-bold">--</div>
+        </div>
+        <div class="p-1.5 rounded bg-idx-panel/60 border border-idx-border">
+          <div class="text-slate-500 text-[9px]">Tradeable</div>
+          <div id="fundTradeable" class="font-bold">--</div>
+        </div>
+      </div>
+      <div class="mt-1.5 flex justify-between items-center px-1.5 py-1 rounded bg-idx-panel/40 border border-idx-border text-[10px]">
+        <span class="text-slate-500">Turnover</span>
+        <span id="fundTurnover" class="font-bold">--</span>
       </div>
     </div>
 
@@ -4014,6 +4096,51 @@
       }
     }
   });
+  // === RASIO FUNDAMENTAL ===
+  async function loadFundamental(code) {
+    try {
+      const data = await apiGet('/api/fundamental/' + encodeURIComponent(code));
+      if (!data.success) throw new Error(data.error || 'Unknown');
+
+      const fmtBig = (n) => {
+        if (n >= 1e12) return (n/1e12).toFixed(2) + ' T';
+        if (n >= 1e9) return (n/1e9).toFixed(2) + ' B';
+        if (n >= 1e6) return (n/1e6).toFixed(1) + ' M';
+        if (n >= 1e3) return (n/1e3).toFixed(1) + ' K';
+        return String(n);
+      };
+
+      const fmtNum = (n) => {
+        if (n >= 1e12) return (n/1e12).toFixed(1) + ' T';
+        if (n >= 1e9) return (n/1e9).toFixed(1) + ' B';
+        if (n >= 1e6) return (n/1e6).toFixed(0) + ' M';
+        return Number(n).toLocaleString('id-ID');
+      };
+
+      document.getElementById('fundDate').textContent = data.trade_date || '--';
+      document.getElementById('fundMarketCap').textContent = 'Rp ' + fmtBig(data.market_cap);
+      document.getElementById('fundListed').textContent = fmtNum(data.listed_shares);
+      document.getElementById('fundTradeable').textContent = fmtNum(data.tradeable_shares);
+
+      const ff = data.free_float_pct || 0;
+      const ffEl = document.getElementById('fundFreeFloat');
+      ffEl.textContent = ff.toFixed(1) + '%';
+      ffEl.style.color = ff < 15 ? '#FFB300' : ff < 30 ? '#00E5FF' : '#00E676';
+      ffEl.title = ff < 15 ? 'Free float sangat rendah, rentan manipulasi' : '';
+
+      const to = data.turnover_pct || 0;
+      const toEl = document.getElementById('fundTurnover');
+      toEl.textContent = to.toFixed(3) + '%';
+      toEl.style.color = to < 0.05 ? '#64748B' : to < 0.2 ? '#FFB300' : '#00E676';
+
+    } catch (err) {
+      console.error('[loadFundamental]', code, err);
+      ['fundMarketCap','fundFreeFloat','fundListed','fundTradeable','fundTurnover'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '--';
+      });
+    }
+  }
   // === BID/OFFER FROM SUPABASE ===
   async function loadBidOfferFromSupabase(code) {
     try {
@@ -4064,21 +4191,36 @@
     try {
       const data = await apiGet('/api/public/history/' + encodeURIComponent(code) + '?range=1y');
       if (!data.success || !data.nonRegular || !data.nonRegular.length) {
-        chartArea.innerHTML = '<div class="bt-empty">Tidak ada data Block Trade untuk ' + code + '</div>';
+        chartArea.innerHTML = '<div class="bt-empty">Tidak ada data Block Trade</div>';
         return;
       }
       
-      // Group by month
+      // === 1. Group BT by month ===
       const byMonth = {};
       data.nonRegular.forEach(bt => {
-        const month = String(bt.time).slice(0, 7); // YYYY-MM
+        const month = String(bt.time).slice(0, 7);
         if (!byMonth[month]) byMonth[month] = { volume: 0, value: 0, count: 0 };
         byMonth[month].volume += Number(bt.volume) || 0;
         byMonth[month].value += Number(bt.value) || 0;
         byMonth[month].count++;
       });
       
-      // Ambil 12 bulan terakhir
+      // === 2. Group harga by month (avg close) ===
+      const priceByMonth = {};
+      (data.candles || []).forEach(c => {
+        const m = String(c.time).slice(0, 7);
+        if (!priceByMonth[m]) priceByMonth[m] = { sum: 0, count: 0, high: 0, low: Infinity };
+        priceByMonth[m].sum += Number(c.close);
+        priceByMonth[m].count++;
+        priceByMonth[m].high = Math.max(priceByMonth[m].high, Number(c.high));
+        priceByMonth[m].low = Math.min(priceByMonth[m].low, Number(c.low));
+      });
+      
+      Object.keys(priceByMonth).forEach(m => {
+        priceByMonth[m].avg = priceByMonth[m].sum / priceByMonth[m].count;
+      });
+      
+      // === 3. Ambil 12 bulan terakhir yang ada BT-nya ===
       const allMonths = Object.keys(byMonth).sort();
       const months = allMonths.slice(-12);
       
@@ -4088,32 +4230,59 @@
       }
       
       const maxVol = Math.max(...months.map(m => byMonth[m].volume));
+      const prices = months.map(m => priceByMonth[m]?.avg).filter(v => v != null);
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      const priceRange = maxPrice - minPrice || 1;
       
-      // Buat map harga untuk deteksi warna (bull/bear)
-      const candleMap = new Map();
-      (data.candles || []).forEach(c => candleMap.set(String(c.time), c));
+      // === 4. Deteksi Fase Wyckoff ===
+      const avgBT = months.reduce((s, m) => s + byMonth[m].volume, 0) / months.length;
       
-      // Ambil harga awal & akhir bulan untuk tentukan warna
-      function getMonthDirection(month) {
-        const monthCandles = (data.candles || []).filter(c => String(c.time).startsWith(month));
-        if (monthCandles.length < 2) return 'neutral';
-        const first = Number(monthCandles[0].close);
-        const last = Number(monthCandles[monthCandles.length - 1].close);
-        if (last > first * 1.01) return 'bull';
-        if (last < first * 0.99) return 'bear';
-        return 'neutral';
+      function detectPhase(month, idx) {
+        const bt = byMonth[month].volume;
+        const btRatio = bt / avgBT;
+        const price = priceByMonth[month]?.avg;
+        const prevPrice = idx > 0 ? priceByMonth[months[idx - 1]]?.avg : price;
+        const priceChange = prevPrice ? (price - prevPrice) / prevPrice : 0;
+        
+        // Posisi dalam range (0-1)
+        const rangePos = (price - minPrice) / priceRange;
+        
+        // Rule-based detection
+        if (btRatio > 1.3 && Math.abs(priceChange) < 0.05) {
+          // BT tinggi, harga sideways
+          if (rangePos > 0.65) return { type: 'dist', name: 'DISTRIBUSI', detail: 'BT tinggi @ puncak' };
+          return { type: 'akum', name: 'AKUMULASI', detail: 'BT tinggi @ dasar' };
+        }
+        if (btRatio < 0.8 && priceChange > 0.05) {
+          return { type: 'markup', name: 'MARKUP', detail: 'Harga naik, BT sepi' };
+        }
+        if (btRatio < 0.8 && priceChange < -0.05) {
+          return { type: 'markdown', name: 'MARKDOWN', detail: 'Harga turun, BT sepi' };
+        }
+        if (btRatio > 1.3 && priceChange > 0.05) {
+          return { type: 'markup', name: 'MARKUP+BT', detail: 'BT & harga naik' };
+        }
+        if (btRatio > 1.3 && priceChange < -0.05) {
+          return { type: 'dist', name: 'DISTRIBUSI', detail: 'BT tinggi, harga turun' };
+        }
+        return { type: 'konsol', name: 'KONSOLIDASI', detail: 'Mixed signal' };
       }
       
-      // Render bars
-      const barsHtml = months.map(m => {
+      const phases = months.map((m, i) => ({ month: m, ...detectPhase(m, i) }));
+      
+      // === 5. Render Bars + SVG Overlay ===
+      const monthLabels = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+      
+      const barsHtml = months.map((m, i) => {
         const d = byMonth[m];
         const pct = maxVol > 0 ? (d.volume / maxVol) * 100 : 0;
-        const dir = getMonthDirection(m);
+        const price = priceByMonth[m]?.avg || 0;
+        const prevPrice = i > 0 ? (priceByMonth[months[i-1]]?.avg || 0) : price;
+        const dir = price > prevPrice * 1.01 ? 'bull' : price < prevPrice * 0.99 ? 'bear' : 'neutral';
         const [year, mon] = m.split('-');
-        const monthName = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][parseInt(mon) - 1];
-        const label = monthName + ' ' + year.slice(2);
+        const label = monthLabels[parseInt(mon) - 1] + ' ' + year.slice(2);
         
-        // Format volume
         const volText = d.volume >= 1e9 ? (d.volume/1e9).toFixed(1)+'B' 
                        : d.volume >= 1e6 ? (d.volume/1e6).toFixed(0)+'M' 
                        : (d.volume/1e3).toFixed(0)+'K';
@@ -4121,8 +4290,9 @@
                        : d.value >= 1e9 ? 'Rp '+(d.value/1e9).toFixed(1)+' B'
                        : 'Rp '+(d.value/1e6).toFixed(0)+' M';
         
-        const dirLabel = dir === 'bull' ? '🟢 Bullish' : dir === 'bear' ? '🔴 Bearish' : '⚪ Neutral';
-        const dirColor = dir === 'bull' ? '#00E676' : dir === 'bear' ? '#FF5252' : '#64748B';
+        const phase = phases[i];
+        const phaseIcon = phase.type === 'akum' ? '🟢' : phase.type === 'dist' ? '🔴' 
+                        : phase.type === 'markup' ? '🔵' : phase.type === 'markdown' ? '🟠' : '⚪';
         
         return `
           <div class="bt-bar-wrapper">
@@ -4131,24 +4301,57 @@
             <div class="bt-bar-month">${label}</div>
             <div class="bt-bar-tooltip">
               <div class="tt-row"><span class="tt-label">Bulan</span><span class="tt-value">${label}</span></div>
-              <div class="tt-row"><span class="tt-label">Volume</span><span class="tt-value">${volText} lot</span></div>
+              <div class="tt-row"><span class="tt-label">Volume BT</span><span class="tt-value">${volText} lot</span></div>
               <div class="tt-row"><span class="tt-label">Nilai</span><span class="tt-value">${valText}</span></div>
               <div class="tt-row"><span class="tt-label">Transaksi</span><span class="tt-value">${d.count}x</span></div>
-              <span class="tt-badge" style="background: ${dirColor}22; color: ${dirColor};">${dirLabel}</span>
+              <div class="tt-row"><span class="tt-label">Harga Avg</span><span class="tt-value">Rp ${price.toLocaleString('id-ID')}</span></div>
+              <span class="tt-badge" style="background: ${phase.type === 'akum' ? '#00E67622' : phase.type === 'dist' ? '#FF525222' : phase.type === 'markup' ? '#00E5FF22' : phase.type === 'markdown' ? '#FFB30022' : '#64748B22'}; color: ${phase.type === 'akum' ? '#00E676' : phase.type === 'dist' ? '#FF5252' : phase.type === 'markup' ? '#00E5FF' : phase.type === 'markdown' ? '#FFB300' : '#64748B'};">${phaseIcon} ${phase.name}</span>
             </div>
           </div>
         `;
       }).join('');
       
-      chartArea.innerHTML = barsHtml;
+      // SVG overlay - viewBox 0 0 100 100, preserveAspectRatio none
+      const points = months.map((m, i) => {
+        const price = priceByMonth[m]?.avg || 0;
+        const x = ((i + 0.5) / months.length) * 100;
+        const y = 100 - ((price - minPrice) / priceRange) * 100;
+        return { x, y, price };
+      });
       
-      // Summary
+      const pathD = points.map((p, i) => (i === 0 ? 'M' : 'L') + p.x.toFixed(2) + ',' + p.y.toFixed(2)).join(' ');
+      
+      const svgOverlay = `
+        <svg class="bt-svg-overlay" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <path class="bt-price-line" d="${pathD}"/>
+          ${points.map(p => `<circle class="bt-price-dot" cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="0.6"/>`).join('')}
+        </svg>
+      `;
+      
+      chartArea.innerHTML = '<div class="bt-bars-wrapper">' + barsHtml + svgOverlay + '</div>';
+      // Hapus phase panel lama kalau ada
+      const oldPhase = document.getElementById('btPhasePanel');
+      if (oldPhase) oldPhase.remove();
+      // Buat phase panel sebagai child dari btHistoryPanel (bukan chartArea)
+      const phasePanelEl2 = document.createElement('div');
+      phasePanelEl2.className = 'bt-phase-panel';
+      phasePanelEl2.id = 'btPhasePanel';
+      phasePanelEl2.innerHTML = phases.map((p, i) => {
+        const [year, mon] = p.month.split('-');
+        const label = monthLabels[parseInt(mon) - 1] + ' ' + year.slice(2);
+        return '<div class="bt-phase-item ' + p.type + '"><span class="phase-month">' + label + '</span><span class="phase-name ' + p.type + '">' + p.name + '</span><span class="phase-detail">' + p.detail + '</span></div>';
+      }).join('');
+      const historyPanelEl2 = document.getElementById('btHistoryPanel');
+      if (historyPanelEl2) historyPanelEl2.appendChild(phasePanelEl2);
+      console.log('[phase] Panel created with', phasePanelEl2.children.length, 'items');
+      
+      // === 6. Summary + Phase Panel ===
       const totalBT = data.nonRegular.length;
       const totalVol = data.nonRegular.reduce((s, b) => s + (Number(b.volume) || 0), 0);
       const totalVal = data.nonRegular.reduce((s, b) => s + (Number(b.value) || 0), 0);
       const peakMonth = months.reduce((a, m) => byMonth[m].volume > byMonth[a].volume ? m : a, months[0]);
       const [py, pm] = peakMonth.split('-');
-      const peakLabel = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][parseInt(pm)-1] + ' ' + py;
+      const peakLabel = monthLabels[parseInt(pm)-1] + ' ' + py;
       
       const fmtVol = (n) => n >= 1e9 ? (n/1e9).toFixed(2)+'B' : n >= 1e6 ? (n/1e6).toFixed(0)+'M' : (n/1e3).toFixed(0)+'K';
       const fmtVal = (n) => n >= 1e12 ? (n/1e12).toFixed(2)+' T' : n >= 1e9 ? (n/1e9).toFixed(1)+' B' : (n/1e6).toFixed(0)+' M';
@@ -4160,11 +4363,38 @@
         <div class="bt-summary-item"><span class="label">Puncak</span><span class="value">${peakLabel}</span></div>
       `;
       
+      // Phase panel di bawah bars
+      const phasePanel = document.createElement('div');
+      phasePanel.className = 'bt-phase-panel';
+      phasePanel.innerHTML = phases.map((p, i) => {
+        const [year, mon] = p.month.split('-');
+        const label = monthLabels[parseInt(mon) - 1] + ' ' + year.slice(2);
+        return `
+          <div class="bt-phase-item ${p.type}">
+            <span class="phase-month">${label}</span>
+            <span class="phase-name ${p.type}">${p.name}</span>
+            <span class="phase-detail">${p.detail}</span>
+          </div>
+        `;
+      }).join('');
+      
+      // Sisipkan phase panel setelah chart area
+      chartArea.parentNode.insertBefore(phasePanel, chartArea.nextSibling);
+      
+      // Hapus phase panel lama kalau ada
+      const oldPanels = chartArea.parentNode.querySelectorAll('.bt-phase-panel');
+      if (oldPanels.length > 1) {
+        for (let i = 0; i < oldPanels.length - 1; i++) {
+          oldPanels[i].remove();
+        }
+      }
+      
     } catch (err) {
       console.error('[loadHistoricalBT]', err);
       chartArea.innerHTML = '<div class="bt-empty">Error: ' + err.message + '</div>';
     }
   }
+  
   
   window.toggleBTHistory = function() {
     const panel = document.getElementById('btHistoryPanel');
@@ -4375,6 +4605,7 @@
       loadBlockTradeMarkers(code);
       loadHistoricalBT(code);
       loadBidOfferFromSupabase(code);
+      loadFundamental(code);
 
       chart.priceScale('right').applyOptions({ autoScale: true });
       // fitContent hanya sekali di awal, setelah itu biarkan user yang zoom
@@ -4761,6 +4992,9 @@
     loadQuoteHeader(activeCode);
     loadBandarmology(activeCode);
     loadGemScore(activeCode);
+    loadBidOfferFromSupabase(activeCode);
+    loadFundamental(activeCode);
+    loadHistoricalBT(activeCode);
     loadWatchlist();
   }
 
@@ -6378,6 +6612,7 @@ function togglePanel(panelId, headerEl) {
         flex-direction: column !important;
         gap: 8px !important;
       }
+      .bt-phase-panel { grid-template-columns: repeat(3, 1fr) !important; }
       
       .bt-chart-area {
         height: 100px !important;
@@ -6391,7 +6626,73 @@ function togglePanel(panelId, headerEl) {
       
       #activeTicker { font-size: 18px !important; }
       #activeName { font-size: 10px !important; }
-    }</style>
+    }    /* === Wyckoff Overlay CSS === */
+    .bt-chart-area {
+      position: relative;
+    }
+    .bt-svg-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .bt-price-line {
+      fill: none;
+      stroke: #FFD700;
+      stroke-width: 0.8;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      vector-effect: non-scaling-stroke;
+      filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.5));
+    }
+    .bt-price-dot {
+      fill: #FFD700;
+      r: 0.8;
+    }
+    .bt-phase-panel {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+      gap: 4px;
+      padding: 6px 0 0 0;
+      border-top: 1px solid #2A2E39;
+      margin-top: 6px;
+    }
+    .bt-phase-item {
+      display: flex;
+      flex-direction: column;
+      padding: 4px 6px;
+      border-radius: 4px;
+      background: #131722;
+      border-left: 3px solid #64748B;
+      font-size: 9px;
+      line-height: 1.3;
+    }
+    .bt-phase-item.akum { border-left-color: #00E676; }
+    .bt-phase-item.dist { border-left-color: #FF5252; }
+    .bt-phase-item.markup { border-left-color: #00E5FF; }
+    .bt-phase-item.markdown { border-left-color: #FFB300; }
+    .bt-phase-item.konsol { border-left-color: #64748B; }
+    .bt-phase-item .phase-month {
+      color: #94A3B8;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .bt-phase-item .phase-name {
+      font-weight: 700;
+      font-size: 10px;
+      margin-top: 1px;
+    }
+    .bt-phase-item .phase-name.akum { color: #00E676; }
+    .bt-phase-item .phase-name.dist { color: #FF5252; }
+    .bt-phase-item .phase-name.markup { color: #00E5FF; }
+    .bt-phase-item .phase-name.markdown { color: #FFB300; }
+    .bt-phase-item .phase-name.konsol { color: #64748B; }
+    .bt-phase-item .phase-detail {
+      color: #64748B;
+      font-size: 8px;
+    }
+</style>
 </body>
 </html>
 
