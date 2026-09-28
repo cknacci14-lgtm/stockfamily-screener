@@ -17,7 +17,7 @@ on:
 jobs:
   monitor:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     
     steps:
       - name: Checkout repo
@@ -28,13 +28,7 @@ jobs:
         with:
           node-version: '20'
       
-      # Install HANYA dependencies yang dibutuhkan monitor
-      - name: Install minimal dependencies
-        env:
-          PUPPETEER_SKIP_DOWNLOAD: 'true'
-          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
-        run: |
-          npm install --no-audit --no-fund --prefer-offline --ignore-scripts @supabase/supabase-js dotenv
+      # NO npm install — script pakai native fetch + dotenv optional
       
       - name: Run monitor
         env:
