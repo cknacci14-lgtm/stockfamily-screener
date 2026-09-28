@@ -322,6 +322,17 @@
       font-size: 12px;
       font-style: italic;
     }
+      
+      nav.sidebar,
+      .sidebar {
+        width: 60px !important;
+      }
+      
+      nav.sidebar .nav-item span:not(.icon),
+      .sidebar .nav-item span:not(.icon) {
+        display: none;
+      }
+    }
 </style>
 <style id="sf-chart-header-polish">
   #sf-top-header {
@@ -2312,6 +2323,7 @@
       font-style: italic;
     }
 </style>
+<style></style>
 </head>
 <body class="bg-idx-bg text-slate-200 font-sans antialiased h-screen flex flex-col select-none">
 
@@ -3324,7 +3336,7 @@
           <span class="text-slate-400">Foreign Sell (hari ini)</span><span id="foreignSellToday" class="font-bold text-idx-red">--</span>
         </div>
         <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border">
-          <span class="text-slate-400">Net Foreign 20D</span><span id="netForeign20d" class="font-bold">--</span>
+          <span class="text-slate-400">Net Foreign Hari Ini</span><span id="netForeignToday" class="font-bold">--</span>
         </div>
       </div>
       <!-- Catatan internal dihapus -->
@@ -3985,6 +3997,23 @@
 
     container.innerHTML = html;
   }
+  // === MOBILE DETECT ===
+  window.isMobile = function() {
+    return window.innerWidth <= 768;
+  };
+  
+  // Handle resize dari desktop → mobile atau sebaliknya
+  window.addEventListener('resize', function() {
+    if (typeof chart !== 'undefined' && chart) {
+      const wrapper = document.getElementById('chartWrapper');
+      if (wrapper) {
+        const rect = wrapper.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+          chart.applyOptions({ width: rect.width, height: rect.height });
+        }
+      }
+    }
+  });
   // === BID/OFFER FROM SUPABASE ===
   async function loadBidOfferFromSupabase(code) {
     try {
@@ -4498,7 +4527,7 @@
         document.getElementById('bandarScore').innerText = '--';
         document.getElementById('foreignBuyToday').innerText = '--';
         document.getElementById('foreignSellToday').innerText = '--';
-        document.getElementById('netForeign20d').innerText = '--';
+        document.getElementById('netForeignToday').innerText = '--';
         document.getElementById('low52Label').innerText = '--';
         document.getElementById('high52Label').innerText = '--';
         document.getElementById('range52Bar').style.width = '2px';
@@ -4565,15 +4594,18 @@
       }
 
       const netEl =
-        document.getElementById('netForeign20d');
+        document.getElementById('netForeignToday');
 
-      if (data.netForeign20d != null) {
+      // Hitung Net Foreign Hari Ini = Buy - Sell
+      const netToday = (Number(data.foreignBuyToday) || 0) - (Number(data.foreignSellToday) || 0);
+
+      if (data.foreignBuyToday != null || data.foreignSellToday != null) {
         netEl.innerText =
-          `${data.netForeign20d >= 0 ? '+' : ''}${fmtNum(data.netForeign20d)}`;
+          `${netToday >= 0 ? '+' : ''}${fmtNum(netToday)}`;
 
         netEl.className =
           `font-bold ${
-            data.netForeign20d >= 0
+            netToday >= 0
               ? 'text-idx-green'
               : 'text-idx-red'
           }`;
@@ -4634,7 +4666,7 @@
       document.getElementById('bandarScore').innerText = '--';
       document.getElementById('foreignBuyToday').innerText = '--';
       document.getElementById('foreignSellToday').innerText = '--';
-      document.getElementById('netForeign20d').innerText = '--';
+      document.getElementById('netForeignToday').innerText = '--';
       document.getElementById('low52Label').innerText = '--';
       document.getElementById('high52Label').innerText = '--';
       document.getElementById('range52Bar').style.width = '2px';
@@ -6249,6 +6281,217 @@ function togglePanel(panelId, headerEl) {
     }
 })();
 </script>
+
+<style id="mobile-v4">    /* === MOBILE RESPONSIVE OVERRIDE v4 === */
+    @media (max-width: 768px) {
+      html, body {
+        overflow-x: hidden !important;
+      }
+      
+      /* 1. Hide sidebar kiri (dari JS) */
+      #stockfamily-global-sidebar,
+      aside#stockfamily-global-sidebar {
+        display: none !important;
+      }
+      
+      /* 2. Top header — full width, compact */
+      #sf-top-header {
+        width: 100% !important;
+        max-width: 100vw !important;
+        height: auto !important;
+        padding: 8px 12px !important;
+      }
+      
+      /* 3. Workspace — yang perlu jadi column */
+      body > div.flex-1.min-h-0.flex,
+      div[class*="flex-1"][class*="min-h-0"][class*="flex"]:not([class*="fixed"]) {
+        flex-direction: column !important;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        width: 100% !important;
+      }
+      
+      /* 4. Main area — full width */
+      main {
+        width: 100% !important;
+        max-width: 100vw !important;
+        flex: none !important;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+      }
+      
+      /* 5. Chart wrapper */
+      #chartWrapper {
+        height: 55vh !important;
+        min-height: 280px !important;
+        width: 100% !important;
+      }
+      
+      /* 6. Aside kanan — full width, stack bawah */
+      aside#sf-right-sidebar {
+        width: 100% !important;
+        max-width: 100vw !important;
+        flex: none !important;
+        border-left: none !important;
+        border-top: 2px solid #2A2E39 !important;
+        margin: 0 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+        position: static !important;
+      }
+      
+      aside#sf-right-sidebar > div {
+        padding: 10px !important;
+      }
+      
+      /* 7. Hide element fixed/hidden */
+      #fibSettingsPanel,
+      #sf-mobile-backdrop {
+        /* biarkan default */
+      }
+      
+      /* 8. Historical BT */
+      #btHistoryPanel {
+        margin: 8px 0 !important;
+        padding: 10px !important;
+      }
+      
+      #btHistoryBody {
+        height: auto !important;
+        min-height: 100px !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+      }
+      
+      .bt-chart-area {
+        height: 100px !important;
+        padding-bottom: 18px !important;
+      }
+      
+      .bt-summary-grid {
+        min-width: auto !important;
+        grid-template-columns: 1fr 1fr !important;
+      }
+      
+      /* 9. Compact header */
+      #activeTicker { font-size: 18px !important; }
+      #activeName { font-size: 10px !important; }
+      #watermarkInput { width: 80px !important; font-size: 10px !important; }
+    }</style>
+<style id="mobile-v6">    /* === MOBILE RESPONSIVE OVERRIDE v6 === */
+    @media (max-width: 768px) {
+      html, body { overflow-x: hidden !important; }
+      
+      /* Hide sidebar kiri */
+      #stockfamily-global-sidebar {
+        display: none !important;
+      }
+      
+      /* Workspace jadi column */
+      body > div.flex-1.min-h-0.flex,
+      div[class*="flex-1"][class*="min-h-0"][class*="flex"]:not([class*="fixed"]) {
+        flex-direction: column !important;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        width: 100% !important;
+        display: flex !important;
+      }
+      
+      /* MAIN - Order 1 */
+      main {
+        width: 100% !important;
+        max-width: 100vw !important;
+        flex: none !important;
+        order: 1 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+        display: block !important;
+      }
+      
+      /* Chart wrapper */
+      #chartWrapper {
+        height: 60vh !important;
+        min-height: 320px !important;
+        width: 100% !important;
+      }
+      
+      /* ASIDE - Order 2 */
+      aside#sf-right-sidebar {
+        width: 100% !important;
+        max-width: 100vw !important;
+        flex: none !important;
+        order: 2 !important;
+        border-left: none !important;
+        border-top: 2px solid #2A2E39 !important;
+        margin: 0 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+        position: static !important;
+        display: flex !important;
+      }
+      
+      aside#sf-right-sidebar > div {
+        padding: 10px !important;
+      }
+      
+      /* === HEADER FIX — geser kanan untuk hindari hamburger === */
+      #sf-top-header {
+        width: 100% !important;
+        padding-left: 60px !important;
+        padding-right: 12px !important;
+        height: auto !important;
+        min-height: 48px !important;
+        overflow: visible !important;
+      }
+      
+      /* Pastikan logo tidak keluar */
+      #sf-top-header * {
+        max-width: 100% !important;
+      }
+      
+      /* Watermark input lebih kecil */
+      #watermarkInput {
+        width: 70px !important;
+        font-size: 9px !important;
+        padding: 4px 6px !important;
+      }
+      
+      /* Historical BT */
+      #btHistoryPanel {
+        margin: 8px 0 !important;
+        padding: 10px !important;
+      }
+      
+      #btHistoryBody {
+        height: auto !important;
+        min-height: 100px !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+      }
+      
+      .bt-chart-area {
+        height: 100px !important;
+        padding-bottom: 18px !important;
+      }
+      
+      .bt-summary-grid {
+        min-width: auto !important;
+        grid-template-columns: 1fr 1fr !important;
+      }
+      
+      #activeTicker { font-size: 18px !important; }
+      #activeName { font-size: 10px !important; }
+    }</style>
 </body>
 </html>
 

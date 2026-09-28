@@ -628,7 +628,10 @@
   let chart = null;
   let candleSeries = null;
   let closeSeries = null;
+  let highSeries = null;
+  let lowSeries = null;
   let volumeSeries = null;
+  let tradePlanLines = [];
 
   const fmt = value => {
     const n = Number(value);
@@ -810,8 +813,26 @@
 
     closeSeries = chart.addLineSeries({
       color: "#00d9ff",
+      lineWidth: 2,
+      visible: true,
+      priceLineVisible: false,
+      lastValueVisible: true
+    });
+
+    highSeries = chart.addLineSeries({
+      color: "rgba(170, 180, 188, 0.55)",
       lineWidth: 1,
-      visible: true
+      visible: false,
+      priceLineVisible: false,
+      lastValueVisible: false
+    });
+
+    lowSeries = chart.addLineSeries({
+      color: "rgba(120, 130, 140, 0.45)",
+      lineWidth: 1,
+      visible: false,
+      priceLineVisible: false,
+      lastValueVisible: false
     });
 
     volumeSeries = chart.addHistogramSeries({
@@ -832,48 +853,76 @@
     });
   }
 
-  function addTradePlanLines(signal) {
-    if (!chart || !signal) return;
+  function clearTradePlanLines() {
+    tradePlanLines.forEach(item => {
+      if (!item?.series || !item?.line) return;
+
+      try {
+        item.series.removePriceLine(item.line);
+      } catch (_) {}
+    });
+
+    tradePlanLines = [];
+  }
+
+  function addTradePlanLines(signal, currentPrice, activeSeries) {
+    if (!chart || !activeSeries) return;
+
+    clearTradePlanLines();
 
     const plans = [
       {
-        value: Number(signal.trigger),
+        value: Number(signal?.target2),
+        color: "#00d084",
+        title: "TARGET 2",
+        width: 1
+      },
+      {
+        value: Number(signal?.target1),
+        color: "#00d084",
+        title: "TARGET 1",
+        width: 1
+      },
+      {
+        value: Number(currentPrice),
+        color: "#f5f7f8",
+        title: "CURRENT",
+        width: 2
+      },
+      {
+        value: Number(signal?.trigger),
         color: "#00d9ff",
-        title: "TRIGGER"
+        title: "TRIGGER",
+        width: 2
       },
       {
-        value: Number(signal.invalidation),
+        value: Number(signal?.invalidation),
         color: "#ff4d4d",
-        title: "INVALIDATION"
-      },
-      {
-        value: Number(signal.target1),
-        color: "#00d084",
-        title: "TARGET 1"
-      },
-      {
-        value: Number(signal.target2),
-        color: "#00d084",
-        title: "TARGET 2"
+        title: "INVALIDATION",
+        width: 1
       }
     ];
 
     plans.forEach(item => {
       if (!Number.isFinite(item.value) || item.value <= 0) return;
 
-      const line = candleSeries.createPriceLine({
+      const line = activeSeries.createPriceLine({
         price: item.value,
         color: item.color,
-        lineWidth: 1,
+        lineWidth: item.width,
         lineStyle: LightweightCharts.LineStyle.Dashed,
         axisLabelVisible: true,
         title: item.title
       });
 
-      if (!line) return;
+      if (line) {
+        tradePlanLines.push({
+          series: activeSeries,
+          line
+        });
+      }
     });
   }
-
   function renderChart(data, signal) {
     if (!chart) return;
 
@@ -884,6 +933,21 @@
     const volumes = Array.isArray(data?.volumes)
       ? data.volumes
       : [];
+
+    /*
+     * CHARTNALIST DATA QUALITY RULE #1
+     *
+     * Never synthesize Open.
+     *
+     * Complete OHLC:
+     *   -> Candlestick
+     *
+     * Open unavailable:
+     *   -> High / Low / Close
+     *
+     * This preserves the actual trading range without
+     * inventing an Open price.
+     */
 
     const candleData = rows
       .filter(validCandle)
@@ -900,7 +964,30 @@
         time: r.time,
         value: Number(r.close)
       }))
-      .filter(r => Number.isFinite(r.value) && r.value > 0);
+      .filter(r =>
+        Number.isFinite(r.value) &&
+        r.value > 0
+      );
+
+    const highData = rows
+      .map(r => ({
+        time: r.time,
+        value: Number(r.high)
+      }))
+      .filter(r =>
+        Number.isFinite(r.value) &&
+        r.value > 0
+      );
+
+    const lowData = rows
+      .map(r => ({
+        time: r.time,
+        value: Number(r.low)
+      }))
+      .filter(r =>
+        Number.isFinite(r.value) &&
+        r.value > 0
+      );
 
     const volumeData = volumes
       .map(r => ({
@@ -912,69 +999,90 @@
       }))
       .filter(r => r.value > 0);
 
-    candleSeries.setData(candleData);
-    closeSeries.setData(closeData);
-    volumeSeries.setData(volumeData);
-
-    /*
-     * CHARTNALIST DATA QUALITY RULE #1
-     *
-     * Open <= 0 is unavailable and must NOT be fabricated.
-     * Therefore:
-     * - valid OHLC rows become candlesticks
-     * - rows with unavailable Open remain available through Close
-     * - Close line becomes the visual fallback when no valid candles exist
-     */
-    /*
-     * CHARTNALIST DATA QUALITY RULE #1
-     *
-     * Candles require a real Open.
-     * Close remains authoritative even when Open is unavailable.
-     *
-     * Therefore:
-     * - Valid OHLC rows render as candlesticks.
-     * - Close line remains visible whenever the latest session
-     *   cannot be represented as a valid candle.
-     * - Never synthesize Open.
-     */
-    const latestRow = rows.length ? rows[rows.length - 1] : null;
-    const latestOpen = latestRow ? Number(latestRow.open) : NaN;
-    const latestClose = latestRow ? Number(latestRow.close) : NaN;
-
-    const latestHasValidOHLC =
-      Number.isFinite(latestOpen) &&
-      latestOpen > 0 &&
-      Number.isFinite(Number(latestRow.high)) &&
-      Number(latestRow.high) > 0 &&
-      Number.isFinite(Number(latestRow.low)) &&
-      Number(latestRow.low) > 0 &&
-      Number.isFinite(latestClose) &&
-      latestClose > 0;
-
-    /*
-     * If the latest session has no usable Open, keep the close line
-     * visible so the chart reaches the actual latest market close.
-     *
-     * If the latest session has a complete OHLC candle, candlesticks
-     * remain the primary visualization.
-     */
-    closeSeries.applyOptions({
-      visible: !latestHasValidOHLC
+    const hasUnavailableOpen = rows.some(r => {
+      const open = Number(r.open);
+      return !Number.isFinite(open) || open <= 0;
     });
 
-    addTradePlanLines(signal);
+    const latestRow = rows.length
+      ? rows[rows.length - 1]
+      : null;
+
+    const latestClose = latestRow
+      ? Number(latestRow.close)
+      : NaN;
+
+    const useHLCMode = hasUnavailableOpen;
+
+    candleSeries.setData(candleData);
+    closeSeries.setData(closeData);
+    highSeries.setData(highData);
+    lowSeries.setData(lowData);
+    volumeSeries.setData(volumeData);
+
+    if (useHLCMode) {
+      candleSeries.applyOptions({
+        visible: false
+      });
+
+      highSeries.applyOptions({
+        visible: true
+      });
+
+      lowSeries.applyOptions({
+        visible: true
+      });
+
+      closeSeries.applyOptions({
+        visible: true
+      });
+    } else {
+      candleSeries.applyOptions({
+        visible: true
+      });
+
+      highSeries.applyOptions({
+        visible: false
+      });
+
+      lowSeries.applyOptions({
+        visible: false
+      });
+
+      closeSeries.applyOptions({
+        visible: false
+      });
+    }
+
+    /*
+     * Trade-plan levels must belong to the visible price series.
+     *
+     * Complete OHLC:
+     *   candleSeries is visible
+     *
+     * Open unavailable:
+     *   closeSeries is the authoritative visible price series
+     */
+    const activePriceSeries = useHLCMode
+      ? closeSeries
+      : candleSeries;
+
+    addTradePlanLines(
+      signal,
+      latestClose,
+      activePriceSeries
+    );
 
     chart.timeScale().fitContent();
 
-    const chartMode =
-      candleData.length > 0
-        ? `${candleData.length} candles`
-        : `${closeData.length} closes · Open unavailable`;
+    const modeLabel = useHLCMode
+      ? "H/L/C · Open unavailable"
+      : "Candlestick";
 
     $("chartStatus").textContent =
-      `${chartMode} · ${data?.startDate || "—"} → ${data?.endDate || "—"}`;
+      `${closeData.length} closes · ${modeLabel} · ` +
+      `${data?.startDate || "—"} → ${data?.endDate || "—"}`;
   }
-
   function renderBlocks(data) {
     const list = $("blockList");
     const blocks = Array.isArray(data?.nonRegular)
@@ -1122,6 +1230,11 @@
       if (chart) {
         candleSeries.setData([]);
         closeSeries.setData([]);
+        highSeries.setData([]);
+        lowSeries.setData([]);
+        volumeSeries.setData([]);
+        clearTradePlanLines();
+        closeSeries.setData([]);
         volumeSeries.setData([]);
       }
 
@@ -1138,5 +1251,7 @@
 
 </body>
 </html>
+
+
 
 
