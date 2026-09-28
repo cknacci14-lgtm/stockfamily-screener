@@ -168,20 +168,73 @@
       .main { padding: 16px; }
       .admin-card .row { flex-direction: column; align-items: stretch; }
     }
+  
+    /* === Admin Tabs === */
+    .admin-tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid #2a2f3e; }
+    .admin-tab { background: transparent; border: none; color: #9ca3af; padding: 12px 22px; font-size: 14px; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; font-family: inherit; }
+    .admin-tab:hover { color: #fff; background: rgba(255,255,255,0.03); }
+    .admin-tab.active { color: #f7971e; border-bottom-color: #f7971e; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .signal-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+    .signal-form-group label { display: block; font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; font-weight: 600; }
+    .signal-form-group input, .signal-form-group select, .signal-form-group textarea { width: 100%; background: #0a0e17; border: 1px solid #2a2f3e; color: #e0e0e0; padding: 8px 12px; border-radius: 6px; font-family: inherit; font-size: 13px; box-sizing: border-box; }
+    .signal-form-group input:focus, .signal-form-group select:focus, .signal-form-group textarea:focus { outline: none; border-color: #f7971e; }
+    .signal-form-section { margin-bottom: 16px; padding: 12px; background: #0a0e17; border: 1px solid #2a2f3e; border-radius: 8px; }
+    .signal-form-section-title { font-size: 11px; color: #f7971e; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; font-weight: 700; }
+    .signal-preview { display: flex; gap: 24px; padding: 10px 14px; background: #0a0e17; border: 1px solid #2a2f3e; border-radius: 6px; font-size: 12px; margin-bottom: 12px; }
+    .signal-preview-item { display: flex; flex-direction: column; }
+    .signal-preview-label { font-size: 10px; color: #6b7280; text-transform: uppercase; }
+    .signal-preview-value { font-weight: 700; color: #f7971e; font-family: 'SF Mono', monospace; }
+    .signal-list-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .signal-list-table th { text-align: left; padding: 10px 8px; color: #6b7280; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #2a2f3e; font-weight: 600; }
+    .signal-list-table td { padding: 10px 8px; border-bottom: 1px solid #1e222d; }
+    .signal-list-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .signal-status-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    .signal-status-badge.draft { background: #374151; color: #d1d5db; }
+    .signal-status-badge.published { background: #1e3a5f; color: #60a5fa; }
+    .signal-status-badge.active { background: #14532d; color: #86efac; }
+    .signal-status-badge.closed { background: #4c1d95; color: #c4b5fd; }
+    .signal-status-badge.tp1, .signal-status-badge.tp2, .signal-status-badge.tp3 { background: #14532d; color: #86efac; }
+    .signal-status-badge.sl { background: #7f1d1d; color: #fca5a5; }
+    .signal-action-btn { padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer; border: 1px solid; margin-right: 4px; font-family: inherit; }
+    .signal-action-btn.publish { background: #1e3a5f; border-color: #3b82f6; color: #60a5fa; }
+    .signal-action-btn.publish:hover { background: #1e40af; color: #fff; }
+    .signal-action-btn.delete { background: #7f1d1d22; border-color: #dc2626; color: #ef4444; }
+    .signal-action-btn.delete:hover { background: #dc2626; color: #fff; }
+    .signal-empty { text-align: center; padding: 30px; color: #6b7280; font-style: italic; }
+
+  
+    /* === Ticker Autocomplete === */
+    .ticker-wrap { position: relative; }
+    .ticker-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: #0a0e17; border: 1px solid #f7971e; border-top: none; border-radius: 0 0 6px 6px; max-height: 250px; overflow-y: auto; z-index: 1000; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+    .ticker-dropdown.show { display: block; }
+    .ticker-option { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #1e222d; display: flex; justify-content: space-between; align-items: center; transition: background 0.1s; }
+    .ticker-option:last-child { border-bottom: none; }
+    .ticker-option:hover, .ticker-option.active { background: rgba(247,151,30,0.12); }
+    .ticker-option .t-code { font-weight: 700; color: #f7971e; font-family: 'SF Mono', monospace; font-size: 13px; }
+    .ticker-option .t-name { font-size: 11px; color: #9ca3af; margin-left: 12px; flex: 1; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ticker-option .t-name mark { background: rgba(247,151,30,0.3); color: #f7971e; padding: 0 2px; border-radius: 2px; }
+    .ticker-name-badge { display: block; margin-top: 6px; font-size: 11px; color: #10b981; font-weight: 600; }
+    .ticker-loading { padding: 10px 12px; color: #6b7280; font-size: 11px; font-style: italic; text-align: center; }
+    .ticker-empty { padding: 12px; color: #6b7280; font-size: 11px; font-style: italic; text-align: center; }
+
   </style>
 </head>
 <body>
-  <nav class="sidebar">
-    <div class="brand">📈 StockFamily</div>
-    <a class="nav-item" href="/"><span class="icon">🏠</span> <span>Dashboard</span></a>
-    <a class="nav-item" href="/screener.html"><span class="icon">📊</span> <span>Screener</span></a>
-    <a class="nav-item" href="/backtest.html"><span class="icon">📈</span> <span>Backtest</span></a>
-    <a class="nav-item" href="/watchlist.html"><span class="icon">⭐</span> <span>Watchlist</span></a>
-    <a class="nav-item active" href="/admin.html"><span class="icon">⚙️</span> <span>Admin</span></a>
-  </nav>
+  <!-- Sidebar di-inject oleh stockfamily-sidebar.js -->
 
   <div class="main">
     <h1 style="margin-bottom:20px;">⚙️ Admin Panel</h1>
+
+    <!-- Admin Tabs -->
+    <div class="admin-tabs">
+      <button class="admin-tab active" data-tab="dashboard" onclick="switchAdminTab('dashboard')">📊 Dashboard</button>
+      <button class="admin-tab" data-tab="signals" onclick="switchAdminTab('signals')">🎯 Signals</button>
+    </div>
+
+    <!-- Tab: Dashboard -->
+    <div id="tab-dashboard" class="tab-panel active">
 
     <!-- System Status -->
     <div class="admin-card">
@@ -280,7 +333,117 @@
         <div><span class="time">[System]</span> <span class="info">Ready to manage data</span></div>
       </div>
     </div>
-  </div>
+    </div> <!-- /tab-dashboard -->
+
+    <!-- Tab: Signals -->
+    <div id="tab-signals" class="tab-panel">
+
+      <!-- Create Signal Form -->
+      <div class="admin-card">
+        <h2>🎯 Create New Signal</h2>
+
+        <div class="signal-form-section">
+          <div class="signal-form-section-title">Basic Info</div>
+          <div class="signal-form-grid">
+            <div class="signal-form-group ticker-wrap">
+              <label>Ticker</label>
+              <input type="text" id="sig-ticker" placeholder="Ketik kode saham..." autocomplete="off" style="text-transform:uppercase;">
+              <div id="tickerDropdown" class="ticker-dropdown"></div>
+              <span id="tickerNameBadge" class="ticker-name-badge" style="display:none;"></span>
+            </div>
+            <div class="signal-form-group">
+              <label>Timeframe</label>
+              <select id="sig-timeframe">
+                <option value="D1">D1 (Daily)</option>
+                <option value="H1">H1 (1 Hour)</option>
+                <option value="W1">W1 (Weekly)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="signal-form-section">
+          <div class="signal-form-section-title">Entry Positions (Weighted)</div>
+          <div class="signal-form-grid">
+            <div class="signal-form-group">
+              <label>Entry 1</label>
+              <input type="number" id="sig-entry1" placeholder="1700" step="any">
+            </div>
+            <div class="signal-form-group">
+              <label>Weight 1 (%)</label>
+              <input type="number" id="sig-weight1" value="30" min="0" max="100">
+            </div>
+            <div class="signal-form-group">
+              <label>Entry 2</label>
+              <input type="number" id="sig-entry2" placeholder="1680" step="any">
+            </div>
+            <div class="signal-form-group">
+              <label>Weight 2 (%)</label>
+              <input type="number" id="sig-weight2" value="30" min="0" max="100">
+            </div>
+            <div class="signal-form-group">
+              <label>Entry 3</label>
+              <input type="number" id="sig-entry3" placeholder="1660" step="any">
+            </div>
+            <div class="signal-form-group">
+              <label>Weight 3 (%)</label>
+              <input type="number" id="sig-weight3" value="40" min="0" max="100">
+            </div>
+          </div>
+        </div>
+
+        <div class="signal-form-section">
+          <div class="signal-form-section-title">Risk & Reward</div>
+          <div class="signal-form-grid">
+            <div class="signal-form-group">
+              <label>Stop Loss</label>
+              <input type="number" id="sig-sl" placeholder="1600" step="any">
+            </div>
+            <div class="signal-form-group">
+              <label>Target 1</label>
+              <input type="number" id="sig-tp1" placeholder="1780" step="any">
+            </div>
+            <div class="signal-form-group">
+              <label>Target 2</label>
+              <input type="number" id="sig-tp2" placeholder="1850" step="any">
+            </div>
+            <div class="signal-form-group">
+              <label>Target 3</label>
+              <input type="number" id="sig-tp3" placeholder="1950" step="any">
+            </div>
+          </div>
+        </div>
+
+        <div class="signal-form-section">
+          <div class="signal-form-section-title">Notes</div>
+          <div class="signal-form-group">
+            <textarea id="sig-notes" rows="3" placeholder="Plan buy on retrace D1..."></textarea>
+          </div>
+        </div>
+
+        <div class="signal-preview">
+          <div class="signal-preview-item">
+            <span class="signal-preview-label">Entry Avg</span>
+            <span class="signal-preview-value" id="preview-entry-avg">—</span>
+          </div>
+          <div class="signal-preview-item">
+            <span class="signal-preview-label">Risk / Reward</span>
+            <span class="signal-preview-value" id="preview-rr">—</span>
+          </div>
+        </div>
+
+        <button class="btn" onclick="createSignal()" id="createSignalBtn">💾 Save Draft</button>
+      </div>
+
+      <div class="admin-card">
+        <h2>📋 Signals List</h2>
+        <div id="signalsListContainer">
+          <div class="signal-empty">Loading...</div>
+        </div>
+      </div>
+
+    </div> <!-- /tab-signals -->
+
 
   <script>
     // ============================================================
@@ -640,6 +803,295 @@
     // ============================================================
     // INIT
     // ============================================================
+
+    // ============================================================
+    // ADMIN TABS
+    // ============================================================
+    function switchAdminTab(tabName) {
+      document.querySelectorAll('.admin-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.tab === tabName);
+      });
+      document.querySelectorAll('.tab-panel').forEach(p => {
+        p.classList.toggle('active', p.id === 'tab-' + tabName);
+      });
+      if (tabName === 'signals') loadSignalsList();
+    }
+
+    // ============================================================
+    // SIGNAL MANAGEMENT
+    // ============================================================
+    function calcEntryAvgFromForm() {
+      const e1 = parseFloat(document.getElementById('sig-entry1').value) || 0;
+      const e2 = parseFloat(document.getElementById('sig-entry2').value) || 0;
+      const e3 = parseFloat(document.getElementById('sig-entry3').value) || 0;
+      const w1 = parseInt(document.getElementById('sig-weight1').value) || 0;
+      const w2 = parseInt(document.getElementById('sig-weight2').value) || 0;
+      const w3 = parseInt(document.getElementById('sig-weight3').value) || 0;
+      const items = [{p:e1,w:w1},{p:e2,w:w2},{p:e3,w:w3}].filter(x => x.p > 0 && x.w > 0);
+      if (!items.length) return null;
+      const totalW = items.reduce((s,x) => s+x.w, 0);
+      const sum = items.reduce((s,x) => s+x.p*x.w, 0);
+      return totalW > 0 ? sum/totalW : null;
+    }
+
+    function updateSignalPreview() {
+      const avg = calcEntryAvgFromForm();
+      const sl = parseFloat(document.getElementById('sig-sl').value);
+      const tp1 = parseFloat(document.getElementById('sig-tp1').value);
+      const avgEl = document.getElementById('preview-entry-avg');
+      const rrEl = document.getElementById('preview-rr');
+      avgEl.textContent = avg ? 'Rp ' + avg.toLocaleString('id-ID',{maximumFractionDigits:2}) : '—';
+      if (avg && sl && tp1 && sl < avg && tp1 > avg) {
+        rrEl.textContent = ((tp1-avg)/(avg-sl)).toFixed(2) + ' R';
+      } else {
+        rrEl.textContent = '—';
+      }
+    }
+
+    async function createSignal() {
+      const btn = document.getElementById('createSignalBtn');
+      const payload = {
+        ticker: document.getElementById('sig-ticker').value.trim().toUpperCase(),
+        timeframe: document.getElementById('sig-timeframe').value,
+        entry_1: parseFloat(document.getElementById('sig-entry1').value) || null,
+        entry_2: parseFloat(document.getElementById('sig-entry2').value) || null,
+        entry_3: parseFloat(document.getElementById('sig-entry3').value) || null,
+        entry_1_pct: parseInt(document.getElementById('sig-weight1').value) || 30,
+        entry_2_pct: parseInt(document.getElementById('sig-weight2').value) || 30,
+        entry_3_pct: parseInt(document.getElementById('sig-weight3').value) || 40,
+        stop_loss: parseFloat(document.getElementById('sig-sl').value) || null,
+        target_1: parseFloat(document.getElementById('sig-tp1').value) || null,
+        target_2: parseFloat(document.getElementById('sig-tp2').value) || null,
+        target_3: parseFloat(document.getElementById('sig-tp3').value) || null,
+        notes: document.getElementById('sig-notes').value.trim() || null
+      };
+      if (!payload.ticker) return addLog('❌ Ticker wajib', 'error');
+      if (!payload.entry_1) return addLog('❌ Entry 1 wajib', 'error');
+      if (!payload.stop_loss) return addLog('❌ SL wajib', 'error');
+      if (!payload.target_1) return addLog('❌ TP1 wajib', 'error');
+      btn.disabled = true;
+      btn.textContent = '⏳ Saving...';
+      try {
+        const res = await adminFetch('/api/admin/signals', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!data.success) {
+          addLog('❌ ' + data.error, 'error');
+        } else {
+          addLog('✅ Signal created: ' + data.signal.ticker + ' (DRAFT)', 'success');
+          ['sig-entry1','sig-entry2','sig-entry3','sig-sl','sig-tp1','sig-tp2','sig-tp3','sig-notes'].forEach(id => document.getElementById(id).value = '');
+          if (window.resetTickerAutocomplete) window.resetTickerAutocomplete();
+          document.getElementById('sig-weight1').value = 30;
+          document.getElementById('sig-weight2').value = 30;
+          document.getElementById('sig-weight3').value = 40;
+          updateSignalPreview();
+          loadSignalsList();
+        }
+      } catch (err) {
+        addLog('❌ ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '💾 Save Draft';
+      }
+    }
+
+    async function loadSignalsList() {
+      const container = document.getElementById('signalsListContainer');
+      if (!container) return;
+      container.innerHTML = '<div class="signal-empty">Loading...</div>';
+      try {
+        const res = await adminFetch('/api/admin/signals');
+        const data = await res.json();
+        if (!data.success || !data.signals.length) {
+          container.innerHTML = '<div class="signal-empty">Belum ada signal. Buat signal pertama di atas.</div>';
+          return;
+        }
+        const rows = data.signals.map(s => {
+          const statusClass = (s.status || 'draft').toLowerCase();
+          const outcomeClass = (s.outcome || '').toLowerCase();
+          const dateStr = s.created_at ? new Date(s.created_at).toLocaleDateString('id-ID',{day:'2-digit',month:'short'}) : '—';
+          return '<tr>' +
+            '<td><strong>' + s.ticker + '</strong></td>' +
+            '<td>' + (s.timeframe||'—') + '</td>' +
+            '<td>' + (s.entry_avg ? 'Rp '+Number(s.entry_avg).toLocaleString('id-ID') : '—') + '</td>' +
+            '<td>' + (s.stop_loss ? Number(s.stop_loss).toLocaleString('id-ID') : '—') + '</td>' +
+            '<td>' + (s.target_1 ? Number(s.target_1).toLocaleString('id-ID') : '—') + '</td>' +
+            '<td>' + (s.risk_reward ? Number(s.risk_reward).toFixed(2)+'R' : '—') + '</td>' +
+            '<td><span class="signal-status-badge ' + statusClass + '">' + s.status + '</span></td>' +
+            '<td>' + (s.outcome ? '<span class="signal-status-badge ' + outcomeClass + '">' + s.outcome + '</span>' : '—') + '</td>' +
+            '<td>' + dateStr + '</td>' +
+            '<td>' +
+              (s.status === 'DRAFT' ? '<button class="signal-action-btn publish" onclick="publishSignal(' + s.id + ')">Publish</button>' : '') +
+              (s.status === 'DRAFT' ? '<button class="signal-action-btn delete" onclick="deleteSignal(' + s.id + ')">Delete</button>' : '') +
+            '</td>' +
+          '</tr>';
+        }).join('');
+        container.innerHTML = '<table class="signal-list-table"><thead><tr><th>Ticker</th><th>TF</th><th>Entry Avg</th><th>SL</th><th>TP1</th><th>RR</th><th>Status</th><th>Outcome</th><th>Created</th><th>Actions</th></tr></thead><tbody>' + rows + '</tbody></table>';
+      } catch (err) {
+        container.innerHTML = '<div class="signal-empty">Error: ' + err.message + '</div>';
+      }
+    }
+
+    async function publishSignal(id) {
+      if (!confirm('Publish signal ini?')) return;
+      try {
+        const res = await adminFetch('/api/admin/signals/'+id+'/publish', { method: 'POST' });
+        const data = await res.json();
+        if (!data.success) return addLog('❌ ' + data.error, 'error');
+        addLog('✅ Signal published!', 'success');
+        loadSignalsList();
+      } catch (err) { addLog('❌ ' + err.message, 'error'); }
+    }
+
+    async function deleteSignal(id) {
+      if (!confirm('Hapus signal ini?')) return;
+      try {
+        const res = await adminFetch('/api/admin/signals/'+id, { method: 'DELETE' });
+        const data = await res.json();
+        if (!data.success) return addLog('❌ ' + data.error, 'error');
+        addLog('🗑️ Signal deleted', 'info');
+        loadSignalsList();
+      } catch (err) { addLog('❌ ' + err.message, 'error'); }
+    }
+
+    ['sig-entry1','sig-entry2','sig-entry3','sig-weight1','sig-weight2','sig-weight3','sig-sl','sig-tp1'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', updateSignalPreview);
+    });
+
+
+
+    // ============================================================
+    // TICKER AUTOCOMPLETE
+    // ============================================================
+    (function() {
+      const tickerInput = document.getElementById('sig-ticker');
+      const dropdown = document.getElementById('tickerDropdown');
+      const nameBadge = document.getElementById('tickerNameBadge');
+      if (!tickerInput || !dropdown) return;
+
+      let debounceTimer = null;
+      let currentResults = [];
+      let activeIdx = -1;
+
+      function highlightMatch(text, query) {
+        if (!query) return text;
+        const idx = text.toUpperCase().indexOf(query.toUpperCase());
+        if (idx < 0) return text;
+        return text.substring(0, idx) + '<mark>' + text.substring(idx, idx + query.length) + '</mark>' + text.substring(idx + query.length);
+      }
+
+      function renderDropdown(results, query) {
+        if (!results.length) {
+          dropdown.innerHTML = '<div class="ticker-empty">Tidak ada hasil untuk "' + query + '"</div>';
+          dropdown.classList.add('show');
+          return;
+        }
+        dropdown.innerHTML = results.map((r, i) =>
+          '<div class="ticker-option" data-idx="' + i + '" data-code="' + r.code + '" data-name="' + (r.name || '').replace(/"/g, '&quot;') + '">' +
+            '<span class="t-code">' + highlightMatch(r.code, query) + '</span>' +
+            '<span class="t-name">' + highlightMatch(r.name || '', query) + '</span>' +
+          '</div>'
+        ).join('');
+        dropdown.classList.add('show');
+        activeIdx = -1;
+
+        // Attach click handlers
+        dropdown.querySelectorAll('.ticker-option').forEach(opt => {
+          opt.addEventListener('click', () => selectTicker(opt));
+        });
+      }
+
+      function selectTicker(opt) {
+        const code = opt.getAttribute('data-code');
+        const name = opt.getAttribute('data-name');
+        tickerInput.value = code;
+        nameBadge.textContent = '✓ ' + name;
+        nameBadge.style.display = 'block';
+        dropdown.classList.remove('show');
+        tickerInput.dataset.selectedCode = code;
+        tickerInput.dataset.selectedName = name;
+      }
+
+      function clearSelection() {
+        nameBadge.style.display = 'none';
+        nameBadge.textContent = '';
+        delete tickerInput.dataset.selectedCode;
+        delete tickerInput.dataset.selectedName;
+      }
+
+      async function searchTicker(q) {
+        if (q.length < 1) {
+          dropdown.classList.remove('show');
+          return;
+        }
+        dropdown.innerHTML = '<div class="ticker-loading">Mencari...</div>';
+        dropdown.classList.add('show');
+        try {
+          const res = await fetch('/api/public/search?q=' + encodeURIComponent(q));
+          const data = await res.json();
+          if (data.success && data.results) {
+            currentResults = data.results;
+            renderDropdown(data.results, q);
+          } else {
+            dropdown.innerHTML = '<div class="ticker-empty">Tidak ada hasil</div>';
+          }
+        } catch (err) {
+          console.error('Ticker search error:', err);
+          dropdown.innerHTML = '<div class="ticker-empty">Error: ' + err.message + '</div>';
+        }
+      }
+
+      tickerInput.addEventListener('input', (e) => {
+        clearTimeout(debounceTimer);
+        const q = e.target.value.trim().toUpperCase();
+        clearSelection();
+        if (!q) {
+          dropdown.classList.remove('show');
+          return;
+        }
+        debounceTimer = setTimeout(() => searchTicker(q), 250);
+      });
+
+      // Arrow key navigation
+      tickerInput.addEventListener('keydown', (e) => {
+        const opts = dropdown.querySelectorAll('.ticker-option');
+        if (!opts.length || !dropdown.classList.contains('show')) return;
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          activeIdx = Math.min(activeIdx + 1, opts.length - 1);
+          opts.forEach((o, i) => o.classList.toggle('active', i === activeIdx));
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          activeIdx = Math.max(activeIdx - 1, 0);
+          opts.forEach((o, i) => o.classList.toggle('active', i === activeIdx));
+        } else if (e.key === 'Enter' && activeIdx >= 0) {
+          e.preventDefault();
+          selectTicker(opts[activeIdx]);
+        } else if (e.key === 'Escape') {
+          dropdown.classList.remove('show');
+        }
+      });
+
+      // Close on click outside
+      document.addEventListener('click', (e) => {
+        if (!tickerInput.contains(e.target) && !dropdown.contains(e.target)) {
+          dropdown.classList.remove('show');
+        }
+      });
+
+      // Reset on create success (dipanggil dari createSignal)
+      window.resetTickerAutocomplete = function() {
+        tickerInput.value = '';
+        clearSelection();
+        dropdown.classList.remove('show');
+      };
+    })();
+
+
     loadSettings();
     loadDailySummary();
   </script>

@@ -3570,7 +3570,29 @@
   }
 
   let watchlistCodes = loadWatchlistCodesFromStorage();
-  let activeCode = "BBCA";
+  // Auto-add URL code ke watchlist kalau belum ada
+  (function() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlCode = params.get('code');
+      if (urlCode) {
+        const c = String(urlCode).toUpperCase().trim();
+        if (c && !watchlistCodes.includes(c)) {
+          watchlistCodes.push(c);
+          try { localStorage.setItem(WATCHLIST_STORAGE_KEY, JSON.stringify(watchlistCodes)); } catch(e) {}
+        }
+      }
+    } catch (e) {}
+  })();
+  // === URL PARAM HANDLER ===
+  let activeCode = (function() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlCode = params.get('code');
+      if (urlCode) return String(urlCode).toUpperCase().trim();
+    } catch (e) {}
+    return "BBCA";
+  })();
   let latestCandles = [];
 
   // ============================================================

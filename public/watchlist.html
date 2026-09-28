@@ -457,7 +457,17 @@
       <div class="meta" id="meta">
         Loading signal universe...
       </div>
-    </header>
+    
+  <div class="watchlist-signal-center-link-wrap">
+  <a
+    class="watchlist-signal-center-link"
+    href="/signal-center.html"
+    title="Open system-wide Signal Center"
+    aria-label="Open Signal Center">
+    SIGNAL CENTER
+  </a>
+</div>
+</header>
 
     <section class="toolbar">
       <div class="filters" id="filters">
@@ -779,8 +789,56 @@
   },60000);
   requestAnimationFrame(decorate);
 })();
-</script></body>
+</script><style id="watchlist-signal-center-link-style">
+.watchlist-signal-center-link {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  height:34px;
+  padding:0 13px;
+  border:1px solid #263238;
+  border-radius:7px;
+  background:#101315;
+  color:#F5F7F8;
+  font-family:inherit;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.045em;
+  text-decoration:none;
+  white-space:nowrap;
+  transition:
+    border-color .15s ease,
+    background .15s ease,
+    color .15s ease,
+    transform .15s ease;
+}
+.watchlist-signal-center-link:hover {
+  border-color:#00D9FF;
+  background:#12181B;
+  color:#00D9FF;
+  transform:translateY(-1px);
+}
+.watchlist-signal-center-link::before {
+  content:"◈";
+  font-size:12px;
+  line-height:1;
+}
+.watchlist-signal-center-link-wrap {
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  margin-left:auto;
+  margin-bottom:0;
+  flex-shrink:0;
+}
+</style>
+
+</body>
 </html>
+
+
 
 
 

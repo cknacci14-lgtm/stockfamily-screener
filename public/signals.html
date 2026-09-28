@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signals | CHARTNALIST</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script>
+tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{
+  idx:{ bg:'#0B0E14', card:'#131722', panel:'#1E222D', border:'#2A2E39',
+        green:'#00E676', red:'#FF5252', amber:'#FFB300', cyan:'#00E5FF', purple:'#A855F7' }}}}}
+</script>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: #0B0E14; color: #e0e0e0; margin: 0; }
+  .mono { font-family: 'JetBrains Mono', Consolas, monospace; }
+
+  /* Stats */
+  .stat-card { padding: 14px 16px; border-radius: 10px; background: #131722; border: 1px solid #2A2E39; }
+  .stat-label { font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 6px; }
+  .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 800; }
+  .stat-value.cyan { color: #00E5FF; }
+  .stat-value.green { color: #10b981; }
+  .stat-value.amber { color: #fbbf24; }
+  .stat-value.gray { color: #9ca3af; font-size: 14px; }
+
+  /* Filters */
+  .filter-btn { padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: 1px solid #2A2E39; background: #1E222D; color: #9ca3af; font-family: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .filter-btn:hover { border-color: #00E5FF; color: #fff; }
+  .filter-btn.active { background: rgba(0,229,255,0.15); border-color: #00E5FF; color: #00E5FF; }
+
+  /* Signal Card */
+  .signal-card { background: #131722; border: 1px solid #2A2E39; border-radius: 12px; padding: 20px 22px; margin-bottom: 16px; transition: all 0.2s; border-left: 4px solid #2A2E39; }
+  .signal-card:hover { border-color: #00E5FF; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,229,255,0.08); }
+  .signal-card.published { border-left-color: #3b82f6; }
+  .signal-card.active { border-left-color: #10b981; }
+  .signal-card.closed { border-left-color: #8b5cf6; }
+  .signal-card.sl { border-left-color: #ef4444; }
+
+  /* Status Badges */
+  .status-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .status-badge.draft { background: #374151; color: #d1d5db; }
+  .status-badge.published { background: #1e3a5f; color: #60a5fa; }
+  .status-badge.active { background: #14532d; color: #86efac; }
+  .status-badge.closed { background: #4c1d95; color: #c4b5fd; }
+  .status-badge.sl { background: #7f1d1d; color: #fca5a5; }
+  .status-badge.expired { background: #374151; color: #d1d5db; }
+
+  /* Price Grid */
+  .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px; margin: 16px 0; padding: 16px; background: #0a0e17; border-radius: 8px; }
+  .price-item { display: flex; flex-direction: column; gap: 4px; }
+  .price-label { font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  .price-value { font-size: 14px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+  .price-value.entry { color: #00E5FF; }
+  .price-value.sl { color: #ef4444; }
+  .price-value.tp { color: #10b981; }
+  .price-value.default { color: #e0e0e0; }
+
+  /* P/L Block */
+  .pl-block { display: flex; align-items: center; gap: 12px; margin: 12px 0; padding: 14px 16px; background: linear-gradient(90deg, rgba(0,229,255,0.05), transparent); border-radius: 8px; border-left: 3px solid #00E5FF; }
+  .pl-block.profit { background: linear-gradient(90deg, rgba(16,185,129,0.08), transparent); border-left-color: #10b981; }
+  .pl-block.loss { background: linear-gradient(90deg, rgba(239,68,68,0.08), transparent); border-left-color: #ef4444; }
+  .pl-block.neutral { background: linear-gradient(90deg, rgba(107,114,128,0.05), transparent); border-left-color: #6b7280; }
+  .pl-item { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .pl-label { font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  .pl-value { font-size: 15px; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: #e0e0e0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pl-value.profit { color: #10b981; }
+  .pl-value.loss { color: #ef4444; }
+  .pl-value.live { color: #00E5FF; }
+  .pl-value.muted { color: #6b7280; font-size: 12px; font-weight: 500; }
+  .pl-divider { width: 1px; height: 32px; background: #2A2E39; flex-shrink: 0; }
+
+  /* Progress */
+  .progress-bar { height: 8px; background: #1e222d; border-radius: 4px; overflow: hidden; margin: 14px 0 6px 0; }
+  .progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+  .progress-label { font-size: 11px; color: #6b7280; text-align: center; }
+
+  /* Empty & Loading */
+  .empty-state { text-align: center; padding: 60px 20px; color: #6b7280; }
+  .empty-state i { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
+  .loading-spinner { display: inline-block; width: 24px; height: 24px; border: 2px solid #2A2E39; border-top-color: #00E5FF; border-radius: 50%; animation: spin 0.6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .price-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 14px; }
+    .pl-block { flex-wrap: wrap; }
+    .pl-divider { display: none; }
+    .pl-item { min-width: calc(50% - 8px); }
+    .signal-card { padding: 16px; }
+    .stat-value { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div style="min-height: 100vh;">
+  <header style="border-bottom: 1px solid #2A2E39; background: rgba(19,23,34,0.85); backdrop-filter: blur(8px); position: sticky; top: 0; z-index: 40;">
+    <div style="max-width: 1100px; margin: 0 auto; padding: 16px; display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #00E676, #00E5FF); display: flex; align-items: center; justify-content: center;">
+          <i class="fa-solid fa-bullseye" style="color: #000; font-size: 18px;"></i>
+        </div>
+        <div>
+          <div style="font-weight: 900; font-size: 17px; letter-spacing: 0.5px;">CHART<span style="color: #00E5FF;">NALIST</span> SIGNALS</div>
+          <div style="font-size: 10px; color: #6b7280;">LIVE TRADING SIGNALS</div>
+        </div>
+      </div>
+      <button onclick="loadSignals()" class="filter-btn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+    </div>
+  </header>
+
+  <main style="max-width: 1100px; margin: 0 auto; padding: 24px 16px;">
+
+    <!-- Stats -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px;">
+      <div class="stat-card">
+        <div class="stat-label">Total Signals</div>
+        <div id="statTotal" class="stat-value cyan">--</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Active</div>
+        <div id="statActive" class="stat-value green">--</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Win Rate</div>
+        <div id="statWinRate" class="stat-value amber">--</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Updated</div>
+        <div id="statUpdated" class="stat-value gray">--:--</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px;">
+      <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)"><i class="fa-solid fa-list"></i> Semua</button>
+      <button class="filter-btn" data-filter="PUBLISHED" onclick="setFilter('PUBLISHED', this)"><i class="fa-solid fa-paper-plane"></i> Published</button>
+      <button class="filter-btn" data-filter="ACTIVE" onclick="setFilter('ACTIVE', this)"><i class="fa-solid fa-bolt"></i> Active</button>
+      <button class="filter-btn" data-filter="TP" onclick="setFilter('TP', this)"><i class="fa-solid fa-check"></i> TP Hit</button>
+      <button class="filter-btn" data-filter="SL" onclick="setFilter('SL', this)"><i class="fa-solid fa-xmark"></i> SL Hit</button>
+    </div>
+
+    <!-- Signals List -->
+    <div id="signalsList">
+      <div class="empty-state">
+        <div class="loading-spinner"></div>
+        <div style="margin-top: 12px;">Memuat signals...</div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer style="max-width: 1100px; margin: 40px auto 0; padding: 24px 16px; text-align: center; font-size: 10px; color: #4b5563; border-top: 1px solid #1e222d;">
+    <div style="margin-bottom: 4px;">Bukan rekomendasi beli/jual. Lakukan analisis sendiri.</div>
+    <div>2026 CHARTNALIST &middot; Powered by StockFamily</div>
+  </footer>
+</div>
+
+<script src="/assets/stockfamily-sidebar.js"></script>
+<script>
+var allSignals = [];
+var currentFilter = 'all';
+var priceCache = {};
+
+// ============================================================
+// HELPERS
+// ============================================================
+function fmtRp(n) {
+  if (n == null || isNaN(n)) return '—';
+  return 'Rp ' + Number(n).toLocaleString('id-ID');
+}
+
+function fmtRpShort(n) {
+  if (n == null || isNaN(n)) return '—';
+  n = Number(n);
+  if (n >= 1e9) return (n/1e9).toFixed(1) + 'B';
+  if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
+  return n.toString();
+}
+
+function safeText(v) {
+  if (v == null) return '';
+  return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function getStatusClass(s) {
+  if (!s) return 'draft';
+  var outcome = s.outcome || '';
+  if (outcome === 'TP1' || outcome === 'TP2' || outcome === 'TP3') return 'closed';
+  if (outcome === 'SL') return 'sl';
+  return String(s.status || 'draft').toLowerCase();
+}
+
+// ============================================================
+// PRICE FETCH (non-blocking)
+// ============================================================
+async function fetchPrices(tickers) {
+  if (!tickers.length) return {};
+  try {
+    var symbols = tickers.map(function(t) { return t + '.JK'; }).join(',');
+    var controller = new AbortController();
+    var timeout = setTimeout(function() { controller.abort(); }, 5000);
+    var res = await fetch('/api/yahoo/quote?symbols=' + encodeURIComponent(symbols), { signal: controller.signal });
+    clearTimeout(timeout);
+    if (!res.ok) return {};
+    var data = await res.json();
+    if (!data.success || !data.result) return {};
+    var map = {};
+    data.result.forEach(function(q) {
+      var code = String(q.symbol || '').replace('.JK', '').toUpperCase();
+      map[code] = {
+        price: q.regularMarketPrice,
+        change: q.regularMarketChange,
+        changePct: q.regularMarketChangePercent
+      };
+    });
+    return map;
+  } catch (err) {
+    console.warn('[fetchPrices]', err.message);
+    return {};
+  }
+}
+
+// ============================================================
+// P/L CALC
+// ============================================================
+function computePL(s, currentPrice) {
+  if (!currentPrice || !s.entry_avg) return null;
+  var entryAvg = Number(s.entry_avg);
+  var cp = Number(currentPrice);
+  if (!entryAvg || !cp) return null;
+  var plPct = ((cp - entryAvg) / entryAvg) * 100;
+  var plRp = cp - entryAvg;
+  var status = 'neutral';
+  if (plPct > 0.05) status = 'profit';
+  else if (plPct < -0.05) status = 'loss';
+  return { status: status, pl_pct: plPct, pl_rp: plRp };
+}
+
+// ============================================================
+// RENDER: P/L BLOCK
+// ============================================================
+function renderPLBlock(s, priceData) {
+  try {
+    if (!priceData || !priceData.price) {
+      return '<div class="pl-block neutral">' +
+        '<div class="pl-item"><span class="pl-label">Last Price</span><span class="pl-value muted">Loading...</span></div>' +
+      '</div>';
+    }
+
+    var cp = Number(priceData.price);
+    var pl = computePL(s, cp);
+    var isPublished = s.status === 'PUBLISHED';
+    var blockClass = pl ? pl.status : 'neutral';
+    var changePctVal = priceData.changePct;
+    if (changePctVal == null && priceData.change != null && priceData.price != null) {
+      var prevClose = Number(priceData.price) - Number(priceData.change);
+      if (prevClose > 0) changePctVal = (Number(priceData.change) / prevClose) * 100;
+    }
+    var changeText = '—';
+    var changeClass = 'muted';
+    if (changePctVal != null && !isNaN(changePctVal) && isFinite(changePctVal)) {
+      changePctVal = Number(changePctVal);
+      var sign = changePctVal >= 0 ? '+' : '';
+      changeText = sign + changePctVal.toFixed(2) + '%';
+      changeClass = changePctVal >= 0.001 ? 'profit' : (changePctVal < -0.001 ? 'loss' : 'muted');
+    }
+
+    var thirdLabel = isPublished ? 'Distance to Entry' : 'P/L from Entry';
+    var thirdValue = '—';
+    var thirdClass = 'muted';
+    if (pl) {
+      if (isPublished) {
+        var distSign = pl.pl_pct >= 0 ? '+' : '';
+        thirdValue = distSign + pl.pl_pct.toFixed(2) + '%';
+        thirdClass = pl.pl_pct >= 0 ? 'muted' : 'loss';
+      } else {
+        var plSign = pl.pl_pct >= 0 ? '+' : '';
+        var rpSign = pl.pl_rp >= 0 ? '+' : '-';
+        thirdValue = plSign + pl.pl_pct.toFixed(2) + '% (' + rpSign + 'Rp ' + Math.abs(pl.pl_rp).toLocaleString('id-ID', {maximumFractionDigits: 0}) + ')';
+        thirdClass = pl.status;
+      }
+    }
+
+    return '<div class="pl-block ' + blockClass + '">' +
+      '<div class="pl-item"><span class="pl-label">Last Price</span><span class="pl-value live">' + fmtRp(cp) + '</span></div>' +
+      '<div class="pl-divider"></div>' +
+      '<div class="pl-item"><span class="pl-label">Today</span><span class="pl-value ' + changeClass + '">' + changeText + '</span></div>' +
+      '<div class="pl-divider"></div>' +
+      '<div class="pl-item"><span class="pl-label">' + thirdLabel + '</span><span class="pl-value ' + thirdClass + '">' + thirdValue + '</span></div>' +
+    '</div>';
+  } catch (err) {
+    console.error('[renderPLBlock]', err);
+    return '';
+  }
+}
+
+function renderPLBlockWithWarning(s, priceData) {
+  var html = renderPLBlock(s, priceData);
+  try {
+    var pl = computePL(s, priceData ? priceData.price : null);
+    if (pl && Math.abs(pl.pl_pct) > 50) {
+      html += '<div style="margin-top: 8px; padding: 8px 12px; background: rgba(239,68,68,0.1); border-left: 3px solid #ef4444; border-radius: 4px; font-size: 11px; color: #fca5a5;">' +
+        '<i class="fa-solid fa-triangle-exclamation" style="margin-right: 6px;"></i>' +
+        'Perhatian: Jarak harga sangat besar (' + pl.pl_pct.toFixed(1) + '%). Cek apakah input entry/skala sudah benar.' +
+      '</div>';
+    }
+  } catch (e) {}
+  return html;
+}
+
+// ============================================================
+// RENDER: STATUS BADGE
+// ============================================================
+function renderStatusBadge(s) {
+  var display = s.outcome || s.status || 'DRAFT';
+  var cls = getStatusClass(s);
+  return '<span class="status-badge ' + cls + '">' + safeText(display) + '</span>';
+}
+
+// ============================================================
+// RENDER: PROGRESS
+// ============================================================
+function computeProgress(s) {
+  if (!s) return { pct: 0, label: '', color: '#6b7280' };
+  if (s.status === 'DRAFT') return { pct: 0, label: 'Draft belum dipublikasi', color: '#6b7280' };
+  if (s.outcome === 'TP3') return { pct: 100, label: 'Semua target tercapai!', color: '#10b981' };
+  if (s.outcome === 'TP2') return { pct: 80, label: 'TP2 hit - TP3 menunggu', color: '#10b981' };
+  if (s.outcome === 'TP1') return { pct: 60, label: 'TP1 hit - menuju TP2', color: '#10b981' };
+  if (s.outcome === 'SL') return { pct: 100, label: 'Stop Loss hit', color: '#ef4444' };
+  if (s.status === 'ACTIVE') return { pct: 40, label: 'Harga di area entry', color: '#fbbf24' };
+  if (s.status === 'PUBLISHED') return { pct: 20, label: 'Menunggu harga masuk area entry', color: '#3b82f6' };
+  return { pct: 0, label: 'Status: ' + (s.status || '?'), color: '#6b7280' };
+}
+
+// ============================================================
+// RENDER: SIGNAL CARD
+// ============================================================
+function renderSignalCard(s) {
+  try {
+    var cardClass = getStatusClass(s);
+    var progress = computeProgress(s);
+    var ticker = safeText(s.ticker || '—');
+    var timeframe = safeText(s.timeframe || 'D1');
+    var priceData = priceCache[s.ticker] || null;
+
+    var entries = [s.entry_1, s.entry_2, s.entry_3].filter(function(x) { return x != null; });
+    var entryRange = '—';
+    if (entries.length > 1) {
+      entryRange = fmtRp(Math.min.apply(null, entries)) + ' – ' + fmtRp(Math.max.apply(null, entries));
+    } else if (entries.length === 1) {
+      entryRange = fmtRp(entries[0]);
+    }
+
+    var targets = [s.target_1, s.target_2, s.target_3].filter(function(x) { return x != null; });
+    var targetRange = targets.length ? targets.map(fmtRpShort).join(' / ') : '—';
+
+    var pubDate = s.published_at
+      ? new Date(s.published_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
+      : 'Belum dipublikasi';
+
+    return '<div class="signal-card ' + cardClass + '">' +
+      '<div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 4px;">' +
+        '<div style="flex: 1; min-width: 200px;">' +
+          '<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">' +
+            '<span class="mono" style="font-size: 22px; font-weight: 900; color: #fff;">' + ticker + '</span>' +
+            '<span class="mono" style="font-size: 10px; padding: 3px 8px; border-radius: 4px; background: #1E222D; color: #9ca3af;">' + timeframe + '</span>' +
+            renderStatusBadge(s) +
+          '</div>' +
+          '<div style="font-size: 12px; color: #6b7280; margin-top: 6px;">' + safeText(s.notes || '') + '</div>' +
+        '</div>' +
+        '<div style="text-align: right;">' +
+          '<div style="font-size: 10px; color: #6b7280; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Risk / Reward</div>' +
+          '<div class="mono" style="font-size: 18px; font-weight: 800; color: #fbbf24;">' + (s.risk_reward ? Number(s.risk_reward).toFixed(2) + 'R' : '—') + '</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="price-grid">' +
+        '<div class="price-item"><span class="price-label">Entry Range</span><span class="price-value entry">' + entryRange + '</span></div>' +
+        '<div class="price-item"><span class="price-label">Stop Loss</span><span class="price-value sl">' + fmtRp(s.stop_loss) + '</span></div>' +
+        '<div class="price-item"><span class="price-label">Target 1 / 2 / 3</span><span class="price-value tp">' + targetRange + '</span></div>' +
+        '<div class="price-item"><span class="price-label">Entry Avg</span><span class="price-value default">' + fmtRp(s.entry_avg) + '</span></div>' +
+      '</div>' +
+
+      renderPLBlockWithWarning(s, priceData) +
+
+      '<div class="progress-bar"><div class="progress-fill" style="width:' + progress.pct + '%; background:' + progress.color + ';"></div></div>' +
+      '<div class="progress-label">' + safeText(progress.label) + '</div>' +
+
+      '<div style="display: flex; align-items: center; justify-content: space-between; margin-top: 16px; flex-wrap: wrap; gap: 8px;">' +
+        '<div style="font-size: 10px; color: #6b7280;">Published: ' + pubDate + '</div>' +
+        '<a href="/?code=' + safeText(ticker) + '" class="filter-btn"><i class="fa-solid fa-chart-line"></i> Lihat Chart</a>' +
+      '</div>' +
+    '</div>';
+  } catch (err) {
+    console.error('[renderSignalCard]', s, err);
+    return '<div class="signal-card" style="border-left-color: #ef4444;"><div style="color: #ef4444; font-size: 12px;">Error render card: ' + safeText(err.message) + '</div></div>';
+  }
+}
+
+// ============================================================
+// RENDER SIGNALS
+// ============================================================
+function renderSignals() {
+  var container = document.getElementById('signalsList');
+  if (!container) return;
+
+  var signals = allSignals.slice();
+
+  if (currentFilter !== 'all') {
+    if (currentFilter === 'TP') {
+      signals = signals.filter(function(s) { return ['TP1','TP2','TP3'].indexOf(s.outcome) >= 0; });
+    } else if (currentFilter === 'SL') {
+      signals = signals.filter(function(s) { return s.outcome === 'SL'; });
+    } else {
+      signals = signals.filter(function(s) { return s.status === currentFilter; });
+    }
+  }
+
+  if (!signals.length) {
+    container.innerHTML = '<div class="empty-state">' +
+      '<i class="fa-solid fa-inbox"></i>' +
+      '<div>Belum ada signal' + (currentFilter !== 'all' ? ' untuk filter ini' : '') + '</div>' +
+      '</div>';
+    return;
+  }
+
+  var html = '';
+  for (var i = 0; i < signals.length; i++) {
+    html += renderSignalCard(signals[i]);
+  }
+  container.innerHTML = html;
+}
+
+// ============================================================
+// FILTER
+// ============================================================
+function setFilter(f, btn) {
+  currentFilter = f;
+  var btns = document.querySelectorAll('.filter-btn[data-filter]');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.toggle('active', btns[i] === btn);
+  }
+  renderSignals();
+}
+
+// ============================================================
+// LOAD SIGNALS
+// ============================================================
+async function loadSignals() {
+  var container = document.getElementById('signalsList');
+  if (!container) return;
+
+  container.innerHTML = '<div class="empty-state"><div class="loading-spinner"></div><div style="margin-top: 12px;">Memuat...</div></div>';
+
+  try {
+    var res = await fetch('/api/public/signals');
+    var data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Failed');
+
+    allSignals = data.signals || [];
+
+    // Stats
+    document.getElementById('statTotal').textContent = allSignals.length;
+    document.getElementById('statActive').textContent = allSignals.filter(function(s) { return s.status === 'ACTIVE'; }).length;
+
+    var closed = allSignals.filter(function(s) { return ['TP1','TP2','TP3','SL'].indexOf(s.outcome) >= 0; });
+    var wins = closed.filter(function(s) { return ['TP1','TP2','TP3'].indexOf(s.outcome) >= 0; }).length;
+    document.getElementById('statWinRate').textContent = closed.length ? Math.round(wins / closed.length * 100) + '%' : '—';
+    document.getElementById('statUpdated').textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+    // RENDER dulu (tanpa harga)
+    renderSignals();
+
+    // Fetch harga di background (non-blocking)
+    var tickers = allSignals.map(function(s) { return s.ticker; }).filter(Boolean);
+    var uniqueTickers = [];
+    for (var i = 0; i < tickers.length; i++) {
+      if (uniqueTickers.indexOf(tickers[i]) < 0) uniqueTickers.push(tickers[i]);
+    }
+
+    if (uniqueTickers.length > 0) {
+      fetchPrices(uniqueTickers).then(function(prices) {
+        priceCache = prices || {};
+        renderSignals();
+      }).catch(function(err) {
+        console.warn('Price fetch failed:', err);
+      });
+    }
+  } catch (err) {
+    console.error('[loadSignals]', err);
+    container.innerHTML = '<div class="empty-state">' +
+      '<i class="fa-solid fa-exclamation-triangle" style="color: #ef4444;"></i>' +
+      '<div style="margin-top: 12px; color: #ef4444;">Error: ' + safeText(err.message) + '</div>' +
+      '</div>';
+  }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+loadSignals();
+setInterval(loadSignals, 5 * 60 * 1000);
+</script>
+</body>
+</html>

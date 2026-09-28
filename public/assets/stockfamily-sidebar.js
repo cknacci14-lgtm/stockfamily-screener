@@ -34,14 +34,14 @@
       `
     },
     {
-      key: "backtest",
-      label: "Backtest",
-      href: "/backtest.html",
+      key: "signals",
+      label: "Signals",
+      href: "/signals.html",
       icon: `
         <svg viewBox="0 0 24 24">
-          <path d="M4 19V5"></path>
-          <path d="M4 19h16"></path>
-          <path d="m7 15 3-4 3 2 4-6"></path>
+          <circle cx="12" cy="12" r="9"></circle>
+          <circle cx="12" cy="12" r="5"></circle>
+          <circle cx="12" cy="12" r="1.5" fill="currentColor"></circle>
         </svg>
       `
     },
@@ -87,8 +87,8 @@
       return "screener";
     }
 
-    if (path.endsWith("/backtest.html")) {
-      return "backtest";
+    if (path.endsWith("/signals.html")) {
+      return "signals";
     }
 
     if (path.endsWith("/watchlist.html")) {
@@ -1010,7 +1010,7 @@
             "screener"
           ),
           hrefText.includes(
-            "backtest"
+            "signals"
           ),
           hrefText.includes(
             "watchlist"
