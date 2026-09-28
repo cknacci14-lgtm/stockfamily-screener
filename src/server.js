@@ -1,4 +1,4 @@
-// src/server.js - FIX V2.4 - Express v5 Safe Routing
+﻿// src/server.js - FIX V2.4 - Express v5 Safe Routing
 const fs = require('fs');
 const express = require('express');
 const path = require('path');
@@ -9,6 +9,7 @@ const { createClient } = require('@supabase/supabase-js');
 const { runQbsProductionSnapshot, clearProductionCache } = require('./services/qbsProductionService');
 const gemScoreRoute = require('./routes/gemScoreRoute');
 const { buildSmartwatchlist } = require('./services/smartwatchlistService');
+const { buildSignalCenter } = require('./services/signalCenterService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,7 +28,7 @@ try {
   backtestEngine = require('./engine/backtestEngine');
   console.log('[OK] Backtest Engine loaded');
 } catch (e) { 
-    console.error('❌ Backtest Engine:', e.message);
+    console.error('âŒ Backtest Engine:', e.message);
 }
 
 app.use((req, res, next) => {
@@ -273,9 +274,9 @@ app.post('/api/admin/upload-multiple', upload.array('excelFiles'), async (req, r
       // === AUTO-BACKUP: Simpan file ke folder archive ===
       const archiveResult = saveExcelToArchive(file.buffer, filename);
       if (archiveResult.saved) {
-        console.log(`[UPLOAD] ✅ Archived to: ${archiveResult.path}`);
+        console.log(`[UPLOAD] âœ… Archived to: ${archiveResult.path}`);
       } else {
-        console.warn(`[UPLOAD] ⚠️ Archive failed: ${archiveResult.reason}`);
+        console.warn(`[UPLOAD] âš ï¸ Archive failed: ${archiveResult.reason}`);
       }
 
       const wb = xlsx.read(file.buffer, { type: 'buffer' });
@@ -455,6 +456,63 @@ app.get('/api/public/watchlist', async (req, res) => {
   }
 });
 
+
+/*
+ * CHARTNALIST — Signal Center
+ *
+ * Adapter/view endpoint only.
+ * Signal Engine remains authoritative.
+ */
+app.get('/api/public/signal-center', async (req, res) => {
+  try {
+    const rawCodes = String(req.query.codes || '').trim();
+
+    const codes = rawCodes
+      ? rawCodes
+          .split(',')
+          .map(code => code.trim().toUpperCase())
+          .filter(Boolean)
+      : [];
+
+    /*
+     * buildSmartwatchlist() intentionally treats an empty code list
+     * as an empty watchlist. Signal Center therefore needs the
+     * universe explicitly when no codes are supplied.
+     *
+     * Fetch the stock universe here, then pass the codes into the
+     * existing authoritative adapter.
+     */
+    let universe = codes;
+
+    if (!universe.length) {
+      const { data, error } = await supabase
+        .from('stocks')
+        .select('code')
+        .order('code', { ascending: true });
+
+      if (error) {
+        throw error;
+      }
+
+      universe = (data || [])
+        .map(row => String(row.code || '').trim().toUpperCase())
+        .filter(Boolean);
+    }
+
+    const result = await buildSignalCenter(universe);
+
+    res.setHeader('Cache-Control', 'no-store');
+    res.json(result);
+  } catch (error) {
+    console.error('[Signal Center] error:', error);
+
+    res.status(500).json({
+      success: false,
+      error: 'SIGNAL_CENTER_ERROR',
+      message: error?.message || String(error),
+    });
+  }
+});
 app.get('/api/public/smartwatchlist', async (req, res) => {
   try {
     const codes = (req.query.codes || '')
@@ -552,6 +610,137 @@ app.get('/api/bid-offer', async (req, res) => {
 });
 
 // === FUNDAMENTAL endpoint (dari Supabase) ===
+
+// === SCREENER BLOCK TRADE (v2 - with Quality Score) ===
+app.get('/api/screener/block-trade', async (req, res) => {
+  try {
+    const days = parseInt(req.query.days) || 30;
+    const minVol = parseInt(req.query.minVol) || 5000000;
+    const phaseFilter = (req.query.phase || 'all').toLowerCase();
+    const limit = Math.min(parseInt(req.query.limit) || 50, 100);
+
+    const latestDate = await getLatestTradeDate();
+    if (!latestDate) return res.status(404).json({ error: 'No data' });
+
+    const endDate = new Date(latestDate);
+    const startDate = new Date(endDate);
+    startDate.setDate(startDate.getDate() - days);
+    const startStr = startDate.toISOString().slice(0, 10);
+
+    const { data: btRows, error: btErr } = await supabase
+      .from('daily_stock_data')
+      .select('stock_id, trade_date, close, high, low, open, volume, value, non_regular_volume, non_regular_value, non_regular_frequency')
+      .gte('trade_date', startStr)
+      .lte('trade_date', latestDate)
+      .gt('non_regular_volume', 0)
+      .order('trade_date', { ascending: false });
+    if (btErr) throw btErr;
+
+    const { data: stocks } = await supabase.from('stocks').select('id, code, name');
+    const stockMap = {};
+    stocks.forEach(s => stockMap[s.id] = s);
+
+    const byStock = {};
+    btRows.forEach(r => {
+      const sid = r.stock_id;
+      if (!byStock[sid]) byStock[sid] = {
+        stock_id: sid, bt_volume: 0, bt_value: 0, bt_count: 0, dates: [],
+        latest_close: Number(r.close), latest_date: r.trade_date
+      };
+      const btVol = Number(r.non_regular_volume) || 0;
+      if (btVol >= minVol) {
+        byStock[sid].bt_volume += btVol;
+        byStock[sid].bt_value += Number(r.non_regular_value) || 0;
+        byStock[sid].bt_count++;
+        byStock[sid].dates.push({ date: r.trade_date, volume: btVol, value: Number(r.non_regular_value) || 0, close: Number(r.close) });
+        if (r.trade_date > byStock[sid].latest_date) {
+          byStock[sid].latest_close = Number(r.close);
+          byStock[sid].latest_date = r.trade_date;
+        }
+      }
+    });
+
+    const stockIds = Object.keys(byStock).map(Number);
+    if (!stockIds.length) return res.json({ success: true, filter: { days, minVol, phase: phaseFilter }, totalMatched: 0, returned: 0, stocks: [] });
+
+    const { data: candles } = await supabase
+      .from('daily_stock_data')
+      .select('stock_id, trade_date, close, high, low, volume')
+      .in('stock_id', stockIds)
+      .gte('trade_date', startStr)
+      .lte('trade_date', latestDate)
+      .order('trade_date', { ascending: true });
+
+    const candlesByStock = {};
+    (candles || []).forEach(c => {
+      if (!candlesByStock[c.stock_id]) candlesByStock[c.stock_id] = [];
+      candlesByStock[c.stock_id].push(c);
+    });
+
+    function detectPhase(stockData, candles) {
+      if (!candles || candles.length < 3) return { phase: 'NEUTRAL', color: '#64748B', detail: 'Data kurang', weight: 0 };
+      const closes = candles.map(c => Number(c.close));
+      const highs = candles.map(c => Number(c.high));
+      const lows = candles.map(c => Number(c.low));
+      const firstClose = closes[0];
+      const lastClose = closes[closes.length - 1];
+      const priceChange = (lastClose - firstClose) / firstClose;
+      const hi = Math.max(...highs);
+      const lo = Math.min(...lows);
+      const range = hi - lo;
+      const pos = range > 0 ? (lastClose - lo) / range : 0.5;
+      
+      if (priceChange > 0.05) return { phase: 'MARKUP', color: '#00E5FF', detail: 'Harga naik tajam', weight: 80 };
+      if (priceChange < -0.05) return { phase: 'MARKDOWN', color: '#FFB300', detail: 'Harga turun tajam', weight: 10 };
+      if (pos > 0.65 && Math.abs(priceChange) < 0.05) return { phase: 'DISTRIBUSI', color: '#FF5252', detail: 'BT tinggi @ puncak', weight: 60 };
+      if (pos < 0.35 && Math.abs(priceChange) < 0.05) return { phase: 'AKUMULASI', color: '#00E676', detail: 'BT tinggi @ dasar', weight: 100 };
+      return { phase: 'KONSOLIDASI', color: '#64748B', detail: 'Mixed signal', weight: 20 };
+    }
+
+    // === QUALITY SCORE ===
+    function calculateScore(volume, phaseWeight, count) {
+      const volScore = Math.min(Math.log10(volume + 1) * 12, 100);
+      const countBonus = Math.min(count * 5, 30);
+      const score = (volScore * 0.3) + (phaseWeight * 0.5) + (countBonus * 0.2);
+      return Math.round(score);
+    }
+
+    const results = [];
+    for (const sid of stockIds) {
+      const sd = byStock[sid];
+      const stock = stockMap[sid];
+      if (!stock) continue;
+      const phaseInfo = detectPhase(sd, candlesByStock[sid] || []);
+      if (phaseFilter !== 'all' && phaseInfo.phase.toLowerCase() !== phaseFilter) continue;
+      
+      const score = calculateScore(sd.bt_volume, phaseInfo.weight, sd.bt_count);
+      
+      results.push({
+        code: stock.code, name: stock.name,
+        phase: phaseInfo.phase, phase_color: phaseInfo.color, phase_detail: phaseInfo.detail,
+        score: score,
+        bt_volume: sd.bt_volume, bt_value: sd.bt_value, bt_count: sd.bt_count,
+        latest_close: sd.latest_close, latest_date: sd.latest_date,
+        latest_bt: sd.dates[0] || null
+      });
+    }
+
+    // Sort by SCORE (bukan volume)
+    results.sort((a, b) => b.score - a.score);
+    const top = results.slice(0, limit);
+
+    res.json({
+      success: true,
+      filter: { days, minVol, phase: phaseFilter },
+      totalMatched: results.length,
+      returned: top.length,
+      stocks: top
+    });
+  } catch (err) {
+    console.error('[screener-bt]', err);
+    res.status(500).json({ error: err.message });
+  }
+});
 app.get('/api/fundamental/:code', async (req, res) => {
   try {
     const code = String(req.params.code || '').trim().toUpperCase();
@@ -1028,7 +1217,7 @@ function scheduleGemRefresh() {
     }
   }, 60 * 1000);
 
-  console.log('[GEM Auto] Scheduler aktif — refresh setiap hari jam 18:30 WIB');
+  console.log('[GEM Auto] Scheduler aktif â€” refresh setiap hari jam 18:30 WIB');
 }
 
 if (require.main === module) {
@@ -1037,3 +1226,4 @@ if (require.main === module) {
 }
 
 module.exports = app;
+

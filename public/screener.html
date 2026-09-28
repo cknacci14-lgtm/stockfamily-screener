@@ -1042,17 +1042,38 @@
 
           grid.innerHTML = "";
 
+          const qbsTargetDate =
+            rawData?.targetDate || "";
+
+          const qbsData =
+            rawData?.data?.[0] || {};
+
+          const symbolsEvaluated =
+            Number(qbsData.symbolsEvaluated);
+
           showEmpty(
-            "Tidak ada QBS signal",
-            "Tidak ada event QBS pada scan terakhir."
+            "NO QUALIFYING QBS EVENT",
+            [
+              "Latest completed market session.",
+              qbsTargetDate
+                ? `Scan: ${formatDate(qbsTargetDate)}`
+                : "Scan date unavailable.",
+              Number.isFinite(symbolsEvaluated)
+                ? `${symbolsEvaluated.toLocaleString("en-US")} symbols evaluated.`
+                : "Symbol evaluation count unavailable.",
+              "No event currently meets the canonical QBS detection contract."
+            ].join(" ")
           );
 
           document.getElementById(
             "scanDate"
-          ).textContent = "—";
+          ).textContent =
+            qbsTargetDate
+              ? formatDate(qbsTargetDate)
+              : "—";
 
           status.textContent =
-            "NO SIGNAL";
+            "0 EVENTS DETECTED";
 
           return;
         }
@@ -1091,7 +1112,7 @@
       } catch (error) {
 
         console.error(
-          "StockFamily QBS Screener:",
+          "CHARTNALIST QBS Screener:",
           error
         );
 
@@ -1250,6 +1271,8 @@ function closeResearchDetail(){
 <script src="/assets/chartnalist-typography.js"></script>
 </body>
 </html>
+
+
 
 
 

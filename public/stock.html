@@ -531,6 +531,109 @@
     }
 
   </style>
+<style id="execution-monitor-style">
+.execution-monitor {
+  margin: 0 0 16px;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 10px;
+  background: rgba(255,255,255,.025);
+}
+.execution-monitor-head {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:14px;
+}
+.execution-monitor-title {
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.08em;
+  color:#9AA3AA;
+}
+.execution-state {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  min-height:24px;
+  padding:0 9px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:999px;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.06em;
+}
+.execution-state::before {
+  content:"";
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#9AA3AA;
+}
+.execution-state.WATCH {
+  color:#F5B700;
+  border-color:rgba(245,183,0,.30);
+  background:rgba(245,183,0,.07);
+}
+.execution-state.WATCH::before { background:#F5B700; }
+.execution-state.TRIGGERED {
+  color:#00D9FF;
+  border-color:rgba(0,217,255,.30);
+  background:rgba(0,217,255,.07);
+}
+.execution-state.TRIGGERED::before { background:#00D9FF; }
+.execution-state.ACTIVE,
+.execution-state.TARGET {
+  color:#00D084;
+  border-color:rgba(0,208,132,.30);
+  background:rgba(0,208,132,.07);
+}
+.execution-state.ACTIVE::before,
+.execution-state.TARGET::before { background:#00D084; }
+.execution-state.INVALIDATED {
+  color:#FF4D4D;
+  border-color:rgba(255,77,77,.30);
+  background:rgba(255,77,77,.07);
+}
+.execution-state.INVALIDATED::before { background:#FF4D4D; }
+.execution-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+.execution-item {
+  padding:10px;
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:8px;
+  background:rgba(0,0,0,.12);
+}
+.execution-label {
+  margin-bottom:5px;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.07em;
+  color:#626B72;
+  text-transform:uppercase;
+}
+.execution-value {
+  font-size:13px;
+  font-weight:800;
+  color:#F5F7F8;
+}
+.execution-value.muted { color:#9AA3AA; }
+.execution-value.positive { color:#00D084; }
+.execution-value.warning { color:#F5B700; }
+.execution-value.negative { color:#FF4D4D; }
+.execution-meta {
+  margin-top:10px;
+  font-size:9px;
+  color:#626B72;
+}
+@media (max-width:640px) {
+  .execution-grid { grid-template-columns:1fr; }
+}
+</style>
 </head>
 
 <body>
@@ -592,7 +695,57 @@
         </div>
 
         
-    <div class="smartwatchlist-action">
+    <div id="executionMonitor" class="execution-monitor" hidden>
+  <div class="execution-monitor-head">
+    <div class="execution-monitor-title">EXECUTION MONITOR</div>
+    <div id="executionState" class="execution-state OBSERVE">OBSERVE</div>
+  </div>
+
+  <div class="execution-grid">
+    <div class="execution-item">
+      <div class="execution-label">Setup</div>
+      <div id="executionSetup" class="execution-value muted">—</div>
+    </div>
+
+    <div class="execution-item">
+      <div class="execution-label">Current</div>
+      <div id="executionCurrent" class="execution-value">—</div>
+    </div>
+
+    <div class="execution-item">
+      <div class="execution-label">Trigger</div>
+      <div id="executionTrigger" class="execution-value">—</div>
+    </div>
+
+    <div class="execution-item">
+      <div class="execution-label">Invalidation</div>
+      <div id="executionInvalidation" class="execution-value negative">—</div>
+    </div>
+
+    <div class="execution-item">
+      <div class="execution-label">Target 1</div>
+      <div id="executionTarget1" class="execution-value positive">—</div>
+    </div>
+
+    <div class="execution-item">
+      <div class="execution-label">Target 2</div>
+      <div id="executionTarget2" class="execution-value positive">—</div>
+    </div>
+
+    <div class="execution-item">
+      <div class="execution-label">Risk</div>
+      <div id="executionRisk" class="execution-value warning">—</div>
+    </div>
+
+    <div class="execution-item">
+      <div class="execution-label">Risk / Reward</div>
+      <div id="executionRR" class="execution-value">—</div>
+    </div>
+  </div>
+
+  <div id="executionMeta" class="execution-meta">Signal Engine output.</div>
+</div>
+<div class="smartwatchlist-action">
       <button
         type="button"
         id="smartwatchlistBtn"
@@ -766,6 +919,10 @@
   }
 
   function renderSignal(signal) {
+  renderExecutionMonitor(
+    signal,
+    Number(document.getElementById("price")?.textContent?.replace(/[^0-9.-]/g, "")) || undefined
+  );
     if (!signal) {
       resetSignal();
       return;
@@ -1429,8 +1586,55 @@
 
   </script>
 
+<script id="execution-monitor-script">
+function renderExecutionMonitor(signal, currentPrice) {
+  const monitor = document.getElementById("executionMonitor");
+  if (!monitor) return;
+
+  if (!signal) {
+    monitor.hidden = true;
+    return;
+  }
+
+  const state = String(signal.status || "OBSERVE").toUpperCase();
+  const setup = String(signal.setup || "—").toUpperCase();
+  const plan = signal.tradePlan || {};
+
+  const stateEl = document.getElementById("executionState");
+  const setupEl = document.getElementById("executionSetup");
+  const currentEl = document.getElementById("executionCurrent");
+  const triggerEl = document.getElementById("executionTrigger");
+  const invalidationEl = document.getElementById("executionInvalidation");
+  const target1El = document.getElementById("executionTarget1");
+  const target2El = document.getElementById("executionTarget2");
+  const riskEl = document.getElementById("executionRisk");
+  const rrEl = document.getElementById("executionRR");
+  const metaEl = document.getElementById("executionMeta");
+
+  stateEl.className = "execution-state " + state;
+  stateEl.textContent = state;
+
+  setupEl.textContent = setup;
+  currentEl.textContent = formatPrice(currentPrice);
+  triggerEl.textContent = formatPrice(plan.trigger);
+  invalidationEl.textContent = formatPrice(plan.invalidation);
+  target1El.textContent = formatPrice(plan.target1);
+  target2El.textContent = formatPrice(plan.target2);
+
+  riskEl.textContent = signal.riskLevel || plan.riskLevel || "—";
+  rrEl.textContent = formatRR(plan.riskReward);
+
+  const date = signal.latestTradeDate || signal.updatedAt || "";
+  metaEl.textContent = date
+    ? "Signal Engine output • " + date
+    : "Signal Engine output.";
+
+  monitor.hidden = false;
+}
+</script>
 </body>
 </html>
+
 
 
 

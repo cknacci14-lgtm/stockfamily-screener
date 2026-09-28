@@ -391,6 +391,16 @@
   background:rgba(0,208,132,.09);
   border:1px solid rgba(0,208,132,.24);
 }
+.lifecycle-badge.TARGET {
+  color:#00D084;
+  background:rgba(0,208,132,.10);
+  border-color:rgba(0,208,132,.28);
+}
+.lifecycle-badge.INVALIDATED {
+  color:#FF4D4D;
+  background:rgba(255,77,77,.08);
+  border-color:rgba(255,77,77,.24);
+}
 .lifecycle-badge.WATCH,
 .lifecycle-badge.OBSERVE {
   color:#F5B700;
@@ -456,6 +466,8 @@
         <button class="filter" data-filter="WATCH">WATCH <span class="filter-count" data-count="WATCH">0</span></button>
         <button class="filter" data-filter="TRIGGERED">TRIGGERED <span class="filter-count" data-count="TRIGGERED">0</span></button>
         <button class="filter" data-filter="ACTIVE">ACTIVE <span class="filter-count" data-count="ACTIVE">0</span></button>
+        <button class="filter" data-filter="TARGET">TARGET <span class="filter-count" data-count="TARGET">0</span></button>
+        <button class="filter" data-filter="INVALIDATED">INVALIDATED <span class="filter-count" data-count="INVALIDATED">0</span></button>
       </div>
 
       <button class="refresh" id="refreshBtn">REFRESH</button>
@@ -538,6 +550,8 @@
         WATCH: state.all.filter(row => row.status === "WATCH").length,
         TRIGGERED: state.all.filter(row => row.status === "TRIGGERED").length,
         ACTIVE: state.all.filter(row => row.status === "ACTIVE").length,
+        TARGET: state.all.filter(row => row.status === "TARGET").length,
+        INVALIDATED: state.all.filter(row => row.status === "INVALIDATED").length,
       };
 
       Object.entries(counts).forEach(([status, count]) => {
@@ -767,6 +781,7 @@
 })();
 </script></body>
 </html>
+
 
 
 

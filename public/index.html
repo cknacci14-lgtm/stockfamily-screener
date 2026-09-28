@@ -2381,8 +2381,20 @@
 /* 3. Bars wrapper tetap proporsional */
 #btHistoryPanel .bt-bars-wrapper {
   height: 100px !important;
-  overflow: hidden !important;
+  !important;
 }
+</style><style id="tooltip-overflow-fix">
+/* Ketika hover ke bar-wrapper, biarkan tooltip keluar dari bars-wrapper */
+.bt-bars-wrapper:has(.bt-bar-wrapper:hover) { overflow: visible !important; }
+.bt-bars-wrapper:hover { overflow: visible !important; }
+
+/* Extra safety: z-index tinggi untuk tooltip */
+.bt-bar-tooltip { z-index: 9999 !important; }
+
+/* Tambah margin-top supaya tooltip tidak terpotong oleh header panel di atas */
+.bt-chart-area { padding-top: 20px !important; }
+</style><style id="overflow-override">
+.bt-bars-wrapper { overflow: visible !important; }
 </style></head>
 <body class="bg-idx-bg text-slate-200 font-sans antialiased h-screen flex flex-col select-none">
 
