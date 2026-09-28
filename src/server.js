@@ -27,7 +27,7 @@ try {
   backtestEngine = require('./engine/backtestEngine');
   console.log('[OK] Backtest Engine loaded');
 } catch (e) { 
-  console.error('Ã¢ÂÅ’ Backtest Engine:', e.message); 
+    console.error('❌ Backtest Engine:', e.message);
 }
 
 app.use((req, res, next) => {
@@ -974,7 +974,7 @@ function scheduleGemRefresh() {
     }
   }, 60 * 1000);
 
-  console.log('[GEM Auto] Scheduler aktif â€” refresh setiap hari jam 18:30 WIB');
+  console.log('[GEM Auto] Scheduler aktif — refresh setiap hari jam 18:30 WIB');
 }
 
 if (require.main === module) {
