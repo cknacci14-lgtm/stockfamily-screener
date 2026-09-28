@@ -186,6 +186,10 @@
     #chart {
       height:570px;
       width:100%;
+      resize: vertical;
+      overflow: hidden;
+      min-height: 300px;
+      max-height: 1000px;
     }
 
     .chart-status {
@@ -421,6 +425,10 @@
 
       #chart {
         height:500px;
+      resize: vertical;
+      overflow: hidden;
+      min-height: 300px;
+      max-height: 1000px;
       }
     }
 
@@ -445,6 +453,10 @@
 
       #chart {
         height:420px;
+      resize: vertical;
+      overflow: hidden;
+      min-height: 300px;
+      max-height: 1000px;
       }
     }
   </style>
@@ -667,9 +679,7 @@
         </div>
 
         <div class="range-tabs">
-          <button class="range-tab" data-range="3mo">3M</button>
-          <button class="range-tab active" data-range="6mo">6M</button>
-          <button class="range-tab" data-range="1y">1Y</button>
+          <span class="range-tab active" style="cursor:default;">1Y</span>
         </div>
       </div>
 
@@ -839,13 +849,15 @@
 
   const $ = id => document.getElementById(id);
 
-  let currentRange = "6mo";
+  let currentRange = "1y";
   let chart = null;
   let candleSeries = null;
   let closeSeries = null;
   let highSeries = null;
   let lowSeries = null;
   let volumeSeries = null;
+  let sma20Series = null;
+  let sma50Series = null;
   let tradePlanLines = [];
 
   const fmt = value => {
@@ -989,7 +1001,17 @@
     chart = LightweightCharts.createChart(el, {
       layout: {
         background: { color: "#0a0d0f" },
-        textColor: "#7f8a91"
+        textColor: "#7f8a91",
+        attributionLogo: false
+      },
+      
+      watermark: {
+        visible: true,
+        text: "CHARTNALIST",
+        fontSize: 28,
+        color: "rgba(127, 138, 145, 0.06)",
+        horzAlign: "center",
+        vertAlign: "center"
       },
 
       grid: {
@@ -1002,7 +1024,13 @@
       },
 
       rightPriceScale: {
-        borderColor: "#20262a"
+        borderColor: "#20262a",
+        visible: true,
+        borderVisible: true,
+        scaleMargins: {
+          top: 0.05,
+          bottom: 0.38
+        }
       },
 
       timeScale: {
@@ -1056,11 +1084,34 @@
 
     volumeSeries = chart.addHistogramSeries({
       priceFormat: { type: "volume" },
-      priceScaleId: "",
+      priceScaleId: "volume_scale",
+      priceLineVisible: false,
+      lastValueVisible: false
+    });
+
+    // === APPLY VOLUME SCALE MARGINS (buat volume terpisah dari chart) ===
+    chart.priceScale('volume_scale').applyOptions({
       scaleMargins: {
-        top: 0.82,
-        bottom: 0
+        top: 0.68,
+        bottom: 0.02
       }
+    });
+
+    // === SMA20 & SMA50 LINES ===
+    sma20Series = chart.addLineSeries({
+      color: "#00E5FF",
+      lineWidth: 1,
+      priceLineVisible: false,
+      lastValueVisible: false,
+      crosshairMarkerVisible: false
+    });
+
+    sma50Series = chart.addLineSeries({
+      color: "#FFB300",
+      lineWidth: 1,
+      priceLineVisible: false,
+      lastValueVisible: false,
+      crosshairMarkerVisible: false
     });
 
     window.addEventListener("resize", () => {
@@ -1168,15 +1219,32 @@
      * inventing an Open price.
      */
 
+    // === FALLBACK OPEN: pakai previous close kalau open=0 ===
+    const getFallbackOpen = (idx) => {
+      // Cari previous close yang valid
+      for (let i = idx - 1; i >= 0; i--) {
+        const pc = Number(rows[i].close);
+        if (Number.isFinite(pc) && pc > 0) return pc;
+      }
+      return null;
+    };
+
     const candleData = rows
       .filter(validCandle)
-      .map(r => ({
-        time: r.time,
-        open: Number(r.open),
-        high: Number(r.high),
-        low: Number(r.low),
-        close: Number(r.close)
-      }));
+      .map((r, idx) => {
+        let open = Number(r.open);
+        if (!Number.isFinite(open) || open <= 0) {
+          const fallback = getFallbackOpen(idx);
+          open = fallback || Number(r.close);
+        }
+        return {
+          time: r.time,
+          open: open,
+          high: Number(r.high),
+          low: Number(r.low),
+          close: Number(r.close)
+        };
+      });
 
     const closeData = rows
       .map(r => ({
@@ -1218,10 +1286,8 @@
       }))
       .filter(r => r.value > 0);
 
-    const hasUnavailableOpen = rows.some(r => {
-      const open = Number(r.open);
-      return !Number.isFinite(open) || open <= 0;
-    });
+    // === HLCMode disabled — open selalu di-fallback ===
+    const hasUnavailableOpen = false;
 
     const latestRow = rows.length
       ? rows[rows.length - 1]
@@ -1238,6 +1304,50 @@
     highSeries.setData(highData);
     lowSeries.setData(lowData);
     volumeSeries.setData(volumeData);
+
+    // === SMA CALCULATION ===
+    const calcSMA = (data, period) => {
+      const out = [];
+      for (let i = period - 1; i < data.length; i++) {
+        let sum = 0;
+        for (let j = 0; j < period; j++) sum += data[i - j].value;
+        out.push({ time: data[i].time, value: sum / period });
+      }
+      return out;
+    };
+
+    if (sma20Series && closeData.length >= 20) {
+      sma20Series.setData(calcSMA(closeData, 20));
+    }
+    if (sma50Series && closeData.length >= 50) {
+      sma50Series.setData(calcSMA(closeData, 50));
+    }
+
+    // === BLOCK TRADE MARKERS ===
+    const _btRows = Array.isArray(data.nonRegular) ? data.nonRegular.slice() : [];
+    const _btMarkers = _btRows
+      .filter(bt => Number(bt.volume) > 0)
+      .sort((a, b) => Number(b.volume) - Number(a.volume))
+      .slice(0, 5)
+      .map(bt => {
+        const vol = Number(bt.volume);
+        const volText = vol >= 1e9 ? (vol/1e9).toFixed(1) + 'B'
+                       : vol >= 1e6 ? (vol/1e6).toFixed(0) + 'M'
+                       : vol >= 1e3 ? (vol/1e3).toFixed(0) + 'K'
+                       : String(vol);
+        return {
+          time: bt.time,
+          position: 'aboveBar',
+          color: '#A855F7',
+          shape: 'arrowDown',
+          text: volText,
+          size: 1
+        };
+      });
+
+    if (candleSeries) {
+      candleSeries.setMarkers(_btMarkers);
+    }
 
     if (useHLCMode) {
       candleSeries.applyOptions({
@@ -1293,6 +1403,19 @@
     );
 
     chart.timeScale().fitContent();
+
+    // === AUTO RESIZE CHART ===
+    const chartContainer = document.getElementById("chart");
+    if (chartContainer) {
+      new ResizeObserver(entries => {
+        for (const entry of entries) {
+          const { width, height } = entry.contentRect;
+          if (width > 0 && height > 0 && chart) {
+            chart.applyOptions({ width, height });
+          }
+        }
+      }).observe(chartContainer);
+    }
 
     const modeLabel = useHLCMode
       ? "H/L/C · Open unavailable"
@@ -1591,6 +1714,21 @@ function renderExecutionMonitor(signal, currentPrice) {
   const monitor = document.getElementById("executionMonitor");
   if (!monitor) return;
 
+  // Local formatter: Execution Monitor must not depend on Stock Detail scope.
+  const monitorFmt = value => {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "—";
+    return n.toLocaleString("id-ID", {
+      maximumFractionDigits: 2
+    });
+  };
+
+  const monitorFmtRR = value => {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "—";
+    return `${n.toFixed(2)}R`;
+  };
+
   if (!signal) {
     monitor.hidden = true;
     return;
@@ -1598,7 +1736,17 @@ function renderExecutionMonitor(signal, currentPrice) {
 
   const state = String(signal.status || "OBSERVE").toUpperCase();
   const setup = String(signal.setup || "—").toUpperCase();
-  const plan = signal.tradePlan || {};
+
+  // Smartwatchlist / Signal Center contract exposes trade-plan fields flat.
+  // Do not create or recalculate a new trade plan here.
+  const plan = {
+    trigger: signal.trigger,
+    invalidation: signal.invalidation,
+    target1: signal.target1,
+    target2: signal.target2,
+    riskReward: signal.riskReward,
+    riskLevel: signal.riskLevel
+  };
 
   const stateEl = document.getElementById("executionState");
   const setupEl = document.getElementById("executionSetup");
@@ -1615,14 +1763,14 @@ function renderExecutionMonitor(signal, currentPrice) {
   stateEl.textContent = state;
 
   setupEl.textContent = setup;
-  currentEl.textContent = formatPrice(currentPrice);
-  triggerEl.textContent = formatPrice(plan.trigger);
-  invalidationEl.textContent = formatPrice(plan.invalidation);
-  target1El.textContent = formatPrice(plan.target1);
-  target2El.textContent = formatPrice(plan.target2);
+  currentEl.textContent = monitorFmt(currentPrice);
+  triggerEl.textContent = monitorFmt(plan.trigger);
+  invalidationEl.textContent = monitorFmt(plan.invalidation);
+  target1El.textContent = monitorFmt(plan.target1);
+  target2El.textContent = monitorFmt(plan.target2);
 
   riskEl.textContent = signal.riskLevel || plan.riskLevel || "—";
-  rrEl.textContent = formatRR(plan.riskReward);
+  rrEl.textContent = monitorFmtRR(plan.riskReward);
 
   const date = signal.latestTradeDate || signal.updatedAt || "";
   metaEl.textContent = date
@@ -1634,6 +1782,9 @@ function renderExecutionMonitor(signal, currentPrice) {
 </script>
 </body>
 </html>
+
+
+
 
 
 
