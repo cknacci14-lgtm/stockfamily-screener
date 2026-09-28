@@ -1,0 +1,53 @@
+﻿name: Monitor Signals
+
+on:
+  # Cron: setiap 15 menit
+  schedule:
+    - cron: '*/15 * * * *'
+  
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (no DB changes)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm install
+      
+      - name: Run monitor
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          ARJUM_API_KEY: ${{ secrets.ARJUM_API_KEY }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            node scripts/monitor-signals.js --dry-run
+          else
+            node scripts/monitor-signals.js
+          fi
+      
+      - name: Log completion
+        if: always()
+        run: echo "Monitor job completed at $(date)"
