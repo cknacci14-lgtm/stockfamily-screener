@@ -185,7 +185,7 @@ async function calculateSignalCenter(normalized, cacheKey) {
 
   return payload;
 }
-async function buildSignalCenter(codes = []) {
+async function buildSignalCenter(codes = [], options = {}) {
   const normalized = [
     ...new Set(
       (codes || [])
@@ -215,10 +215,12 @@ async function buildSignalCenter(codes = []) {
    * Explicit ticker requests continue to use the authoritative
    * Smartwatchlist calculation.
    */
-  if (cacheKey === '') {
+  const fullUniverse = options.fullUniverse === true;
+
+  if (fullUniverse) {
     const snapshot = readSnapshot();
 
-    if (snapshot) {
+    if (snapshot && snapshot.date) {
       cache = {
         timestamp: Date.now(),
         data: {
@@ -254,4 +256,5 @@ module.exports = {
   readSnapshot,
   writeSnapshot,
 };
+
 

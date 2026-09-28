@@ -499,7 +499,12 @@ app.get('/api/public/signal-center', async (req, res) => {
         .filter(Boolean);
     }
 
-    const result = await buildSignalCenter(universe);
+    const result = await buildSignalCenter(
+      universe,
+      {
+        fullUniverse: !rawCodes,
+      }
+    );
 
     res.setHeader('Cache-Control', 'no-store');
     res.json(result);
@@ -1495,4 +1500,5 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
 
