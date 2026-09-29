@@ -10,6 +10,8 @@ try {
   // dotenv tidak terinstall — skip (GitHub Actions case)
 }
 
+const { notifySignalEvent } = require('./telegram-notifier.js');
+
 const SUPABASE_URL = (process.env.SUPABASE_URL || '').trim();
 const SUPABASE_KEY = (process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
 const ARJUM_KEY = (process.env.ARJUM_API_KEY || '').trim();
@@ -243,6 +245,15 @@ async function main() {
         })
       });
       console.log('✅ #' + u.update.id + ' ' + u.signal.ticker + ' — ' + u.event);
+      
+      // Kirim notifikasi Telegram
+      console.log('   📤 Sending Telegram notif...');
+      const notifResult = await notifySignalEvent(u.signal, u.event, u.price);
+      if (notifResult.success) {
+        console.log('   ✅ Telegram sent');
+      } else {
+        console.log('   ⚠️  Telegram failed: ' + (notifResult.error || 'unknown'));
+      }
     } catch (err) {
       console.error('❌ #' + u.update.id + ' ' + u.signal.ticker + ' — ' + err.message);
     }
