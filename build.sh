@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 # Cloudflare Pages build script
 # Skip heavy dependencies (puppeteer, express, dll)
 
