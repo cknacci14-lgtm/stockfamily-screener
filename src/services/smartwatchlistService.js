@@ -1,7 +1,7 @@
-"use strict";
+﻿"use strict";
 
 /*
- * CHARTNALIST — Smartwatchlist Adapter
+ * CHARTNALIST â€” Smartwatchlist Adapter
  *
  * This file is ONLY an adapter/view layer.
  *
@@ -16,13 +16,13 @@
  * Pipeline:
  *
  * daily_stock_data
- *      ↓
+ *      â†“
  * SignalEngineInput
- *      ↓
+ *      â†“
  * evaluateStockSignal()
- *      ↓
+ *      â†“
  * Setup + Risk + Lifecycle
- *      ↓
+ *      â†“
  * Smartwatchlist
  */
 
@@ -1118,6 +1118,22 @@ async function buildSmartwatchlist(
       .sort()
       .join(",");
 
+  const { data: latestMarketRows, error: latestMarketError } =
+    await supabase
+      .from("daily_stock_data")
+      .select("trade_date")
+      .order("trade_date", { ascending: false })
+      .limit(1);
+
+  if (latestMarketError) {
+    throw new Error(
+      `Failed to read latest market trade date: ${latestMarketError.message}`
+    );
+  }
+
+  const latestMarketTradeDate =
+    latestMarketRows?.[0]?.trade_date || null;
+
   const cached =
     cache.get(cacheKey);
 
@@ -1125,7 +1141,8 @@ async function buildSmartwatchlist(
     cached &&
     Date.now() -
       cached.timestamp <
-      CACHE_TTL_MS
+      CACHE_TTL_MS &&
+    cached.data?.date === latestMarketTradeDate
   ) {
     return cached.data;
   }
@@ -1317,24 +1334,6 @@ async function buildSmartwatchlist(
       null
     );
 
-  const { data: marketDateRows, error: marketDateError } =
-    await supabase
-      .from("daily_stock_data")
-      .select("trade_date")
-      .order("trade_date", { ascending: false })
-      .limit(1);
-
-  if (marketDateError) {
-    throw new Error(
-      `Failed to read latest market trade date: ${marketDateError.message}`
-    );
-  }
-
-  const latestMarketTradeDate =
-    marketDateRows?.[0]?.trade_date ||
-    latestDate ||
-    null;
-
   const response = {
     success: true,
     date:
@@ -1361,6 +1360,8 @@ async function buildSmartwatchlist(
 module.exports = {
   buildSmartwatchlist,
 };
+
+
 
 
 
