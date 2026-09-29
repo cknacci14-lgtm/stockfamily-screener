@@ -561,6 +561,293 @@ app.get('/api/gem-score/history/:code', async (c) => {
 });
 
 // ============================================================
+// BATCH D: ADMIN SIGNALS - CRUD
+// ============================================================
+
+// Helper: validate signal input
+function validateSignalInput(body) {
+  const errors = [];
+  if (!body.ticker) errors.push('Ticker wajib');
+  if (!body.stop_loss) errors.push('Stop loss wajib');
+  if (!body.entry_1) errors.push('Entry 1 wajib');
+  if (!body.target_1) errors.push('Target 1 wajib');
+  const e1 = Number(body.entry_1);
+  const sl = Number(body.stop_loss);
+  const tp1 = Number(body.target_1);
+  if (sl >= e1) errors.push('Stop loss harus lebih rendah dari entry');
+  if (tp1 <= e1) errors.push('Target 1 harus lebih tinggi dari entry');
+  return errors;
+}
+
+// Helper: calc entry avg (weighted)
+function calcEntryAvg(s) {
+  const p1 = Number(s.entry_1_pct) || 30;
+  const p2 = Number(s.entry_2_pct) || 30;
+  const p3 = Number(s.entry_3_pct) || 40;
+  let sum = 0, weightSum = 0;
+  if (s.entry_1) { sum += Number(s.entry_1) * p1; weightSum += p1; }
+  if (s.entry_2) { sum += Number(s.entry_2) * p2; weightSum += p2; }
+  if (s.entry_3) { sum += Number(s.entry_3) * p3; weightSum += p3; }
+  return weightSum > 0 ? sum / weightSum : null;
+}
+
+// Helper: calc RR
+function calcRR(s) {
+  const entryAvg = calcEntryAvg(s);
+  const sl = Number(s.stop_loss);
+  const tp1 = Number(s.target_1);
+  if (!entryAvg || !sl || !tp1) return null;
+  const risk = Math.abs(entryAvg - sl);
+  const reward = Math.abs(tp1 - entryAvg);
+  if (risk === 0) return null;
+  return reward / risk;
+}
+
+// GET /api/admin/signals - List all
+app.get('/api/admin/signals', async (c) => {
+  try {
+    const env = c.env;
+    const signals = await sbFetch(env, 'signals?select=*&order=created_at.desc');
+    return c.json({ success: true, signals: signals || [] });
+  } catch (err) {
+    console.error('[admin-signals-list]', err);
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
+
+// GET /api/admin/signals/:id - Detail
+app.get('/api/admin/signals/:id', async (c) => {
+  try {
+    const id = parseInt(c.req.param('id'));
+    const env = c.env;
+    const signals = await sbFetch(env, 'signals?select=*&id=eq.' + id);
+    if (!signals || !signals.length) return c.json({ success: false, error: 'Not found' }, 404);
+    const events = await sbFetch(env, 'signal_events?select=*&signal_id=eq.' + id + '&order=created_at.asc');
+    return c.json({ success: true, signal: signals[0], events: events || [] });
+  } catch (err) {
+    console.error('[admin-signals-detail]', err);
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
+
+// POST /api/admin/signals - Create
+app.post('/api/admin/signals', async (c) => {
+  try {
+    const body = await c.req.json();
+    const env = c.env;
+    const errors = validateSignalInput(body);
+    if (errors.length) return c.json({ success: false, error: errors.join(', ') }, 400);
+    
+    const entryAvg = calcEntryAvg(body);
+    const rr = calcRR(body);
+    
+    const insertData = {
+      ticker: String(body.ticker).toUpperCase(),
+      timeframe: body.timeframe || 'D1',
+      notes: body.notes || null,
+      image_url: body.image_url || null,
+      entry_1: Number(body.entry_1) || null,
+      entry_2: Number(body.entry_2) || null,
+      entry_3: Number(body.entry_3) || null,
+      entry_1_pct: Number(body.entry_1_pct) || 30,
+      entry_2_pct: Number(body.entry_2_pct) || 30,
+      entry_3_pct: Number(body.entry_3_pct) || 40,
+      stop_loss: Number(body.stop_loss) || null,
+      target_1: Number(body.target_1) || null,
+      target_2: Number(body.target_2) || null,
+      target_3: Number(body.target_3) || null,
+      status: 'DRAFT',
+      entry_avg: entryAvg,
+      risk_reward: rr,
+      created_by: 'admin'
+    };
+    
+    const created = await sbFetch(env, 'signals', {
+      method: 'POST',
+      headers: { 'Prefer': 'return=representation' },
+      body: JSON.stringify(insertData)
+    });
+    
+    const signal = Array.isArray(created) ? created[0] : created;
+    
+    // Log event
+    await sbFetch(env, 'signal_events', {
+      method: 'POST',
+      body: JSON.stringify({
+        signal_id: signal.id,
+        event_type: 'CREATED',
+        note: 'Signal dibuat sebagai draft'
+      })
+    });
+    
+    return c.json({ success: true, signal });
+  } catch (err) {
+    console.error('[admin-signals-create]', err);
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
+
+// PATCH /api/admin/signals/:id - Update (draft only)
+app.patch('/api/admin/signals/:id', async (c) => {
+  try {
+    const id = parseInt(c.req.param('id'));
+    const body = await c.req.json();
+    const env = c.env;
+    
+    const existing = await sbFetch(env, 'signals?select=*&id=eq.' + id);
+    if (!existing || !existing.length) return c.json({ success: false, error: 'Not found' }, 404);
+    if (existing[0].status !== 'DRAFT') return c.json({ success: false, error: 'Hanya DRAFT yang bisa diubah' }, 400);
+    
+    const updateData = {};
+    const allowed = ['ticker','timeframe','notes','image_url','entry_1','entry_2','entry_3',
+                     'entry_1_pct','entry_2_pct','entry_3_pct','stop_loss','target_1','target_2','target_3'];
+    allowed.forEach(k => { if (body[k] !== undefined) updateData[k] = body[k]; });
+    
+    const merged = { ...existing[0], ...updateData };
+    updateData.entry_avg = calcEntryAvg(merged);
+    updateData.risk_reward = calcRR(merged);
+    
+    const updated = await sbFetch(env, 'signals?id=eq.' + id, {
+      method: 'PATCH',
+      headers: { 'Prefer': 'return=representation' },
+      body: JSON.stringify(updateData)
+    });
+    
+    return c.json({ success: true, signal: Array.isArray(updated) ? updated[0] : updated });
+  } catch (err) {
+    console.error('[admin-signals-update]', err);
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
+
+// POST /api/admin/signals/:id/publish - Publish
+app.post('/api/admin/signals/:id/publish', async (c) => {
+  try {
+    const id = parseInt(c.req.param('id'));
+    const env = c.env;
+    
+    const existing = await sbFetch(env, 'signals?select=*&id=eq.' + id);
+    if (!existing || !existing.length) return c.json({ success: false, error: 'Not found' }, 404);
+    if (existing[0].status !== 'DRAFT') return c.json({ success: false, error: 'Hanya DRAFT yang bisa publish' }, 400);
+    
+    const updated = await sbFetch(env, 'signals?id=eq.' + id, {
+      method: 'PATCH',
+      headers: { 'Prefer': 'return=representation' },
+      body: JSON.stringify({
+        status: 'PUBLISHED',
+        published_at: new Date().toISOString()
+      })
+    });
+    
+    await sbFetch(env, 'signal_events', {
+      method: 'POST',
+      body: JSON.stringify({
+        signal_id: id,
+        event_type: 'PUBLISHED',
+        note: 'Signal dipublikasikan'
+      })
+    });
+    
+    return c.json({ success: true, signal: Array.isArray(updated) ? updated[0] : updated });
+  } catch (err) {
+    console.error('[admin-signals-publish]', err);
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
+
+// DELETE /api/admin/signals/:id
+app.delete('/api/admin/signals/:id', async (c) => {
+  try {
+    const id = parseInt(c.req.param('id'));
+    const env = c.env;
+    
+    const existing = await sbFetch(env, 'signals?select=*&id=eq.' + id);
+    if (!existing || !existing.length) return c.json({ success: false, error: 'Not found' }, 404);
+    if (existing[0].status !== 'DRAFT') return c.json({ success: false, error: 'Hanya DRAFT yang bisa dihapus' }, 400);
+    
+    await sbFetch(env, 'signals?id=eq.' + id, { method: 'DELETE' });
+    return c.json({ success: true });
+  } catch (err) {
+    console.error('[admin-signals-delete]', err);
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
+
+// ============================================================
+// BATCH D: UPLOAD SIGNAL IMAGE
+// ============================================================
+app.post('/api/admin/signals/upload-image', async (c) => {
+  try {
+    const body = await c.req.json();
+    const env = c.env;
+    const { image, filename } = body;
+    if (!image || !filename) return c.json({ success: false, error: 'image dan filename wajib' }, 400);
+    
+    const match = image.match(/^data:image\/(\w+);base64,(.+)$/);
+    if (!match) return c.json({ success: false, error: 'Format image tidak valid' }, 400);
+    
+    const ext = match[1];
+    const base64Data = match[2];
+    
+    // Decode base64
+    const binaryString = atob(base64Data);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    
+    if (bytes.length > 5 * 1024 * 1024) {
+      return c.json({ success: false, error: 'Image max 5MB' }, 400);
+    }
+    
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(2, 8);
+    const safeName = String(filename).replace(/[^a-z0-9._-]/gi, '_').substring(0, 50);
+    const storagePath = timestamp + '_' + random + '_' + safeName;
+    
+    // Upload via Supabase Storage REST API
+    const uploadUrl = env.SUPABASE_URL + '/storage/v1/object/signal-images/' + storagePath;
+    const uploadRes = await fetch(uploadUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + env.SUPABASE_SERVICE_ROLE_KEY,
+        'apikey': env.SUPABASE_SERVICE_ROLE_KEY,
+        'Content-Type': 'image/' + ext,
+        'x-upsert': 'false'
+      },
+      body: bytes
+    });
+    
+    if (!uploadRes.ok) {
+      const errText = await uploadRes.text();
+      throw new Error('Upload failed: ' + uploadRes.status + ' ' + errText.substring(0, 200));
+    }
+    
+    const publicUrl = env.SUPABASE_URL + '/storage/v1/object/public/signal-images/' + storagePath;
+    
+    return c.json({
+      success: true,
+      url: publicUrl,
+      path: storagePath,
+      size: bytes.length
+    });
+  } catch (err) {
+    console.error('[upload-signal-image]', err);
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
+
+// ============================================================
+// BATCH D: UPLOAD EXCEL (IDX)
+// ============================================================
+app.post('/api/admin/upload-multiple', async (c) => {
+  return c.json({
+    success: false,
+    error: 'Excel upload via Cloudflare belum tersedia. Pakai localhost:3000 sementara.'
+  }, 501);
+});
+
+// ============================================================
 // FALLBACK
 // ============================================================
 app.all('/api/*', (c) => {
