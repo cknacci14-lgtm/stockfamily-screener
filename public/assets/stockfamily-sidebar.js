@@ -1073,7 +1073,7 @@
 
     sidebar.setAttribute(
       "aria-label",
-      "StockFamily global navigation"
+      "CHARTNALIST global navigation"
     );
 
     sidebar.innerHTML = `
@@ -1089,11 +1089,11 @@
           <div class="sf-brand-copy">
 
             <div class="sf-brand-name">
-              StockFamily
+              CHARTNALIST
             </div>
 
             <div class="sf-brand-sub">
-              IDX Intelligence
+              IDX TRADING INTELLIGENCE
             </div>
 
           </div>
@@ -1106,7 +1106,7 @@
 
         <nav
           class="sf-nav"
-          aria-label="StockFamily navigation"
+          aria-label="CHARTNALIST navigation"
         >
 
           ${NAV.map(
@@ -1136,7 +1136,7 @@
         </nav>
 
         <div class="sf-footer">
-          StockFamily<br>
+          CHARTNALIST<br>
           Canonical Navigation
         </div>
 
@@ -1384,7 +1384,7 @@
 
     button.setAttribute(
       "aria-label",
-      "Open StockFamily navigation"
+      "Open CHARTNALIST navigation"
     );
 
     button.innerHTML = `
