@@ -3,6 +3,7 @@
 // ============================================================
 
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 import { sbFetch, getLatestTradeDate, rangeToStartDate } from '../_lib/supabase.js';
 
 const app = new Hono();
@@ -10,16 +11,15 @@ const app = new Hono();
 // ============================================================
 // CORS
 // ============================================================
-app.options('*', (c) => {
-  return new Response('', {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Token',
-      'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS'
-    }
-  });
-});
+// CORS middleware untuk semua routes
+app.use('*', cors({
+  origin: '*',
+  allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'X-Admin-Token'],
+  exposeHeaders: ['Content-Length'],
+  maxAge: 600,
+  credentials: false
+}));
 
 // ============================================================
 // HEALTH CHECK

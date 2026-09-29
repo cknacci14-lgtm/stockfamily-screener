@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -495,13 +495,14 @@
             <th class="num" style="width:12%">INVALIDATION</th>
             <th class="num" style="width:9%">TARGET 1</th>
             <th class="num" style="width:9%">TARGET 2</th>
-            <th class="num" style="width:7%">R:R</th>
+            <th class="num" style="width:6%">R:R</th>
+            <th style="width:8%">RISK</th>
           </tr>
         </thead>
 
         <tbody id="rows">
           <tr>
-            <td colspan="9">
+            <td colspan="10">
               <div class="empty loading">
                 Loading Smartwatchlist...
               </div>
@@ -537,14 +538,14 @@
         ? n.toLocaleString("id-ID", {
             maximumFractionDigits: 2,
           })
-        : "—";
+        : "â€”";
     }
 
     function rr(value) {
       const n = Number(value);
       return Number.isFinite(n)
         ? n.toFixed(2) + "R"
-        : "—";
+        : "â€”";
     }
 
     function riskClass(value) {
@@ -581,7 +582,7 @@
       if (!visible.length) {
         rowsEl.innerHTML = `
           <tr>
-            <td colspan="9">
+            <td colspan="10">
               <div class="empty">
                 <strong>No signals in this state</strong>
                 Smartwatchlist only surfaces existing Signal Engine states.
@@ -618,7 +619,12 @@
           <td class="num">${formatPrice(row.invalidation)}</td>
           <td class="num">${formatPrice(row.target1)}</td>
           <td class="num">${formatPrice(row.target2)}</td>
-          <td class="num ${riskClass(row.riskLevel)}">${formatRR(row.riskReward)}</td>
+          <td class="num">${formatRR(row.riskReward)}</td>
+          <td class="risk-cell">
+            <span class="risk-badge ${esc(row.riskLevel || "")}">
+              ${esc(row.riskLevel || "—")}
+            </span>
+          </td>
         </tr>
       `).join("");
     }
@@ -626,7 +632,7 @@
     function formatPrice(value) {
       const n = Number(value);
 
-      if (!Number.isFinite(n)) return "—";
+      if (!Number.isFinite(n)) return "â€”";
 
       if (Number.isInteger(n)) {
         return n.toLocaleString("id-ID");
@@ -641,7 +647,7 @@
     function formatRR(value) {
       const n = Number(value);
 
-      if (!Number.isFinite(n)) return "—";
+      if (!Number.isFinite(n)) return "â€”";
 
       return `${n.toFixed(1).replace(/\.0$/, "")}R`;
     }
@@ -694,10 +700,10 @@
 
         if (!codes.length) {
           metaEl.textContent =
-            "Watchlist empty · Add stocks from Stock Detail";
+            "Watchlist empty Â· Add stocks from Stock Detail";
         } else if (!state.all.length) {
           metaEl.textContent =
-            `${codes.length} stock${codes.length === 1 ? "" : "s"} monitored · ` +
+            `${codes.length} stock${codes.length === 1 ? "" : "s"} monitored Â· ` +
             "0 active setups";
         } else {
           const signalDate = data.date
@@ -714,7 +720,7 @@
               : "date unavailable";
 
           metaEl.textContent =
-            `${state.all.length} setup${state.all.length === 1 ? "" : "s"} · ` +
+            `${state.all.length} setup${state.all.length === 1 ? "" : "s"} Â· ` +
             `Last signal data: ${formattedDate}`;
         }
 
@@ -728,7 +734,7 @@
 
         rowsEl.innerHTML = `
           <tr>
-            <td colspan="9">
+            <td colspan="10">
               <div class="empty">
                 <strong>Unable to load Smartwatchlist</strong>
                 ${esc(error.message || "Unknown error")}
@@ -799,7 +805,7 @@
     if(meta && !meta.querySelector(".smartwatch-freshness")){
       const span=document.createElement("span");
       span.className="smartwatch-freshness live";
-      span.textContent=" • LIVE";
+      span.textContent=" â€¢ LIVE";
       meta.appendChild(span);
     }
   };
@@ -842,7 +848,7 @@
   transform:translateY(-1px);
 }
 .watchlist-signal-center-link::before {
-  content:"◈";
+  content:"â—ˆ";
   font-size:12px;
   line-height:1;
 }
@@ -859,6 +865,7 @@
 
 </body>
 </html>
+
 
 
 
