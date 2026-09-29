@@ -706,13 +706,13 @@
             `${codes.length} stock${codes.length === 1 ? "" : "s"} monitored Â· ` +
             "0 active setups";
         } else {
-          const signalDate = data.date
+          const marketDataDate = data.date
             ? new Date(`${data.date}T00:00:00`)
             : null;
 
           const formattedDate =
-            signalDate && !Number.isNaN(signalDate.getTime())
-              ? signalDate.toLocaleDateString("en-GB", {
+            marketDataDate && !Number.isNaN(marketDataDate.getTime())
+              ? marketDataDate.toLocaleDateString("en-GB", {
                   day: "2-digit",
                   month: "short",
                   year: "numeric",
@@ -720,8 +720,8 @@
               : "date unavailable";
 
           metaEl.textContent =
-            `${state.all.length} setup${state.all.length === 1 ? "" : "s"} Â· ` +
-            `Last signal data: ${formattedDate}`;
+            `${state.all.length} setup${state.all.length === 1 ? "" : "s"} · ` +
+            `Market data: ${formattedDate}`;
         }
 
         render();
@@ -865,6 +865,7 @@
 
 </body>
 </html>
+
 
 
 

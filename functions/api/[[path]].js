@@ -5,6 +5,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { sbFetch, getLatestTradeDate, rangeToStartDate } from '../_lib/supabase.js';
+import { calculateLatestForHistory, calculateHistoryForAllRows } from '../_lib/gemEngine.js';
 
 const app = new Hono();
 
@@ -491,7 +492,7 @@ app.get('/api/fundamental/:code', async (c) => {
 });
 
 // ============================================================
-// BATCH C: GEM SCORE LATEST
+// GEM SCORE LATEST (compute on-demand dari daily_stock_data)
 // ============================================================
 app.get('/api/gem-score/latest', async (c) => {
   try {
@@ -499,33 +500,30 @@ app.get('/api/gem-score/latest', async (c) => {
     if (!codes.length) return c.json({ success: true, data: [] });
     const env = c.env;
     
-    const codeFilter = codes.map(x => '"' + x + '"').join(',');
-    const stocks = await sbFetch(env, 'stocks?select=id,code&code=in.(' + codeFilter + ')');
-    if (!stocks || !stocks.length) return c.json({ success: true, data: [] });
-    
-    const stockMap = {};
-    stocks.forEach(s => stockMap[s.id] = s.code);
-    const idsFilter = '(' + stocks.map(s => s.id).join(',') + ')';
-    
-    // Try gem_scores table
-    try {
-      const rows = await sbFetch(env, 
-        'gem_scores?select=stock_id,trade_date,gem_score,gem_signal,vol_ratio,foreign_net20&stock_id=in.' +
-        idsFilter + '&order=trade_date.desc&limit=50'
-      );
-      
-      const latestByStock = {};
-      (rows || []).forEach(r => {
-        if (!latestByStock[r.stock_id]) {
-          latestByStock[r.stock_id] = { ...r, code: stockMap[r.stock_id] };
-        }
-      });
-      
-      return c.json({ success: true, data: Object.values(latestByStock) });
-    } catch (innerErr) {
-      console.warn('[gem-latest] Table gem_scores tidak ada:', innerErr.message);
-      return c.json({ success: true, data: [] });
+    const results = [];
+    for (const code of codes) {
+      try {
+        const stocks = await sbFetch(env, 'stocks?select=id,code&code=eq.' + code);
+        if (!stocks || !stocks.length) continue;
+        
+        const rows = await sbFetch(env,
+          'daily_stock_data?select=trade_date,close,high,low,volume,frequency,foreign_buy,foreign_sell&stock_id=eq.' +
+          stocks[0].id + '&order=trade_date.desc&limit=60'
+        );
+        if (!rows || rows.length < 25) continue;
+        
+        // Reverse untuk ascending
+        const ascending = rows.slice().reverse();
+        const result = calculateLatestForHistory(ascending);
+        if (!result) continue;
+        
+        results.push({ ...result, code: stocks[0].code });
+      } catch (e) {
+        console.warn('[gem-latest-code]', code, e.message);
+      }
     }
+    
+    return c.json({ success: true, data: results });
   } catch (err) {
     console.error('[gem-latest]', err);
     return c.json({ success: true, data: [] });
@@ -533,7 +531,7 @@ app.get('/api/gem-score/latest', async (c) => {
 });
 
 // ============================================================
-// BATCH C: GEM SCORE HISTORY
+// GEM SCORE HISTORY (compute on-demand)
 // ============================================================
 app.get('/api/gem-score/history/:code', async (c) => {
   try {
@@ -544,16 +542,18 @@ app.get('/api/gem-score/history/:code', async (c) => {
     const stocks = await sbFetch(env, 'stocks?select=id,code&code=eq.' + code);
     if (!stocks || !stocks.length) return c.json({ success: true, data: [] });
     
-    try {
-      const rows = await sbFetch(env,
-        'gem_scores?select=trade_date,gem_score&stock_id=eq.' +
-        stocks[0].id + '&order=trade_date.asc'
-      );
-      return c.json({ success: true, data: rows || [] });
-    } catch (innerErr) {
-      console.warn('[gem-history]', innerErr.message);
-      return c.json({ success: true, data: [] });
-    }
+    const rows = await sbFetch(env,
+      'daily_stock_data?select=trade_date,close,high,low,volume,frequency,foreign_buy,foreign_sell&stock_id=eq.' +
+      stocks[0].id + '&order=trade_date.desc&limit=400'
+    );
+    if (!rows || rows.length < 25) return c.json({ success: true, data: [] });
+    
+    const ascending = rows.slice().reverse();
+    const data = calculateHistoryForAllRows(ascending, code);
+    
+    // Return hanya yang gem_score != null
+    const filtered = data.filter(r => r.gem_score !== null);
+    return c.json({ success: true, data: filtered });
   } catch (err) {
     console.error('[gem-history]', err);
     return c.json({ success: true, data: [] });
