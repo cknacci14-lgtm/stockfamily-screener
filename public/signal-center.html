@@ -251,6 +251,17 @@ tr:last-child td {
     text-align: left;
   }
 }
+
+    .signal-stock-link {
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .signal-stock-link:hover {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
 </style>
 </head>
 
@@ -399,7 +410,11 @@ tr:last-child td {
 
       tr.innerHTML = `
         <td>
-          <span class="code">${row.stockCode}</span>
+          <a
+            class="code signal-stock-link"
+            href="/stock.html?code=${encodeURIComponent(row.stockCode)}"
+            title="Open Stock Detail"
+          >${row.stockCode}</a>
           <span class="name">${row.stockName || ''}</span>
         </td>
         <td class="setup">${row.setup || '—'}</td>
