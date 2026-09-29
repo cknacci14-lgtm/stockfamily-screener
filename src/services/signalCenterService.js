@@ -214,31 +214,33 @@ async function buildSignalCenter(codes = [], options = {}) {
 
   const cacheKey = normalized.slice().sort().join(',');
 
-  /*
-   * Layer 1 — memory cache.
-   */
-  if (
-    cache.data &&
-    cache.timestamp &&
-    Date.now() - cache.timestamp < CACHE_TTL_MS &&
-    cache.data.cacheKey === cacheKey
-  ) {
-    return cache.data.payload;
-  }
-
-  /*
-   * Layer 2 — persistent snapshot.
-   *
-   * Only the full-universe Signal Center can use this snapshot.
-   * Explicit ticker requests continue to use the authoritative
-   * Smartwatchlist calculation.
-   */
   const fullUniverse = options.fullUniverse === true;
 
+  /*
+   * Full-universe Signal Center is date-aware.
+   * The persistent snapshot is valid only for the latest
+   * daily_stock_data trade date.
+   */
   if (fullUniverse) {
+    const latestTradeDate = await getLatestTradeDate();
+
+    if (
+      cache.data &&
+      cache.timestamp &&
+      Date.now() - cache.timestamp < CACHE_TTL_MS &&
+      cache.data.cacheKey === cacheKey &&
+      cache.data.payload?.date === latestTradeDate
+    ) {
+      return cache.data.payload;
+    }
+
     const snapshot = readSnapshot();
 
-    if (snapshot && snapshot.date) {
+    if (
+      snapshot &&
+      snapshot.date &&
+      snapshot.date === latestTradeDate
+    ) {
       cache = {
         timestamp: Date.now(),
         data: {
@@ -249,14 +251,19 @@ async function buildSignalCenter(codes = [], options = {}) {
 
       return snapshot;
     }
+  } else {
+    /*
+     * Explicit ticker requests keep the existing memory cache.
+     */
+    if (
+      cache.data &&
+      cache.timestamp &&
+      Date.now() - cache.timestamp < CACHE_TTL_MS &&
+      cache.data.cacheKey === cacheKey
+    ) {
+      return cache.data.payload;
+    }
   }
-
-  /*
-   * Layer 3 — authoritative calculation.
-   *
-   * The existing Smartwatchlist adapter remains the only
-   * source of Signal Engine output.
-   */
   if (!refreshPromise) {
     refreshPromise = calculateSignalCenter(
       normalized,
