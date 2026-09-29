@@ -158,24 +158,47 @@ app.get('/api/yahoo/quote', async (c) => {
   try {
     const symbols = c.req.query('symbols') || '';
     if (!symbols) return c.json({ success: false, error: 'symbols required' }, 400);
-    const url = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=' + encodeURIComponent(symbols);
-    const res = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'application/json'
+    
+    // Yahoo now requires crumb. Use v8/chart endpoint for each symbol (no crumb).
+    const symbolList = symbols.split(',').map(s => s.trim()).filter(Boolean);
+    
+    const results = await Promise.all(symbolList.map(async (sym) => {
+      try {
+        const url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(sym) + '?range=5d&interval=1d';
+        const res = await fetch(url, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Accept': 'application/json'
+          }
+        });
+        if (!res.ok) return null;
+        const data = await res.json();
+        const meta = data?.chart?.result?.[0]?.meta;
+        if (!meta) return null;
+        
+        const price = meta.regularMarketPrice || meta.previousClose || 0;
+        const prevClose = meta.chartPreviousClose || meta.previousClose || price;
+        const change = price - prevClose;
+        const changePct = prevClose > 0 ? (change / prevClose) * 100 : 0;
+        
+        return {
+          symbol: meta.symbol || sym,
+          longName: meta.longName || meta.shortName || sym,
+          shortName: meta.shortName || meta.longName || sym,
+          regularMarketPrice: price,
+          regularMarketChange: change,
+          regularMarketChangePercent: changePct,
+          regularMarketVolume: meta.regularMarketVolume || 0,
+          fiftyTwoWeekLow: meta.fiftyTwoWeekLow || null,
+          fiftyTwoWeekHigh: meta.fiftyTwoWeekHigh || null,
+          bid: null, bidSize: null, ask: null, askSize: null
+        };
+      } catch (e) {
+        return null;
       }
-    });
-    if (!res.ok) return c.json({ success: false, error: 'Yahoo HTTP ' + res.status }, res.status);
-    const data = await res.json();
-    const results = data?.quoteResponse?.result || [];
-    const mapped = results.map(q => ({
-      symbol: q.symbol, longName: q.longName || q.shortName, shortName: q.shortName,
-      regularMarketPrice: q.regularMarketPrice, regularMarketChange: q.regularMarketChange,
-      regularMarketChangePercent: q.regularMarketChangePercent, regularMarketVolume: q.regularMarketVolume,
-      fiftyTwoWeekLow: q.fiftyTwoWeekLow, fiftyTwoWeekHigh: q.fiftyTwoWeekHigh,
-      bid: q.bid, bidSize: q.bidSize, ask: q.ask, askSize: q.askSize
     }));
-    return c.json({ success: true, result: mapped });
+    
+    return c.json({ success: true, result: results.filter(Boolean) });
   } catch (err) {
     console.error('[yahoo-quote]', err);
     return c.json({ success: false, error: err.message }, 500);
