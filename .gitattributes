@@ -1,0 +1,6 @@
+# Force LF untuk semua shell script & file yang dijalankan di Linux
+*.sh text eol=lf
+build.sh text eol=lf
+
+# Auto-detect untuk file lain
+* text=auto
