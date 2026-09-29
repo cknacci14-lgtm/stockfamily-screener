@@ -373,6 +373,171 @@ app.get('/api/public/signals/performance', async (c) => {
 });
 
 // ============================================================
+// BATCH C: BID/OFFER (dari daily_stock_data)
+// ============================================================
+app.get('/api/bid-offer', async (c) => {
+  try {
+    const code = String(c.req.query('code') || '').trim().toUpperCase();
+    if (!code) return c.json({ success: false, error: 'Code required' }, 400);
+    const env = c.env;
+    
+    const stocks = await sbFetch(env, 'stocks?select=id,code,name&code=eq.' + code);
+    if (!stocks || !stocks.length) return c.json({ success: false, error: 'Stock not found' }, 404);
+    const stock = stocks[0];
+    
+    const rows = await sbFetch(env,
+      'daily_stock_data?select=trade_date,bid,bid_volume,offer,offer_volume,close,previous_price,change_price&stock_id=eq.' +
+      stock.id + '&order=trade_date.desc&limit=1'
+    );
+    if (!rows || !rows.length) return c.json({ success: false, error: 'No data' }, 404);
+    
+    const row = rows[0];
+    const bidVol = Number(row.bid_volume) || 0;
+    const offerVol = Number(row.offer_volume) || 0;
+    const totalVol = bidVol + offerVol;
+    const ratio = offerVol > 0 ? bidVol / offerVol : (bidVol > 0 ? 999 : 0);
+    
+    let pressure = 'BALANCED', pressureColor = '#64748B';
+    if (ratio >= 5) { pressure = 'STRONG BUY'; pressureColor = '#00E676'; }
+    else if (ratio >= 2) { pressure = 'BUY'; pressureColor = '#00E676'; }
+    else if (ratio >= 1.2) { pressure = 'SLIGHT BUY'; pressureColor = '#88E676'; }
+    else if (ratio > 0 && ratio <= 0.2) { pressure = 'STRONG SELL'; pressureColor = '#FF5252'; }
+    else if (ratio > 0 && ratio <= 0.5) { pressure = 'SELL'; pressureColor = '#FF5252'; }
+    else if (ratio > 0 && ratio <= 0.8) { pressure = 'SLIGHT SELL'; pressureColor = '#FF8888'; }
+    
+    return c.json({
+      success: true,
+      code: stock.code, name: stock.name, trade_date: row.trade_date,
+      bid: Number(row.bid) || 0, bid_volume: bidVol,
+      offer: Number(row.offer) || 0, offer_volume: offerVol,
+      close: Number(row.close) || 0,
+      previous_price: Number(row.previous_price) || 0,
+      change_price: Number(row.change_price) || 0,
+      bid_pct: totalVol > 0 ? (bidVol / totalVol) * 100 : 50,
+      offer_pct: totalVol > 0 ? (offerVol / totalVol) * 100 : 50,
+      ratio: ratio, pressure: pressure, pressure_color: pressureColor,
+      source: 'IDX EOD'
+    });
+  } catch (err) {
+    console.error('[bid-offer]', err);
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
+
+// ============================================================
+// BATCH C: FUNDAMENTAL (Market Cap, Free Float, Turnover)
+// ============================================================
+app.get('/api/fundamental/:code', async (c) => {
+  try {
+    const code = String(c.req.param('code') || '').trim().toUpperCase();
+    if (!code) return c.json({ success: false, error: 'Code required' }, 400);
+    const env = c.env;
+    
+    const stocks = await sbFetch(env, 'stocks?select=id,code,name&code=eq.' + code);
+    if (!stocks || !stocks.length) return c.json({ success: false, error: 'Stock not found' }, 404);
+    const stock = stocks[0];
+    
+    const rows = await sbFetch(env,
+      'daily_stock_data?select=trade_date,close,volume,value,listed_shares,tradeable_shares&stock_id=eq.' +
+      stock.id + '&order=trade_date.desc&limit=1'
+    );
+    if (!rows || !rows.length) return c.json({ success: false, error: 'No data' }, 404);
+    
+    const row = rows[0];
+    const close = Number(row.close) || 0;
+    const listed = Number(row.listed_shares) || 0;
+    const tradeable = Number(row.tradeable_shares) || 0;
+    const volume = Number(row.volume) || 0;
+    const value = Number(row.value) || 0;
+    
+    return c.json({
+      success: true,
+      code: stock.code, name: stock.name, trade_date: row.trade_date,
+      close: close, volume: volume, value: value,
+      listed_shares: listed, tradeable_shares: tradeable,
+      market_cap: close * listed,
+      free_float_pct: listed > 0 ? (tradeable / listed) * 100 : 0,
+      turnover_pct: listed > 0 ? (volume / listed) * 100 : 0,
+      avg_price: volume > 0 ? value / volume : close,
+      source: 'IDX EOD'
+    });
+  } catch (err) {
+    console.error('[fundamental]', err);
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
+
+// ============================================================
+// BATCH C: GEM SCORE LATEST
+// ============================================================
+app.get('/api/gem-score/latest', async (c) => {
+  try {
+    const codes = (c.req.query('codes') || '').toUpperCase().split(',').map(x => x.trim()).filter(Boolean);
+    if (!codes.length) return c.json({ success: true, data: [] });
+    const env = c.env;
+    
+    const codeFilter = codes.map(x => '"' + x + '"').join(',');
+    const stocks = await sbFetch(env, 'stocks?select=id,code&code=in.(' + codeFilter + ')');
+    if (!stocks || !stocks.length) return c.json({ success: true, data: [] });
+    
+    const stockMap = {};
+    stocks.forEach(s => stockMap[s.id] = s.code);
+    const idsFilter = '(' + stocks.map(s => s.id).join(',') + ')';
+    
+    // Try gem_scores table
+    try {
+      const rows = await sbFetch(env, 
+        'gem_scores?select=stock_id,trade_date,gem_score,gem_signal,vol_ratio,foreign_net20&stock_id=in.' +
+        idsFilter + '&order=trade_date.desc&limit=50'
+      );
+      
+      const latestByStock = {};
+      (rows || []).forEach(r => {
+        if (!latestByStock[r.stock_id]) {
+          latestByStock[r.stock_id] = { ...r, code: stockMap[r.stock_id] };
+        }
+      });
+      
+      return c.json({ success: true, data: Object.values(latestByStock) });
+    } catch (innerErr) {
+      console.warn('[gem-latest] Table gem_scores tidak ada:', innerErr.message);
+      return c.json({ success: true, data: [] });
+    }
+  } catch (err) {
+    console.error('[gem-latest]', err);
+    return c.json({ success: true, data: [] });
+  }
+});
+
+// ============================================================
+// BATCH C: GEM SCORE HISTORY
+// ============================================================
+app.get('/api/gem-score/history/:code', async (c) => {
+  try {
+    const code = String(c.req.param('code') || '').trim().toUpperCase();
+    if (!code) return c.json({ success: false, error: 'Code required', data: [] }, 400);
+    const env = c.env;
+    
+    const stocks = await sbFetch(env, 'stocks?select=id,code&code=eq.' + code);
+    if (!stocks || !stocks.length) return c.json({ success: true, data: [] });
+    
+    try {
+      const rows = await sbFetch(env,
+        'gem_scores?select=trade_date,gem_score&stock_id=eq.' +
+        stocks[0].id + '&order=trade_date.asc'
+      );
+      return c.json({ success: true, data: rows || [] });
+    } catch (innerErr) {
+      console.warn('[gem-history]', innerErr.message);
+      return c.json({ success: true, data: [] });
+    }
+  } catch (err) {
+    console.error('[gem-history]', err);
+    return c.json({ success: true, data: [] });
+  }
+});
+
+// ============================================================
 // FALLBACK
 // ============================================================
 app.all('/api/*', (c) => {
