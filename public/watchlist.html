@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -692,9 +692,31 @@
           ? data.stocks
           : [];
 
-        metaEl.textContent =
-          `${state.all.length} signal${state.all.length === 1 ? "" : "s"} · ` +
-          `${data.date || "no trade date"}`;
+        if (!codes.length) {
+          metaEl.textContent =
+            "Watchlist empty · Add stocks from Stock Detail";
+        } else if (!state.all.length) {
+          metaEl.textContent =
+            `${codes.length} stock${codes.length === 1 ? "" : "s"} monitored · ` +
+            "0 active setups";
+        } else {
+          const signalDate = data.date
+            ? new Date(`${data.date}T00:00:00`)
+            : null;
+
+          const formattedDate =
+            signalDate && !Number.isNaN(signalDate.getTime())
+              ? signalDate.toLocaleDateString("en-GB", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })
+              : "date unavailable";
+
+          metaEl.textContent =
+            `${state.all.length} setup${state.all.length === 1 ? "" : "s"} · ` +
+            `Last signal data: ${formattedDate}`;
+        }
 
         render();
       } catch (error) {

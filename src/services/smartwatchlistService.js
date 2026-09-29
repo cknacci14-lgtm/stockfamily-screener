@@ -1317,10 +1317,28 @@ async function buildSmartwatchlist(
       null
     );
 
+  const { data: marketDateRows, error: marketDateError } =
+    await supabase
+      .from("daily_stock_data")
+      .select("trade_date")
+      .order("trade_date", { ascending: false })
+      .limit(1);
+
+  if (marketDateError) {
+    throw new Error(
+      `Failed to read latest market trade date: ${marketDateError.message}`
+    );
+  }
+
+  const latestMarketTradeDate =
+    marketDateRows?.[0]?.trade_date ||
+    latestDate ||
+    null;
+
   const response = {
     success: true,
     date:
-      latestDate ||
+      latestMarketTradeDate ||
       null,
     stocks: output,
     count:
