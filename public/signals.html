@@ -91,7 +91,15 @@ tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{
     .signal-card { padding: 16px; }
     .stat-value { font-size: 18px; }
   }
-</style>
+
+  .signal-image { margin: 12px 0; border-radius: 8px; overflow: hidden; border: 1px solid #2A2E39; background: #0a0e17; }
+  .signal-image img { width: 100%; max-height: 400px; object-fit: contain; display: block; cursor: zoom-in; }
+  .signal-image img:hover { opacity: 0.95; }
+  .image-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 9999; cursor: zoom-out; }
+  .image-modal.show { display: flex; }
+  .image-modal img { max-width: 95vw; max-height: 95vh; object-fit: contain; }
+
+  </style>
 </head>
 <body>
 
@@ -378,12 +386,20 @@ function renderSignalCard(s) {
         '</div>' +
       '</div>' +
 
-      '<div class="price-grid">' +
-        '<div class="price-item"><span class="price-label">Entry Range</span><span class="price-value entry">' + entryRange + '</span></div>' +
-        '<div class="price-item"><span class="price-label">Stop Loss</span><span class="price-value sl">' + fmtRp(s.stop_loss) + '</span></div>' +
-        '<div class="price-item"><span class="price-label">Target 1 / 2 / 3</span><span class="price-value tp">' + targetRange + '</span></div>' +
-        '<div class="price-item"><span class="price-label">Entry Avg</span><span class="price-value default">' + fmtRp(s.entry_avg) + '</span></div>' +
-      '</div>' +
+      (function() {
+        var items = '';
+        if (s.entry_1 != null) items += '<div class="price-item"><span class="price-label">Entry 1</span><span class="price-value entry">' + fmtRp(s.entry_1) + '</span></div>';
+        if (s.entry_2 != null) items += '<div class="price-item"><span class="price-label">Entry 2</span><span class="price-value entry">' + fmtRp(s.entry_2) + '</span></div>';
+        if (s.entry_3 != null) items += '<div class="price-item"><span class="price-label">Entry 3</span><span class="price-value entry">' + fmtRp(s.entry_3) + '</span></div>';
+        items += '<div class="price-item"><span class="price-label">Stop Loss</span><span class="price-value sl">' + fmtRp(s.stop_loss) + '</span></div>';
+        items += '<div class="price-item"><span class="price-label">Target 1</span><span class="price-value tp">' + fmtRp(s.target_1) + '</span></div>';
+        if (s.target_2 != null) items += '<div class="price-item"><span class="price-label">Target 2</span><span class="price-value tp">' + fmtRp(s.target_2) + '</span></div>';
+        if (s.target_3 != null) items += '<div class="price-item"><span class="price-label">Target 3</span><span class="price-value tp">' + fmtRp(s.target_3) + '</span></div>';
+        items += '<div class="price-item"><span class="price-label">Entry Avg</span><span class="price-value default">' + fmtRp(s.entry_avg) + '</span></div>';
+        return '<div class="price-grid">' + items + '</div>';
+      })() +
+
+      (s.image_url ? '<div class="signal-image" onclick="openImageModal(this.querySelector(\'img\').src)"><img src="' + safeText(s.image_url) + '" loading="lazy" alt="Chart ' + ticker + '"></div>' : '') +
 
       renderPLBlockWithWarning(s, priceData) +
 
@@ -504,6 +520,28 @@ async function loadSignals() {
 // ============================================================
 loadSignals();
 setInterval(loadSignals, 5 * 60 * 1000);
+
+function openImageModal(src) {
+  const modal = document.getElementById('imageModal');
+  const img = document.getElementById('imageModalImg');
+  if (modal && img && src) {
+    img.src = src;
+    modal.classList.add('show');
+  }
+}
+function closeImageModal() {
+  const modal = document.getElementById('imageModal');
+  if (modal) modal.classList.remove('show');
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeImageModal();
+});
+
 </script>
+
+<div class="image-modal" id="imageModal" onclick="closeImageModal()">
+  <img id="imageModalImg" src="">
+</div>
+
 </body>
 </html>

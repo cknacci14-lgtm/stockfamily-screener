@@ -864,6 +864,56 @@ function calcRR(s) {
 }
 
 // === GET ALL SIGNALS (admin) ===
+
+// === UPLOAD SIGNAL IMAGE ===
+app.post('/api/admin/signals/upload-image', express.json({ limit: '10mb' }), async (req, res) => {
+  try {
+    const { image, filename } = req.body || {};
+    if (!image || !filename) {
+      return res.status(400).json({ success: false, error: 'image dan filename wajib' });
+    }
+    const match = image.match(/^data:image\/(\w+);base64,(.+)$/);
+    if (!match) {
+      return res.status(400).json({ success: false, error: 'Format image tidak valid' });
+    }
+    const ext = match[1];
+    const base64Data = match[2];
+    const buffer = Buffer.from(base64Data, 'base64');
+    if (buffer.length > 5 * 1024 * 1024) {
+      return res.status(400).json({ success: false, error: 'Image max 5MB' });
+    }
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(2, 8);
+    const safeName = String(filename).replace(/[^a-z0-9._-]/gi, '_').substring(0, 50);
+    const storagePath = timestamp + '_' + random + '_' + safeName;
+    const { data, error } = await supabase.storage
+      .from('signal-images')
+      .upload(storagePath, buffer, { contentType: 'image/' + ext, upsert: false });
+    if (error) throw error;
+    const { data: urlData } = supabase.storage
+      .from('signal-images')
+      .getPublicUrl(storagePath);
+    res.json({ success: true, url: urlData.publicUrl, path: storagePath, size: buffer.length });
+  } catch (err) {
+    console.error('[upload-signal-image]', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// === DELETE SIGNAL IMAGE ===
+app.delete('/api/admin/signals/delete-image', express.json(), async (req, res) => {
+  try {
+    const { path: storagePath } = req.body || {};
+    if (!storagePath) return res.status(400).json({ success: false, error: 'path wajib' });
+    const { error } = await supabase.storage.from('signal-images').remove([storagePath]);
+    if (error) throw error;
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[delete-signal-image]', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 app.get('/api/admin/signals', async (req, res) => {
   try {
     const { data, error } = await supabase

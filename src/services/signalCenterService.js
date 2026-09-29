@@ -29,6 +29,11 @@ const path = require('path');
  */
 
 const { buildSmartwatchlist } = require('./smartwatchlistService');
+const { createClient } = require('@supabase/supabase-js');
+const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
 
 const CACHE_TTL_MS = 30 * 1000;
 
@@ -100,6 +105,19 @@ function rankSignal(row) {
 }
 
 
+async function getLatestTradeDate() {
+  const { data, error } = await supabase
+    .from('daily_stock_data')
+    .select('trade_date')
+    .order('trade_date', { ascending: false })
+    .limit(1);
+
+  if (error) {
+    throw new Error(`Failed to read latest trade date: ${error.message}`);
+  }
+
+  return data?.[0]?.trade_date || null;
+}
 function readSnapshot() {
   try {
     if (!fs.existsSync(SNAPSHOT_FILE)) return null;
