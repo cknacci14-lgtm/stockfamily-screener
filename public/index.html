@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id" class="dark">
 <head>
 <meta charset="UTF-8">
@@ -1744,7 +1744,7 @@
 </style>
 <style id="chartnalist-toolbar-polish">
   /* =========================================================
-     CHARTNALIST — CHART TOOLBAR
+     CHARTNALIST â€” CHART TOOLBAR
      Visual-only. No logic/auth/navigation changes.
      ========================================================= */
 
@@ -2395,7 +2395,10 @@
 .bt-chart-area { padding-top: 20px !important; }
 </style><style id="overflow-override">
 .bt-bars-wrapper { overflow: visible !important; }
-</style></head>
+</style>    <!-- CHARTNALIST_PHASE5_AUTH -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/assets/chartnalist-app-auth.js"></script>
+</head>
 <body class="bg-idx-bg text-slate-200 font-sans antialiased h-screen flex flex-col select-none">
 
 <!-- CHARTNALIST Top Header -->
@@ -3345,9 +3348,9 @@
         <div class="bt-title">
           <i class="fa-solid fa-chart-column"></i>
           <span>Historical Block Trade</span>
-          <span id="btHistoryCode" style="color: #64748B; font-weight: 400;">—</span>
+          <span id="btHistoryCode" style="color: #64748B; font-weight: 400;">â€”</span>
         </div>
-        <button onclick="toggleBTHistory()" id="btToggleBtn" title="Minimize/Maximize">−</button>
+        <button onclick="toggleBTHistory()" id="btToggleBtn" title="Minimize/Maximize">âˆ’</button>
       </div>
       <div id="btHistoryBody">
         <div class="bt-chart-area" id="btChartArea">
@@ -3535,8 +3538,8 @@
         Memuat status data...
       </div>
       <div style="display:flex; gap:4px; margin-bottom:6px; font-size:9px;">
-        <button id="btSortVol" onclick="setBTSort('volume')" style="flex:1; padding:3px 6px; border-radius:3px; background:rgba(0,229,255,0.15); color:#00E5FF; border:1px solid rgba(0,229,255,0.3); cursor:pointer; font-weight:600;">📊 Top Volume</button>
-        <button id="btSortDate" onclick="setBTSort('date')" style="flex:1; padding:3px 6px; border-radius:3px; background:rgba(100,116,139,0.15); color:#64748B; border:1px solid rgba(100,116,139,0.3); cursor:pointer; font-weight:600;">📅 Terbaru</button>
+        <button id="btSortVol" onclick="setBTSort('volume')" style="flex:1; padding:3px 6px; border-radius:3px; background:rgba(0,229,255,0.15); color:#00E5FF; border:1px solid rgba(0,229,255,0.3); cursor:pointer; font-weight:600;">ðŸ“Š Top Volume</button>
+        <button id="btSortDate" onclick="setBTSort('date')" style="flex:1; padding:3px 6px; border-radius:3px; background:rgba(100,116,139,0.15); color:#64748B; border:1px solid rgba(100,116,139,0.3); cursor:pointer; font-weight:600;">ðŸ“… Terbaru</button>
       </div>
       <div id="btPanel" class="space-y-1.5">
         <div id="btTableContainer" class="text-[10px] text-slate-500 italic text-center py-3">
@@ -3984,7 +3987,7 @@
     if (!badge) return;
 
     if (!candles || !candles.length || !btList || !btList.length) {
-      badge.innerText = '⚠️ Tidak ada data';
+      badge.innerText = 'âš ï¸ Tidak ada data';
       badge.style.background = 'rgba(100,116,139,0.15)';
       badge.style.color = '#64748B';
       return;
@@ -4006,14 +4009,14 @@
 
     let label, bg, color, icon;
     if (gapDays <= 2) {
-      label = '✓ Data Fresh • ' + fmtDate(lastBT);
-      bg = 'rgba(0, 230, 118, 0.15)'; color = '#00E676'; icon = '✓';
+      label = 'âœ“ Data Fresh â€¢ ' + fmtDate(lastBT);
+      bg = 'rgba(0, 230, 118, 0.15)'; color = '#00E676'; icon = 'âœ“';
     } else if (gapDays <= 5) {
-      label = '⚠ Update ' + gapDays + ' hari lalu • ' + fmtDate(lastBT);
-      bg = 'rgba(255, 179, 0, 0.15)'; color = '#FFB300'; icon = '⚠';
+      label = 'âš  Update ' + gapDays + ' hari lalu â€¢ ' + fmtDate(lastBT);
+      bg = 'rgba(255, 179, 0, 0.15)'; color = '#FFB300'; icon = 'âš ';
     } else {
-      label = '🔴 DATA STALE ' + gapDays + ' hari • ' + fmtDate(lastBT);
-      bg = 'rgba(255, 82, 82, 0.15)'; color = '#FF5252'; icon = '🔴';
+      label = 'ðŸ”´ DATA STALE ' + gapDays + ' hari â€¢ ' + fmtDate(lastBT);
+      bg = 'rgba(255, 82, 82, 0.15)'; color = '#FF5252'; icon = 'ðŸ”´';
     }
 
     badge.innerText = label;
@@ -4033,11 +4036,11 @@
     }
 
     const classMap = {
-      'AKUMULASI': { cls: 'akum', icon: '▲', label: 'AKUMULASI', color: '#00E676' },
-      'DISTRIBUSI': { cls: 'dist', icon: '▼', label: 'DISTRIBUSI', color: '#FF5252' },
-      'BULLISH CONFIRM': { cls: 'bull', icon: '▲', label: 'BULLISH', color: '#00E5FF' },
-      'BEARISH CONFIRM': { cls: 'bear', icon: '▼', label: 'BEARISH', color: '#FFB300' },
-      'NEUTRAL': { cls: 'neutral', icon: '◆', label: 'NEUTRAL', color: '#A855F7' }
+      'AKUMULASI': { cls: 'akum', icon: 'â–²', label: 'AKUMULASI', color: '#00E676' },
+      'DISTRIBUSI': { cls: 'dist', icon: 'â–¼', label: 'DISTRIBUSI', color: '#FF5252' },
+      'BULLISH CONFIRM': { cls: 'bull', icon: 'â–²', label: 'BULLISH', color: '#00E5FF' },
+      'BEARISH CONFIRM': { cls: 'bear', icon: 'â–¼', label: 'BEARISH', color: '#FFB300' },
+      'NEUTRAL': { cls: 'neutral', icon: 'â—†', label: 'NEUTRAL', color: '#A855F7' }
     };
 
     function classifyBT(bt) {
@@ -4105,8 +4108,8 @@
       html += '  <div class="bt-row"><span>Volume</span><span>' + fmtVol(bt.volume) + ' lot</span></div>';
       html += '  <div class="bt-row"><span>Nilai</span><span>' + fmt(bt.value) + '</span></div>';
       html += '  <div class="bt-detail">';
-      html += '    <span>📊 Posisi: ' + cls.position + '%</span>';
-      html += '    <span style="color:' + fwdColor + '">📈 Fwd 3D: ' + fwdSign + cls.fwdReturn + '%</span>';
+      html += '    <span>ðŸ“Š Posisi: ' + cls.position + '%</span>';
+      html += '    <span style="color:' + fwdColor + '">ðŸ“ˆ Fwd 3D: ' + fwdSign + cls.fwdReturn + '%</span>';
       html += '  </div>';
       html += '</div>';
     });
@@ -4118,7 +4121,7 @@
     return window.innerWidth <= 768;
   };
   
-  // Handle resize dari desktop → mobile atau sebaliknya
+  // Handle resize dari desktop â†’ mobile atau sebaliknya
   window.addEventListener('resize', function() {
     if (typeof chart !== 'undefined' && chart) {
       const wrapper = document.getElementById('chartWrapper');
@@ -4218,7 +4221,7 @@
     
     if (!chartArea) return;
     
-    codeLabel.textContent = '— ' + code;
+    codeLabel.textContent = 'â€” ' + code;
     chartArea.innerHTML = '<div class="bt-loading">Loading data...</div>';
     summaryGrid.innerHTML = '';
     
@@ -4325,8 +4328,8 @@
                        : 'Rp '+(d.value/1e6).toFixed(0)+' M';
         
         const phase = phases[i];
-        const phaseIcon = phase.type === 'akum' ? '🟢' : phase.type === 'dist' ? '🔴' 
-                        : phase.type === 'markup' ? '🔵' : phase.type === 'markdown' ? '🟠' : '⚪';
+        const phaseIcon = phase.type === 'akum' ? 'ðŸŸ¢' : phase.type === 'dist' ? 'ðŸ”´' 
+                        : phase.type === 'markup' ? 'ðŸ”µ' : phase.type === 'markdown' ? 'ðŸŸ ' : 'âšª';
         
         return `
           <div class="bt-bar-wrapper">
@@ -4440,7 +4443,7 @@
     const isCollapsed = panel.classList.contains('collapsed');
     
     // Update button icon
-    btn.textContent = isCollapsed ? '+' : '−';
+    btn.textContent = isCollapsed ? '+' : 'âˆ’';
     btn.title = isCollapsed ? 'Expand panel' : 'Collapse panel';
     
     // Resize chart
@@ -4518,7 +4521,7 @@
       // Helper: klasifikasi Block Trade
       function classifyBT(bt) {
         const idx = candleMap.get(String(bt.time));
-        if (!idx) return { type: 'NEUTRAL', color: '#A855F7', label: '◇' };
+        if (!idx) return { type: 'NEUTRAL', color: '#A855F7', label: 'â—‡' };
 
         const c = candleArr[idx.index];
         const open = Number(c.open), close = Number(c.close);
@@ -4541,18 +4544,18 @@
 
         // Rule-based classification
         if (position >= 65 && fwdReturn < -0.5) {
-          return { type: 'DISTRIBUSI', color: '#FF5252', label: '▼DIST' };
+          return { type: 'DISTRIBUSI', color: '#FF5252', label: 'â–¼DIST' };
         }
         if (position <= 35 && fwdReturn > 0.5) {
-          return { type: 'AKUMULASI', color: '#00E676', label: '▲AKUM' };
+          return { type: 'AKUMULASI', color: '#00E676', label: 'â–²AKUM' };
         }
         if (isBullish && fwdReturn > 0) {
-          return { type: 'BULLISH CONFIRM', color: '#00E5FF', label: '▲BULL' };
+          return { type: 'BULLISH CONFIRM', color: '#00E5FF', label: 'â–²BULL' };
         }
         if (!isBullish && fwdReturn < 0) {
-          return { type: 'BEARISH CONFIRM', color: '#FFB300', label: '▼BEAR' };
+          return { type: 'BEARISH CONFIRM', color: '#FFB300', label: 'â–¼BEAR' };
         }
-        return { type: 'NEUTRAL', color: '#A855F7', label: '◇' };
+        return { type: 'NEUTRAL', color: '#A855F7', label: 'â—‡' };
       }
 
       currentMarkers = allTrades.map(nr => {
@@ -4805,8 +4808,8 @@
 
       document.getElementById('bandarDateLabel').innerText =
         current
-          ? `${data.date} · CURRENT`
-          : `${data.date} · STALE`;
+          ? `${data.date} Â· CURRENT`
+          : `${data.date} Â· STALE`;
 
       const scoreEl =
         document.getElementById('bandarScore');
@@ -6612,7 +6615,7 @@ function togglePanel(panelId, headerEl) {
         padding: 10px !important;
       }
       
-      /* === HEADER FIX — geser kanan untuk hindari hamburger === */
+      /* === HEADER FIX â€” geser kanan untuk hindari hamburger === */
       #sf-top-header {
         width: 100% !important;
         padding-left: 60px !important;
@@ -6729,6 +6732,8 @@ function togglePanel(panelId, headerEl) {
 </style>
 </body>
 </html>
+
+
 
 
 

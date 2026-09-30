@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050607">
+  <meta name="description" content="CHARTNALIST — Trading intelligence for Indonesian equities.">
+  <title>CHARTNALIST — Trading Intelligence for IDX</title>
+
+  <style>
+    :root{
+      --bg:#050607;
+      --bg-2:#080a0c;
+      --panel:#0b0e11;
+      --panel-2:#101418;
+      --line:#1b2126;
+      --line-soft:rgba(255,255,255,.065);
+      --text:#f4f6f7;
+      --muted:#89939a;
+      --muted-2:#5e6870;
+      --green:#00d084;
+      --green-soft:rgba(0,208,132,.11);
+      --gold:#d6bd8a;
+      --blue:#66a8ff;
+      --red:#ff5d62;
+      --max:1180px;
+      --radius:18px;
+      --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+      --sans:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      background:
+        radial-gradient(900px 520px at 72% 8%,rgba(0,208,132,.065),transparent 62%),
+        radial-gradient(700px 420px at 10% 24%,rgba(102,168,255,.035),transparent 65%),
+        var(--bg);
+      color:var(--text);
+      font-family:var(--sans);
+      -webkit-font-smoothing:antialiased;
+      overflow-x:hidden;
+    }
+    body:before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.18;
+      background-image:
+        linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+      background-size:56px 56px;
+      mask-image:linear-gradient(to bottom,black,transparent 78%);
+    }
+    a{color:inherit;text-decoration:none}
+    button{font:inherit}
+    .wrap{width:min(var(--max),calc(100% - 40px));margin:0 auto}
+
+    /* NAV */
+    .nav{
+      position:sticky;
+      top:0;
+      z-index:50;
+      height:72px;
+      border-bottom:1px solid rgba(255,255,255,.055);
+      background:rgba(5,6,7,.78);
+      backdrop-filter:blur(18px);
+    }
+    .nav-inner{
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:24px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:190px;
+    }
+    .brand-mark{
+      width:29px;height:29px;
+      display:grid;place-items:center;
+      border-radius:8px;
+      background:linear-gradient(135deg,#e1c991,#a8874c);
+      color:#0a0a08;
+      font:900 10px/1 var(--mono);
+      box-shadow:0 0 24px rgba(214,189,138,.13);
+    }
+    .brand-name{
+      font-size:13px;
+      font-weight:850;
+      letter-spacing:-.025em;
+    }
+    .brand-name .chart{color:var(--green)}
+    .brand-name .nalist{color:#f4f6f7}
+    .brand-sub{
+      margin-top:3px;
+      color:#59636a;
+      font:700 6.5px/1 var(--mono);
+      letter-spacing:.16em;
+    }
+    .nav-links{
+      display:flex;
+      align-items:center;
+      gap:30px;
+      color:#8f989e;
+      font-size:12px;
+      font-weight:650;
+    }
+    .nav-links a:hover{color:#fff}
+    .nav-actions{display:flex;align-items:center;gap:10px}
+    .btn{
+      min-height:40px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:9px;
+      padding:0 16px;
+      border-radius:9px;
+      border:1px solid var(--line);
+      font-size:12px;
+      font-weight:750;
+      transition:.2s ease;
+      cursor:pointer;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn-ghost{background:rgba(255,255,255,.02);color:#d9dee1}
+    .btn-ghost:hover{background:rgba(255,255,255,.055)}
+    .btn-primary{
+      color:#04100a;
+      background:var(--green);
+      border-color:var(--green);
+      box-shadow:0 10px 32px rgba(0,208,132,.13);
+    }
+    .btn-primary:hover{filter:brightness(1.06)}
+    .mobile-menu{display:none}
+
+    /* HERO */
+    .hero{position:relative;padding:110px 0 100px}
+    .hero-grid{
+      display:grid;
+      grid-template-columns:minmax(0,1.02fr) minmax(460px,.98fr);
+      align-items:center;
+      gap:72px;
+    }
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:9px;
+      color:#8f999f;
+      font:750 10px/1 var(--mono);
+      letter-spacing:.15em;
+      text-transform:uppercase;
+    }
+    .eyebrow:before{
+      content:"";
+      width:24px;height:1px;
+      background:var(--green);
+      box-shadow:0 0 10px rgba(0,208,132,.55);
+    }
+    h1{
+      margin:20px 0 22px;
+      max-width:680px;
+      font-size:clamp(48px,6.2vw,78px);
+      line-height:.96;
+      letter-spacing:-.065em;
+      font-weight:790;
+    }
+    h1 em{font-style:normal;color:var(--green)}
+    .hero-copy{
+      max-width:570px;
+      color:#89939a;
+      font-size:16px;
+      line-height:1.72;
+    }
+    .hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:30px}
+    .hero-meta{
+      display:flex;
+      gap:25px;
+      margin-top:34px;
+      color:#5e686f;
+      font:650 9px/1.5 var(--mono);
+      letter-spacing:.05em;
+      text-transform:uppercase;
+    }
+    .hero-meta span{display:flex;align-items:center;gap:7px}
+    .dot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+
+    /* TERMINAL PREVIEW */
+    .terminal{
+      position:relative;
+      border:1px solid #20262b;
+      border-radius:16px;
+      background:#090c0f;
+      box-shadow:0 35px 90px rgba(0,0,0,.48),0 0 80px rgba(0,208,132,.035);
+      overflow:hidden;
+      transform:perspective(1200px) rotateY(-3deg) rotateX(1deg);
+    }
+    .terminal:after{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+    .term-top{
+      height:40px;
+      display:flex;align-items:center;
+      padding:0 14px;
+      border-bottom:1px solid var(--line);
+      background:#0c0f12;
+    }
+    .traffic{display:flex;gap:5px}
+    .traffic i{width:6px;height:6px;border-radius:50%;background:#32383d}
+    .term-title{
+      margin-left:13px;
+      color:#69737a;
+      font:650 8px/1 var(--mono);
+      letter-spacing:.08em;
+    }
+    .term-body{padding:18px}
+    .term-header{display:flex;justify-content:space-between;align-items:end;margin-bottom:17px}
+    .term-kicker{color:#5e686f;font:700 8px/1 var(--mono);letter-spacing:.12em}
+    .term-market{font:800 22px/1 var(--mono);letter-spacing:-.04em}
+    .term-change{color:var(--green);font:750 9px/1 var(--mono)}
+    .chart{
+      position:relative;
+      height:190px;
+      border:1px solid #171d21;
+      border-radius:10px;
+      background:
+        linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),
+        #080b0d;
+      background-size:34px 34px;
+      overflow:hidden;
+    }
+    .chart svg{width:100%;height:100%;display:block}
+    .chart-label{
+      position:absolute;right:10px;top:9px;
+      color:#4f5a61;font:700 7px/1 var(--mono);
+      letter-spacing:.06em;
+    }
+    .term-stats{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:8px;
+      margin-top:9px;
+    }
+    .stat{
+      padding:11px;
+      border:1px solid #171d21;
+      border-radius:8px;
+      background:#0b0e11;
+    }
+    .stat-label{color:#566168;font:700 7px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+    .stat-value{margin-top:7px;font:800 12px/1 var(--mono)}
+    .stat-value.green{color:var(--green)}
+    .stat-value.gold{color:var(--gold)}
+    .term-footer{
+      display:flex;justify-content:space-between;
+      margin-top:12px;
+      color:#485259;font:650 7px/1 var(--mono);
+    }
+
+    /* SECTIONS */
+    section{position:relative}
+    .section{padding:105px 0}
+    .section-head{max-width:690px;margin-bottom:45px}
+    .section-kicker{
+      color:var(--green);
+      font:800 9px/1 var(--mono);
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+    h2{
+      margin:13px 0 15px;
+      font-size:clamp(32px,4vw,52px);
+      line-height:1.02;
+      letter-spacing:-.055em;
+    }
+    .section-copy{color:#7d878e;font-size:15px;line-height:1.7;max-width:610px}
+
+    /* CAPABILITIES */
+    .cap-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+    }
+    .cap{
+      min-height:265px;
+      padding:25px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,.008));
+      transition:.22s ease;
+    }
+    .cap:hover{
+      transform:translateY(-3px);
+      border-color:#2b343a;
+      background:#0d1114;
+    }
+    .cap-index{color:#4d575e;font:700 8px/1 var(--mono)}
+    .cap-icon{
+      width:40px;height:40px;
+      display:grid;place-items:center;
+      margin:34px 0 25px;
+      border:1px solid #253038;
+      border-radius:10px;
+      color:var(--green);
+      background:var(--green-soft);
+      font:800 13px/1 var(--mono);
+    }
+    .cap h3{margin:0 0 10px;font-size:17px;letter-spacing:-.025em}
+    .cap p{margin:0;color:#737e85;font-size:12px;line-height:1.7}
+
+    /* FLOW */
+    .flow-wrap{
+      display:grid;
+      grid-template-columns:.8fr 1.2fr;
+      gap:75px;
+      align-items:center;
+    }
+    .flow-list{border-top:1px solid var(--line)}
+    .flow-row{
+      display:grid;
+      grid-template-columns:44px 1fr auto;
+      align-items:center;
+      min-height:72px;
+      border-bottom:1px solid var(--line);
+    }
+    .flow-num{color:#475159;font:700 9px/1 var(--mono)}
+    .flow-name{font-size:14px;font-weight:720}
+    .flow-desc{color:#667178;font-size:10px}
+    .flow-arrow{color:#5c686f;font:700 12px/1 var(--mono)}
+
+    /* SIGNAL BOARD */
+    .board{
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#090c0f;
+      overflow:hidden;
+    }
+    .board-head{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:15px 18px;
+      border-bottom:1px solid var(--line);
+    }
+    .board-title{font:800 9px/1 var(--mono);letter-spacing:.12em;color:#9aa3a9}
+    .board-badge{
+      color:var(--green);
+      font:750 8px/1 var(--mono);
+      padding:6px 8px;
+      border:1px solid rgba(0,208,132,.18);
+      border-radius:5px;
+      background:var(--green-soft);
+    }
+    .board-grid{
+      display:grid;
+      grid-template-columns:1.1fr .9fr .8fr .8fr;
+      padding:0 18px;
+    }
+    .board-cell{
+      min-height:67px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      border-bottom:1px solid #151a1e;
+    }
+    .board-cell:not(:last-child){padding-right:18px}
+    .board-label{color:#4f5a61;font:700 7px/1 var(--mono);letter-spacing:.09em}
+    .board-value{margin-top:7px;font:800 11px/1 var(--mono)}
+    .board-value.green{color:var(--green)}
+    .board-value.gold{color:var(--gold)}
+    .board-value.red{color:var(--red)}
+    .board-foot{
+      display:flex;justify-content:space-between;
+      padding:14px 18px;
+      color:#4e5960;font:650 7px/1 var(--mono);
+    }
+
+    /* CTA */
+    .cta{
+      padding:105px 0 120px;
+    }
+    .cta-box{
+      position:relative;
+      overflow:hidden;
+      padding:75px 65px;
+      border:1px solid #222a2f;
+      border-radius:20px;
+      background:
+        radial-gradient(500px 260px at 90% 30%,rgba(0,208,132,.10),transparent 70%),
+        linear-gradient(135deg,#0b0f11,#080a0c);
+    }
+    .cta-box:before{
+      content:"";
+      position:absolute;
+      width:400px;height:400px;
+      right:-210px;bottom:-260px;
+      border:1px solid rgba(214,189,138,.10);
+      border-radius:50%;
+    }
+    .cta-box h2{max-width:680px}
+    .cta-box p{max-width:580px;color:#7d878e;line-height:1.7}
+    .cta-actions{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap}
+
+    /* FOOTER */
+    footer{
+      border-top:1px solid var(--line);
+      padding:28px 0 35px;
+    }
+    .footer-inner{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:20px;
+      color:#4f5a61;
+      font:650 8px/1.5 var(--mono);
+    }
+    .footer-links{display:flex;gap:20px}
+    .footer-links a:hover{color:#9aa3a9}
+
+    @media (max-width: 980px){
+      .nav-links{display:none}
+      .mobile-menu{display:inline-flex}
+      .hero{padding-top:80px}
+      .hero-grid{grid-template-columns:1fr;gap:55px}
+      .terminal{max-width:720px}
+      .flow-wrap{grid-template-columns:1fr;gap:45px}
+    }
+
+    @media (max-width: 720px){
+      .wrap{width:min(var(--max),calc(100% - 28px))}
+      .nav{height:64px}
+      .brand{min-width:auto}
+      .brand-sub{display:none}
+      .nav-actions .btn-ghost{display:none}
+      .hero{padding:65px 0 70px}
+      h1{font-size:clamp(43px,14vw,62px)}
+      .hero-copy{font-size:14px}
+      .hero-meta{flex-wrap:wrap;gap:13px}
+      .terminal{transform:none}
+      .term-body{padding:12px}
+      .term-stats{grid-template-columns:1fr 1fr 1fr}
+      .section{padding:75px 0}
+      .cap-grid{grid-template-columns:1fr}
+      .cap{min-height:auto}
+      .board-grid{grid-template-columns:1fr 1fr}
+      .board-cell:nth-child(2){border-left:1px solid #151a1e;padding-left:14px}
+      .board-cell:nth-child(3){padding-right:18px}
+      .cta{padding:75px 0 85px}
+      .cta-box{padding:45px 26px}
+      .footer-inner{align-items:flex-start;flex-direction:column}
+      .footer-links{flex-wrap:wrap}
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      html{scroll-behavior:auto}
+      *,*:before,*:after{transition:none!important}
+    }
+  </style>
+</head>
+
+<body>
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="/" aria-label="CHARTNALIST home">
+        <div class="brand-mark">CN</div>
+        <div>
+          <div class="brand-name"><span class="chart">CHART</span><span class="nalist">NALIST</span></div>
+          <div class="brand-sub">IDX TRADING INTELLIGENCE</div>
+        </div>
+      </a>
+
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="#intelligence">Intelligence</a>
+        <a href="#workflow">How it works</a>
+        <a href="#terminal">Terminal</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a class="btn btn-ghost" href="/login">Sign In</a>
+        <a class="btn btn-primary" href="/register">Get Started</a>
+        <button class="btn btn-ghost mobile-menu" type="button" onclick="document.getElementById('mobile-nav').toggleAttribute('hidden')">Menu</button>
+      </div>
+    </div>
+
+    <div id="mobile-nav" hidden style="border-top:1px solid #171c20;background:#07090b">
+      <div class="wrap" style="padding:15px 0;display:grid;gap:14px;font-size:12px;color:#9aa3a9">
+        <a href="#intelligence" onclick="document.getElementById('mobile-nav').hidden=true">Intelligence</a>
+        <a href="#workflow" onclick="document.getElementById('mobile-nav').hidden=true">How it works</a>
+        <a href="#terminal" onclick="document.getElementById('mobile-nav').hidden=true">Terminal</a>
+        <a href="/login">Sign In</a>
+        <a href="/register" style="color:#00d084">Get Started</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow">Trading intelligence for IDX</div>
+          <h1>See the market.<br><em>Before the noise.</em></h1>
+          <p class="hero-copy">
+            CHARTNALIST brings market data, technical structure, participation and flow
+            into one focused trading intelligence workspace for Indonesian equities.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="/app">Open Terminal <span>→</span></a>
+            <a class="btn btn-ghost" href="#intelligence">Explore Intelligence</a>
+          </div>
+
+          <div class="hero-meta">
+            <span><i class="dot"></i> IDX focused</span>
+            <span>Market data</span>
+            <span>Technical structure</span>
+          </div>
+        </div>
+
+        <div class="terminal" aria-label="Illustrative CHARTNALIST terminal preview">
+          <div class="term-top">
+            <div class="traffic"><i></i><i></i><i></i></div>
+            <div class="term-title">CHARTNALIST / MARKET OVERVIEW</div>
+          </div>
+          <div class="term-body">
+            <div class="term-header">
+              <div>
+                <div class="term-kicker">MARKET REGIME</div>
+                <div class="term-market">IHSG</div>
+              </div>
+              <div style="text-align:right">
+                <div class="term-market">6,445.26</div>
+                <div class="term-change">+0.82% · PREVIEW</div>
+              </div>
+            </div>
+
+            <div class="chart">
+              <span class="chart-label">ILLUSTRATIVE UI</span>
+              <svg viewBox="0 0 700 240" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="area" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0" stop-color="#00d084" stop-opacity=".18"/>
+                    <stop offset="1" stop-color="#00d084" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M0 185 L34 179 L67 190 L100 166 L132 173 L164 147 L196 158 L228 129 L260 137 L292 119 L325 126 L356 92 L390 110 L420 82 L454 94 L486 68 L518 78 L550 54 L582 64 L616 38 L650 48 L700 24 L700 240 L0 240 Z" fill="url(#area)"/>
+                <path d="M0 185 L34 179 L67 190 L100 166 L132 173 L164 147 L196 158 L228 129 L260 137 L292 119 L325 126 L356 92 L390 110 L420 82 L454 94 L486 68 L518 78 L550 54 L582 64 L616 38 L650 48 L700 24" fill="none" stroke="#00d084" stroke-width="3"/>
+              </svg>
+            </div>
+
+            <div class="term-stats">
+              <div class="stat"><div class="stat-label">Regime</div><div class="stat-value green">BULLISH</div></div>
+              <div class="stat"><div class="stat-label">Flow</div><div class="stat-value">POSITIVE</div></div>
+              <div class="stat"><div class="stat-label">Signal</div><div class="stat-value gold">WATCH</div></div>
+            </div>
+            <div class="term-footer"><span>UI PREVIEW · NOT LIVE DATA</span><span>IDX / INTELLIGENCE</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="intelligence">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-kicker">01 / Intelligence layer</div>
+          <h2>Less noise.<br>More market context.</h2>
+          <p class="section-copy">
+            Three focused surfaces turn a large equity universe into a workflow:
+            discover candidates, understand the signal, then keep the names that matter close.
+          </p>
+        </div>
+
+        <div class="cap-grid">
+          <article class="cap">
+            <div class="cap-index">01</div>
+            <div class="cap-icon">SC</div>
+            <h3>Screener</h3>
+            <p>Filter the IDX universe through market activity, technical structure, participation and flow-oriented factors.</p>
+          </article>
+
+          <article class="cap">
+            <div class="cap-index">02</div>
+            <div class="cap-icon">SG</div>
+            <h3>Signals</h3>
+            <p>Turn market evidence into concise, explainable trade ideas with the context behind each signal.</p>
+          </article>
+
+          <article class="cap">
+            <div class="cap-index">03</div>
+            <div class="cap-icon">SW</div>
+            <h3>Smartwatchlist</h3>
+            <p>Keep the stocks that deserve attention in one focused view instead of scanning everything manually.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="workflow">
+      <div class="wrap flow-wrap">
+        <div>
+          <div class="section-kicker">02 / Decision workflow</div>
+          <h2>From data<br>to decision.</h2>
+          <p class="section-copy">
+            CHARTNALIST is designed around the sequence traders actually need:
+            observe the market, inspect structure, validate participation and flow, then act on a defined setup.
+          </p>
+        </div>
+
+        <div class="flow-list">
+          <div class="flow-row"><div class="flow-num">01</div><div><div class="flow-name">Market Data</div><div class="flow-desc">Price, volume, value, frequency & flow</div></div><div class="flow-arrow">→</div></div>
+          <div class="flow-row"><div class="flow-num">02</div><div><div class="flow-name">Structure</div><div class="flow-desc">Trend, range, candle & relative strength</div></div><div class="flow-arrow">→</div></div>
+          <div class="flow-row"><div class="flow-num">03</div><div><div class="flow-name">Participation</div><div class="flow-desc">Activity, ratios & persistence</div></div><div class="flow-arrow">→</div></div>
+          <div class="flow-row"><div class="flow-num">04</div><div><div class="flow-name">Flow</div><div class="flow-desc">Foreign activity & market participation</div></div><div class="flow-arrow">→</div></div>
+          <div class="flow-row"><div class="flow-num">05</div><div><div class="flow-name">Signal</div><div class="flow-desc">A focused setup with a reason behind it</div></div><div class="flow-arrow">✓</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="terminal">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-kicker">03 / Product preview</div>
+          <h2>A trading terminal<br>built around evidence.</h2>
+          <p class="section-copy">
+            One workspace for the parts of the process that matter: discovery,
+            signal context and a watchlist that stays actionable.
+          </p>
+        </div>
+
+        <div class="board">
+          <div class="board-head">
+            <div class="board-title">SMARTWATCHLIST / MARKET INTELLIGENCE</div>
+            <div class="board-badge">FREE ACCESS</div>
+          </div>
+
+          <div class="board-grid">
+            <div class="board-cell"><div class="board-label">SYMBOL</div><div class="board-value">BBCA</div></div>
+            <div class="board-cell"><div class="board-label">SETUP</div><div class="board-value green">MOMENTUM</div></div>
+            <div class="board-cell"><div class="board-label">FLOW</div><div class="board-value green">POSITIVE</div></div>
+            <div class="board-cell"><div class="board-label">STATUS</div><div class="board-value gold">WATCH</div></div>
+
+            <div class="board-cell"><div class="board-label">SYMBOL</div><div class="board-value">BMRI</div></div>
+            <div class="board-cell"><div class="board-label">SETUP</div><div class="board-value">PULLBACK</div></div>
+            <div class="board-cell"><div class="board-label">FLOW</div><div class="board-value green">BUILDING</div></div>
+            <div class="board-cell"><div class="board-label">STATUS</div><div class="board-value gold">WATCH</div></div>
+
+            <div class="board-cell"><div class="board-label">SYMBOL</div><div class="board-value">TLKM</div></div>
+            <div class="board-cell"><div class="board-label">SETUP</div><div class="board-value red">HIGH RISK</div></div>
+            <div class="board-cell"><div class="board-label">FLOW</div><div class="board-value">MIXED</div></div>
+            <div class="board-cell"><div class="board-label">STATUS</div><div class="board-value">MONITOR</div></div>
+          </div>
+
+          <div class="board-foot">
+            <span>PRODUCT UI CONCEPT · DATA SHOWN FOR VISUALIZATION</span>
+            <span>CHARTNALIST</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="wrap">
+        <div class="cta-box">
+          <div class="section-kicker">04 / Start your workspace</div>
+          <h2>Stop watching everything.<br>Focus on what matters.</h2>
+          <p>
+            Start with the free CHARTNALIST workspace and build your market workflow
+            around the signals and stocks you actually want to follow.
+          </p>
+          <div class="cta-actions">
+            <a class="btn btn-primary" href="/register">Get Started <span>→</span></a>
+            <a class="btn btn-ghost" href="/login">Sign In</a>
+            <a class="btn btn-ghost" href="/app">Open Terminal</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <div>© 2026 CHARTNALIST · IDX TRADING INTELLIGENCE</div>
+      <div class="footer-links">
+        <a href="/login">Sign In</a>
+        <a href="/register">Get Started</a>
+        <a href="/app">Terminal</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

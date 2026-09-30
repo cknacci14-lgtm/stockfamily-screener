@@ -57,6 +57,8 @@
     },
     {
       key: "admin",
+      role: "admin",
+      phase6RoleGuard: "CHARTNALIST_PHASE6_ADMIN_ROLE",
       label: "Admin",
       href: "/admin.html",
       icon: `
@@ -1161,6 +1163,34 @@
     return sidebar;
   }
 
+  // ============================================================
+  // CHARTNALIST_PHASE6_ADMIN_ROLE
+  // Admin navigation is hidden by default and revealed only when
+  // chartnalistAuth confirms role === "admin".
+  // ============================================================
+
+  function applyAdminRoleVisibility() {
+    const sidebar = document.getElementById(
+      "stockfamily-global-sidebar"
+    );
+
+    if (!sidebar) return;
+
+    const adminLink = sidebar.querySelector(
+      '.sf-nav-link[href="/admin.html"]'
+    );
+
+    if (!adminLink) return;
+
+    const authState = window.chartnalistAuth;
+    const isAdmin = authState?.isAdmin === true;
+
+    adminLink.style.display = isAdmin ? "" : "none";
+    adminLink.setAttribute(
+      "aria-hidden",
+      isAdmin ? "false" : "true"
+    );
+  }
   function markActive(sidebar) {
 
     const current =
@@ -1508,6 +1538,13 @@
 
     markActive(
       sidebar
+    );
+
+    applyAdminRoleVisibility();
+
+    window.addEventListener(
+      "chartnalist:auth-ready",
+      applyAdminRoleVisibility
     );
 
     setupToggle(

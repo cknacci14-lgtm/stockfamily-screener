@@ -1,4 +1,4 @@
-﻿// src/server.js - FIX V2.4 - Express v5 Safe Routing
+// src/server.js - FIX V2.4 - Express v5 Safe Routing
 const fs = require('fs');
 const express = require('express');
 const path = require('path');
@@ -39,6 +39,116 @@ app.use((req, res, next) => {
 });
 
 app.get('/api/test', (req, res) => res.json({ ok: true }));
+app.get('/api/auth/me', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization || '';
+    const match = authHeader.match(/^Bearer\s+(.+)$/i);
+
+    if (!match) {
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication required'
+      });
+    }
+
+    const accessToken = match[1];
+
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return res.status(500).json({
+        success: false,
+        error: 'Supabase server configuration missing'
+      });
+    }
+
+    const { createClient } = require('@supabase/supabase-js');
+
+    const adminClient = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    );
+
+    const {
+      data: { user },
+      error: userError
+    } = await adminClient.auth.getUser(accessToken);
+
+    if (userError || !user) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid or expired session'
+      });
+    }
+
+    const {
+      data: profile,
+      error: profileError
+    } = await adminClient
+      .from('profiles')
+      .select('id, email, display_name, avatar_url, role, plan, created_at')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (profileError) {
+      console.error('[AUTH ME] Profile query error:', profileError);
+
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to load user profile'
+      });
+    }
+
+    if (!profile) {
+      return res.status(404).json({
+        success: false,
+        error: 'User profile not found'
+      });
+    }
+
+    return res.json({
+      success: true,
+      user: {
+        id: user.id,
+        email: profile.email || user.email || '',
+        displayName: profile.display_name || '',
+        avatarUrl: profile.avatar_url || '',
+        role: profile.role || 'user',
+        plan: profile.plan || 'free',
+        createdAt: profile.created_at || null
+      }
+    });
+
+  } catch (error) {
+    console.error('[AUTH ME] Unexpected error:', error);
+
+    return res.status(500).json({
+      success: false,
+      error: 'Authentication service error'
+    });
+  }
+});
+app.get('/api/auth/config', (req, res) => {
+  const url = process.env.SUPABASE_URL;
+  const anonKey = process.env.SUPABASE_ANON_KEY;
+
+  if (!url || !anonKey) {
+    return res.status(500).json({
+      success: false,
+      error: 'Supabase Auth configuration missing'
+    });
+  }
+
+  res.json({
+    success: true,
+    supabaseUrl: url,
+    supabaseAnonKey: anonKey
+  });
+});
 
 // QBS production surface: event intelligence only.
 // No broker orders, capital execution, or production-trading approval is performed here.
@@ -128,7 +238,87 @@ app.post('/api/qbs/refresh', async (req, res) => {
   }
 });
 
-app.get('/api/admin/stats', async (req, res) => {
+
+/* ============================================================
+   CHARTNALIST_PHASE6_4_REQUIRE_ADMIN
+   Server-side role enforcement for /api/admin/*
+   ============================================================ */
+async function requireAdmin(req, res, next) {
+  try {
+    const authHeader = req.headers.authorization || '';
+    const match = authHeader.match(/^Bearer\s+(.+)$/i);
+
+    if (!match) {
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication required'
+      });
+    }
+
+    const accessToken = match[1];
+
+    const {
+      data: { user },
+      error: userError
+    } = await supabase.auth.getUser(accessToken);
+
+    if (userError || !user) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid or expired session'
+      });
+    }
+
+    const {
+      data: profile,
+      error: profileError
+    } = await supabase
+      .from('profiles')
+      .select('id, email, role, plan')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (profileError) {
+      console.error('[ADMIN AUTH] Profile query error:', profileError);
+
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to verify admin profile'
+      });
+    }
+
+    if (!profile) {
+      return res.status(403).json({
+        success: false,
+        error: 'Profile not found'
+      });
+    }
+
+    if (profile.role !== 'admin') {
+      console.warn(
+        `[ADMIN AUTH] Forbidden user ${user.id} (${profile.email || user.email || 'unknown'})`
+      );
+
+      return res.status(403).json({
+        success: false,
+        error: 'Admin access required'
+      });
+    }
+
+    req.authUser = user;
+    req.authProfile = profile;
+
+    next();
+  } catch (error) {
+    console.error('[ADMIN AUTH] Unexpected error:', error);
+
+    return res.status(500).json({
+      success: false,
+      error: 'Admin authentication service error'
+    });
+  }
+}
+app.get('/api/admin/stats', requireAdmin, async (req, res) => {
   try {
     const { data: lastBatch } = await supabase.from('upload_batches').select('*').order('trade_date', { ascending: false }).limit(1).maybeSingle();
     const { count } = await supabase.from('daily_stock_data').select('id', { count: 'exact', head: true });
@@ -140,7 +330,7 @@ app.get('/api/admin/stats', async (req, res) => {
   }
 });
 
-app.get('/api/admin/daily-summary', async (req, res) => {
+app.get('/api/admin/daily-summary', requireAdmin, async (req, res) => {
   try {
     const { data: latestRow, error: dErr } = await supabase
       .from('daily_stock_data')
@@ -219,10 +409,10 @@ app.get('/api/admin/daily-summary', async (req, res) => {
   }
 });
 
-app.get('/api/admin/settings', (req, res) => res.json({ success: true, settings: {} }));
-app.post('/api/admin/settings', (req, res) => res.json({ success: true }));
-app.post('/api/admin/scrape', (req, res) => res.json({ success: true, message: 'Scrape disabled in FIX mode' }));
-app.delete('/api/admin/cache', (req, res) => res.json({ success: true, message: 'Cache cleared' }));
+app.get('/api/admin/settings', requireAdmin, (req, res) => res.json({ success: true, settings: {} }));
+app.post('/api/admin/settings', requireAdmin, (req, res) => res.json({ success: true }));
+app.post('/api/admin/scrape', requireAdmin, (req, res) => res.json({ success: true, message: 'Scrape disabled in FIX mode' }));
+app.delete('/api/admin/cache', requireAdmin, (req, res) => res.json({ success: true, message: 'Cache cleared' }));
 
 app.get('/api/backtest/dates', async (req, res) => {
   try {
@@ -285,7 +475,7 @@ function saveExcelToArchive(fileBuffer, originalName) {
   }
 }
 
-app.post('/api/admin/upload-multiple', upload.array('excelFiles'), async (req, res) => {
+app.post('/api/admin/upload-multiple', requireAdmin, upload.array('excelFiles'), async (req, res) => {
   console.log(`[UPLOAD] hit ${req.files?.length || 0} files`);
   try {
     if (!req.files?.length) return res.status(400).json({ success: false, error: 'No files received, field must be excelFiles' });
@@ -899,7 +1089,7 @@ function calcRR(s) {
 // === GET ALL SIGNALS (admin) ===
 
 // === UPLOAD SIGNAL IMAGE ===
-app.post('/api/admin/signals/upload-image', express.json({ limit: '10mb' }), async (req, res) => {
+app.post('/api/admin/signals/upload-image', requireAdmin, express.json({ limit: '10mb' }), async (req, res) => {
   try {
     const { image, filename } = req.body || {};
     if (!image || !filename) {
@@ -934,7 +1124,7 @@ app.post('/api/admin/signals/upload-image', express.json({ limit: '10mb' }), asy
 });
 
 // === DELETE SIGNAL IMAGE ===
-app.delete('/api/admin/signals/delete-image', express.json(), async (req, res) => {
+app.delete('/api/admin/signals/delete-image', requireAdmin, express.json(), async (req, res) => {
   try {
     const { path: storagePath } = req.body || {};
     if (!storagePath) return res.status(400).json({ success: false, error: 'path wajib' });
@@ -947,7 +1137,7 @@ app.delete('/api/admin/signals/delete-image', express.json(), async (req, res) =
   }
 });
 
-app.get('/api/admin/signals', async (req, res) => {
+app.get('/api/admin/signals', requireAdmin, async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('signals')
@@ -962,7 +1152,7 @@ app.get('/api/admin/signals', async (req, res) => {
 });
 
 // === GET SIGNAL DETAIL ===
-app.get('/api/admin/signals/:id', async (req, res) => {
+app.get('/api/admin/signals/:id', requireAdmin, async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const { data: signal, error: sErr } = await supabase
@@ -985,7 +1175,7 @@ app.get('/api/admin/signals/:id', async (req, res) => {
 });
 
 // === CREATE SIGNAL (draft) ===
-app.post('/api/admin/signals', async (req, res) => {
+app.post('/api/admin/signals', requireAdmin, async (req, res) => {
   try {
     const body = req.body || {};
     const errors = validateSignalInput(body);
@@ -1036,7 +1226,7 @@ app.post('/api/admin/signals', async (req, res) => {
 });
 
 // === UPDATE SIGNAL ===
-app.patch('/api/admin/signals/:id', async (req, res) => {
+app.patch('/api/admin/signals/:id', requireAdmin, async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const body = req.body || {};
@@ -1073,7 +1263,7 @@ app.patch('/api/admin/signals/:id', async (req, res) => {
 });
 
 // === PUBLISH SIGNAL ===
-app.post('/api/admin/signals/:id/publish', async (req, res) => {
+app.post('/api/admin/signals/:id/publish', requireAdmin, async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const { data: existing } = await supabase
@@ -1105,7 +1295,7 @@ app.post('/api/admin/signals/:id/publish', async (req, res) => {
 });
 
 // === DELETE SIGNAL (only draft) ===
-app.delete('/api/admin/signals/:id', async (req, res) => {
+app.delete('/api/admin/signals/:id', requireAdmin, async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const { data: existing } = await supabase
@@ -1542,6 +1732,27 @@ app.use((req, res, next) => {
 });
 
 // ROUTE CATCH-ALL UNTUK FRONTEND (Aman Express v5)
+// === STOCKFAMILY AUTH / ENTRY ROUTES ===
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/landing.html'));
+});
+
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/login.html'));
+});
+
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/register.html'));
+});
+
+app.get('/forgot-password', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/forgot-password.html'));
+});
+
+app.get('/app', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
 app.get(/^(?!\/api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });

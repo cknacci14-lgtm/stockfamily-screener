@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — CHARTNALIST</title>
+  <link rel="stylesheet" href="/assets/stockfamily-auth.css">
+</head>
+<body class="sf-auth-page">
+  <main class="sf-auth-shell">
+    <section class="sf-auth-card">
+      <a href="/" class="sf-brand">CHARTNALIST<span></span></a>
+
+      <div class="sf-auth-heading">
+        <div class="sf-eyebrow">MARKET INTELLIGENCE</div>
+        <h1>Welcome back.</h1>
+        <p>Sign in to access your CHARTNALIST workspace.</p>
+      </div>
+
+      <form id="loginForm" class="sf-form">
+        <label>
+          Email
+          <input id="email" type="email" autocomplete="email" required>
+        </label>
+
+        <label>
+          Password
+          <input id="password" type="password" autocomplete="current-password" required>
+        </label>
+
+        <div id="authMessage" class="sf-message" hidden></div>
+
+        <button type="submit" class="sf-button sf-button-primary sf-button-full">
+          Sign In
+        </button>
+      </form>
+
+      <a href="/forgot-password" class="sf-link">Forgot password?</a>
+
+      <div class="sf-auth-footer">
+        Don't have an account?
+        <a href="/register">Create one</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/stockfamily-auth.js"></script>
+</body>
+</html>
+
+
+
+
+
+

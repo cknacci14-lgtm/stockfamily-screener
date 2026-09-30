@@ -30,6 +30,46 @@ app.get('/api/test', (c) => {
 });
 
 // ============================================================
+// ============================================================
+// AUTH (CHARTNALIST) - Edge-compatible
+// ============================================================
+app.get('/api/auth/config', (c) => {
+  const supabaseUrl = c.env.SUPABASE_URL;
+  const supabaseAnonKey = c.env.SUPABASE_ANON_KEY;
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return c.json({ success: false, error: 'Auth config incomplete' }, 503);
+  }
+  return c.json({ success: true, supabaseUrl, supabaseAnonKey });
+});
+
+app.get('/api/auth/me', async (c) => {
+  const authHeader = c.req.header('Authorization') || '';
+  const match = authHeader.match(/^Bearer\s+(.+)$/i);
+  if (!match) {
+    return c.json({ success: false, error: 'Authentication required' }, 401);
+  }
+  const token = match[1];
+  const url = c.env.SUPABASE_URL;
+  const key = c.env.SUPABASE_SERVICE_ROLE_KEY || c.env.SUPABASE_ANON_KEY;
+  if (!url || !key) {
+    return c.json({ success: false, error: 'Supabase server configuration missing' }, 500);
+  }
+  try {
+    const res = await fetch(url + '/auth/v1/user', {
+      headers: { 'Authorization': 'Bearer ' + token, 'apikey': key },
+    });
+    if (!res.ok) {
+      return c.json({ success: false, error: 'Invalid or expired session' }, 401);
+    }
+    const user = await res.json();
+    const isAdmin = user?.app_metadata?.role === 'admin'
+      || user?.user_metadata?.role === 'admin';
+    return c.json({ success: true, user, isAdmin });
+  } catch (e) {
+    return c.json({ success: false, error: e.message }, 500);
+  }
+});
+
 // BATCH A: HISTORY (Candlestick + Volume + NonRegular)
 // ============================================================
 app.get('/api/public/history/:code', async (c) => {
