@@ -87,7 +87,7 @@ async function runV3() {
         regime: result.regime,
         regimeDetails: result.regimeDetails,
         generatedAt: new Date().toISOString(),
-        lastSync: new Date().toLocaleString("id-ID"),
+        lastSync: new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" }),
         total: data.length,
         data: data,
     };
@@ -106,7 +106,7 @@ async function runV4() {
         regime: "legacy",
         regimeDetails: null,
         generatedAt: new Date().toISOString(),
-        lastSync: new Date().toLocaleString("id-ID"),
+        lastSync: new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" }),
         total: results.length,
         data: results,
     };
