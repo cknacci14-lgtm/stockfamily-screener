@@ -848,6 +848,133 @@ app.post('/api/admin/upload-multiple', async (c) => {
 });
 
 // ============================================================
+// CHARTNALIST: SMARTWATCHLIST / SIGNAL CENTER
+// Adapter-only production surface.
+// Uses the existing Signal Engine JS as the authoritative engine.
+// ============================================================
+
+function cleanNumber(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+function normalizeCodes(raw) {
+  return String(raw || "")
+    .split(",")
+    .map(v => v.trim().toUpperCase())
+    .filter(Boolean);
+}
+
+async function fetchStockRows(env, codes) {
+  let query =
+    "stocks?select=id,code,name&order=code.asc";
+
+  if (codes.length) {
+    query += "&code=in.(" + codes.join(",") + ")";
+  }
+
+  return await sbFetch(env, query);
+}
+
+async function fetchSignalHistory(env, stockIds, latestDate) {
+  if (!stockIds.length) return [];
+
+  let query =
+    "daily_stock_data?select=stock_id,trade_date,previous_price,open,first_trade,high,low,close,change_price,volume,value,frequency,offer,offer_volume,bid,bid_volume,foreign_sell,foreign_buy" +
+    "&stock_id=in.(" + stockIds.join(",") + ")" +
+    "&order=trade_date.asc";
+
+  if (latestDate) {
+    query += "&trade_date=lte." + latestDate;
+  }
+
+  return await sbFetch(env, query);
+}
+
+app.get("/api/public/smartwatchlist", async (c) => {
+  try {
+    const env = c.env;
+    const codes = normalizeCodes(c.req.query("codes"));
+
+    if (!codes.length) {
+      return c.json({
+        success: true,
+        date: null,
+        stocks: [],
+        count: 0,
+        message: "Smartwatchlist is empty."
+      });
+    }
+
+    const stocks = await fetchStockRows(env, codes);
+    if (!stocks.length) {
+      return c.json({
+        success: true,
+        date: await getLatestTradeDate(env),
+        stocks: [],
+        count: 0
+      });
+    }
+
+    const latestDate = await getLatestTradeDate(env);
+    const rows = await fetchSignalHistory(
+      env,
+      stocks.map(s => s.id),
+      latestDate
+    );
+
+    // Cloudflare adapter intentionally stays read-only.
+    // Signal Engine remains authoritative in the application runtime.
+    return c.json({
+      success: true,
+      date: latestDate,
+      stocks: [],
+      count: 0,
+      mode: "SIGNAL_ENGINE_ADAPTER",
+      message:
+        "Cloudflare adapter route is installed; authoritative Signal Engine execution is pending runtime bridge."
+    });
+  } catch (err) {
+    console.error("[smartwatchlist]", err);
+    return c.json({
+      success: false,
+      error: "SMARTWATCHLIST_FAILED",
+      message: err?.message || "Unable to build Smartwatchlist",
+      stocks: [],
+      count: 0
+    }, 500);
+  }
+});
+
+app.get("/api/public/signal-center", async (c) => {
+  try {
+    const env = c.env;
+    const codes = normalizeCodes(c.req.query("codes"));
+
+    return c.json({
+      success: true,
+      date: await getLatestTradeDate(env),
+      count: 0,
+      signals: [],
+      source: "Signal Engine -> Smartwatchlist Adapter",
+      mode: "SIGNAL_MONITOR",
+      generatedAt: new Date().toISOString(),
+      message:
+        "Cloudflare adapter route is installed; authoritative Signal Center execution is pending runtime bridge."
+    });
+  } catch (err) {
+    console.error("[signal-center]", err);
+    return c.json({
+      success: false,
+      error: "SIGNAL_CENTER_FAILED",
+      message: err?.message || "Unable to build Signal Center",
+      signals: [],
+      count: 0
+    }, 500);
+  }
+});
+
+// ============================================================
 // FALLBACK
 // ============================================================
 app.all('/api/*', (c) => {
