@@ -183,7 +183,7 @@
 .research-card-clickable{cursor:pointer;transition:.15s}
 .research-card-clickable:hover{border-color:#273238;transform:translateY(-1px)}
 </style>
-<link rel="stylesheet" href="/assets/chartnalist-typography.css">
+<!-- removed: chartnalist-typography.css (file missing) -->
 </head>
 
 <body>
@@ -791,7 +791,7 @@
 
       refresh.disabled = true;
 
-      if (force) {
+      if (false && force) { /* static mode */
         refresh.innerHTML = `
           <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i>
           LOADING
@@ -807,7 +807,7 @@
         let res;
 
         // Force canonical QBS V4.9.1 refresh when user clicks REFRESH.
-        if (force) {
+        if (false && force) { /* static mode */
           const refreshRes =
             await fetch(
               "/api/qbs/refresh",
@@ -836,7 +836,7 @@
         // Read fresh canonical QBS snapshot.
         res =
           await fetch(
-            "/api/qbs/production",
+            "/screener_results.json?v=" + Date.now(),
             {
               cache: "no-store"
             }
@@ -1128,7 +1128,7 @@
 
         showEmpty(
           "Data tidak dapat dimuat",
-          "Pastikan backend QBS berjalan dan endpoint /api/qbs/production tersedia."
+          "Pastikan /screener_results.json tersedia (dijalankan oleh cron harian)."
         );
 
         status.textContent =
@@ -1268,7 +1268,7 @@ function closeResearchDetail(){
 }
 </script>
 <script src="/assets/stockfamily-sidebar.js"></script>
-<script src="/assets/chartnalist-typography.js"></script>
+<!-- removed: chartnalist-typography.js (file missing) -->
 </body>
 </html>
 
