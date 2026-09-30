@@ -21,6 +21,9 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: '1'
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: '1'
         run: npm install --omit=dev --no-audit --no-fund --ignore-scripts
 
       - name: Run QBS screener
