@@ -7,6 +7,8 @@ const xlsx = require('xlsx');
 require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
 const { runQbsProductionSnapshot, clearProductionCache } = require('./services/qbsProductionService');
+const { runStockScreenerV3 } = require('./engine/screenerV3');
+const SCREENER_ENGINE = (process.env.SCREENER_ENGINE || 'v3').toLowerCase();
 const gemScoreRoute = require('./routes/gemScoreRoute');
 const { buildSmartwatchlist } = require('./services/smartwatchlistService');
 const { buildSignalCenter } = require('./services/signalCenterService');
@@ -28,7 +30,7 @@ try {
   backtestEngine = require('./engine/backtestEngine');
   console.log('[OK] Backtest Engine loaded');
 } catch (e) { 
-    console.error('âŒ Backtest Engine:', e.message);
+    console.error('â Backtest Engine:', e.message);
 }
 
 app.use((req, res, next) => {
@@ -40,14 +42,45 @@ app.get('/api/test', (req, res) => res.json({ ok: true }));
 
 // QBS production surface: event intelligence only.
 // No broker orders, capital execution, or production-trading approval is performed here.
+//
+// Engine switch (query param overrides env):
+//   default    -> V3 (Supportive only, A/B FULL, C SKIP, exit T+10)
+//   ?engine=v4 -> legacy V4.9.1 production snapshot
 app.get('/api/qbs/production', async (req, res) => {
+  const engine = (req.query.engine || SCREENER_ENGINE || 'v3').toLowerCase();
   try {
-    const snapshot = await runQbsProductionSnapshot({
-      force: req.query.refresh === '1',
-      targetDate: req.query.targetDate || null,
+    if (engine === 'v4') {
+      const snapshot = await runQbsProductionSnapshot({
+        force: req.query.refresh === '1',
+        targetDate: req.query.targetDate || null,
+      });
+      res.set('Cache-Control', 'no-store');
+      return res.json({ success: true, engine: 'v4', ...snapshot });
+    }
+
+    // V3 default
+    const result = await runStockScreenerV3({
+      limitDays: Number(req.query.days) || 60,
+      limit: Number(req.query.limit) || 50,
     });
+
+    const now = new Date();
+    const firstRow = (result.data && result.data[0]) || null;
+
     res.set('Cache-Control', 'no-store');
-    res.json({ success: true, ...snapshot });
+    return res.json({
+      success: true,
+      engine: 'v3',
+      status: 'READY',
+      regime: result.regime,
+      regimeDetails: result.regimeDetails,
+      targetDate: firstRow ? firstRow.date : null,
+      events: result.data || [],
+      total: result.total || 0,
+      data: result.data || [],
+      generatedAt: now.toISOString(),
+      lastSync: now.toLocaleString('id-ID'),
+    });
   } catch (e) {
     console.error('[QBS Production Error]', e);
     res.status(503).json({
@@ -274,9 +307,9 @@ app.post('/api/admin/upload-multiple', upload.array('excelFiles'), async (req, r
       // === AUTO-BACKUP: Simpan file ke folder archive ===
       const archiveResult = saveExcelToArchive(file.buffer, filename);
       if (archiveResult.saved) {
-        console.log(`[UPLOAD] âœ… Archived to: ${archiveResult.path}`);
+        console.log(`[UPLOAD] Archived to: ${archiveResult.path}`);
       } else {
-        console.warn(`[UPLOAD] âš ï¸ Archive failed: ${archiveResult.reason}`);
+        console.warn(`[UPLOAD] Archive failed: ${archiveResult.reason}`);
       }
 
       const wb = xlsx.read(file.buffer, { type: 'buffer' });
@@ -1541,7 +1574,7 @@ function scheduleGemRefresh() {
     }
   }, 60 * 1000);
 
-  console.log('[GEM Auto] Scheduler aktif â€” refresh setiap hari jam 18:30 WIB');
+  console.log('[GEM Auto] Scheduler aktif - refresh setiap hari jam 18:30 WIB');
 }
 
 if (require.main === module) {
@@ -1550,5 +1583,3 @@ if (require.main === module) {
 }
 
 module.exports = app;
-
-
