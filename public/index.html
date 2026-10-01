@@ -3031,7 +3031,7 @@
     const rp = v >= 1e12
       ? (v / 1e12).toLocaleString('id-ID', { maximumFractionDigits: 2 }) + ' T'
       : (v / 1e9).toLocaleString('id-ID', { maximumFractionDigits: 0 }) + ' M';
-    out += ' <span style="opacity:.65;font-size:9px">&asymp;Rp ' + rp + '</span>';
+    out += '<span style="display:block;text-align:right;opacity:.65;font-size:9px">&asymp;Rp ' + rp + '</span>';
   }
   return out;
 }

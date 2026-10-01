@@ -223,7 +223,7 @@ app.get('/api/yahoo/quote', async (c) => {
         if (!meta) return null;
         
         const price = meta.regularMarketPrice || meta.previousClose || 0;
-        const prevClose = meta.chartPreviousClose || meta.previousClose || price;
+        const prevClose = (function () { try { const r = data.chart.result[0]; const ts = r.timestamp || []; const cl = (r.indicators && r.indicators.quote && r.indicators.quote[0] && r.indicators.quote[0].close) || []; const rows = []; for (let i = 0; i < ts.length; i++) { if (cl[i] != null) rows.push({ t: ts[i], c: cl[i] }); } if (rows.length < 2) return meta.previousClose || price; const day = function (s) { return new Date((s + 7 * 3600) * 1000).toISOString().slice(0, 10); }; const lastDay = day(rows[rows.length - 1].t); const mktDay = meta.regularMarketTime ? day(meta.regularMarketTime) : lastDay; return lastDay === mktDay ? rows[rows.length - 2].c : rows[rows.length - 1].c; } catch (e) { return meta.previousClose || price; } })();
         const change = price - prevClose;
         const changePct = prevClose > 0 ? (change / prevClose) * 100 : 0;
         
