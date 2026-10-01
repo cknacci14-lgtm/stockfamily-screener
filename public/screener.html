@@ -608,7 +608,7 @@
       <div class="flex items-start gap-3">
 
         <div class="text-[#f5b700] mt-0.5">
-          â—†
+          ◆
         </div>
 
         <div>
@@ -1233,18 +1233,62 @@
           const symbolsEvaluated =
             Number(qbsData.symbolsEvaluated);
 
+          const marketRegime =
+            String(rawData?.regime || "").trim();
+
+          const regimeDetails =
+            rawData?.regimeDetails || {};
+
+          const pctUp =
+            Number(regimeDetails.pctUp);
+
+          const meanFnet =
+            Number(regimeDetails.meanFnet);
+
+          const universeSize =
+            Number(regimeDetails.universeSize);
+
+          const isWeakMarketGate =
+            marketRegime.toLowerCase() === "weak";
+
+          const emptyTitle =
+            isWeakMarketGate
+              ? "MARKET GATE · WEAK"
+              : "NO QUALIFYING QBS EVENT";
+
+          const emptyMessage =
+            isWeakMarketGate
+              ? [
+                  "QBS scan completed, but the current market regime is not supportive for signal generation.",
+                  Number.isFinite(pctUp)
+                    ? `${(pctUp * 100).toFixed(2)}% stocks up.`
+                    : "",
+                  Number.isFinite(meanFnet)
+                    ? `Mean foreign net ${meanFnet.toLocaleString("en-US", {
+                        maximumFractionDigits: 0
+                      })}.`
+                    : "",
+                  Number.isFinite(universeSize)
+                    ? `${universeSize.toLocaleString("en-US")} stocks in regime universe.`
+                    : "",
+                  "No QBS event was generated."
+                ]
+                  .filter(Boolean)
+                  .join(" ")
+              : [
+                  "Latest completed market session.",
+                  qbsTargetDate
+                    ? `Scan: ${formatDate(qbsTargetDate)}`
+                    : "Scan date unavailable.",
+                  Number.isFinite(symbolsEvaluated)
+                    ? `${symbolsEvaluated.toLocaleString("en-US")} symbols evaluated.`
+                    : "Symbol evaluation count unavailable.",
+                  "No event currently meets the canonical QBS detection contract."
+                ].join(" ");
+
           showEmpty(
-            "NO QUALIFYING QBS EVENT",
-            [
-              "Latest completed market session.",
-              qbsTargetDate
-                ? `Scan: ${formatDate(qbsTargetDate)}`
-                : "Scan date unavailable.",
-              Number.isFinite(symbolsEvaluated)
-                ? `${symbolsEvaluated.toLocaleString("en-US")} symbols evaluated.`
-                : "Symbol evaluation count unavailable.",
-              "No event currently meets the canonical QBS detection contract."
-            ].join(" ")
+            emptyTitle,
+            emptyMessage
           );
 
           document.getElementById(
@@ -1287,6 +1331,8 @@
           stocks
             .map(renderSignal)
             .join("");
+
+        chartnalistPhase10SyncWatchButtons();
 
         status.textContent =
           `${stocks.length} SIGNAL${stocks.length === 1 ? "" : "S"} DETECTED`;
@@ -1333,6 +1379,71 @@
   </script>
 
 <script id="chartnalist-phase10-watch">
+function chartnalistPhase10IsWatched(ticker) {
+  const code = String(ticker || "")
+    .trim()
+    .toUpperCase();
+
+  if (!code || code === "—") return false;
+
+  try {
+    const saved = JSON.parse(
+      localStorage.getItem("watchlist") || "[]"
+    );
+
+    if (!Array.isArray(saved)) return false;
+
+    return saved.some(item => {
+      if (typeof item === "string") {
+        return item.trim().toUpperCase() === code;
+      }
+
+      const itemCode =
+        item?.code ||
+        item?.stockCode ||
+        item?.symbol ||
+        "";
+
+      return String(itemCode)
+        .trim()
+        .toUpperCase() === code;
+    });
+  } catch {
+    return false;
+  }
+}
+
+function chartnalistPhase10SyncWatchButtons() {
+  document
+    .querySelectorAll(".chartnalist-watch-btn")
+    .forEach(button => {
+      const ticker = String(
+        button?.dataset?.watchTicker || ""
+      )
+        .trim()
+        .toUpperCase();
+
+      if (!ticker) return;
+
+      const watched =
+        chartnalistPhase10IsWatched(ticker);
+
+      button.textContent =
+        watched ? "✓ WATCHED" : "+ WATCH";
+
+      button.dataset.watched =
+        watched ? "true" : "false";
+
+      button.disabled = watched;
+
+      button.setAttribute(
+        "title",
+        watched
+          ? "Already in Smartwatchlist"
+          : "Add to Smartwatchlist"
+      );
+    });
+}
 function chartnalistPhase10ToggleWatch(button) {
   const ticker = String(button?.dataset?.watchTicker || "")
     .trim()
@@ -1505,6 +1616,10 @@ function closeResearchDetail(){
 <!-- removed: chartnalist-typography.js (file missing) -->
 </body>
 </html>
+
+
+
+
 
 
 
