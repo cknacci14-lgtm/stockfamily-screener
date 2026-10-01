@@ -740,7 +740,7 @@
             </span>
 
             <span class="text-[10px] mono text-[#c8ced2]">
-              ${formatNumber(value, 2)}Ã—
+              ${formatNumber(value, 2)}×
             </span>
 
           </div>
@@ -857,13 +857,13 @@
               ${metric(
                 "Volume Surge",
                 formatNumber(volumeSurge, 2),
-                "Ã—"
+                "×"
               )}
 
               ${metric(
                 "Frequency Surge",
                 formatNumber(frequencySurge, 2),
-                "Ã—"
+                "×"
               )}
 
               ${metric(
@@ -1373,7 +1373,7 @@ function openResearchDetail(encoded){
             ${formatDate(s.date)} · EXIT T+10
           </div>
         </div>
-        <button class="research-close" onclick="closeResearchDetail()">Ã—</button>
+        <button class="research-close" onclick="closeResearchDetail()">×</button>
       </div>
 
       <div class="mt-6 flex justify-between items-end">
@@ -1393,8 +1393,8 @@ function openResearchDetail(encoded){
       <div class="mt-1 mb-4 text-xs muted">Evidence yang membuat event memenuhi QBS.</div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        ${qbsEvidence("Volume Surge",formatNumber(vol,2),"Ã—")}
-        ${qbsEvidence("Frequency Surge",formatNumber(freq,2),"Ã—")}
+        ${qbsEvidence("Volume Surge",formatNumber(vol,2),"×")}
+        ${qbsEvidence("Frequency Surge",formatNumber(freq,2),"×")}
         ${qbsEvidence("BB Width",formatNumber(bb,2),"%")}
         ${qbsEvidence("20D Price Range",formatNumber(range,2),"%")}
         ${qbsEvidence("Close Position",formatNumber(cp,2),"%")}
@@ -1410,8 +1410,8 @@ function openResearchDetail(encoded){
           ${qbsGate("Transaction Value",value,value!==null&&value>=2000000000,value!==null?formatNumber(value/1000000000,2)+"B â‰¥ 2B":"—")}
           ${qbsGate("BB Width",bb,bb!==null&&bb<6,bb!==null?formatNumber(bb,2)+"% < 6%":"—")}
           ${qbsGate("20D Price Range",range,range!==null&&range<15,range!==null?formatNumber(range,2)+"% < 15%":"—")}
-          ${qbsGate("Volume Surge",vol,vol!==null&&vol>=6,vol!==null?formatNumber(vol,2)+"Ã— â‰¥ 6Ã—":"—")}
-          ${qbsGate("Frequency Surge",freq,freq!==null&&freq>=5,freq!==null?formatNumber(freq,2)+"Ã— â‰¥ 5Ã—":"—")}
+          ${qbsGate("Volume Surge",vol,vol!==null&&vol>=6,vol!==null?formatNumber(vol,2)+"× â‰¥ 6×":"—")}
+          ${qbsGate("Frequency Surge",freq,freq!==null&&freq>=5,freq!==null?formatNumber(freq,2)+"× â‰¥ 5×":"—")}
         </div>
       </div>
 
