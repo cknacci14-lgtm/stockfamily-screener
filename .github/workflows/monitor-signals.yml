@@ -1,4 +1,4 @@
-﻿name: Monitor Signals
+name: Monitor Signals
 
 on:
   schedule:
@@ -26,7 +26,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
       
       # NO npm install — script pakai native fetch + dotenv optional
       
