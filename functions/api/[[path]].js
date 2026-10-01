@@ -16,7 +16,7 @@ const app = new Hono();
 app.use('*', cors({
   origin: '*',
   allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowHeaders: ['Content-Type', 'X-Admin-Token'],
+  allowHeaders: ['Content-Type', 'Authorization', 'X-Admin-Token'],
   exposeHeaders: ['Content-Length'],
   maxAge: 600,
   credentials: false
@@ -659,6 +659,7 @@ function validateSignalInput(body) {
   const e1 = Number(body.entry_1);
   const sl = Number(body.stop_loss);
   const tp1 = Number(body.target_1);
+  if (![e1, sl, tp1].every(Number.isFinite)) errors.push('Entry, stop loss, dan target harus berupa angka');
   if (sl >= e1) errors.push('Stop loss harus lebih rendah dari entry');
   if (tp1 <= e1) errors.push('Target 1 harus lebih tinggi dari entry');
   return errors;
