@@ -118,3 +118,34 @@ Jangan commit secrets ke repo. Cek `.env.example` untuk reference.
 - Cloudflare Dashboard: https://dash.cloudflare.com/72dc2181843265a7dd864febad5a99c4
 - Pages Project: `chartnalist`
 - Zone: `chartnalis.web.id` (Account: Cknacci14@gmail.com)
+---
+
+## UPDATE 2026-10-01 — Auth + Paper Trade Live
+
+### New Components
+- Auth system: Supabase Auth (login/register/landing) + role guard
+- Hono auth endpoints: /api/auth/config, /api/auth/me (Edge-compatible)
+- Paper trade tracker: scripts/qbs-paper-trade-track.js (auto via cron)
+- Docs: docs/paper-trade-result-2026-10-01.md
+
+### Production Status (2026-10-01)
+- chartnalis.web.id/screener -> 200 (V3, regime=Weak, 0 signals)
+- chartnalis.web.id/login -> 200 (Supabase Auth)
+- chartnalis.web.id/signals -> 200
+- chartnalis.web.id/watchlist -> 200
+- /api/auth/config -> 200
+- /results/paper-trade-log.json -> 200 (140 entries)
+
+### Paper Trade Validation (OOS Oct-Dec 2025)
+- N=140 signals
+- Win rate 48.6%, Avg return +1.58%, R:R 1.82:1
+- Spec v3 VALIDATED
+
+### Workflow Cron
+- Schedule: Mon-Fri 17:00 WIB (10:00 UTC)
+- Steps: QBS screener -> paper trade tracker -> auto-commit
+- Node: v22 (required for Supabase WebSocket)
+
+### Current State Notes
+- 2026-10-01: Market regime = Weak -> 0 signals (expected v3 behavior)
+- Weak/Neutral regime => SKIP all (spec v3 policy)
