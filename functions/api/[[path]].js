@@ -989,19 +989,27 @@ app.get("/api/public/smartwatchlist", async (c) => {
 
 app.get("/api/public/signal-center", async (c) => {
   try {
-    const env = c.env;
-    const codes = normalizeCodes(c.req.query("codes"));
+    const url = new URL(c.req.url);
+    url.pathname = "/data/signal-center-snapshot.json";
+    url.search = "";
+
+    const res = await c.env.ASSETS.fetch(new Request(url.toString()));
+
+    if (res.ok) {
+      const snapshot = await res.json();
+      return c.json({
+        ...snapshot,
+        servedFrom: "snapshot",
+        servedAt: new Date().toISOString()
+      });
+    }
 
     return c.json({
       success: true,
-      date: await getLatestTradeDate(env),
+      date: await getLatestTradeDate(c.env),
       count: 0,
       signals: [],
-      source: "Signal Engine -> Smartwatchlist Adapter",
-      mode: "SIGNAL_MONITOR",
-      generatedAt: new Date().toISOString(),
-      message:
-        "Cloudflare adapter route is installed; authoritative Signal Center execution is pending runtime bridge."
+      message: "Snapshot not available; regenerate via cron."
     });
   } catch (err) {
     console.error("[signal-center]", err);
