@@ -1565,7 +1565,7 @@
   <aside id="sf-right-sidebar" class="w-80 h-full min-h-0 border-l border-idx-border bg-idx-card flex flex-col shrink-0 overflow-y-auto text-xs font-mono">
 
     <div id="sfSummary" class="p-3 border-b border-idx-border shrink-0">
-      <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mb-2 flex items-center gap-1.5"><i class="fa-solid fa-bullseye"></i> Ringkasan <span id="sumCode" class="text-slate-500 font-normal normal-case"></span></h2>
+      <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mb-2 flex items-center gap-1.5"><i class="fa-solid fa-bullseye"></i> Ringkasan <span id="sumCode" class="text-slate-500 font-normal normal-case"></span><span class="ml-auto flex gap-1"><button id="modeSwing" onclick="setSumMode('swing')">Swing</button><button id="modeDay" onclick="setSumMode('day')">Day</button></span></h2>
       <div class="space-y-1.5 text-[11px]">
         <div id="sumVerdict" class="p-2 rounded bg-idx-panel/60 border border-idx-border font-bold text-center">--</div>
         <div class="p-2 rounded bg-idx-panel/60 border border-idx-border"><div class="text-slate-500 text-[10px]">HARGA</div><div id="sumPrice" class="font-bold text-slate-300">--</div></div>
@@ -2892,7 +2892,7 @@
       document.getElementById('structSwingLow').innerText = structure?.lastLow ? fmtRp(structure.lastLow) : '--';
       document.getElementById('structRsi').innerText = rsi != null ? rsi.toFixed(1) : '--';
       document.getElementById('structVwap').innerText = lastVwap != null ? fmtRp(Math.round(lastVwap)) : '--';
-      window._sf = { code: code, structure: structure, rsi: rsi, vwap: lastVwap, atr: calcATR(latestCandles, 14), close: Number(latestCandles[latestCandles.length - 1].close) };
+      window._sf = { candles: latestCandles, code: code, structure: structure, rsi: rsi, vwap: lastVwap, atr: calcATR(latestCandles, 14), close: Number(latestCandles[latestCandles.length - 1].close) };
       renderSummary();
 
       const lastTs = latestCandles[latestCandles.length - 1].time;
@@ -3054,7 +3054,73 @@ function sfRound(p, dir) {
   const t = sfTick(p), q = p / t;
   return (dir === 'up' ? Math.ceil(q) : dir === 'down' ? Math.floor(q) : Math.round(q)) * t;
 }
-function renderSummary() {
+var sfMode = 'swing';
+try { sfMode = localStorage.getItem('sfMode') || 'swing'; } catch (e) {}
+function setSumMode(m) { sfMode = m; try { localStorage.setItem('sfMode', m); } catch (e) {} renderMode(); }
+function renderSummary() { renderSummaryBase(); renderMode(); }
+function renderMode() {
+  const tp = document.getElementById('tpStatus');
+  if (!tp) return;
+  const box = tp.parentElement, head = box.previousElementSibling;
+  let day = document.getElementById('dayBox');
+  if (!day) {
+    day = document.createElement('div');
+    day.id = 'dayBox';
+    day.className = 'space-y-1.5 text-[11px]';
+    box.parentNode.insertBefore(day, box.nextSibling);
+  }
+  const isDay = sfMode === 'day';
+  box.style.display = isDay ? 'none' : '';
+  if (head) head.style.display = isDay ? 'none' : '';
+  day.style.display = isDay ? '' : 'none';
+  ['modeSwing', 'modeDay'].forEach(function (id) {
+    const b = document.getElementById(id);
+    if (!b) return;
+    const on = (id === 'modeDay') === isDay;
+    b.style.cssText = 'font-size:9px;padding:1px 6px;border-radius:3px;cursor:pointer;border:1px solid rgba(0,229,255,.4);' + (on ? 'background:rgba(0,229,255,.2);color:#00E5FF;' : 'background:transparent;color:#64748B;');
+  });
+  if (isDay) renderDay(day);
+}
+function renderDay(box) {
+  const s = window._sf;
+  const row = function (l, v, c) { return '<div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border"><span class="text-slate-400">' + l + '</span><span class="font-bold" style="color:' + (c || '#CBD5E1') + '">' + v + '</span></div>'; };
+  let html = '<h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mt-3 mb-2 flex items-center gap-1.5"><i class="fa-solid fa-bolt"></i> Day Plan</h2>';
+  const cs = s && s.candles;
+  if (!cs || cs.length < 2) { box.innerHTML = html + '<div class="p-2 rounded bg-idx-panel/60 border border-idx-border text-slate-300">Data belum cukup.</div>'; return; }
+  const G = '#00E676', R = '#FF5252', A = '#FFB300';
+  const last = cs[cs.length - 1], prev = cs[cs.length - 2];
+  const todayWib = new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 10);
+  const lastDay = new Date((Number(last.time) + 7 * 3600) * 1000).toISOString().slice(0, 10);
+  const live = lastDay === todayWib;
+  const ref = live ? prev : last, cur = live ? last : null;
+  const H = Number(ref.high), L = Number(ref.low), C = Number(ref.close);
+  const P = (H + L + C) / 3, R1 = 2 * P - L, S1 = 2 * P - H, R2 = P + (H - L), S2 = P - (H - L);
+  const px = Number(s.close), atr = s.atr;
+  const rr = function (v) { return fmtRp(sfRound(v)); };
+  let bias, bc;
+  if (px > R1) { bias = 'Kuat: di atas R1'; bc = G; }
+  else if (px > P) { bias = 'Condong naik: di atas pivot'; bc = G; }
+  else if (px > S1) { bias = 'Condong turun: di bawah pivot'; bc = A; }
+  else { bias = 'Lemah: di bawah S1'; bc = R; }
+  html += '<div class="p-2 rounded bg-idx-panel/60 border border-idx-border font-bold text-center" style="color:' + bc + '">' + bias + '</div>';
+  html += row('R2', rr(R2), G) + row('R1', rr(R1), G) + row('Pivot', rr(P), A) + row('S1', rr(S1), R) + row('S2', rr(S2), R);
+  html += row('High / Low kemarin', rr(H) + ' / ' + rr(L));
+  if (cur && isFinite(Number(cur.open)) && C > 0) {
+    const gp = (Number(cur.open) - C) / C * 100;
+    html += row('Gap buka', (gp >= 0 ? '+' : '') + gp.toFixed(2) + '%', gp > 0.1 ? G : gp < -0.1 ? R : '#CBD5E1');
+    if (atr) html += row('Range terpakai', ((Number(cur.high) - Number(cur.low)) / atr * 100).toFixed(0) + '% dari ATR');
+  }
+  const bd = window._sfBandar;
+  if (bd && bd.hasData !== false && String(bd.code || '').toUpperCase() === String(s.code || '').toUpperCase() && bd.netForeignToday != null) {
+    const n = Number(bd.netForeignToday) || 0;
+    const v = Math.abs(n) * (Number(bd.close) || px || 0);
+    const rp = v >= 1e12 ? (v / 1e12).toLocaleString('id-ID', { maximumFractionDigits: 2 }) + ' T' : (v / 1e9).toLocaleString('id-ID', { maximumFractionDigits: 0 }) + ' M';
+    html += row('Asing EOD ' + (bd.date || ''), 'net ' + (n >= 0 ? 'beli' : 'jual') + ' &asymp; Rp ' + rp, n >= 0 ? G : R);
+  }
+  html += '<div class="text-[9px] text-slate-500 italic">Level dihitung dari data harian (tertunda), bukan data intraday. Bukan rekomendasi.</div>';
+  box.innerHTML = html;
+}
+function renderSummaryBase() {
   const s = window._sf;
   if (!s) return;
   const set = function (id, html, color) {
