@@ -419,12 +419,10 @@
             <span class="status-dot"></span>
 
             <span class="text-[9px] mono uppercase tracking-[0.18em] muted-2">
-              QBS V3 â€” Supportive Strategy
+              SUPPORTIVE STRATEGY
             </span>
 
-            <span class="qbs-badge rounded-md px-2 py-1 text-[9px] mono font-bold">
-              QBS V1.0.0
-            </span>
+            
 
           </div>
 
@@ -449,7 +447,7 @@
             id="lastUpdated"
             class="mt-1 text-xs mono text-[#c7cdd1]"
           >
-            â€”
+            —
           </div>
 
         </div>
@@ -473,7 +471,7 @@
           id="signalCount"
           class="mt-2 text-2xl font-bold mono"
         >
-          â€”
+          —
         </div>
 
         <div class="mt-1 text-[10px] muted-2">
@@ -491,7 +489,7 @@
           id="scanDate"
           class="mt-2 text-sm font-semibold mono"
         >
-          â€”
+          —
         </div>
 
         <div class="mt-1 text-[10px] muted-2">
@@ -635,7 +633,7 @@
 
 
     <footer class="mt-8 pb-8 text-[9px] mono muted-2">
-      CHARTNALIST · QBS V3 · SUPPORTIVE-ONLY STRATEGY
+      CHARTNALIST · SUPPORTIVE-ONLY STRATEGY
     </footer>
 
   </main>
@@ -652,7 +650,7 @@
     function formatNumber(value, decimals = 2) {
       const n = number(value);
 
-      if (n === null) return "â€”";
+      if (n === null) return "—";
 
       return n.toLocaleString("id-ID", {
         minimumFractionDigits: decimals,
@@ -663,7 +661,7 @@
     function formatPrice(value) {
       const n = number(value);
 
-      if (n === null) return "Rp â€”";
+      if (n === null) return "Rp —";
 
       return "Rp " + n.toLocaleString("id-ID", {
         maximumFractionDigits: 0
@@ -671,7 +669,7 @@
     }
 
     function formatDate(value) {
-      if (!value) return "â€”";
+      if (!value) return "—";
 
       const text = String(value);
 
@@ -692,7 +690,7 @@
     function changeText(value) {
       const n = number(value);
 
-      if (n === null) return "â€”";
+      if (n === null) return "—";
 
       return `${n > 0 ? "+" : ""}${formatNumber(n, 2)}%`;
     }
@@ -761,7 +759,7 @@
 
     function renderSignal(stock, index) {
   const detailPayload = encodeURIComponent(JSON.stringify(stock));
-      const ticker = stock.ticker || stock.symbol || "â€”";
+      const ticker = stock.ticker || stock.symbol || "—";
 
       const close = stock.close ?? stock.h0?.close;
 
@@ -1062,7 +1060,7 @@
               event.symbol ||
               event.code ||
               event.ticker ||
-              "â€”",
+              "—",
 
             date:
               event.eventDate ||
@@ -1205,7 +1203,7 @@
         });
 
         document.getElementById("lastUpdated").textContent =
-          (rawData.generatedAt ? new Date(rawData.generatedAt).toLocaleString("id-ID") : "â€”");
+          (rawData.generatedAt ? new Date(rawData.generatedAt).toLocaleString("id-ID") : "—");
 
         document.getElementById(
           "signalCount"
@@ -1247,7 +1245,7 @@
           ).textContent =
             qbsTargetDate
               ? formatDate(qbsTargetDate)
-              : "â€”";
+              : "—";
 
           status.textContent =
             "0 EVENTS DETECTED";
@@ -1297,11 +1295,11 @@
 
         document.getElementById(
           "signalCount"
-        ).textContent = "â€”";
+        ).textContent = "—";
 
         document.getElementById(
           "scanDate"
-        ).textContent = "â€”";
+        ).textContent = "—";
 
         showEmpty(
           "Data tidak dapat dimuat",
@@ -1369,11 +1367,11 @@ function openResearchDetail(encoded){
       <div class="flex items-start justify-between gap-4">
         <div>
           <div class="flex items-center gap-3">
-            <div class="text-2xl font-extrabold">${s.ticker||"â€”"}</div>
+            <div class="text-2xl font-extrabold">${s.ticker||"—"}</div>
             <span class="qbs-badge rounded px-2 py-1 text-[8px] mono font-bold">QBS</span>
           </div>
           <div class="mt-2 text-[9px] mono muted-2">
-            ${formatDate(s.date)} · QBS V3 · EXIT T+10
+            ${formatDate(s.date)} · EXIT T+10
           </div>
         </div>
         <button class="research-close" onclick="closeResearchDetail()">Ã—</button>
@@ -1409,12 +1407,12 @@ function openResearchDetail(encoded){
         <div class="mt-1 mb-4 text-xs muted">Threshold QBS tidak dimodifikasi oleh UI.</div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          ${qbsGate("Close Price",close,close!==null&&close>=100,close!==null?formatPrice(close)+" â‰¥ Rp 100":"â€”")}
-          ${qbsGate("Transaction Value",value,value!==null&&value>=2000000000,value!==null?formatNumber(value/1000000000,2)+"B â‰¥ 2B":"â€”")}
-          ${qbsGate("BB Width",bb,bb!==null&&bb<6,bb!==null?formatNumber(bb,2)+"% < 6%":"â€”")}
-          ${qbsGate("20D Price Range",range,range!==null&&range<15,range!==null?formatNumber(range,2)+"% < 15%":"â€”")}
-          ${qbsGate("Volume Surge",vol,vol!==null&&vol>=6,vol!==null?formatNumber(vol,2)+"Ã— â‰¥ 6Ã—":"â€”")}
-          ${qbsGate("Frequency Surge",freq,freq!==null&&freq>=5,freq!==null?formatNumber(freq,2)+"Ã— â‰¥ 5Ã—":"â€”")}
+          ${qbsGate("Close Price",close,close!==null&&close>=100,close!==null?formatPrice(close)+" â‰¥ Rp 100":"—")}
+          ${qbsGate("Transaction Value",value,value!==null&&value>=2000000000,value!==null?formatNumber(value/1000000000,2)+"B â‰¥ 2B":"—")}
+          ${qbsGate("BB Width",bb,bb!==null&&bb<6,bb!==null?formatNumber(bb,2)+"% < 6%":"—")}
+          ${qbsGate("20D Price Range",range,range!==null&&range<15,range!==null?formatNumber(range,2)+"% < 15%":"—")}
+          ${qbsGate("Volume Surge",vol,vol!==null&&vol>=6,vol!==null?formatNumber(vol,2)+"Ã— â‰¥ 6Ã—":"—")}
+          ${qbsGate("Frequency Surge",freq,freq!==null&&freq>=5,freq!==null?formatNumber(freq,2)+"Ã— â‰¥ 5Ã—":"—")}
         </div>
       </div>
 
@@ -1428,7 +1426,7 @@ function openResearchDetail(encoded){
     </div>
 
     <div class="px-6 py-4 border-t border-[#171d21] flex justify-between">
-      <span class="text-[8px] mono muted-2">CHARTNALIST · QBS V1.0.0</span>
+      <span class="text-[8px] mono muted-2">CHARTNALIST </span>
       <button onclick="closeResearchDetail()" class="text-[9px] mono positive font-bold">CLOSE</button>
     </div>
   </div>`;
