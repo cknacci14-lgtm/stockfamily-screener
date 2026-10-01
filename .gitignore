@@ -44,3 +44,6 @@ Thumbs.db
 
 # Auth backups (auto-generated during phase work)
 public/auth-backup/
+
+cek-*.txt
+cek-*.css
