@@ -163,8 +163,11 @@ app.get('/api/public/summary/:code', async (c) => {
     // Simple bandar score heuristic (0-100)
     // Based on: net foreign trend + volume surge
     let bandarScore = 50;
-    if (netForeign20d > 0) bandarScore += Math.min(30, Math.log10(Math.abs(netForeign20d) / 1e6 + 1) * 10);
-    if (netForeign20d < 0) bandarScore -= Math.min(30, Math.log10(Math.abs(netForeign20d) / 1e6 + 1) * 10);
+    const val20 = last20.reduce((s, r) => s + (Number(r.value) || 0), 0);
+    const netVal20 = last20.reduce((s, r) => s + ((Number(r.foreign_buy) || 0) - (Number(r.foreign_sell) || 0)) * (Number(r.close) || 0), 0);
+    const flowRatio = val20 > 0 ? netVal20 / val20 : 0;
+    bandarScore += Math.max(-30, Math.min(30, (flowRatio / 0.10) * 30));
+    
     if (netForeignToday > 0) bandarScore += 5;
     if (netForeignToday < 0) bandarScore -= 5;
     bandarScore = Math.max(0, Math.min(100, Math.round(bandarScore)));

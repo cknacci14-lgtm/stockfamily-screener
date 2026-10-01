@@ -96,232 +96,7 @@
         transition: width 0.6s ease-in-out, background-color 0.4s ease;
         background-color: #FF5252;
     }
-    /* === Block Trade Intelligence Panel CSS === */
-    .bt-card {
-      padding: 8px 10px;
-      border-radius: 6px;
-      background: rgba(19, 23, 34, 0.6);
-      border-left: 3px solid #A855F7;
-      margin-bottom: 6px;
-      transition: all 0.2s ease;
-      cursor: default;
-    }
-    .bt-card:hover {
-      background: rgba(30, 34, 45, 0.8);
-      transform: translateX(2px);
-    }
-    .bt-card.akum { border-left-color: #00E676; }
-    .bt-card.dist { border-left-color: #FF5252; }
-    .bt-card.bull { border-left-color: #00E5FF; }
-    .bt-card.bear { border-left-color: #FFB300; }
-    .bt-card.neutral { border-left-color: #A855F7; }
-    .bt-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-    }
-    .bt-date {
-      font-size: 10px;
-      color: #94A3B8;
-      font-weight: 600;
-    }
-    .bt-badge {
-      font-size: 8px;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-    }
-    .bt-badge.akum { background: rgba(0, 230, 118, 0.15); color: #00E676; }
-    .bt-badge.dist { background: rgba(255, 82, 82, 0.15); color: #FF5252; }
-    .bt-badge.bull { background: rgba(0, 229, 255, 0.15); color: #00E5FF; }
-    .bt-badge.bear { background: rgba(255, 179, 0, 0.15); color: #FFB300; }
-    .bt-badge.neutral { background: rgba(168, 85, 247, 0.15); color: #A855F7; }
-    .bt-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      color: #CBD5E1;
-      margin-top: 2px;
-    }
-    .bt-row span:last-child {
-      font-weight: 600;
-      color: #E0E0E0;
-    }
-    .bt-detail {
-      font-size: 9px;
-      color: #64748B;
-      margin-top: 3px;
-      display: flex;
-      gap: 8px;
-    }
-    /* === Historical BT Chart CSS === */
-    #btHistoryPanel {
-      background: #0B0E14;
-      border-top: 1px solid #2A2E39;
-      padding: 8px 12px;
-      font-family: ui-monospace, 'SF Mono', Monaco, monospace;
-      transition: height 0.3s ease;
-    }
-    #btHistoryPanel.collapsed #btHistoryBody { display: none; }
-    #btHistoryPanel.collapsed { padding: 6px 12px; }
-    #btHistoryPanel { transition: padding 0.3s ease; }
-    #btHistoryPanel.collapsed { padding: 8px 16px; }
-    .bt-history-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 12px;
-      color: #00E5FF;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-    .bt-history-header .bt-title {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .bt-history-header button {
-      background: transparent;
-      border: 1px solid #2A2E39;
-      color: #94A3B8;
-      padding: 2px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 11px;
-    }
-    .bt-history-header button:hover {
-      background: #1E222D;
-      color: #fff;
-    }
-    #btHistoryBody {
-      display: flex;
-      gap: 16px;
-      height: 110px;
-    }
-    .bt-chart-area {
-      flex: 1;
-      display: flex;
-      align-items: flex-end;
-      gap: 3px;
-      padding: 8px 0 20px 0;
-      position: relative;
-      border-bottom: 1px solid #2A2E39;
-    }
-    .bt-chart-area::before {
-      content: '0';
-      position: absolute;
-      left: -18px;
-      bottom: 20px;
-      font-size: 9px;
-      color: #475569;
-    }
-    .bt-bar-wrapper {
-      flex: 1;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-      cursor: pointer;
-      position: relative;
-      min-width: 20px;
-    }
-    .bt-bar-fill {
-      width: 100%;
-      border-radius: 3px 3px 0 0;
-      transition: all 0.2s ease;
-      min-height: 2px;
-    }
-    .bt-bar-fill.bull { background: linear-gradient(to top, #00E676, #00B85A); }
-    .bt-bar-fill.bear { background: linear-gradient(to top, #FF5252, #D32F2F); }
-    .bt-bar-fill.neutral { background: linear-gradient(to top, #64748B, #475569); }
-    .bt-bar-wrapper:hover .bt-bar-fill {
-      filter: brightness(1.3);
-      transform: scaleX(1.05);
-    }
-    .bt-bar-month {
-      position: absolute;
-      bottom: -16px;
-      font-size: 9px;
-      color: #64748B;
-      white-space: nowrap;
-    }
-    .bt-bar-vol {
-      position: absolute;
-      top: -14px;
-      font-size: 9px;
-      color: #94A3B8;
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
-    .bt-bar-wrapper:hover .bt-bar-vol { opacity: 1; }
-    .bt-bar-tooltip {
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #1E222D;
-      border: 1px solid #00E5FF;
-      border-radius: 6px;
-      padding: 8px 10px;
-      font-size: 10px;
-      color: #E0E0E0;
-      white-space: nowrap;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.15s;
-      z-index: 100;
-      margin-bottom: 4px;
-    }
-    .bt-bar-wrapper:hover .bt-bar-tooltip { opacity: 1; }
-    .bt-bar-tooltip .tt-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin: 2px 0;
-    }
-    .bt-bar-tooltip .tt-label { color: #94A3B8; }
-    .bt-bar-tooltip .tt-value { color: #E0E0E0; font-weight: bold; }
-    .bt-bar-tooltip .tt-badge {
-      display: inline-block;
-      padding: 1px 6px;
-      border-radius: 3px;
-      font-size: 9px;
-      font-weight: 700;
-      margin-top: 4px;
-    }
-    .bt-summary-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 6px;
-      min-width: 110px;
-      align-content: center;
-    }
-    .bt-summary-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 4px 8px;
-      background: #131722;
-      border-radius: 4px;
-      border-left: 2px solid #00E5FF;
-      font-size: 10px;
-    }
-    .bt-summary-item .label { color: #94A3B8; }
-    .bt-summary-item .value { color: #E0E0E0; font-weight: bold; }
-    .bt-loading, .bt-empty {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      color: #64748B;
-      font-size: 12px;
-      font-style: italic;
-    }
+    
       
       nav.sidebar,
       .sidebar {
@@ -398,232 +173,7 @@
         transition: width 0.6s ease-in-out, background-color 0.4s ease;
         background-color: #FF5252;
     }
-    /* === Block Trade Intelligence Panel CSS === */
-    .bt-card {
-      padding: 8px 10px;
-      border-radius: 6px;
-      background: rgba(19, 23, 34, 0.6);
-      border-left: 3px solid #A855F7;
-      margin-bottom: 6px;
-      transition: all 0.2s ease;
-      cursor: default;
-    }
-    .bt-card:hover {
-      background: rgba(30, 34, 45, 0.8);
-      transform: translateX(2px);
-    }
-    .bt-card.akum { border-left-color: #00E676; }
-    .bt-card.dist { border-left-color: #FF5252; }
-    .bt-card.bull { border-left-color: #00E5FF; }
-    .bt-card.bear { border-left-color: #FFB300; }
-    .bt-card.neutral { border-left-color: #A855F7; }
-    .bt-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-    }
-    .bt-date {
-      font-size: 10px;
-      color: #94A3B8;
-      font-weight: 600;
-    }
-    .bt-badge {
-      font-size: 8px;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-    }
-    .bt-badge.akum { background: rgba(0, 230, 118, 0.15); color: #00E676; }
-    .bt-badge.dist { background: rgba(255, 82, 82, 0.15); color: #FF5252; }
-    .bt-badge.bull { background: rgba(0, 229, 255, 0.15); color: #00E5FF; }
-    .bt-badge.bear { background: rgba(255, 179, 0, 0.15); color: #FFB300; }
-    .bt-badge.neutral { background: rgba(168, 85, 247, 0.15); color: #A855F7; }
-    .bt-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      color: #CBD5E1;
-      margin-top: 2px;
-    }
-    .bt-row span:last-child {
-      font-weight: 600;
-      color: #E0E0E0;
-    }
-    .bt-detail {
-      font-size: 9px;
-      color: #64748B;
-      margin-top: 3px;
-      display: flex;
-      gap: 8px;
-    }
-    /* === Historical BT Chart CSS === */
-    #btHistoryPanel {
-      background: #0B0E14;
-      border-top: 1px solid #2A2E39;
-      padding: 8px 12px;
-      font-family: ui-monospace, 'SF Mono', Monaco, monospace;
-      transition: height 0.3s ease;
-    }
-    #btHistoryPanel.collapsed #btHistoryBody { display: none; }
-    #btHistoryPanel.collapsed { padding: 6px 12px; }
-    #btHistoryPanel { transition: padding 0.3s ease; }
-    #btHistoryPanel.collapsed { padding: 8px 16px; }
-    .bt-history-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 12px;
-      color: #00E5FF;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-    .bt-history-header .bt-title {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .bt-history-header button {
-      background: transparent;
-      border: 1px solid #2A2E39;
-      color: #94A3B8;
-      padding: 2px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 11px;
-    }
-    .bt-history-header button:hover {
-      background: #1E222D;
-      color: #fff;
-    }
-    #btHistoryBody {
-      display: flex;
-      gap: 16px;
-      height: 110px;
-    }
-    .bt-chart-area {
-      flex: 1;
-      display: flex;
-      align-items: flex-end;
-      gap: 3px;
-      padding: 8px 0 20px 0;
-      position: relative;
-      border-bottom: 1px solid #2A2E39;
-    }
-    .bt-chart-area::before {
-      content: '0';
-      position: absolute;
-      left: -18px;
-      bottom: 20px;
-      font-size: 9px;
-      color: #475569;
-    }
-    .bt-bar-wrapper {
-      flex: 1;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-      cursor: pointer;
-      position: relative;
-      min-width: 20px;
-    }
-    .bt-bar-fill {
-      width: 100%;
-      border-radius: 3px 3px 0 0;
-      transition: all 0.2s ease;
-      min-height: 2px;
-    }
-    .bt-bar-fill.bull { background: linear-gradient(to top, #00E676, #00B85A); }
-    .bt-bar-fill.bear { background: linear-gradient(to top, #FF5252, #D32F2F); }
-    .bt-bar-fill.neutral { background: linear-gradient(to top, #64748B, #475569); }
-    .bt-bar-wrapper:hover .bt-bar-fill {
-      filter: brightness(1.3);
-      transform: scaleX(1.05);
-    }
-    .bt-bar-month {
-      position: absolute;
-      bottom: -16px;
-      font-size: 9px;
-      color: #64748B;
-      white-space: nowrap;
-    }
-    .bt-bar-vol {
-      position: absolute;
-      top: -14px;
-      font-size: 9px;
-      color: #94A3B8;
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
-    .bt-bar-wrapper:hover .bt-bar-vol { opacity: 1; }
-    .bt-bar-tooltip {
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #1E222D;
-      border: 1px solid #00E5FF;
-      border-radius: 6px;
-      padding: 8px 10px;
-      font-size: 10px;
-      color: #E0E0E0;
-      white-space: nowrap;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.15s;
-      z-index: 100;
-      margin-bottom: 4px;
-    }
-    .bt-bar-wrapper:hover .bt-bar-tooltip { opacity: 1; }
-    .bt-bar-tooltip .tt-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin: 2px 0;
-    }
-    .bt-bar-tooltip .tt-label { color: #94A3B8; }
-    .bt-bar-tooltip .tt-value { color: #E0E0E0; font-weight: bold; }
-    .bt-bar-tooltip .tt-badge {
-      display: inline-block;
-      padding: 1px 6px;
-      border-radius: 3px;
-      font-size: 9px;
-      font-weight: 700;
-      margin-top: 4px;
-    }
-    .bt-summary-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 6px;
-      min-width: 110px;
-      align-content: center;
-    }
-    .bt-summary-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 4px 8px;
-      background: #131722;
-      border-radius: 4px;
-      border-left: 2px solid #00E5FF;
-      font-size: 10px;
-    }
-    .bt-summary-item .label { color: #94A3B8; }
-    .bt-summary-item .value { color: #E0E0E0; font-weight: bold; }
-    .bt-loading, .bt-empty {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      color: #64748B;
-      font-size: 12px;
-      font-style: italic;
-    }
+    
 </style>
 <style id="sf-right-sidebar-fix">
   #sf-right-sidebar {
@@ -681,232 +231,7 @@
         transition: width 0.6s ease-in-out, background-color 0.4s ease;
         background-color: #FF5252;
     }
-    /* === Block Trade Intelligence Panel CSS === */
-    .bt-card {
-      padding: 8px 10px;
-      border-radius: 6px;
-      background: rgba(19, 23, 34, 0.6);
-      border-left: 3px solid #A855F7;
-      margin-bottom: 6px;
-      transition: all 0.2s ease;
-      cursor: default;
-    }
-    .bt-card:hover {
-      background: rgba(30, 34, 45, 0.8);
-      transform: translateX(2px);
-    }
-    .bt-card.akum { border-left-color: #00E676; }
-    .bt-card.dist { border-left-color: #FF5252; }
-    .bt-card.bull { border-left-color: #00E5FF; }
-    .bt-card.bear { border-left-color: #FFB300; }
-    .bt-card.neutral { border-left-color: #A855F7; }
-    .bt-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-    }
-    .bt-date {
-      font-size: 10px;
-      color: #94A3B8;
-      font-weight: 600;
-    }
-    .bt-badge {
-      font-size: 8px;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-    }
-    .bt-badge.akum { background: rgba(0, 230, 118, 0.15); color: #00E676; }
-    .bt-badge.dist { background: rgba(255, 82, 82, 0.15); color: #FF5252; }
-    .bt-badge.bull { background: rgba(0, 229, 255, 0.15); color: #00E5FF; }
-    .bt-badge.bear { background: rgba(255, 179, 0, 0.15); color: #FFB300; }
-    .bt-badge.neutral { background: rgba(168, 85, 247, 0.15); color: #A855F7; }
-    .bt-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      color: #CBD5E1;
-      margin-top: 2px;
-    }
-    .bt-row span:last-child {
-      font-weight: 600;
-      color: #E0E0E0;
-    }
-    .bt-detail {
-      font-size: 9px;
-      color: #64748B;
-      margin-top: 3px;
-      display: flex;
-      gap: 8px;
-    }
-    /* === Historical BT Chart CSS === */
-    #btHistoryPanel {
-      background: #0B0E14;
-      border-top: 1px solid #2A2E39;
-      padding: 8px 12px;
-      font-family: ui-monospace, 'SF Mono', Monaco, monospace;
-      transition: height 0.3s ease;
-    }
-    #btHistoryPanel.collapsed #btHistoryBody { display: none; }
-    #btHistoryPanel.collapsed { padding: 6px 12px; }
-    #btHistoryPanel { transition: padding 0.3s ease; }
-    #btHistoryPanel.collapsed { padding: 8px 16px; }
-    .bt-history-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 12px;
-      color: #00E5FF;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-    .bt-history-header .bt-title {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .bt-history-header button {
-      background: transparent;
-      border: 1px solid #2A2E39;
-      color: #94A3B8;
-      padding: 2px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 11px;
-    }
-    .bt-history-header button:hover {
-      background: #1E222D;
-      color: #fff;
-    }
-    #btHistoryBody {
-      display: flex;
-      gap: 16px;
-      height: 110px;
-    }
-    .bt-chart-area {
-      flex: 1;
-      display: flex;
-      align-items: flex-end;
-      gap: 3px;
-      padding: 8px 0 20px 0;
-      position: relative;
-      border-bottom: 1px solid #2A2E39;
-    }
-    .bt-chart-area::before {
-      content: '0';
-      position: absolute;
-      left: -18px;
-      bottom: 20px;
-      font-size: 9px;
-      color: #475569;
-    }
-    .bt-bar-wrapper {
-      flex: 1;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-      cursor: pointer;
-      position: relative;
-      min-width: 20px;
-    }
-    .bt-bar-fill {
-      width: 100%;
-      border-radius: 3px 3px 0 0;
-      transition: all 0.2s ease;
-      min-height: 2px;
-    }
-    .bt-bar-fill.bull { background: linear-gradient(to top, #00E676, #00B85A); }
-    .bt-bar-fill.bear { background: linear-gradient(to top, #FF5252, #D32F2F); }
-    .bt-bar-fill.neutral { background: linear-gradient(to top, #64748B, #475569); }
-    .bt-bar-wrapper:hover .bt-bar-fill {
-      filter: brightness(1.3);
-      transform: scaleX(1.05);
-    }
-    .bt-bar-month {
-      position: absolute;
-      bottom: -16px;
-      font-size: 9px;
-      color: #64748B;
-      white-space: nowrap;
-    }
-    .bt-bar-vol {
-      position: absolute;
-      top: -14px;
-      font-size: 9px;
-      color: #94A3B8;
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
-    .bt-bar-wrapper:hover .bt-bar-vol { opacity: 1; }
-    .bt-bar-tooltip {
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #1E222D;
-      border: 1px solid #00E5FF;
-      border-radius: 6px;
-      padding: 8px 10px;
-      font-size: 10px;
-      color: #E0E0E0;
-      white-space: nowrap;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.15s;
-      z-index: 100;
-      margin-bottom: 4px;
-    }
-    .bt-bar-wrapper:hover .bt-bar-tooltip { opacity: 1; }
-    .bt-bar-tooltip .tt-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin: 2px 0;
-    }
-    .bt-bar-tooltip .tt-label { color: #94A3B8; }
-    .bt-bar-tooltip .tt-value { color: #E0E0E0; font-weight: bold; }
-    .bt-bar-tooltip .tt-badge {
-      display: inline-block;
-      padding: 1px 6px;
-      border-radius: 3px;
-      font-size: 9px;
-      font-weight: 700;
-      margin-top: 4px;
-    }
-    .bt-summary-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 6px;
-      min-width: 110px;
-      align-content: center;
-    }
-    .bt-summary-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 4px 8px;
-      background: #131722;
-      border-radius: 4px;
-      border-left: 2px solid #00E5FF;
-      font-size: 10px;
-    }
-    .bt-summary-item .label { color: #94A3B8; }
-    .bt-summary-item .value { color: #E0E0E0; font-weight: bold; }
-    .bt-loading, .bt-empty {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      color: #64748B;
-      font-size: 12px;
-      font-style: italic;
-    }
+    
 </style>
 <!-- removed: typography.css (file not found) -->
 <style id="sf-panel-title-fix">
@@ -931,232 +256,7 @@
         transition: width 0.6s ease-in-out, background-color 0.4s ease;
         background-color: #FF5252;
     }
-    /* === Block Trade Intelligence Panel CSS === */
-    .bt-card {
-      padding: 8px 10px;
-      border-radius: 6px;
-      background: rgba(19, 23, 34, 0.6);
-      border-left: 3px solid #A855F7;
-      margin-bottom: 6px;
-      transition: all 0.2s ease;
-      cursor: default;
-    }
-    .bt-card:hover {
-      background: rgba(30, 34, 45, 0.8);
-      transform: translateX(2px);
-    }
-    .bt-card.akum { border-left-color: #00E676; }
-    .bt-card.dist { border-left-color: #FF5252; }
-    .bt-card.bull { border-left-color: #00E5FF; }
-    .bt-card.bear { border-left-color: #FFB300; }
-    .bt-card.neutral { border-left-color: #A855F7; }
-    .bt-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-    }
-    .bt-date {
-      font-size: 10px;
-      color: #94A3B8;
-      font-weight: 600;
-    }
-    .bt-badge {
-      font-size: 8px;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-    }
-    .bt-badge.akum { background: rgba(0, 230, 118, 0.15); color: #00E676; }
-    .bt-badge.dist { background: rgba(255, 82, 82, 0.15); color: #FF5252; }
-    .bt-badge.bull { background: rgba(0, 229, 255, 0.15); color: #00E5FF; }
-    .bt-badge.bear { background: rgba(255, 179, 0, 0.15); color: #FFB300; }
-    .bt-badge.neutral { background: rgba(168, 85, 247, 0.15); color: #A855F7; }
-    .bt-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      color: #CBD5E1;
-      margin-top: 2px;
-    }
-    .bt-row span:last-child {
-      font-weight: 600;
-      color: #E0E0E0;
-    }
-    .bt-detail {
-      font-size: 9px;
-      color: #64748B;
-      margin-top: 3px;
-      display: flex;
-      gap: 8px;
-    }
-    /* === Historical BT Chart CSS === */
-    #btHistoryPanel {
-      background: #0B0E14;
-      border-top: 1px solid #2A2E39;
-      padding: 8px 12px;
-      font-family: ui-monospace, 'SF Mono', Monaco, monospace;
-      transition: height 0.3s ease;
-    }
-    #btHistoryPanel.collapsed #btHistoryBody { display: none; }
-    #btHistoryPanel.collapsed { padding: 6px 12px; }
-    #btHistoryPanel { transition: padding 0.3s ease; }
-    #btHistoryPanel.collapsed { padding: 8px 16px; }
-    .bt-history-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 12px;
-      color: #00E5FF;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-    .bt-history-header .bt-title {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .bt-history-header button {
-      background: transparent;
-      border: 1px solid #2A2E39;
-      color: #94A3B8;
-      padding: 2px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 11px;
-    }
-    .bt-history-header button:hover {
-      background: #1E222D;
-      color: #fff;
-    }
-    #btHistoryBody {
-      display: flex;
-      gap: 16px;
-      height: 110px;
-    }
-    .bt-chart-area {
-      flex: 1;
-      display: flex;
-      align-items: flex-end;
-      gap: 3px;
-      padding: 8px 0 20px 0;
-      position: relative;
-      border-bottom: 1px solid #2A2E39;
-    }
-    .bt-chart-area::before {
-      content: '0';
-      position: absolute;
-      left: -18px;
-      bottom: 20px;
-      font-size: 9px;
-      color: #475569;
-    }
-    .bt-bar-wrapper {
-      flex: 1;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-      cursor: pointer;
-      position: relative;
-      min-width: 20px;
-    }
-    .bt-bar-fill {
-      width: 100%;
-      border-radius: 3px 3px 0 0;
-      transition: all 0.2s ease;
-      min-height: 2px;
-    }
-    .bt-bar-fill.bull { background: linear-gradient(to top, #00E676, #00B85A); }
-    .bt-bar-fill.bear { background: linear-gradient(to top, #FF5252, #D32F2F); }
-    .bt-bar-fill.neutral { background: linear-gradient(to top, #64748B, #475569); }
-    .bt-bar-wrapper:hover .bt-bar-fill {
-      filter: brightness(1.3);
-      transform: scaleX(1.05);
-    }
-    .bt-bar-month {
-      position: absolute;
-      bottom: -16px;
-      font-size: 9px;
-      color: #64748B;
-      white-space: nowrap;
-    }
-    .bt-bar-vol {
-      position: absolute;
-      top: -14px;
-      font-size: 9px;
-      color: #94A3B8;
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
-    .bt-bar-wrapper:hover .bt-bar-vol { opacity: 1; }
-    .bt-bar-tooltip {
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #1E222D;
-      border: 1px solid #00E5FF;
-      border-radius: 6px;
-      padding: 8px 10px;
-      font-size: 10px;
-      color: #E0E0E0;
-      white-space: nowrap;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.15s;
-      z-index: 100;
-      margin-bottom: 4px;
-    }
-    .bt-bar-wrapper:hover .bt-bar-tooltip { opacity: 1; }
-    .bt-bar-tooltip .tt-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin: 2px 0;
-    }
-    .bt-bar-tooltip .tt-label { color: #94A3B8; }
-    .bt-bar-tooltip .tt-value { color: #E0E0E0; font-weight: bold; }
-    .bt-bar-tooltip .tt-badge {
-      display: inline-block;
-      padding: 1px 6px;
-      border-radius: 3px;
-      font-size: 9px;
-      font-weight: 700;
-      margin-top: 4px;
-    }
-    .bt-summary-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 6px;
-      min-width: 110px;
-      align-content: center;
-    }
-    .bt-summary-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 4px 8px;
-      background: #131722;
-      border-radius: 4px;
-      border-left: 2px solid #00E5FF;
-      font-size: 10px;
-    }
-    .bt-summary-item .label { color: #94A3B8; }
-    .bt-summary-item .value { color: #E0E0E0; font-weight: bold; }
-    .bt-loading, .bt-empty {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      color: #64748B;
-      font-size: 12px;
-      font-style: italic;
-    }
+    
 </style>
 <style id="sf-right-sidebar-header-final">
   #sf-right-sidebar > div > h2 {
@@ -1216,232 +316,7 @@
         transition: width 0.6s ease-in-out, background-color 0.4s ease;
         background-color: #FF5252;
     }
-    /* === Block Trade Intelligence Panel CSS === */
-    .bt-card {
-      padding: 8px 10px;
-      border-radius: 6px;
-      background: rgba(19, 23, 34, 0.6);
-      border-left: 3px solid #A855F7;
-      margin-bottom: 6px;
-      transition: all 0.2s ease;
-      cursor: default;
-    }
-    .bt-card:hover {
-      background: rgba(30, 34, 45, 0.8);
-      transform: translateX(2px);
-    }
-    .bt-card.akum { border-left-color: #00E676; }
-    .bt-card.dist { border-left-color: #FF5252; }
-    .bt-card.bull { border-left-color: #00E5FF; }
-    .bt-card.bear { border-left-color: #FFB300; }
-    .bt-card.neutral { border-left-color: #A855F7; }
-    .bt-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-    }
-    .bt-date {
-      font-size: 10px;
-      color: #94A3B8;
-      font-weight: 600;
-    }
-    .bt-badge {
-      font-size: 8px;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-    }
-    .bt-badge.akum { background: rgba(0, 230, 118, 0.15); color: #00E676; }
-    .bt-badge.dist { background: rgba(255, 82, 82, 0.15); color: #FF5252; }
-    .bt-badge.bull { background: rgba(0, 229, 255, 0.15); color: #00E5FF; }
-    .bt-badge.bear { background: rgba(255, 179, 0, 0.15); color: #FFB300; }
-    .bt-badge.neutral { background: rgba(168, 85, 247, 0.15); color: #A855F7; }
-    .bt-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      color: #CBD5E1;
-      margin-top: 2px;
-    }
-    .bt-row span:last-child {
-      font-weight: 600;
-      color: #E0E0E0;
-    }
-    .bt-detail {
-      font-size: 9px;
-      color: #64748B;
-      margin-top: 3px;
-      display: flex;
-      gap: 8px;
-    }
-    /* === Historical BT Chart CSS === */
-    #btHistoryPanel {
-      background: #0B0E14;
-      border-top: 1px solid #2A2E39;
-      padding: 8px 12px;
-      font-family: ui-monospace, 'SF Mono', Monaco, monospace;
-      transition: height 0.3s ease;
-    }
-    #btHistoryPanel.collapsed #btHistoryBody { display: none; }
-    #btHistoryPanel.collapsed { padding: 6px 12px; }
-    #btHistoryPanel { transition: padding 0.3s ease; }
-    #btHistoryPanel.collapsed { padding: 8px 16px; }
-    .bt-history-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 12px;
-      color: #00E5FF;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-    .bt-history-header .bt-title {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .bt-history-header button {
-      background: transparent;
-      border: 1px solid #2A2E39;
-      color: #94A3B8;
-      padding: 2px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 11px;
-    }
-    .bt-history-header button:hover {
-      background: #1E222D;
-      color: #fff;
-    }
-    #btHistoryBody {
-      display: flex;
-      gap: 16px;
-      height: 110px;
-    }
-    .bt-chart-area {
-      flex: 1;
-      display: flex;
-      align-items: flex-end;
-      gap: 3px;
-      padding: 8px 0 20px 0;
-      position: relative;
-      border-bottom: 1px solid #2A2E39;
-    }
-    .bt-chart-area::before {
-      content: '0';
-      position: absolute;
-      left: -18px;
-      bottom: 20px;
-      font-size: 9px;
-      color: #475569;
-    }
-    .bt-bar-wrapper {
-      flex: 1;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-      cursor: pointer;
-      position: relative;
-      min-width: 20px;
-    }
-    .bt-bar-fill {
-      width: 100%;
-      border-radius: 3px 3px 0 0;
-      transition: all 0.2s ease;
-      min-height: 2px;
-    }
-    .bt-bar-fill.bull { background: linear-gradient(to top, #00E676, #00B85A); }
-    .bt-bar-fill.bear { background: linear-gradient(to top, #FF5252, #D32F2F); }
-    .bt-bar-fill.neutral { background: linear-gradient(to top, #64748B, #475569); }
-    .bt-bar-wrapper:hover .bt-bar-fill {
-      filter: brightness(1.3);
-      transform: scaleX(1.05);
-    }
-    .bt-bar-month {
-      position: absolute;
-      bottom: -16px;
-      font-size: 9px;
-      color: #64748B;
-      white-space: nowrap;
-    }
-    .bt-bar-vol {
-      position: absolute;
-      top: -14px;
-      font-size: 9px;
-      color: #94A3B8;
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
-    .bt-bar-wrapper:hover .bt-bar-vol { opacity: 1; }
-    .bt-bar-tooltip {
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #1E222D;
-      border: 1px solid #00E5FF;
-      border-radius: 6px;
-      padding: 8px 10px;
-      font-size: 10px;
-      color: #E0E0E0;
-      white-space: nowrap;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.15s;
-      z-index: 100;
-      margin-bottom: 4px;
-    }
-    .bt-bar-wrapper:hover .bt-bar-tooltip { opacity: 1; }
-    .bt-bar-tooltip .tt-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin: 2px 0;
-    }
-    .bt-bar-tooltip .tt-label { color: #94A3B8; }
-    .bt-bar-tooltip .tt-value { color: #E0E0E0; font-weight: bold; }
-    .bt-bar-tooltip .tt-badge {
-      display: inline-block;
-      padding: 1px 6px;
-      border-radius: 3px;
-      font-size: 9px;
-      font-weight: 700;
-      margin-top: 4px;
-    }
-    .bt-summary-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 6px;
-      min-width: 110px;
-      align-content: center;
-    }
-    .bt-summary-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 4px 8px;
-      background: #131722;
-      border-radius: 4px;
-      border-left: 2px solid #00E5FF;
-      font-size: 10px;
-    }
-    .bt-summary-item .label { color: #94A3B8; }
-    .bt-summary-item .value { color: #E0E0E0; font-weight: bold; }
-    .bt-loading, .bt-empty {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      color: #64748B;
-      font-size: 12px;
-      font-style: italic;
-    }
+    
 </style>
 <style id="chartnalist-brand-only-final">
   /* =========================================================
@@ -1515,232 +390,7 @@
         transition: width 0.6s ease-in-out, background-color 0.4s ease;
         background-color: #FF5252;
     }
-    /* === Block Trade Intelligence Panel CSS === */
-    .bt-card {
-      padding: 8px 10px;
-      border-radius: 6px;
-      background: rgba(19, 23, 34, 0.6);
-      border-left: 3px solid #A855F7;
-      margin-bottom: 6px;
-      transition: all 0.2s ease;
-      cursor: default;
-    }
-    .bt-card:hover {
-      background: rgba(30, 34, 45, 0.8);
-      transform: translateX(2px);
-    }
-    .bt-card.akum { border-left-color: #00E676; }
-    .bt-card.dist { border-left-color: #FF5252; }
-    .bt-card.bull { border-left-color: #00E5FF; }
-    .bt-card.bear { border-left-color: #FFB300; }
-    .bt-card.neutral { border-left-color: #A855F7; }
-    .bt-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-    }
-    .bt-date {
-      font-size: 10px;
-      color: #94A3B8;
-      font-weight: 600;
-    }
-    .bt-badge {
-      font-size: 8px;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-    }
-    .bt-badge.akum { background: rgba(0, 230, 118, 0.15); color: #00E676; }
-    .bt-badge.dist { background: rgba(255, 82, 82, 0.15); color: #FF5252; }
-    .bt-badge.bull { background: rgba(0, 229, 255, 0.15); color: #00E5FF; }
-    .bt-badge.bear { background: rgba(255, 179, 0, 0.15); color: #FFB300; }
-    .bt-badge.neutral { background: rgba(168, 85, 247, 0.15); color: #A855F7; }
-    .bt-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      color: #CBD5E1;
-      margin-top: 2px;
-    }
-    .bt-row span:last-child {
-      font-weight: 600;
-      color: #E0E0E0;
-    }
-    .bt-detail {
-      font-size: 9px;
-      color: #64748B;
-      margin-top: 3px;
-      display: flex;
-      gap: 8px;
-    }
-    /* === Historical BT Chart CSS === */
-    #btHistoryPanel {
-      background: #0B0E14;
-      border-top: 1px solid #2A2E39;
-      padding: 8px 12px;
-      font-family: ui-monospace, 'SF Mono', Monaco, monospace;
-      transition: height 0.3s ease;
-    }
-    #btHistoryPanel.collapsed #btHistoryBody { display: none; }
-    #btHistoryPanel.collapsed { padding: 6px 12px; }
-    #btHistoryPanel { transition: padding 0.3s ease; }
-    #btHistoryPanel.collapsed { padding: 8px 16px; }
-    .bt-history-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 12px;
-      color: #00E5FF;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-    .bt-history-header .bt-title {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .bt-history-header button {
-      background: transparent;
-      border: 1px solid #2A2E39;
-      color: #94A3B8;
-      padding: 2px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 11px;
-    }
-    .bt-history-header button:hover {
-      background: #1E222D;
-      color: #fff;
-    }
-    #btHistoryBody {
-      display: flex;
-      gap: 16px;
-      height: 110px;
-    }
-    .bt-chart-area {
-      flex: 1;
-      display: flex;
-      align-items: flex-end;
-      gap: 3px;
-      padding: 8px 0 20px 0;
-      position: relative;
-      border-bottom: 1px solid #2A2E39;
-    }
-    .bt-chart-area::before {
-      content: '0';
-      position: absolute;
-      left: -18px;
-      bottom: 20px;
-      font-size: 9px;
-      color: #475569;
-    }
-    .bt-bar-wrapper {
-      flex: 1;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-      cursor: pointer;
-      position: relative;
-      min-width: 20px;
-    }
-    .bt-bar-fill {
-      width: 100%;
-      border-radius: 3px 3px 0 0;
-      transition: all 0.2s ease;
-      min-height: 2px;
-    }
-    .bt-bar-fill.bull { background: linear-gradient(to top, #00E676, #00B85A); }
-    .bt-bar-fill.bear { background: linear-gradient(to top, #FF5252, #D32F2F); }
-    .bt-bar-fill.neutral { background: linear-gradient(to top, #64748B, #475569); }
-    .bt-bar-wrapper:hover .bt-bar-fill {
-      filter: brightness(1.3);
-      transform: scaleX(1.05);
-    }
-    .bt-bar-month {
-      position: absolute;
-      bottom: -16px;
-      font-size: 9px;
-      color: #64748B;
-      white-space: nowrap;
-    }
-    .bt-bar-vol {
-      position: absolute;
-      top: -14px;
-      font-size: 9px;
-      color: #94A3B8;
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
-    .bt-bar-wrapper:hover .bt-bar-vol { opacity: 1; }
-    .bt-bar-tooltip {
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #1E222D;
-      border: 1px solid #00E5FF;
-      border-radius: 6px;
-      padding: 8px 10px;
-      font-size: 10px;
-      color: #E0E0E0;
-      white-space: nowrap;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.15s;
-      z-index: 100;
-      margin-bottom: 4px;
-    }
-    .bt-bar-wrapper:hover .bt-bar-tooltip { opacity: 1; }
-    .bt-bar-tooltip .tt-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin: 2px 0;
-    }
-    .bt-bar-tooltip .tt-label { color: #94A3B8; }
-    .bt-bar-tooltip .tt-value { color: #E0E0E0; font-weight: bold; }
-    .bt-bar-tooltip .tt-badge {
-      display: inline-block;
-      padding: 1px 6px;
-      border-radius: 3px;
-      font-size: 9px;
-      font-weight: 700;
-      margin-top: 4px;
-    }
-    .bt-summary-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 6px;
-      min-width: 110px;
-      align-content: center;
-    }
-    .bt-summary-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 4px 8px;
-      background: #131722;
-      border-radius: 4px;
-      border-left: 2px solid #00E5FF;
-      font-size: 10px;
-    }
-    .bt-summary-item .label { color: #94A3B8; }
-    .bt-summary-item .value { color: #E0E0E0; font-weight: bold; }
-    .bt-loading, .bt-empty {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      color: #64748B;
-      font-size: 12px;
-      font-style: italic;
-    }
+    
 </style>
 <style id="chartnalist-toolbar-polish">
   /* =========================================================
@@ -1837,232 +487,7 @@
         transition: width 0.6s ease-in-out, background-color 0.4s ease;
         background-color: #FF5252;
     }
-    /* === Block Trade Intelligence Panel CSS === */
-    .bt-card {
-      padding: 8px 10px;
-      border-radius: 6px;
-      background: rgba(19, 23, 34, 0.6);
-      border-left: 3px solid #A855F7;
-      margin-bottom: 6px;
-      transition: all 0.2s ease;
-      cursor: default;
-    }
-    .bt-card:hover {
-      background: rgba(30, 34, 45, 0.8);
-      transform: translateX(2px);
-    }
-    .bt-card.akum { border-left-color: #00E676; }
-    .bt-card.dist { border-left-color: #FF5252; }
-    .bt-card.bull { border-left-color: #00E5FF; }
-    .bt-card.bear { border-left-color: #FFB300; }
-    .bt-card.neutral { border-left-color: #A855F7; }
-    .bt-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-    }
-    .bt-date {
-      font-size: 10px;
-      color: #94A3B8;
-      font-weight: 600;
-    }
-    .bt-badge {
-      font-size: 8px;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-    }
-    .bt-badge.akum { background: rgba(0, 230, 118, 0.15); color: #00E676; }
-    .bt-badge.dist { background: rgba(255, 82, 82, 0.15); color: #FF5252; }
-    .bt-badge.bull { background: rgba(0, 229, 255, 0.15); color: #00E5FF; }
-    .bt-badge.bear { background: rgba(255, 179, 0, 0.15); color: #FFB300; }
-    .bt-badge.neutral { background: rgba(168, 85, 247, 0.15); color: #A855F7; }
-    .bt-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      color: #CBD5E1;
-      margin-top: 2px;
-    }
-    .bt-row span:last-child {
-      font-weight: 600;
-      color: #E0E0E0;
-    }
-    .bt-detail {
-      font-size: 9px;
-      color: #64748B;
-      margin-top: 3px;
-      display: flex;
-      gap: 8px;
-    }
-    /* === Historical BT Chart CSS === */
-    #btHistoryPanel {
-      background: #0B0E14;
-      border-top: 1px solid #2A2E39;
-      padding: 8px 12px;
-      font-family: ui-monospace, 'SF Mono', Monaco, monospace;
-      transition: height 0.3s ease;
-    }
-    #btHistoryPanel.collapsed #btHistoryBody { display: none; }
-    #btHistoryPanel.collapsed { padding: 6px 12px; }
-    #btHistoryPanel { transition: padding 0.3s ease; }
-    #btHistoryPanel.collapsed { padding: 8px 16px; }
-    .bt-history-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 12px;
-      color: #00E5FF;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-    .bt-history-header .bt-title {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .bt-history-header button {
-      background: transparent;
-      border: 1px solid #2A2E39;
-      color: #94A3B8;
-      padding: 2px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 11px;
-    }
-    .bt-history-header button:hover {
-      background: #1E222D;
-      color: #fff;
-    }
-    #btHistoryBody {
-      display: flex;
-      gap: 16px;
-      height: 110px;
-    }
-    .bt-chart-area {
-      flex: 1;
-      display: flex;
-      align-items: flex-end;
-      gap: 3px;
-      padding: 8px 0 20px 0;
-      position: relative;
-      border-bottom: 1px solid #2A2E39;
-    }
-    .bt-chart-area::before {
-      content: '0';
-      position: absolute;
-      left: -18px;
-      bottom: 20px;
-      font-size: 9px;
-      color: #475569;
-    }
-    .bt-bar-wrapper {
-      flex: 1;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-      cursor: pointer;
-      position: relative;
-      min-width: 20px;
-    }
-    .bt-bar-fill {
-      width: 100%;
-      border-radius: 3px 3px 0 0;
-      transition: all 0.2s ease;
-      min-height: 2px;
-    }
-    .bt-bar-fill.bull { background: linear-gradient(to top, #00E676, #00B85A); }
-    .bt-bar-fill.bear { background: linear-gradient(to top, #FF5252, #D32F2F); }
-    .bt-bar-fill.neutral { background: linear-gradient(to top, #64748B, #475569); }
-    .bt-bar-wrapper:hover .bt-bar-fill {
-      filter: brightness(1.3);
-      transform: scaleX(1.05);
-    }
-    .bt-bar-month {
-      position: absolute;
-      bottom: -16px;
-      font-size: 9px;
-      color: #64748B;
-      white-space: nowrap;
-    }
-    .bt-bar-vol {
-      position: absolute;
-      top: -14px;
-      font-size: 9px;
-      color: #94A3B8;
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
-    .bt-bar-wrapper:hover .bt-bar-vol { opacity: 1; }
-    .bt-bar-tooltip {
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #1E222D;
-      border: 1px solid #00E5FF;
-      border-radius: 6px;
-      padding: 8px 10px;
-      font-size: 10px;
-      color: #E0E0E0;
-      white-space: nowrap;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.15s;
-      z-index: 100;
-      margin-bottom: 4px;
-    }
-    .bt-bar-wrapper:hover .bt-bar-tooltip { opacity: 1; }
-    .bt-bar-tooltip .tt-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin: 2px 0;
-    }
-    .bt-bar-tooltip .tt-label { color: #94A3B8; }
-    .bt-bar-tooltip .tt-value { color: #E0E0E0; font-weight: bold; }
-    .bt-bar-tooltip .tt-badge {
-      display: inline-block;
-      padding: 1px 6px;
-      border-radius: 3px;
-      font-size: 9px;
-      font-weight: 700;
-      margin-top: 4px;
-    }
-    .bt-summary-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 6px;
-      min-width: 110px;
-      align-content: center;
-    }
-    .bt-summary-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 4px 8px;
-      background: #131722;
-      border-radius: 4px;
-      border-left: 2px solid #00E5FF;
-      font-size: 10px;
-    }
-    .bt-summary-item .label { color: #94A3B8; }
-    .bt-summary-item .value { color: #E0E0E0; font-weight: bold; }
-    .bt-loading, .bt-empty {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      color: #64748B;
-      font-size: 12px;
-      font-style: italic;
-    }
+    
 </style>
 <style id="chartnalist-drawing-final">
   #fibSettingsPanel {
@@ -2096,232 +521,7 @@
         transition: width 0.6s ease-in-out, background-color 0.4s ease;
         background-color: #FF5252;
     }
-    /* === Block Trade Intelligence Panel CSS === */
-    .bt-card {
-      padding: 8px 10px;
-      border-radius: 6px;
-      background: rgba(19, 23, 34, 0.6);
-      border-left: 3px solid #A855F7;
-      margin-bottom: 6px;
-      transition: all 0.2s ease;
-      cursor: default;
-    }
-    .bt-card:hover {
-      background: rgba(30, 34, 45, 0.8);
-      transform: translateX(2px);
-    }
-    .bt-card.akum { border-left-color: #00E676; }
-    .bt-card.dist { border-left-color: #FF5252; }
-    .bt-card.bull { border-left-color: #00E5FF; }
-    .bt-card.bear { border-left-color: #FFB300; }
-    .bt-card.neutral { border-left-color: #A855F7; }
-    .bt-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-    }
-    .bt-date {
-      font-size: 10px;
-      color: #94A3B8;
-      font-weight: 600;
-    }
-    .bt-badge {
-      font-size: 8px;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-    }
-    .bt-badge.akum { background: rgba(0, 230, 118, 0.15); color: #00E676; }
-    .bt-badge.dist { background: rgba(255, 82, 82, 0.15); color: #FF5252; }
-    .bt-badge.bull { background: rgba(0, 229, 255, 0.15); color: #00E5FF; }
-    .bt-badge.bear { background: rgba(255, 179, 0, 0.15); color: #FFB300; }
-    .bt-badge.neutral { background: rgba(168, 85, 247, 0.15); color: #A855F7; }
-    .bt-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      color: #CBD5E1;
-      margin-top: 2px;
-    }
-    .bt-row span:last-child {
-      font-weight: 600;
-      color: #E0E0E0;
-    }
-    .bt-detail {
-      font-size: 9px;
-      color: #64748B;
-      margin-top: 3px;
-      display: flex;
-      gap: 8px;
-    }
-    /* === Historical BT Chart CSS === */
-    #btHistoryPanel {
-      background: #0B0E14;
-      border-top: 1px solid #2A2E39;
-      padding: 8px 12px;
-      font-family: ui-monospace, 'SF Mono', Monaco, monospace;
-      transition: height 0.3s ease;
-    }
-    #btHistoryPanel.collapsed #btHistoryBody { display: none; }
-    #btHistoryPanel.collapsed { padding: 6px 12px; }
-    #btHistoryPanel { transition: padding 0.3s ease; }
-    #btHistoryPanel.collapsed { padding: 8px 16px; }
-    .bt-history-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 12px;
-      color: #00E5FF;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-    .bt-history-header .bt-title {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .bt-history-header button {
-      background: transparent;
-      border: 1px solid #2A2E39;
-      color: #94A3B8;
-      padding: 2px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 11px;
-    }
-    .bt-history-header button:hover {
-      background: #1E222D;
-      color: #fff;
-    }
-    #btHistoryBody {
-      display: flex;
-      gap: 16px;
-      height: 110px;
-    }
-    .bt-chart-area {
-      flex: 1;
-      display: flex;
-      align-items: flex-end;
-      gap: 3px;
-      padding: 8px 0 20px 0;
-      position: relative;
-      border-bottom: 1px solid #2A2E39;
-    }
-    .bt-chart-area::before {
-      content: '0';
-      position: absolute;
-      left: -18px;
-      bottom: 20px;
-      font-size: 9px;
-      color: #475569;
-    }
-    .bt-bar-wrapper {
-      flex: 1;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-      cursor: pointer;
-      position: relative;
-      min-width: 20px;
-    }
-    .bt-bar-fill {
-      width: 100%;
-      border-radius: 3px 3px 0 0;
-      transition: all 0.2s ease;
-      min-height: 2px;
-    }
-    .bt-bar-fill.bull { background: linear-gradient(to top, #00E676, #00B85A); }
-    .bt-bar-fill.bear { background: linear-gradient(to top, #FF5252, #D32F2F); }
-    .bt-bar-fill.neutral { background: linear-gradient(to top, #64748B, #475569); }
-    .bt-bar-wrapper:hover .bt-bar-fill {
-      filter: brightness(1.3);
-      transform: scaleX(1.05);
-    }
-    .bt-bar-month {
-      position: absolute;
-      bottom: -16px;
-      font-size: 9px;
-      color: #64748B;
-      white-space: nowrap;
-    }
-    .bt-bar-vol {
-      position: absolute;
-      top: -14px;
-      font-size: 9px;
-      color: #94A3B8;
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
-    .bt-bar-wrapper:hover .bt-bar-vol { opacity: 1; }
-    .bt-bar-tooltip {
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #1E222D;
-      border: 1px solid #00E5FF;
-      border-radius: 6px;
-      padding: 8px 10px;
-      font-size: 10px;
-      color: #E0E0E0;
-      white-space: nowrap;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.15s;
-      z-index: 100;
-      margin-bottom: 4px;
-    }
-    .bt-bar-wrapper:hover .bt-bar-tooltip { opacity: 1; }
-    .bt-bar-tooltip .tt-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin: 2px 0;
-    }
-    .bt-bar-tooltip .tt-label { color: #94A3B8; }
-    .bt-bar-tooltip .tt-value { color: #E0E0E0; font-weight: bold; }
-    .bt-bar-tooltip .tt-badge {
-      display: inline-block;
-      padding: 1px 6px;
-      border-radius: 3px;
-      font-size: 9px;
-      font-weight: 700;
-      margin-top: 4px;
-    }
-    .bt-summary-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 6px;
-      min-width: 110px;
-      align-content: center;
-    }
-    .bt-summary-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 4px 8px;
-      background: #131722;
-      border-radius: 4px;
-      border-left: 2px solid #00E5FF;
-      font-size: 10px;
-    }
-    .bt-summary-item .label { color: #94A3B8; }
-    .bt-summary-item .value { color: #E0E0E0; font-weight: bold; }
-    .bt-loading, .bt-empty {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      color: #64748B;
-      font-size: 12px;
-      font-style: italic;
-    }
+    
 </style>
 <style></style>
 <style id="wyckoff-css">
@@ -3350,7 +1550,7 @@
           <span>Historical Block Trade</span>
           <span id="btHistoryCode" style="color: #64748B; font-weight: 400;">—</span>
         </div>
-        <button onclick="toggleBTHistory()" id="btToggleBtn" title="Minimize/Maximize">âˆ’</button>
+        <button onclick="toggleBTHistory()" id="btToggleBtn" title="Minimize/Maximize">−</button>
       </div>
       <div id="btHistoryBody">
         <div class="bt-chart-area" id="btChartArea">
@@ -3538,8 +1738,8 @@
         Memuat status data...
       </div>
       <div style="display:flex; gap:4px; margin-bottom:6px; font-size:9px;">
-        <button id="btSortVol" onclick="setBTSort('volume')" style="flex:1; padding:3px 6px; border-radius:3px; background:rgba(0,229,255,0.15); color:#00E5FF; border:1px solid rgba(0,229,255,0.3); cursor:pointer; font-weight:600;">ðŸ“Š Top Volume</button>
-        <button id="btSortDate" onclick="setBTSort('date')" style="flex:1; padding:3px 6px; border-radius:3px; background:rgba(100,116,139,0.15); color:#64748B; border:1px solid rgba(100,116,139,0.3); cursor:pointer; font-weight:600;">ðŸ“… Terbaru</button>
+        <button id="btSortVol" onclick="setBTSort('volume')" style="flex:1; padding:3px 6px; border-radius:3px; background:rgba(0,229,255,0.15); color:#00E5FF; border:1px solid rgba(0,229,255,0.3); cursor:pointer; font-weight:600;">📊 Top Volume</button>
+        <button id="btSortDate" onclick="setBTSort('date')" style="flex:1; padding:3px 6px; border-radius:3px; background:rgba(100,116,139,0.15); color:#64748B; border:1px solid rgba(100,116,139,0.3); cursor:pointer; font-weight:600;">📅 Terbaru</button>
       </div>
       <div id="btPanel" class="space-y-1.5">
         <div id="btTableContainer" class="text-[10px] text-slate-500 italic text-center py-3">
@@ -3737,10 +1937,10 @@
     title: 'GEM'
   });
   // Level seperti RSI
-  gemSeries.createPriceLine({ price: 75, color: '#00E676', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: '75' });
-  gemSeries.createPriceLine({ price: 60, color: '#00E5FF', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: '60' });
-  gemSeries.createPriceLine({ price: 45, color: '#FFB300', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: '45' });
-  gemSeries.createPriceLine({ price: 30, color: '#FF5252', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: '30' });
+  gemSeries.createPriceLine({ price: 75, color: '#00E676', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'GEM 75' });
+  gemSeries.createPriceLine({ price: 60, color: '#00E5FF', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'GEM 60' });
+  gemSeries.createPriceLine({ price: 45, color: '#FFB300', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'GEM 45' });
+  gemSeries.createPriceLine({ price: 30, color: '#FF5252', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'GEM 30' });
   chart.priceScale('gem_scale').applyOptions({
     scaleMargins: { top: 0.90, bottom: 0 },
     borderVisible: false,
@@ -3921,10 +2121,15 @@
         (higherHigh && lowerLow) ||
         (lowerHigh && higherLow)
       ) {
-        trend = 'MIXED';
+        trend = 'SIDEWAYS (CHOP)';
       }
     }
 
+    const lastClose = Number(candles[candles.length - 1] && candles[candles.length - 1].close);
+    if (Number.isFinite(lastClose)) {
+      if (lastLow !== null && lastClose < lastLow) trend = 'BREAKDOWN';
+      else if (lastHigh !== null && lastClose > lastHigh) trend = 'BREAKOUT';
+    }
     return {
       trend,
       lastHigh,
@@ -3987,7 +2192,7 @@
     if (!badge) return;
 
     if (!candles || !candles.length || !btList || !btList.length) {
-      badge.innerText = 'âš ï¸ Tidak ada data';
+      badge.innerText = '⚠️ Tidak ada data';
       badge.style.background = 'rgba(100,116,139,0.15)';
       badge.style.color = '#64748B';
       return;
@@ -4009,14 +2214,14 @@
 
     let label, bg, color, icon;
     if (gapDays <= 2) {
-      label = 'âœ“ Data Fresh â€¢ ' + fmtDate(lastBT);
-      bg = 'rgba(0, 230, 118, 0.15)'; color = '#00E676'; icon = 'âœ“';
+      label = '✓ Data Fresh • ' + fmtDate(lastBT);
+      bg = 'rgba(0, 230, 118, 0.15)'; color = '#00E676'; icon = '✓';
     } else if (gapDays <= 5) {
-      label = 'âš  Update ' + gapDays + ' hari lalu â€¢ ' + fmtDate(lastBT);
-      bg = 'rgba(255, 179, 0, 0.15)'; color = '#FFB300'; icon = 'âš ';
+      label = '⚠ Update ' + gapDays + ' hari lalu • ' + fmtDate(lastBT);
+      bg = 'rgba(255, 179, 0, 0.15)'; color = '#FFB300'; icon = '⚠';
     } else {
-      label = 'ðŸ”´ DATA STALE ' + gapDays + ' hari â€¢ ' + fmtDate(lastBT);
-      bg = 'rgba(255, 82, 82, 0.15)'; color = '#FF5252'; icon = 'ðŸ”´';
+      label = '🔴 DATA STALE ' + gapDays + ' hari • ' + fmtDate(lastBT);
+      bg = 'rgba(255, 82, 82, 0.15)'; color = '#FF5252'; icon = '🔴';
     }
 
     badge.innerText = label;
@@ -4040,7 +2245,7 @@
       'DISTRIBUSI': { cls: 'dist', icon: '▼', label: 'DISTRIBUSI', color: '#FF5252' },
       'BULLISH CONFIRM': { cls: 'bull', icon: '▲', label: 'BULLISH', color: '#00E5FF' },
       'BEARISH CONFIRM': { cls: 'bear', icon: '▼', label: 'BEARISH', color: '#FFB300' },
-      'NEUTRAL': { cls: 'neutral', icon: 'â—†', label: 'NEUTRAL', color: '#A855F7' }
+      'NEUTRAL': { cls: 'neutral', icon: '◆', label: 'NEUTRAL', color: '#A855F7' }
     };
 
     function classifyBT(bt) {
@@ -4105,11 +2310,11 @@
       html += '    <span class="bt-date">' + fmtDate(bt.time) + '</span>';
       html += '    <span class="bt-badge ' + meta.cls + '">' + meta.icon + ' ' + meta.label + '</span>';
       html += '  </div>';
-      html += '  <div class="bt-row"><span>Volume</span><span>' + fmtVol(bt.volume) + ' lot</span></div>';
+      html += '  <div class="bt-row"><span>Volume</span><span>' + fmtVol(bt.volume) + ' lbr</span></div>';
       html += '  <div class="bt-row"><span>Nilai</span><span>' + fmt(bt.value) + '</span></div>';
       html += '  <div class="bt-detail">';
-      html += '    <span>ðŸ“Š Posisi: ' + cls.position + '%</span>';
-      html += '    <span style="color:' + fwdColor + '">ðŸ“ˆ Fwd 3D: ' + fwdSign + cls.fwdReturn + '%</span>';
+      html += '    <span>📊 Posisi: ' + cls.position + '%</span>';
+      html += '    <span style="color:' + fwdColor + '">📈 Fwd 3D: ' + fwdSign + cls.fwdReturn + '%</span>';
       html += '  </div>';
       html += '</div>';
     });
@@ -4121,7 +2326,7 @@
     return window.innerWidth <= 768;
   };
   
-  // Handle resize dari desktop â†’ mobile atau sebaliknya
+  // Handle resize dari desktop → mobile atau sebaliknya
   window.addEventListener('resize', function() {
     if (typeof chart !== 'undefined' && chart) {
       const wrapper = document.getElementById('chartWrapper');
@@ -4159,11 +2364,12 @@
       document.getElementById('fundListed').textContent = fmtNum(data.listed_shares);
       document.getElementById('fundTradeable').textContent = fmtNum(data.tradeable_shares);
 
-      const ff = data.free_float_pct || 0;
+      const ff = Number(data.free_float_pct);
+      const ffNA = !isFinite(ff) || ff >= 99.5;
       const ffEl = document.getElementById('fundFreeFloat');
-      ffEl.textContent = ff.toFixed(1) + '%';
-      ffEl.style.color = ff < 15 ? '#FFB300' : ff < 30 ? '#00E5FF' : '#00E676';
-      ffEl.title = ff < 15 ? 'Free float sangat rendah, rentan manipulasi' : '';
+      ffEl.textContent = ffNA ? 'n/a' : ff.toFixed(1) + '%';
+      ffEl.style.color = ffNA ? '#64748B' : ff < 15 ? '#FFB300' : ff < 30 ? '#00E5FF' : '#00E676';
+      ffEl.title = ffNA ? 'Data IDX: Tradeble Shares = Listed Shares, bukan free float sebenarnya' : ff < 15 ? 'Free float sangat rendah, rentan manipulasi' : '';
 
       const to = data.turnover_pct || 0;
       const toEl = document.getElementById('fundTurnover');
@@ -4202,7 +2408,7 @@
         document.getElementById('bidRatioBar').style.width = bidPct + '%';
         document.getElementById('offerRatioBar').style.width = offerPct + '%';
         const pressureEl = document.getElementById('bidOfferPressure');
-        pressureEl.textContent = data.pressure + ' (' + data.ratio.toFixed(2) + 'x)';
+        pressureEl.textContent = (data.ratio >= 1.2 ? 'Bid dominan' : data.ratio <= 0.8 ? 'Offer dominan' : 'Seimbang') + ' ' + data.ratio.toFixed(1) + 'x \u2022 snapshot EOD ' + (data.trade_date || '');
         pressureEl.style.color = data.pressure_color;
       }
     } catch (err) {
@@ -4328,8 +2534,8 @@
                        : 'Rp '+(d.value/1e6).toFixed(0)+' M';
         
         const phase = phases[i];
-        const phaseIcon = phase.type === 'akum' ? 'ðŸŸ¢' : phase.type === 'dist' ? 'ðŸ”´' 
-                        : phase.type === 'markup' ? 'ðŸ”µ' : phase.type === 'markdown' ? 'ðŸŸ ' : 'âšª';
+        const phaseIcon = phase.type === 'akum' ? '🟢' : phase.type === 'dist' ? '🔴' 
+                        : phase.type === 'markup' ? '🔵' : phase.type === 'markdown' ? '🟠' : '⚪';
         
         return `
           <div class="bt-bar-wrapper">
@@ -4338,7 +2544,7 @@
             <div class="bt-bar-month">${label}</div>
             <div class="bt-bar-tooltip">
               <div class="tt-row"><span class="tt-label">Bulan</span><span class="tt-value">${label}</span></div>
-              <div class="tt-row"><span class="tt-label">Volume BT</span><span class="tt-value">${volText} lot</span></div>
+              <div class="tt-row"><span class="tt-label">Volume BT</span><span class="tt-value">${volText} lbr</span></div>
               <div class="tt-row"><span class="tt-label">Nilai</span><span class="tt-value">${valText}</span></div>
               <div class="tt-row"><span class="tt-label">Transaksi</span><span class="tt-value">${d.count}x</span></div>
               <div class="tt-row"><span class="tt-label">Harga Avg</span><span class="tt-value">Rp ${price.toLocaleString('id-ID')}</span></div>
@@ -4373,7 +2579,7 @@
       const phasePanelEl2 = document.createElement('div');
       phasePanelEl2.className = 'bt-phase-panel';
       phasePanelEl2.id = 'btPhasePanel';
-      phasePanelEl2.innerHTML = phases.map((p, i) => {
+      phasePanelEl2.innerHTML = phases.filter(p => p.type !== 'konsol').map((p, i) => {
         const [year, mon] = p.month.split('-');
         const label = monthLabels[parseInt(mon) - 1] + ' ' + year.slice(2);
         return '<div class="bt-phase-item ' + p.type + '"><span class="phase-month">' + label + '</span><span class="phase-name ' + p.type + '">' + p.name + '</span><span class="phase-detail">' + p.detail + '</span></div>';
@@ -4403,7 +2609,7 @@
       // Phase panel di bawah bars
       const phasePanel = document.createElement('div');
       phasePanel.className = 'bt-phase-panel';
-      phasePanel.innerHTML = phases.map((p, i) => {
+      phasePanel.innerHTML = phases.filter(p => p.type !== 'konsol').map((p, i) => {
         const [year, mon] = p.month.split('-');
         const label = monthLabels[parseInt(mon) - 1] + ' ' + year.slice(2);
         return `
@@ -4443,7 +2649,7 @@
     const isCollapsed = panel.classList.contains('collapsed');
     
     // Update button icon
-    btn.textContent = isCollapsed ? '+' : 'âˆ’';
+    btn.textContent = isCollapsed ? '+' : '−';
     btn.title = isCollapsed ? 'Expand panel' : 'Collapse panel';
     
     // Resize chart
@@ -4521,7 +2727,7 @@
       // Helper: klasifikasi Block Trade
       function classifyBT(bt) {
         const idx = candleMap.get(String(bt.time));
-        if (!idx) return { type: 'NEUTRAL', color: '#A855F7', label: 'â—‡' };
+        if (!idx) return { type: 'NEUTRAL', color: '#A855F7', label: '◇' };
 
         const c = candleArr[idx.index];
         const open = Number(c.open), close = Number(c.close);
@@ -4555,7 +2761,7 @@
         if (!isBullish && fwdReturn < 0) {
           return { type: 'BEARISH CONFIRM', color: '#FFB300', label: '▼BEAR' };
         }
-        return { type: 'NEUTRAL', color: '#A855F7', label: 'â—‡' };
+        return { type: 'NEUTRAL', color: '#A855F7', label: '◇' };
       }
 
       currentMarkers = allTrades.map(nr => {
@@ -4655,7 +2861,13 @@
       const rsi = calcRSI(latestCandles, 14);
       const lastVwap = vwapData.length ? vwapData[vwapData.length - 1].value : null;
 
-      document.getElementById('structTrend').innerText = structure ? structure.trend : '--';
+      (function () {
+        const tEl = document.getElementById('structTrend');
+        const tv = structure ? structure.trend : '--';
+        tEl.innerText = tv;
+        const up = /BULL|BREAKOUT/.test(tv), dn = /BEAR|BREAKDOWN/.test(tv);
+        tEl.className = 'font-bold ' + (up ? 'text-idx-green' : dn ? 'text-idx-red' : (tv === '--' ? 'text-slate-300' : 'text-idx-amber'));
+      })();
       document.getElementById('structSwingHigh').innerText = structure?.lastHigh ? fmtRp(structure.lastHigh) : '--';
       document.getElementById('structSwingLow').innerText = structure?.lastLow ? fmtRp(structure.lastLow) : '--';
       document.getElementById('structRsi').innerText = rsi != null ? rsi.toFixed(1) : '--';
@@ -4786,7 +2998,22 @@
   // ============================================================
   // LOAD BANDARMOLOGY
   // ============================================================
-  async function loadBandarmology(code) {
+  function fmtFlow(shares, price, signed) {
+  const n = Number(shares) || 0;
+  const sign = n < 0 ? '-' : (signed ? '+' : '');
+  const abs = Math.abs(n);
+  let out = sign + (abs / 1e6).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' jt lbr';
+  const p = Number(price);
+  if (isFinite(p) && p > 0) {
+    const v = abs * p;
+    const rp = v >= 1e12
+      ? (v / 1e12).toLocaleString('id-ID', { maximumFractionDigits: 2 }) + ' T'
+      : (v / 1e9).toLocaleString('id-ID', { maximumFractionDigits: 0 }) + ' M';
+    out += ' <span style="opacity:.65;font-size:9px">&asymp;Rp ' + rp + '</span>';
+  }
+  return out;
+}
+async function loadBandarmology(code) {
     try {
       const data = await apiGet(`/api/public/summary/${encodeURIComponent(code)}`);
 
@@ -4835,14 +3062,14 @@
         document.getElementById('foreignSellToday');
 
       if (current) {
-        buyEl.innerText =
+        buyEl.innerHTML =
           data.foreignBuyToday != null
-            ? fmtNum(data.foreignBuyToday)
+            ? fmtFlow(data.foreignBuyToday, data.close, false)
             : '--';
 
-        sellEl.innerText =
+        sellEl.innerHTML =
           data.foreignSellToday != null
-            ? fmtNum(data.foreignSellToday)
+            ? fmtFlow(data.foreignSellToday, data.close, false)
             : '--';
 
         buyEl.title =
@@ -4851,8 +3078,8 @@
         sellEl.title =
           `EOD ${data.marketLatestDate}`;
       } else {
-        buyEl.innerText = '--';
-        sellEl.innerText = '--';
+        buyEl.innerHTML = '--';
+        sellEl.innerHTML = '--';
 
         buyEl.title =
           `Ticker terakhir ${data.date}; market terbaru ${data.marketLatestDate}`;
@@ -4868,8 +3095,8 @@
       const netToday = (Number(data.foreignBuyToday) || 0) - (Number(data.foreignSellToday) || 0);
 
       if (data.foreignBuyToday != null || data.foreignSellToday != null) {
-        netEl.innerText =
-          `${netToday >= 0 ? '+' : ''}${fmtNum(netToday)}`;
+        netEl.innerHTML =
+          `${netToday >= 0 ? '+' : ''}${fmtFlow(netToday, data.close, false)}`;
 
         netEl.className =
           `font-bold ${
@@ -4878,7 +3105,7 @@
               : 'text-idx-red'
           }`;
       } else {
-        netEl.innerText = '--';
+        netEl.innerHTML = '--';
         netEl.className =
           'font-bold text-slate-400';
       }
@@ -5131,7 +3358,7 @@ async function loadGemScore(code) {
     scoreEl.textContent = d.gem_score ?? '--';
     if (signalEl) signalEl.textContent = d.gem_signal ?? '--';
     if (volEl) volEl.textContent = d.vol_ratio ?? '--';
-    if (foreignEl) foreignEl.textContent = d.foreign_net20 != null ? Number(d.foreign_net20).toLocaleString('id-ID') : '--';
+    if (foreignEl) { const fn = d.foreign_net20 != null ? Number(d.foreign_net20) : null; foreignEl.textContent = fn == null ? '--' : (fn > 0 ? '+' : '') + (fn / 1e6).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' jt lbr'; foreignEl.style.color = fn == null ? '' : (fn >= 0 ? '#00E676' : '#FF5252'); }
     if (dateEl) dateEl.textContent = d.trade_date || '--';
 
     scoreEl.className = 'font-bold text-lg';
