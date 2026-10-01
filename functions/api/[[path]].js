@@ -35,8 +35,8 @@ app.get('/api/test', (c) => {
 // ============================================================
 
 app.get('/api/auth/config', (c) => {
-  const supabaseUrl = c.env.SUPABASE_URL;
-  const supabaseAnonKey = c.env.SUPABASE_ANON_KEY;
+  const supabaseUrl = (c.env.SUPABASE_URL || "").trim();
+  const supabaseAnonKey = (c.env.SUPABASE_ANON_KEY || "").trim();
   if (!supabaseUrl || !supabaseAnonKey) {
     return c.json({ success: false, error: 'Auth config incomplete' }, 503);
   }
