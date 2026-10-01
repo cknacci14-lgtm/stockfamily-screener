@@ -47,3 +47,5 @@ public/auth-backup/
 
 cek-*.txt
 cek-*.css
+
+.wrangler/
