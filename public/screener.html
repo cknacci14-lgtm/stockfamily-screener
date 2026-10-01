@@ -1406,12 +1406,12 @@ function openResearchDetail(encoded){
         <div class="mt-1 mb-4 text-xs muted">Threshold QBS tidak dimodifikasi oleh UI.</div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          ${qbsGate("Close Price",close,close!==null&&close>=100,close!==null?formatPrice(close)+" â‰¥ Rp 100":"—")}
-          ${qbsGate("Transaction Value",value,value!==null&&value>=2000000000,value!==null?formatNumber(value/1000000000,2)+"B â‰¥ 2B":"—")}
+          ${qbsGate("Close Price",close,close!==null&&close>=100,close!==null?formatPrice(close)+" ≥ Rp 100":"—")}
+          ${qbsGate("Transaction Value",value,value!==null&&value>=2000000000,value!==null?formatNumber(value/1000000000,2)+"B ≥ 2B":"—")}
           ${qbsGate("BB Width",bb,bb!==null&&bb<6,bb!==null?formatNumber(bb,2)+"% < 6%":"—")}
           ${qbsGate("20D Price Range",range,range!==null&&range<15,range!==null?formatNumber(range,2)+"% < 15%":"—")}
-          ${qbsGate("Volume Surge",vol,vol!==null&&vol>=6,vol!==null?formatNumber(vol,2)+"× â‰¥ 6×":"—")}
-          ${qbsGate("Frequency Surge",freq,freq!==null&&freq>=5,freq!==null?formatNumber(freq,2)+"× â‰¥ 5×":"—")}
+          ${qbsGate("Volume Surge",vol,vol!==null&&vol>=6,vol!==null?formatNumber(vol,2)+"× ≥ 6×":"—")}
+          ${qbsGate("Frequency Surge",freq,freq!==null&&freq>=5,freq!==null?formatNumber(freq,2)+"× ≥ 5×":"—")}
         </div>
       </div>
 
