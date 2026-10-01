@@ -945,10 +945,11 @@ function cleanNumber(value) {
 }
 
 function normalizeCodes(raw) {
-  return String(raw || "")
+  const codes = String(raw || "")
     .split(",")
     .map(v => v.trim().toUpperCase())
-    .filter(Boolean);
+    .filter(v => /^[A-Z0-9]{1,10}$/.test(v));
+  return [...new Set(codes)].slice(0, 50);
 }
 
 async function fetchStockRows(env, codes) {
