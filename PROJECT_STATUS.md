@@ -149,3 +149,15 @@ Jangan commit secrets ke repo. Cek `.env.example` untuk reference.
 ### Current State Notes
 - 2026-10-01: Market regime = Weak -> 0 signals (expected v3 behavior)
 - Weak/Neutral regime => SKIP all (spec v3 policy)
+
+### Monitor Signals Workflow — Known Limitations
+
+- **Schedule:** `*/15 * * * *` (setiap 15 menit)
+- **Reality:** GitHub Actions free tier throttle ? delay 3-4 jam antar runs
+- **Impact:** SL/TP detection delay ~4 jam worst case
+- **Status:** Acceptable untuk swing trading (T+10 exit)
+- **Upgrade path:** Kalau butuh real-time ? port ke Cloudflare Workers Cron
+
+Last verified: 2026-10-01
+- 14 runs total, semua success
+- Scheduled runs: 3-6 jam interval (throttled)
