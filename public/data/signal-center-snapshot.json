@@ -1,0 +1,154 @@
+{
+  "success": true,
+  "date": "2026-09-30",
+  "count": 4,
+  "signals": [
+    {
+      "stockCode": "ASLI",
+      "stockName": "Asri Karya Lestari Tbk.",
+      "setup": "BREAKOUT",
+      "status": "TRIGGERED",
+      "price": 486,
+      "trigger": 450,
+      "invalidation": 272.36,
+      "target1": 716.46,
+      "target2": 894.1,
+      "riskReward": 2.5,
+      "riskLevel": "HIGH",
+      "structure": {
+        "state": "IMPROVING",
+        "label": "Structure improving",
+        "explanation": "Price remains above the main short/intermediate trend references with increasing price activity."
+      },
+      "participation": {
+        "state": "IMPROVING",
+        "label": "Participation improving",
+        "explanation": "Multiple trading-activity measures are materially above their recent baseline."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": 0.00005510018774721577,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HEALTHY",
+        "label": "Healthy liquidity",
+        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-10-01T03:27:21.707Z"
+    },
+    {
+      "stockCode": "ASPI",
+      "stockName": "Andalan Sakti Primaindo Tbk.",
+      "setup": "BREAKOUT",
+      "status": "TRIGGERED",
+      "price": 980,
+      "trigger": 845,
+      "invalidation": 479.58,
+      "target1": 1393.13,
+      "target2": 1758.55,
+      "riskReward": 2.5,
+      "riskLevel": "HIGH",
+      "structure": {
+        "state": "IMPROVING",
+        "label": "Structure improving",
+        "explanation": "Price remains above the main short/intermediate trend references with increasing price activity."
+      },
+      "participation": {
+        "state": "IMPROVING",
+        "label": "Participation improving",
+        "explanation": "Multiple trading-activity measures are materially above their recent baseline."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": -0.000002377600277116197,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HEALTHY",
+        "label": "Healthy liquidity",
+        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-10-01T03:27:21.707Z"
+    },
+    {
+      "stockCode": "TEBE",
+      "stockName": "Dana Brata Luhur Tbk.",
+      "setup": "BREAKOUT",
+      "status": "TRIGGERED",
+      "price": 2690,
+      "trigger": 2460,
+      "invalidation": 1558.7,
+      "target1": 3811.95,
+      "target2": 4713.25,
+      "riskReward": 2.5,
+      "riskLevel": "HIGH",
+      "structure": {
+        "state": "IMPROVING",
+        "label": "Structure improving",
+        "explanation": "Price remains above the main short/intermediate trend references with increasing price activity."
+      },
+      "participation": {
+        "state": "IMPROVING",
+        "label": "Participation improving",
+        "explanation": "Multiple trading-activity measures are materially above their recent baseline."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": 0.000004824106290705083,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HEALTHY",
+        "label": "Healthy liquidity",
+        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-10-01T03:27:21.707Z"
+    },
+    {
+      "stockCode": "UNTR",
+      "stockName": "United Tractors Tbk.",
+      "setup": "BREAKOUT",
+      "status": "TRIGGERED",
+      "price": 27075,
+      "trigger": 26975,
+      "invalidation": 24713.5,
+      "target1": 30367.25,
+      "target2": 32628.75,
+      "riskReward": 2.5,
+      "riskLevel": "HIGH",
+      "structure": {
+        "state": "BULLISH",
+        "label": "Bullish structure",
+        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
+      },
+      "participation": {
+        "state": "IMPROVING",
+        "label": "Participation improving",
+        "explanation": "Multiple trading-activity measures are materially above their recent baseline."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": 0.0000031627282319506236,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HEALTHY",
+        "label": "Healthy liquidity",
+        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-10-01T03:27:21.707Z"
+    }
+  ],
+  "source": "Signal Engine → Smartwatchlist Adapter",
+  "mode": "SIGNAL_MONITOR",
+  "generatedAt": "2026-10-01T03:27:21.707Z"
+}
