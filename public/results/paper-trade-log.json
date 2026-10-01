@@ -1,0 +1,14 @@
+{
+  "created_at": "2026-10-01T01:16:10.845Z",
+  "policy_version": "qbs-v3",
+  "entries": {},
+  "runs": [
+    {
+      "timestamp": "2026-10-01T01:16:10.866Z",
+      "new_signals": 0,
+      "completed": 0,
+      "total_entries": 0
+    }
+  ],
+  "last_run": "2026-10-01T01:16:10.866Z"
+}
