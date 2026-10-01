@@ -1564,6 +1564,26 @@
   <!-- Right: Structure / Bandarmology / Order book -->
   <aside id="sf-right-sidebar" class="w-80 h-full min-h-0 border-l border-idx-border bg-idx-card flex flex-col shrink-0 overflow-y-auto text-xs font-mono">
 
+    <div id="sfSummary" class="p-3 border-b border-idx-border shrink-0">
+      <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mb-2 flex items-center gap-1.5"><i class="fa-solid fa-bullseye"></i> Ringkasan <span id="sumCode" class="text-slate-500 font-normal normal-case"></span></h2>
+      <div class="space-y-1.5 text-[11px]">
+        <div id="sumVerdict" class="p-2 rounded bg-idx-panel/60 border border-idx-border font-bold text-center">--</div>
+        <div class="p-2 rounded bg-idx-panel/60 border border-idx-border"><div class="text-slate-500 text-[10px]">HARGA</div><div id="sumPrice" class="font-bold text-slate-300">--</div></div>
+        <div class="p-2 rounded bg-idx-panel/60 border border-idx-border"><div class="text-slate-500 text-[10px]">FLOW ASING</div><div id="sumFlow" class="font-bold text-slate-300">--</div></div>
+        <div class="p-2 rounded bg-idx-panel/60 border border-idx-border"><div class="text-slate-500 text-[10px]">VOLATILITAS</div><div id="sumRisk" class="font-bold text-slate-300">--</div></div>
+      </div>
+      <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mt-3 mb-2 flex items-center gap-1.5"><i class="fa-solid fa-crosshairs"></i> Trade Plan</h2>
+      <div class="space-y-1.5 text-[11px]">
+        <div id="tpStatus" class="p-2 rounded bg-idx-panel/60 border border-idx-border text-slate-300">--</div>
+        <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border"><span class="text-slate-400">Entry</span><span id="tpEntry" class="font-bold text-slate-300">--</span></div>
+        <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border"><span class="text-slate-400">Stop</span><span id="tpStop" class="font-bold text-idx-red">--</span></div>
+        <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border"><span class="text-slate-400">Target 1</span><span id="tpT1" class="font-bold text-idx-green">--</span></div>
+        <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border"><span class="text-slate-400">Target 2</span><span id="tpT2" class="font-bold text-idx-green">--</span></div>
+        <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border"><span class="text-slate-400">Risk / Reward</span><span id="tpRR" class="font-bold text-slate-300">--</span></div>
+        <div class="text-[9px] text-slate-500 italic">Heuristik swing + ATR(14), bukan rekomendasi.</div>
+      </div>
+    </div>
+
     <div class="p-3 border-b border-idx-border shrink-0">
       <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between cursor-pointer select-none" style="font-family:inherit !important;font-size:13px !important;line-height:1.2 !important;font-weight:700 !important;letter-spacing:.04em !important;" onclick="togglePanel('structPanel', this)">
         <span class="flex items-center gap-1.5" style="font-family:inherit !important;font-size:13px !important;line-height:1.2 !important;font-weight:700 !important;letter-spacing:.04em !important;"><i class="fa-solid fa-microchip"></i> Market Structure <span class="text-slate-500 font-normal normal-case" style="font-size:13px !important;">(Heuristik)</span></span>
@@ -2872,6 +2892,8 @@
       document.getElementById('structSwingLow').innerText = structure?.lastLow ? fmtRp(structure.lastLow) : '--';
       document.getElementById('structRsi').innerText = rsi != null ? rsi.toFixed(1) : '--';
       document.getElementById('structVwap').innerText = lastVwap != null ? fmtRp(Math.round(lastVwap)) : '--';
+      window._sf = { code: code, structure: structure, rsi: rsi, vwap: lastVwap, atr: calcATR(latestCandles, 14), close: Number(latestCandles[latestCandles.length - 1].close) };
+      renderSummary();
 
       const lastTs = latestCandles[latestCandles.length - 1].time;
       const lastCandleLabel = new Date(lastTs * 1000).toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta', day: '2-digit', month: 'short', year: 'numeric' });
@@ -3013,9 +3035,101 @@
   }
   return out;
 }
-async function loadBandarmology(code) {
+function calcATR(candles, period) {
+  period = period || 14;
+  if (!candles || candles.length < period + 1) return null;
+  const tr = [];
+  for (let i = 1; i < candles.length; i++) {
+    const h = Number(candles[i].high), l = Number(candles[i].low), pc = Number(candles[i - 1].close);
+    if (!isFinite(h) || !isFinite(l) || !isFinite(pc)) continue;
+    tr.push(Math.max(h - l, Math.abs(h - pc), Math.abs(l - pc)));
+  }
+  if (tr.length < period) return null;
+  let atr = tr.slice(0, period).reduce(function (a, b) { return a + b; }, 0) / period;
+  for (let i = period; i < tr.length; i++) atr = (atr * (period - 1) + tr[i]) / period;
+  return atr;
+}
+function sfTick(p) { return p < 200 ? 1 : p < 500 ? 2 : p < 2000 ? 5 : p < 5000 ? 10 : 25; }
+function sfRound(p, dir) {
+  const t = sfTick(p), q = p / t;
+  return (dir === 'up' ? Math.ceil(q) : dir === 'down' ? Math.floor(q) : Math.round(q)) * t;
+}
+function renderSummary() {
+  const s = window._sf;
+  if (!s) return;
+  const set = function (id, html, color) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = html;
+    if (color) el.style.color = color;
+  };
+  const G = '#00E676', R = '#FF5252', A = '#FFB300', N = '#94A3B8';
+  const st = s.structure || {};
+  const tr = st.trend || '--';
+  const up = /BULL|BREAKOUT/.test(tr), dn = /BEAR|BREAKDOWN/.test(tr);
+  const close = s.close, atr = s.atr, rsi = s.rsi, vw = s.vwap;
+  set('sumCode', s.code || '');
+
+  // Flow asing (hanya jika data milik ticker yang sama)
+  const bd = window._sfBandar;
+  const b = (bd && bd.hasData !== false && String(bd.code || '').toUpperCase() === String(s.code || '').toUpperCase()) ? bd : null;
+  let flowDir = 0, flowTxt = '<span style="opacity:.6">memuat data asing...</span>';
+  if (b && b.netForeign20d != null) {
+    const n = Number(b.netForeign20d) || 0;
+    flowDir = n > 0 ? 1 : n < 0 ? -1 : 0;
+    const v = Math.abs(n) * (Number(b.close) || close || 0);
+    const rp = v >= 1e12 ? (v / 1e12).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' T' : (v / 1e9).toLocaleString('id-ID', { maximumFractionDigits: 0 }) + ' M';
+    flowTxt = 'Asing net ' + (n >= 0 ? 'beli' : 'jual') + ' 20D &asymp; Rp ' + rp + ' <span style="opacity:.6">(EOD ' + (b.date || '') + ')</span>';
+  }
+  set('sumFlow', flowTxt, flowDir > 0 ? '#00E676' : flowDir < 0 ? '#FF5252' : '#94A3B8');
+
+  // Harga
+  const rsiTxt = rsi == null ? '' : (rsi >= 70 ? 'jenuh beli' : rsi >= 55 ? 'kuat' : rsi > 45 ? 'netral' : rsi > 30 ? 'lemah' : 'jenuh jual');
+  const vwTxt = (vw != null && isFinite(close)) ? (close >= vw ? 'di atas' : 'di bawah') + ' VWAP' : '';
+  set('sumPrice', [tr, vwTxt, rsi == null ? '' : 'RSI ' + rsi.toFixed(0) + ' (' + rsiTxt + ')'].filter(Boolean).join(' &middot; '), up ? G : dn ? R : A);
+
+  // Volatilitas
+  if (isFinite(close) && atr) set('sumRisk', 'ATR(14) ' + (atr / close * 100).toFixed(1) + '% &asymp; ' + fmtRp(Math.round(atr)) + ' / hari', N);
+
+  // Kesimpulan
+  let verdict, vcol;
+  if (dn && flowDir <= 0) { verdict = 'HINDARI / TUNGGU RECLAIM'; vcol = R; }
+  else if (up && flowDir >= 0) { verdict = 'SETUP SEARAH TREN'; vcol = G; }
+  else { verdict = 'NETRAL &mdash; TUNGGU KONFIRMASI'; vcol = A; }
+  set('sumVerdict', verdict, vcol);
+
+  // Trade plan
+  const dash = '--';
+  ['tpEntry', 'tpStop', 'tpT1', 'tpT2', 'tpRR'].forEach(function (id) { set(id, dash); });
+  const lastLow = Number(st.lastLow), lastHigh = Number(st.lastHigh), prevHigh = Number(st.prevHigh);
+  if (!isFinite(close) || !atr) { set('tpStatus', 'Data belum cukup untuk trade plan.'); return; }
+  if (dn) {
+    set('tpStatus', 'Belum ada setup beli. Tunggu harga reclaim ' + (isFinite(lastLow) ? fmtRp(lastLow) : 'swing low') + ' atau terbentuk base baru.');
+  } else if (!up) {
+    set('tpStatus', 'Sideways. Pantau breakout di atas ' + (isFinite(lastHigh) ? fmtRp(lastHigh) : 'swing high') + ' dengan konfirmasi volume.');
+  } else {
+    const entry = sfRound(close, 'up');
+    let stop = (isFinite(lastLow) && lastLow < close && (close - lastLow) <= 3 * atr) ? lastLow - 0.25 * atr : close - 1.5 * atr;
+    stop = sfRound(stop, 'down');
+    const risk = entry - stop;
+    let t1 = (isFinite(lastHigh) && lastHigh > entry + 0.5 * atr) ? lastHigh : entry + 2 * atr;
+    let t2 = (isFinite(prevHigh) && prevHigh > t1 + 0.5 * atr) ? prevHigh : t1 + 2 * atr;
+    t1 = sfRound(t1, 'down'); t2 = sfRound(t2, 'down');
+    const rr = risk > 0 ? (t1 - entry) / risk : 0;
+    const pc = function (a) { return ((a - entry) / entry * 100).toFixed(1) + '%'; };
+    set('tpEntry', fmtRp(entry) + ' <span style="opacity:.6;font-size:9px">harga terakhir</span>');
+    set('tpStop', fmtRp(stop) + ' <span style="opacity:.7;font-size:9px">' + pc(stop) + '</span>');
+    set('tpT1', fmtRp(t1) + ' <span style="opacity:.7;font-size:9px">+' + pc(t1) + '</span>');
+    set('tpT2', fmtRp(t2) + ' <span style="opacity:.7;font-size:9px">+' + pc(t2) + '</span>');
+    set('tpRR', '1 : ' + rr.toFixed(1), rr >= 2 ? G : rr >= 1.5 ? A : R);
+    set('tpStatus', rr >= 1.5 ? 'Layak dipantau. Pasang stop sebelum entry.' : 'R/R tipis. Lebih baik tunggu pullback.');
+  }
+}
+  async function loadBandarmology(code) {
     try {
       const data = await apiGet(`/api/public/summary/${encodeURIComponent(code)}`);
+      window._sfBandar = data;
+      renderSummary();
 
       if (!data.success || !data.hasData) {
         document.getElementById('bandarDateLabel').innerText = 'tidak ada data';

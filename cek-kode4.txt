@@ -1,0 +1,140 @@
+﻿
+
+===== src\server.js [1440-1500] =====
+1440:     if (rErr) throw rErr;
+1441: 
+1442:     if (!rows.length) {
+1443:       return res.json({
+1444:         success: true,
+1445:         hasData: false,
+1446:         message: `Belum ada data historis untuk ${code}.`
+1447:       });
+1448:     }
+1449: 
+1450:     const last = rows[rows.length - 1];
+1451:     const prev = rows.length > 1
+1452:       ? rows[rows.length - 2]
+1453:       : last;
+1454: 
+1455:     /*
+1456:      * Freshness:
+1457:      * ticker harus benar-benar memiliki row pada marketLatestDate
+1458:      */
+1459:     const isCurrentSession =
+1460:       String(last.trade_date) === String(marketLatestDate);
+1461: 
+1462:     /*
+1463:      * 20 observasi terbaru milik ticker.
+1464:      * Ini tetap valid meskipun ticker tidak aktif pada sesi terbaru.
+1465:      */
+1466:     const trailing20 = rows.slice(-20);
+1467: 
+1468:     const netForeign20d = trailing20.reduce(
+1469:       (sum, r) =>
+1470:         sum +
+1471:         ((Number(r.foreign_buy) || 0) -
+1472:          (Number(r.foreign_sell) || 0)),
+1473:       0
+1474:     );
+1475: 
+1476:     const grossForeign20d = trailing20.reduce(
+1477:       (sum, r) =>
+1478:         sum +
+1479:         (Number(r.foreign_buy) || 0) +
+1480:         (Number(r.foreign_sell) || 0),
+1481:       0
+1482:     );
+1483: 
+1484:     /*
+1485:      * Bandar Score:
+1486:      * tetap formula lama.
+1487:      */
+1488:     const bandarScoreRaw =
+1489:       grossForeign20d > 0
+1490:         ? 50 + 50 * (netForeign20d / grossForeign20d)
+1491:         : 50;
+1492: 
+1493:     /*
+1494:      * 52-week range:
+1495:      * gunakan high/low aktual harian, bukan close.
+1496:      */
+1497:     const validHighs = rows
+1498:       .map(r => Number(r.high))
+1499:       .filter(Number.isFinite)
+1500:       .filter(v => v > 0);
+
+===== src\server.js [1606-1625] =====
+1606: 
+1607:       foreignBuyToday,
+1608:       foreignSellToday,
+1609:       netForeignToday,
+1610: 
+1611:       netForeign20d,
+1612: 
+1613:       bandarScore:
+1614:         Math.max(
+1615:           0,
+1616:           Math.min(
+1617:             100,
+1618:             Math.round(bandarScoreRaw)
+1619:           )
+1620:         ),
+1621: 
+1622:       low52,
+1623:       high52,
+1624: 
+1625:       /*
+
+===== public\index.html [1563-1609] =====
+1563: 
+1564:   <!-- Right: Structure / Bandarmology / Order book -->
+1565:   <aside id="sf-right-sidebar" class="w-80 h-full min-h-0 border-l border-idx-border bg-idx-card flex flex-col shrink-0 overflow-y-auto text-xs font-mono">
+1566: 
+1567:     <div class="p-3 border-b border-idx-border shrink-0">
+1568:       <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between cursor-pointer select-none" style="font-family:inherit !important;font-size:13px !important;line-height:1.2 !important;font-weight:700 !important;letter-spacing:.04em !important;" onclick="togglePanel('structPanel', this)">
+1569:         <span class="flex items-center gap-1.5" style="font-family:inherit !important;font-size:13px !important;line-height:1.2 !important;font-weight:700 !important;letter-spacing:.04em !important;"><i class="fa-solid fa-microchip"></i> Market Structure <span class="text-slate-500 font-normal normal-case" style="font-size:13px !important;">(Heuristik)</span></span>
+1570:         <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+1571:       </h2>
+1572:       <div id="structPanel" class="space-y-1.5 text-[11px]">
+1573:         <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border">
+1574:           <span class="text-slate-400">Trend</span><span id="structTrend" class="font-bold text-slate-300">--</span>
+1575:         </div>
+1576:         <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border">
+1577:           <span class="text-slate-400">Swing High</span><span id="structSwingHigh" class="font-bold text-idx-green">--</span>
+1578:         </div>
+1579:         <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border">
+1580:           <span class="text-slate-400">Swing Low</span><span id="structSwingLow" class="font-bold text-idx-red">--</span>
+1581:         </div>
+1582:         <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border">
+1583:           <span class="text-slate-400">RSI (14)</span><span id="structRsi" class="font-bold text-slate-300">--</span>
+1584:         </div>
+1585:         <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border">
+1586:           <span class="text-slate-400">VWAP (window)</span><span id="structVwap" class="font-bold text-idx-amber">--</span>
+1587:         </div>
+1588:       </div>
+1589:     </div>
+1590: 
+1591:     <div class="p-3 border-b border-idx-border shrink-0">
+1592:       <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between cursor-pointer select-none" onclick="togglePanel('bandarPanel', this)">
+1593:         <span class="flex items-center gap-1.5"><i class="fa-solid fa-database"></i> Bandarmology <span id="bandarDateLabel" class="text-slate-500 font-normal normal-case">--</span></span>
+1594:         <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+1595:       </h2>
+1596:       <div id="bandarPanel" class="space-y-1.5">
+1597:         <div class="p-2 rounded bg-idx-panel/60 border border-idx-border">
+1598:           <div class="flex justify-between items-center">
+1599:             <span class="text-slate-400">Skor Akumulasi</span>
+1600:             <span id="bandarScore" class="font-bold">--</span>
+1601:           </div>
+1602:           <div class="gauge-container mt-1.5">
+1603:             <div class="gauge-fill" id="bandarmology-gauge"></div>
+1604:           </div>
+1605:         </div>
+1606:         <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border">
+1607:           <span class="text-slate-400">Foreign Buy (hari ini)</span><span id="foreignBuyToday" class="font-bold text-idx-green">--</span>
+1608:         </div>
+1609:         <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border">
+
+===== FUNGSI TERSEDIA =====
+1979: function calcRSI(candles, period = 14) {
+2030: function calcAnchoredVWAP(candles, volumeByTime) {
+2043: function calcMarketStructure(candles) {
