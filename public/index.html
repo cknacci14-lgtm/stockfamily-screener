@@ -4036,10 +4036,10 @@
     }
 
     const classMap = {
-      'AKUMULASI': { cls: 'akum', icon: 'â–²', label: 'AKUMULASI', color: '#00E676' },
-      'DISTRIBUSI': { cls: 'dist', icon: 'â–¼', label: 'DISTRIBUSI', color: '#FF5252' },
-      'BULLISH CONFIRM': { cls: 'bull', icon: 'â–²', label: 'BULLISH', color: '#00E5FF' },
-      'BEARISH CONFIRM': { cls: 'bear', icon: 'â–¼', label: 'BEARISH', color: '#FFB300' },
+      'AKUMULASI': { cls: 'akum', icon: '▲', label: 'AKUMULASI', color: '#00E676' },
+      'DISTRIBUSI': { cls: 'dist', icon: '▼', label: 'DISTRIBUSI', color: '#FF5252' },
+      'BULLISH CONFIRM': { cls: 'bull', icon: '▲', label: 'BULLISH', color: '#00E5FF' },
+      'BEARISH CONFIRM': { cls: 'bear', icon: '▼', label: 'BEARISH', color: '#FFB300' },
       'NEUTRAL': { cls: 'neutral', icon: 'â—†', label: 'NEUTRAL', color: '#A855F7' }
     };
 
@@ -4544,16 +4544,16 @@
 
         // Rule-based classification
         if (position >= 65 && fwdReturn < -0.5) {
-          return { type: 'DISTRIBUSI', color: '#FF5252', label: 'â–¼DIST' };
+          return { type: 'DISTRIBUSI', color: '#FF5252', label: '▼DIST' };
         }
         if (position <= 35 && fwdReturn > 0.5) {
-          return { type: 'AKUMULASI', color: '#00E676', label: 'â–²AKUM' };
+          return { type: 'AKUMULASI', color: '#00E676', label: '▲AKUM' };
         }
         if (isBullish && fwdReturn > 0) {
-          return { type: 'BULLISH CONFIRM', color: '#00E5FF', label: 'â–²BULL' };
+          return { type: 'BULLISH CONFIRM', color: '#00E5FF', label: '▲BULL' };
         }
         if (!isBullish && fwdReturn < 0) {
-          return { type: 'BEARISH CONFIRM', color: '#FFB300', label: 'â–¼BEAR' };
+          return { type: 'BEARISH CONFIRM', color: '#FFB300', label: '▼BEAR' };
         }
         return { type: 'NEUTRAL', color: '#A855F7', label: 'â—‡' };
       }
