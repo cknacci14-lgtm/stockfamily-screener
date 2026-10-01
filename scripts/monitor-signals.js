@@ -16,6 +16,9 @@ const SUPABASE_URL = (process.env.SUPABASE_URL || '').trim();
 const SUPABASE_KEY = (process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
 const ARJUM_KEY = (process.env.ARJUM_API_KEY || '').trim();
 
+// Parse CLI flags
+const DRY_RUN = process.argv.includes('--dry-run');
+
 // ============================================================
 // SUPABASE REST HELPERS
 // ============================================================
@@ -285,6 +288,16 @@ async function main() {
   }
   
   // 4. Apply updates
+  if (DRY_RUN) {
+    console.log("");
+    console.log("[DRY RUN] -- skipping DB updates and notifications");
+    console.log("");
+    for (const u of updates) {
+      console.log("  [DRY] #" + u.update.id + " " + u.signal.ticker + " -- " + u.event);
+    }
+    return;
+  }
+
   console.log('💾 Applying updates...');
   for (const u of updates) {
     const updateData = { ...u.update };

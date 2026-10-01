@@ -16,13 +16,13 @@
  * Pipeline:
  *
  * daily_stock_data
- *      â†“
+ *      ↓
  * SignalEngineInput
- *      â†“
+ *      ↓
  * evaluateStockSignal()
- *      â†“
+ *      ↓
  * Setup + Risk + Lifecycle
- *      â†“
+ *      ↓
  * Smartwatchlist
  */
 
