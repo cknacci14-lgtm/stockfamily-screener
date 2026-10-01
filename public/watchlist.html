@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -328,43 +328,6 @@
   </style>
 
   <script src="/assets/stockfamily-sidebar.js"></script>
-<style id="chartnalist-brand-only-final">
-  .sf-header-logo { display:none !important; }
-  .sf-header-brand { gap:0 !important; }
-  .sf-header-title {
-    color:#F5F7F8 !important;
-    font-weight:800 !important;
-    letter-spacing:.045em !important;
-  }
-  .sf-header-title-accent {
-    color:#00D9FF !important;
-  }
-
-  #stockfamily-global-sidebar .sf-mark {
-    display:none !important;
-  }
-
-  #stockfamily-global-sidebar .sf-brand-copy {
-    display:none !important;
-  }
-
-  #stockfamily-global-sidebar .sf-brand::after {
-    content:"CHARTNALIST";
-    display:block;
-    color:#F5F7F8;
-    font-family:inherit;
-    font-size:14px;
-    font-weight:800;
-    line-height:1;
-    letter-spacing:.035em;
-    white-space:nowrap;
-  }
-
-  #stockfamily-global-sidebar .sf-brand {
-    gap:0 !important;
-    overflow:hidden !important;
-  }
-</style>
 <style id="chartnalist-smartwatchlist-polish">
 .filter { transition:all .16s ease; }
 .filter:hover { transform:translateY(-1px); }
@@ -441,7 +404,184 @@
 @media (max-width:900px) {
   .signal-table { min-width:980px; }
 }
-</style></head>
+</style><!-- CHARTNALIST_PHASE6_3_CANONICAL_SIDEBAR -->
+<style>
+/* =========================================================
+   CHARTNALIST — CANONICAL SIDEBAR BRAND
+   Phase 6.3 Final
+   ========================================================= */
+
+#stockfamily-global-sidebar .sf-brand {
+  height: 42px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  padding: 0 7px !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+#stockfamily-global-sidebar .sf-mark {
+  width: 29px !important;
+  height: 29px !important;
+  min-width: 29px !important;
+  max-width: 29px !important;
+  flex: 0 0 29px !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  border-radius: 8px !important;
+
+  /*
+     Elegant champagne / brushed-gold treatment.
+     More premium than the previous neon green/blue mark.
+  */
+  background:
+    linear-gradient(
+      145deg,
+      #e1c98a 0%,
+      #c5a866 45%,
+      #96743c 100%
+    ) !important;
+
+  color: #101315 !important;
+
+  font:
+    900 10px/1
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace !important;
+
+  letter-spacing: -0.04em !important;
+
+  box-shadow:
+    0 0 0 1px rgba(225,201,138,.18),
+    0 4px 14px rgba(0,0,0,.28),
+    inset 0 1px 0 rgba(255,255,255,.28) !important;
+
+  text-shadow: none !important;
+}
+
+#stockfamily-global-sidebar .sf-brand-copy {
+  min-width: 0 !important;
+  max-width: 160px !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+#stockfamily-global-sidebar .sf-brand-name {
+  font:
+    800 13px/1
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif !important;
+
+  letter-spacing: -.025em !important;
+  color: #f3f6f7 !important;
+  white-space: nowrap !important;
+}
+
+/*
+   Split-color Chartnalist wordmark:
+   CHART = emerald
+   NALIS = white
+*/
+#stockfamily-global-sidebar .sf-brand-name {
+  font-size: 0 !important;
+}
+
+#stockfamily-global-sidebar .sf-brand-name::before {
+  content: "CHART" !important;
+  color: #00d084 !important;
+  font:
+    800 13px/1
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif !important;
+  letter-spacing: -.025em !important;
+}
+
+#stockfamily-global-sidebar .sf-brand-name::after {
+  content: "NALIS" !important;
+  color: #f3f6f7 !important;
+  font:
+    800 13px/1
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif !important;
+  letter-spacing: -.025em !important;
+}
+
+#stockfamily-global-sidebar .sf-brand-sub {
+  margin-top: 4px !important;
+
+  color: #556168 !important;
+
+  font:
+    700 6.5px/1
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace !important;
+
+  letter-spacing: .17em !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+}
+
+/*
+   Disable legacy page-specific logo decorations.
+*/
+#stockfamily-global-sidebar .sf-brand::before,
+#stockfamily-global-sidebar .sf-brand::after {
+  content: none !important;
+  display: none !important;
+}
+
+/*
+   Canonical navigation typography.
+*/
+#stockfamily-global-sidebar .sf-section {
+  color: #4b565d !important;
+}
+
+#stockfamily-global-sidebar .sf-nav-link {
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif !important;
+}
+
+/*
+   Admin is controlled by Phase 6 role guard.
+*/
+#stockfamily-global-sidebar .sf-nav-link[href="/admin.html"] {
+  transition:
+    opacity .16s ease,
+    background .16s ease,
+    color .16s ease !important;
+}
+</style>
+<!-- CHARTNALIST_PHASE6_3_AUTH_BOOTSTRAP -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/chartnalist-app-auth.js"></script>
+</head>
 
 <body>
   <main class="terminal">
@@ -538,14 +678,14 @@
         ? n.toLocaleString("id-ID", {
             maximumFractionDigits: 2,
           })
-        : "â€”";
+        : "—";
     }
 
     function rr(value) {
       const n = Number(value);
       return Number.isFinite(n)
         ? n.toFixed(2) + "R"
-        : "â€”";
+        : "—";
     }
 
     function riskClass(value) {
@@ -632,7 +772,7 @@
     function formatPrice(value) {
       const n = Number(value);
 
-      if (!Number.isFinite(n)) return "â€”";
+      if (!Number.isFinite(n)) return "—";
 
       if (Number.isInteger(n)) {
         return n.toLocaleString("id-ID");
@@ -647,7 +787,7 @@
     function formatRR(value) {
       const n = Number(value);
 
-      if (!Number.isFinite(n)) return "â€”";
+      if (!Number.isFinite(n)) return "—";
 
       return `${n.toFixed(1).replace(/\.0$/, "")}R`;
     }
@@ -805,7 +945,7 @@
     if(meta && !meta.querySelector(".smartwatch-freshness")){
       const span=document.createElement("span");
       span.className="smartwatch-freshness live";
-      span.textContent=" â€¢ LIVE";
+      span.textContent=" ”¢ LIVE";
       meta.appendChild(span);
     }
   };
@@ -865,6 +1005,8 @@
 
 </body>
 </html>
+
+
 
 
 
