@@ -384,6 +384,140 @@
     text-align: center;
   }
 </style>
+<style id="chartnalist-screener-desktop-scale">
+/* =========================================================
+   CHARTNALIST — SCREENER DESKTOP SCALE POLISH
+   UI ONLY — NO QBS / WATCH LOGIC CHANGE
+   ========================================================= */
+
+@media (min-width: 1280px) {
+
+  main.max-w-7xl {
+    max-width: 1480px !important;
+    padding-left: 32px !important;
+    padding-right: 32px !important;
+    padding-top: 36px !important;
+  }
+
+  header .max-w-7xl {
+    max-width: 1480px !important;
+    padding-left: 32px !important;
+    padding-right: 32px !important;
+  }
+
+  main h1 {
+    font-size: 2.45rem !important;
+  }
+
+  main section.mb-8 {
+    margin-bottom: 32px !important;
+  }
+
+  main section.grid.grid-cols-2.lg\:grid-cols-4 {
+    gap: 14px !important;
+    margin-bottom: 32px !important;
+  }
+
+  main section.grid.grid-cols-2.lg\:grid-cols-4 > .panel {
+    padding: 20px !important;
+    min-height: 108px;
+  }
+
+  main section.grid.grid-cols-2.lg\:grid-cols-4 > .panel .text-\[9px\] {
+    font-size: 10px !important;
+  }
+
+  main section.grid.grid-cols-2.lg\:grid-cols-4 > .panel .text-\[10px\] {
+    font-size: 11px !important;
+  }
+
+  #signalCount,
+  main section.grid.grid-cols-2.lg\:grid-cols-4 > .panel .text-2xl {
+    font-size: 1.65rem !important;
+  }
+
+  #scanDate,
+  main section.grid.grid-cols-2.lg\:grid-cols-4 > .panel .text-sm {
+    font-size: 0.95rem !important;
+  }
+
+  #dataStatus {
+    font-size: 10px !important;
+  }
+
+  #emptyState {
+    min-height: 220px !important;
+    padding: 42px 32px !important;
+  }
+
+  #emptyState #emptyTitle {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.1em !important;
+  }
+
+  #emptyState #emptyMessage {
+    max-width: 920px !important;
+    font-size: 12px !important;
+    line-height: 2.05 !important;
+  }
+
+  .research-note {
+    padding: 20px !important;
+  }
+
+  .research-note .text-xs {
+    font-size: 13px !important;
+  }
+
+  .research-note .text-\[11px\] {
+    font-size: 12px !important;
+    line-height: 1.8 !important;
+  }
+
+  main footer {
+    font-size: 10px !important;
+  }
+}
+
+@media (min-width: 1600px) {
+
+  main.max-w-7xl,
+  header .max-w-7xl {
+    max-width: 1540px !important;
+  }
+}
+</style>
+<style id="chartnalist-market-gate-readability">
+/* CHARTNALIST — MARKET GATE READABILITY — UI ONLY */
+
+#emptyState #emptyMessage {
+  color: #8c969e !important;
+  letter-spacing: 0.01em;
+}
+
+@media (min-width: 1280px) {
+
+  #emptyState #emptyTitle {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.1em !important;
+    margin-bottom: 5px !important;
+  }
+
+  #emptyState #emptyMessage {
+    max-width: 920px !important;
+    font-size: 12.5px !important;
+    line-height: 2.15 !important;
+  }
+
+  #emptyState [data-lucide="scan-search"] {
+    width: 30px !important;
+    height: 30px !important;
+    margin-bottom: 14px !important;
+  }
+}
+</style>
 </head>
 
 <body>
@@ -693,10 +827,13 @@
     function formatDate(value) {
       if (!value) return "—";
 
-      const text = String(value);
+      const text = String(value).trim();
 
-      if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
-        const [year, month, day] = text.split("-");
+      const match =
+        text.match(/^(\d{4})-(\d{2})-(\d{2})(?:T.*)?$/);
+
+      if (match) {
+        const [, year, month, day] = match;
 
         const months = [
           "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
