@@ -208,7 +208,7 @@ async function main() {
   }
   
   // 1. Fetch active signals
-  console.log('📊 Fetching signals (PUBLISHED/ACTIVE)...');
+  console.log('[SIGNALS] Fetching signals (PUBLISHED/ACTIVE)...');
   const signals = await sb('signals?status=in.(PUBLISHED,ACTIVE)&select=*');
   console.log('  Got: ' + signals.length + ' signal(s)');
   console.log('');
@@ -220,7 +220,7 @@ async function main() {
   
   // 2. Fetch prices
   const tickers = [...new Set(signals.map(s => s.ticker))];
-  console.log('📈 Fetching prices for: ' + tickers.join(', '));
+  console.log('[PRICES] Fetching prices for: ' + tickers.join(', '));
   const priceMap = {};
   for (const code of tickers) {
     const p = await fetchPrice(code);
@@ -280,7 +280,7 @@ async function main() {
   }
   
   console.log('');
-  console.log('📝 Total changes: ' + updates.length);
+  console.log('[TOTAL] Total changes: ' + updates.length);
   
   if (updates.length === 0) {
     console.log('Nothing to update.');
@@ -298,7 +298,7 @@ async function main() {
     return;
   }
 
-  console.log('💾 Applying updates...');
+  console.log('[SAVE] Applying updates...');
   for (const u of updates) {
     const updateData = { ...u.update };
     delete updateData.id;
