@@ -55,6 +55,14 @@ function buildTradePlan(input) {
                         ? entry - atr * 1.50
                         : entry * 0.94;
     }
+    /*
+     * Cap stop distance: keep the tighter of the structural stop and
+     * entry - 2.5 ATR, so a far-away SMA50 cannot become the invalidation.
+     */
+    if (typeof invalidation === "number" && Number.isFinite(invalidation) &&
+        typeof atr === "number" && Number.isFinite(atr) && atr > 0) {
+        invalidation = Math.max(invalidation, entry - atr * 2.5);
+    }
     if (!Number.isFinite(invalidation) ||
         invalidation >= entry) {
         return {
