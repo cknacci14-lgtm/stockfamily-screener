@@ -361,6 +361,29 @@
 <!-- CHARTNALIST_PHASE6_3_AUTH_BOOTSTRAP -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/chartnalist-app-auth.js"></script>
+<style id="chartnalist-market-gate-polish">
+  #emptyState {
+    min-height: 170px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #emptyState #emptyTitle {
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  #emptyState #emptyMessage {
+    max-width: 860px;
+    margin-left: auto;
+    margin-right: auto;
+    white-space: pre-line;
+    line-height: 2;
+    text-align: center;
+  }
+</style>
 </head>
 
 <body>
@@ -1225,7 +1248,7 @@
           grid.innerHTML = "";
 
           const qbsTargetDate =
-            rawData?.targetDate || "";
+            rawData?.targetDate || rawData?.generatedAt || "";
 
           const qbsData =
             rawData?.data?.[0] || {};
@@ -1260,21 +1283,23 @@
             isWeakMarketGate
               ? [
                   "QBS scan completed, but the current market regime is not supportive for signal generation.",
+                  "",
                   Number.isFinite(pctUp)
-                    ? `${(pctUp * 100).toFixed(2)}% stocks up.`
+                    ? `${(pctUp * 100).toFixed(2)}%  ·  STOCKS UP`
                     : "",
                   Number.isFinite(meanFnet)
-                    ? `Mean foreign net ${meanFnet.toLocaleString("en-US", {
+                    ? `${meanFnet.toLocaleString("en-US", {
                         maximumFractionDigits: 0
-                      })}.`
+                      })}  ·  MEAN FOREIGN NET`
                     : "",
                   Number.isFinite(universeSize)
-                    ? `${universeSize.toLocaleString("en-US")} stocks in regime universe.`
+                    ? `${universeSize.toLocaleString("en-US")}  ·  REGIME UNIVERSE`
                     : "",
-                  "No QBS event was generated."
+                  "",
+                  "NO QBS EVENT GENERATED"
                 ]
                   .filter(Boolean)
-                  .join(" ")
+                  .join("\n")
               : [
                   "Latest completed market session.",
                   qbsTargetDate
