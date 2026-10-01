@@ -37,3 +37,7 @@ Thumbs.db
 
 # Local Netlify folder
 .netlify
+
+# Root screener output (generated)
+/screener_results.json
+/results/screener_results.json
