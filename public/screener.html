@@ -922,6 +922,14 @@
                   QBS DETECTED
                 </div>
 
+                <button
+                  type="button"
+                  class="chartnalist-watch-btn"
+                  data-watch-ticker="${ticker}"
+                  onclick="event.stopPropagation(); chartnalistPhase10ToggleWatch(this)"
+                  title="Add to Smartwatchlist"
+                >+ WATCH</button>
+
               </div>
 
             </div>
@@ -1324,6 +1332,58 @@
     fetchLiveData();
   </script>
 
+<script id="chartnalist-phase10-watch">
+function chartnalistPhase10ToggleWatch(button) {
+  const ticker = String(button?.dataset?.watchTicker || "")
+    .trim()
+    .toUpperCase();
+
+  if (!ticker || ticker === "—") return;
+
+  let watchlist = [];
+
+  try {
+    const saved = JSON.parse(
+      localStorage.getItem("watchlist") || "[]"
+    );
+
+    watchlist = Array.isArray(saved) ? saved : [];
+  } catch {
+    watchlist = [];
+  }
+
+  const exists = watchlist.some(item => {
+    if (typeof item === "string") {
+      return item.toUpperCase() === ticker;
+    }
+
+    const code =
+      item?.code ||
+      item?.stockCode ||
+      item?.symbol ||
+      "";
+
+    return String(code).toUpperCase() === ticker;
+  });
+
+  if (!exists) {
+    watchlist.push({ code: ticker });
+
+    localStorage.setItem(
+      "watchlist",
+      JSON.stringify(watchlist)
+    );
+  }
+
+  button.textContent = "✓ WATCHED";
+  button.dataset.watched = "true";
+  button.disabled = true;
+  button.setAttribute(
+    "title",
+    "Already in Smartwatchlist"
+  );
+}
+</script>
 <script id="research-detail-js">
 function qbsGate(label,value,pass,detail){
   return `<div class="research-gate flex items-center justify-between gap-4">
@@ -1445,6 +1505,8 @@ function closeResearchDetail(){
 <!-- removed: chartnalist-typography.js (file missing) -->
 </body>
 </html>
+
+
 
 
 

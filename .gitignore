@@ -41,3 +41,6 @@ Thumbs.db
 # Root screener output (generated)
 /screener_results.json
 /results/screener_results.json
+
+# Auth backups (auto-generated during phase work)
+public/auth-backup/

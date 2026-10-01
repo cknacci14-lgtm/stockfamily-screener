@@ -581,6 +581,177 @@
 <!-- CHARTNALIST_PHASE6_3_AUTH_BOOTSTRAP -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/chartnalist-app-auth.js"></script>
+<style id="CHARTNALIST_PRODUCT_SHELL_V1">
+:root{
+  --cn-bg:#050607;
+  --cn-surface:#101315;
+  --cn-surface-2:#15191c;
+  --cn-border:rgba(255,255,255,.075);
+  --cn-text:#f5f7f8;
+  --cn-muted:#7f898f;
+  --cn-dim:#626b72;
+  --cn-green:#00d084;
+  --cn-red:#ff4d4d;
+  --cn-gold:#f5b700;
+}
+
+html,
+body{
+  background:var(--cn-bg) !important;
+  color:var(--cn-text);
+}
+
+body{
+  min-height:100vh;
+}
+
+main.terminal{
+  max-width:1440px;
+  margin:0 auto;
+  padding:30px 34px 54px;
+}
+
+.topbar{
+  border-bottom:1px solid var(--cn-border);
+  padding-bottom:22px;
+  margin-bottom:22px;
+}
+
+.eyebrow{
+  color:var(--cn-green) !important;
+  font-size:10px !important;
+  font-weight:800 !important;
+  letter-spacing:.16em !important;
+  text-transform:uppercase;
+}
+
+.topbar h1{
+  color:var(--cn-text) !important;
+  letter-spacing:-.035em !important;
+  font-weight:800 !important;
+}
+
+.subtitle{
+  color:var(--cn-muted) !important;
+  max-width:680px;
+}
+
+.meta{
+  color:var(--cn-dim) !important;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:10px;
+  letter-spacing:.04em;
+}
+
+.toolbar{
+  background:rgba(16,19,21,.72) !important;
+  border:1px solid var(--cn-border) !important;
+  border-radius:12px !important;
+  padding:10px !important;
+  backdrop-filter:blur(14px);
+}
+
+.filter{
+  border:1px solid transparent !important;
+  background:transparent !important;
+  color:#737d83 !important;
+  border-radius:7px !important;
+  font-size:10px !important;
+  font-weight:800 !important;
+  letter-spacing:.08em;
+}
+
+.filter:hover{
+  color:var(--cn-text) !important;
+  background:rgba(255,255,255,.035) !important;
+}
+
+.filter.active{
+  color:var(--cn-green) !important;
+  background:rgba(0,208,132,.07) !important;
+  border-color:rgba(0,208,132,.18) !important;
+}
+
+.refresh{
+  border-radius:7px !important;
+  border:1px solid rgba(255,255,255,.09) !important;
+  background:#15191c !important;
+  color:#b9c0c4 !important;
+  font-size:10px !important;
+  font-weight:800 !important;
+  letter-spacing:.08em;
+}
+
+.refresh:hover{
+  color:#fff !important;
+  border-color:rgba(0,208,132,.24) !important;
+}
+
+.table-shell{
+  margin-top:14px;
+  background:rgba(16,19,21,.72) !important;
+  border:1px solid var(--cn-border) !important;
+  border-radius:12px !important;
+  overflow:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+thead th{
+  color:#626b72 !important;
+  background:#0b0d0f !important;
+  font-size:9px !important;
+  font-weight:800 !important;
+  letter-spacing:.12em;
+}
+
+tbody tr{
+  border-top:1px solid rgba(255,255,255,.045) !important;
+  transition:background .14s ease;
+}
+
+tbody tr:hover{
+  background:rgba(255,255,255,.022) !important;
+}
+
+.ticker{
+  color:#f5f7f8 !important;
+  font-weight:800 !important;
+  letter-spacing:.015em;
+}
+
+.name{
+  color:#626b72 !important;
+}
+
+.ticker-link{
+  text-decoration:none;
+}
+
+.empty{
+  padding:54px 20px !important;
+  color:#626b72 !important;
+}
+
+.empty strong{
+  display:block;
+  color:#cbd1d4;
+  margin-bottom:6px;
+}
+
+@media(max-width:900px){
+  main.terminal{
+    padding:20px 16px 40px;
+  }
+
+  .topbar{
+    gap:14px;
+  }
+}
+</style>
 </head>
 
 <body>
@@ -988,7 +1159,7 @@
   transform:translateY(-1px);
 }
 .watchlist-signal-center-link::before {
-  content:"â—ˆ";
+  content:"◈";
   font-size:12px;
   line-height:1;
 }
@@ -1003,8 +1174,91 @@
 }
 </style>
 
+<script id="CHARTNALIST_SMARTWATCHLIST_V2">
+(() => {
+  "use strict";
+
+  /*
+   * CHARTNALIST SMARTWATCHLIST V2
+   *
+   * UI/UX layer only.
+   * Existing Signal Engine remains authoritative.
+   * No new signal calculation is introduced here.
+   */
+
+  function bindStockNavigation() {
+    document.querySelectorAll("tbody tr[data-code]").forEach(row => {
+      const code = row.dataset.code;
+
+      if (!code || row.dataset.cnBound === "1") {
+        return;
+      }
+
+      row.dataset.cnBound = "1";
+
+      row.addEventListener("dblclick", () => {
+        window.location.href =
+          "/stock.html?code=" +
+          encodeURIComponent(code);
+      });
+    });
+  }
+
+  function improveMeta() {
+    const meta = document.getElementById("meta");
+
+    if (!meta) {
+      return;
+    }
+
+    const text = meta.textContent || "";
+
+    if (
+      text.includes("Signal engine unavailable") ||
+      text.includes("no trade date")
+    ) {
+      meta.dataset.cnState = "attention";
+    }
+  }
+
+  function observeRender() {
+    const rows = document.getElementById("rows");
+
+    if (!rows) {
+      return;
+    }
+
+    const observer = new MutationObserver(() => {
+      bindStockNavigation();
+      improveMeta();
+    });
+
+    observer.observe(rows, {
+      childList: true,
+      subtree: true
+    });
+
+    bindStockNavigation();
+    improveMeta();
+  }
+
+  function boot() {
+    observeRender();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot, {
+      once: true
+    });
+  } else {
+    boot();
+  }
+})();
+</script>
 </body>
 </html>
+
+
 
 
 
