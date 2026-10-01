@@ -43,31 +43,71 @@ app.get('/api/auth/config', (c) => {
   return c.json({ success: true, supabaseUrl, supabaseAnonKey });
 });
 
-app.get('/api/auth/me', async (c) => {
-  const authHeader = c.req.header('Authorization') || '';
-  const match = authHeader.match(/^Bearer\s+(.+)$/i);
-  if (!match) {
-    return c.json({ success: false, error: 'Authentication required' }, 401);
-  }
-  const token = match[1];
+// ADMIN GUARD - semua route /api/admin/* wajib admin (cek tabel profiles)
+app.use('/api/admin/*', async (c, next) => {
+  if (c.req.method === 'OPTIONS') return next();
+  const match = (c.req.header('Authorization') || '').match(/^Bearer\s+(.+)$/i);
+  if (!match) return c.json({ success: false, error: 'Authentication required' }, 401);
+
   const url = c.env.SUPABASE_URL;
-  const key = c.env.SUPABASE_SERVICE_ROLE_KEY || c.env.SUPABASE_ANON_KEY;
-  if (!url || !key) {
-    return c.json({ success: false, error: 'Supabase server configuration missing' }, 500);
+  const key = c.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return c.json({ success: false, error: 'Supabase server configuration missing' }, 500);
+
+  const uRes = await fetch(url + '/auth/v1/user', {
+    headers: { Authorization: 'Bearer ' + match[1], apikey: key },
+  });
+  if (!uRes.ok) return c.json({ success: false, error: 'Invalid or expired session' }, 401);
+  const user = await uRes.json();
+
+  const pRes = await fetch(url + '/rest/v1/profiles?select=role&id=eq.' + user.id, {
+    headers: { apikey: key, Authorization: 'Bearer ' + key },
+  });
+  const profile = pRes.ok ? (await pRes.json())[0] : null;
+  if (!profile || profile.role !== 'admin') {
+    return c.json({ success: false, error: 'Admin access required' }, 403);
   }
+
+  c.set('authUser', user);
+  await next();
+});
+
+app.get('/api/auth/me', async (c) => {
+  const match = (c.req.header('Authorization') || '').match(/^Bearer\s+(.+)$/i);
+  if (!match) return c.json({ success: false, error: 'Authentication required' }, 401);
+
+  const url = c.env.SUPABASE_URL;
+  const key = c.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return c.json({ success: false, error: 'Supabase server configuration missing' }, 500);
+
   try {
-    const res = await fetch(url + '/auth/v1/user', {
-      headers: { 'Authorization': 'Bearer ' + token, 'apikey': key },
+    const uRes = await fetch(url + '/auth/v1/user', {
+      headers: { Authorization: 'Bearer ' + match[1], apikey: key },
     });
-    if (!res.ok) {
-      return c.json({ success: false, error: 'Invalid or expired session' }, 401);
-    }
-    const user = await res.json();
-    const isAdmin = user?.app_metadata?.role === 'admin'
-      || user?.user_metadata?.role === 'admin';
-    return c.json({ success: true, user, isAdmin });
+    if (!uRes.ok) return c.json({ success: false, error: 'Invalid or expired session' }, 401);
+    const user = await uRes.json();
+
+    const pRes = await fetch(
+      url + '/rest/v1/profiles?select=id,email,display_name,avatar_url,role,plan,created_at&id=eq.' + user.id,
+      { headers: { apikey: key, Authorization: 'Bearer ' + key } }
+    );
+    if (!pRes.ok) return c.json({ success: false, error: 'Failed to load user profile' }, 500);
+    const profile = (await pRes.json())[0];
+    if (!profile) return c.json({ success: false, error: 'User profile not found' }, 404);
+
+    return c.json({
+      success: true,
+      user: {
+        id: user.id,
+        email: profile.email || user.email || '',
+        displayName: profile.display_name || '',
+        avatarUrl: profile.avatar_url || '',
+        role: profile.role || 'user',
+        plan: profile.plan || 'free',
+        createdAt: profile.created_at || null,
+      },
+    });
   } catch (e) {
-    return c.json({ success: false, error: e.message }, 500);
+    return c.json({ success: false, error: 'Auth service error' }, 500);
   }
 });
 
