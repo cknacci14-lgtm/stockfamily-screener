@@ -33,14 +33,6 @@ app.get('/api/test', (c) => {
 // ============================================================
 // AUTH (CHARTNALIST) - Edge-compatible
 // ============================================================
-app.get('/api/_debug/env', (c) => {
-  return c.json({
-    hasUrl: !!c.env.SUPABASE_URL,
-    hasAnon: !!c.env.SUPABASE_ANON_KEY,
-    hasService: !!c.env.SUPABASE_SERVICE_ROLE_KEY,
-    envKeys: Object.keys(c.env || {}).filter(k => k.startsWith('SUPABASE')),
-  });
-});
 
 app.get('/api/auth/config', (c) => {
   const supabaseUrl = c.env.SUPABASE_URL;
