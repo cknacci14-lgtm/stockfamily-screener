@@ -242,7 +242,7 @@ async function buildSmartwatchlist(
       )
     );
 
-  const { stocks: output } = computeSmartwatchlist(stocks, history);
+  const { stocks: output } = computeSmartwatchlist(stocks, history, latestMarketTradeDate);
 
   const response = {
     success: true,

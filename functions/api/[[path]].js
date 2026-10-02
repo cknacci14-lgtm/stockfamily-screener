@@ -1034,7 +1034,7 @@ app.get("/api/public/smartwatchlist", async (c) => {
     }
 
     const history = await fetchHistoryWindow(env, stocks.map(s => s.id), latestDate);
-    const { stocks: output } = smartCore.computeSmartwatchlist(stocks, history);
+    const { stocks: output } = smartCore.computeSmartwatchlist(stocks, history, latestDate);
 
     return c.json({
       success: true,

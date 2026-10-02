@@ -923,7 +923,7 @@ function cleanTradePlan(plan) {
   };
 }
 
-function computeSmartwatchlist(stocks, history) {
+function computeSmartwatchlist(stocks, history, marketDate) {
   const grouped =
     normalizeRows(
       stocks,
@@ -1098,6 +1098,41 @@ function computeSmartwatchlist(stocks, history) {
       },
       null
     );
+
+  /*
+   * Presentation flags (adapter-only). They never change setup,
+   * status or trade-plan values produced by the Signal Engine.
+   */
+  const dayMs = 86400000;
+  const toDay = (d) => {
+    const t = Date.parse(String(d).slice(0, 10) + "T00:00:00Z");
+    return Number.isFinite(t) ? t : null;
+  };
+  let mkt = marketDate ? String(marketDate).slice(0, 10) : null;
+  if (!mkt) {
+    for (const r of history) {
+      const d = String(r.trade_date).slice(0, 10);
+      if (!mkt || d > mkt) mkt = d;
+    }
+  }
+  const mktT = mkt ? toDay(mkt) : null;
+
+  for (const row of output) {
+    const lt = toDay(row.latestTradeDate);
+    row.staleDays =
+      mktT !== null && lt !== null
+        ? Math.max(0, Math.round((mktT - lt) / dayMs))
+        : null;
+    row.dataStale = row.staleDays !== null && row.staleDays > 5;
+
+    const p = Number(row.price);
+    const inv = Number(row.invalidation);
+    row.stopDistancePct =
+      Number.isFinite(p) && Number.isFinite(inv) && p > 0 && inv < p
+        ? Math.round(((p - inv) / p) * 1000) / 10
+        : null;
+    row.stopWide = row.stopDistancePct !== null && row.stopDistancePct > 15;
+  }
 
   return { stocks: output, latestDate };
 }
