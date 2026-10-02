@@ -1,7 +1,7 @@
 {
   "success": true,
-  "date": "2026-09-30",
-  "count": 4,
+  "date": "2026-10-01",
+  "count": 6,
   "signals": [
     {
       "stockCode": "ASLI",
@@ -10,9 +10,9 @@
       "status": "TRIGGERED",
       "price": 486,
       "trigger": 450,
-      "invalidation": 272.36,
-      "target1": 716.46,
-      "target2": 894.1,
+      "invalidation": 305.54,
+      "target1": 666.7,
+      "target2": 811.16,
       "riskReward": 2.5,
       "riskLevel": "HIGH",
       "structure": {
@@ -37,7 +37,7 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-01T03:27:21.707Z"
+      "updatedAt": "2026-10-02T04:12:38.880Z"
     },
     {
       "stockCode": "ASPI",
@@ -46,9 +46,9 @@
       "status": "TRIGGERED",
       "price": 980,
       "trigger": 845,
-      "invalidation": 479.58,
-      "target1": 1393.13,
-      "target2": 1758.55,
+      "invalidation": 564.64,
+      "target1": 1265.54,
+      "target2": 1545.89,
       "riskReward": 2.5,
       "riskLevel": "HIGH",
       "structure": {
@@ -73,7 +73,79 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-01T03:27:21.707Z"
+      "updatedAt": "2026-10-02T04:12:38.880Z"
+    },
+    {
+      "stockCode": "CSMI",
+      "stockName": "Cipta Selera Murni Tbk.",
+      "setup": "BREAKOUT",
+      "status": "TRIGGERED",
+      "price": 290,
+      "trigger": 274,
+      "invalidation": 179,
+      "target1": 416.5,
+      "target2": 511.5,
+      "riskReward": 2.5,
+      "riskLevel": "HIGH",
+      "structure": {
+        "state": "BULLISH",
+        "label": "Bullish structure",
+        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
+      },
+      "participation": {
+        "state": "IMPROVING",
+        "label": "Participation improving",
+        "explanation": "Multiple trading-activity measures are materially above their recent baseline."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": 0.000006498810125645227,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HEALTHY",
+        "label": "Healthy liquidity",
+        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-10-02T04:12:38.880Z"
+    },
+    {
+      "stockCode": "GEMS",
+      "stockName": "Golden Energy Mines Tbk.",
+      "setup": "BREAKOUT",
+      "status": "TRIGGERED",
+      "price": 8150,
+      "trigger": 7800,
+      "invalidation": 7094.64,
+      "target1": 8858.04,
+      "target2": 9563.39,
+      "riskReward": 2.5,
+      "riskLevel": "HIGH",
+      "structure": {
+        "state": "BULLISH",
+        "label": "Bullish structure",
+        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
+      },
+      "participation": {
+        "state": "IMPROVING",
+        "label": "Participation improving",
+        "explanation": "Multiple trading-activity measures are materially above their recent baseline."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": -0.000030559708479190215,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HEALTHY",
+        "label": "Healthy liquidity",
+        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-10-02T04:12:38.880Z"
     },
     {
       "stockCode": "TEBE",
@@ -82,9 +154,9 @@
       "status": "TRIGGERED",
       "price": 2690,
       "trigger": 2460,
-      "invalidation": 1558.7,
-      "target1": 3811.95,
-      "target2": 4713.25,
+      "invalidation": 1814.46,
+      "target1": 3428.3,
+      "target2": 4073.84,
       "riskReward": 2.5,
       "riskLevel": "HIGH",
       "structure": {
@@ -109,18 +181,18 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-01T03:27:21.707Z"
+      "updatedAt": "2026-10-02T04:12:38.880Z"
     },
     {
-      "stockCode": "UNTR",
-      "stockName": "United Tractors Tbk.",
-      "setup": "BREAKOUT",
+      "stockCode": "UVCR",
+      "stockName": "Trimegah Karya Pratama Tbk.",
+      "setup": "PULLBACK",
       "status": "TRIGGERED",
-      "price": 27075,
-      "trigger": 26975,
-      "invalidation": 24713.5,
-      "target1": 30367.25,
-      "target2": 32628.75,
+      "price": 264,
+      "trigger": 184.4,
+      "invalidation": 142,
+      "target1": 248,
+      "target2": 290.4,
       "riskReward": 2.5,
       "riskLevel": "HIGH",
       "structure": {
@@ -129,14 +201,14 @@
         "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
       },
       "participation": {
-        "state": "IMPROVING",
-        "label": "Participation improving",
-        "explanation": "Multiple trading-activity measures are materially above their recent baseline."
+        "state": "CONTRACTING",
+        "label": "Participation contracting",
+        "explanation": "Multiple trading-activity measures are below their recent baseline."
       },
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": 0.0000031627282319506236,
+        "value": 0.00010685816960246925,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
@@ -145,10 +217,10 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-01T03:27:21.707Z"
+      "updatedAt": "2026-10-02T04:12:38.880Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-10-01T03:27:21.707Z"
+  "generatedAt": "2026-10-02T04:12:38.880Z"
 }
