@@ -420,6 +420,8 @@
     <!-- Admin Tabs -->
     <div class="admin-tabs">
       <button class="admin-tab active" data-tab="dashboard" onclick="switchAdminTab('dashboard')">📊 Dashboard</button>
+      <button class="admin-tab" data-tab="forward" onclick="switchAdminTab('forward')">Forward Test</button>
+      <button class="admin-tab" data-tab="monitor" onclick="switchAdminTab('monitor')">Monitoring</button>
       <button class="admin-tab" data-tab="signals" onclick="switchAdminTab('signals')">🎯 Signals</button>
     </div>
 
@@ -526,6 +528,30 @@
     </div> <!-- /tab-dashboard -->
 
     <!-- Tab: Signals -->
+    <div id="tab-forward" class="tab-panel">
+      <div class="admin-card">
+        <h2>Forward Test</h2>
+        <div class="row">
+          <button onclick="loadForwardTab()" style="padding:6px 12px;border-radius:6px;border:1px solid #2a2f3e;background:#1a1f2e;color:#e5e7eb;cursor:pointer">Muat ulang</button>
+          <span id="fw-updated" style="color:#8b93a7;font-size:12px"></span>
+        </div>
+        <p style="color:#8b93a7;font-size:12px;margin-top:8px">Hasil sinyal yang dicatat setiap hari (jalankan scripts/verdict-forward-log.js setelah upload data). Jangan menyimpulkan sebelum sampel (n) sekitar 100 dan datanya minimal sebulan hari berbeda.</p>
+      </div>
+      <div id="fw-body"><div class="admin-card">Klik tab ini untuk memuat data.</div></div>
+    </div>
+
+    <div id="tab-monitor" class="tab-panel">
+      <div class="admin-card">
+        <h2>Monitoring</h2>
+        <div class="row">
+          <button onclick="loadMonitorTab()" style="padding:6px 12px;border-radius:6px;border:1px solid #2a2f3e;background:#1a1f2e;color:#e5e7eb;cursor:pointer">Muat ulang</button>
+          <span id="mon-updated" style="color:#8b93a7;font-size:12px"></span>
+        </div>
+        <p style="color:#8b93a7;font-size:12px;margin-top:8px">Traffic dihitung mulai pencatat dipasang. Pengunjung unik dihitung per browser, user aktif per akun yang login. Kunjungan dari admin.html dan localhost tidak dihitung.</p>
+      </div>
+      <div id="mon-body"><div class="admin-card">Klik tab ini untuk memuat data.</div></div>
+    </div>
+
     <div id="tab-signals" class="tab-panel">
 
       <!-- Create Signal Form -->
@@ -1022,6 +1048,166 @@
     // ============================================================
     // ADMIN TABS
     // ============================================================
+    function cnEsc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+      });
+    }
+    function cnNum(n) { return Number(n || 0).toLocaleString('id-ID'); }
+    function cnTile(label, value, sub, color) {
+      return '<div style="background:#12151c;border:1px solid #2a2f3e;border-radius:8px;padding:12px">' +
+        '<div style="font-size:11px;color:#8b93a7">' + cnEsc(label) + '</div>' +
+        '<div style="font-size:22px;font-weight:700;margin-top:4px;color:' + (color || '#e5e7eb') + '">' + value + '</div>' +
+        (sub ? '<div style="font-size:11px;color:#8b93a7;margin-top:2px">' + sub + '</div>' : '') + '</div>';
+    }
+    function cnGrid(tiles) {
+      return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">' + tiles.join('') + '</div>';
+    }
+    function cnSection(title, inner) {
+      return '<div class="admin-card"><h2 style="font-size:15px">' + cnEsc(title) + '</h2>' + inner + '</div>';
+    }
+    function cnAgo(iso) {
+      var t = new Date(iso).getTime();
+      if (isNaN(t)) return '-';
+      var m = Math.round((Date.now() - t) / 60000);
+      if (m < 1) return 'baru saja';
+      if (m < 60) return m + ' menit lalu';
+      if (m < 1440) return Math.round(m / 60) + ' jam lalu';
+      return Math.round(m / 1440) + ' hari lalu';
+    }
+    function cnLagBizDays(latest) {
+      if (!latest) return null;
+      var wib = new Date(Date.now() + 7 * 3600 * 1000);
+      var end = new Date(Date.UTC(wib.getUTCFullYear(), wib.getUTCMonth(), wib.getUTCDate()));
+      if (wib.getUTCHours() < 18) end.setUTCDate(end.getUTCDate() - 1);
+      var d = new Date(String(latest).slice(0, 10) + 'T00:00:00Z');
+      if (isNaN(d.getTime())) return null;
+      var n = 0, guard = 0;
+      while (guard++ < 400) {
+        d.setUTCDate(d.getUTCDate() + 1);
+        if (d > end) break;
+        var w = d.getUTCDay();
+        if (w >= 1 && w <= 5) n++;
+      }
+      return n;
+    }
+    async function loadMonitorTab() {
+      var body = document.getElementById('mon-body');
+      var upd = document.getElementById('mon-updated');
+      body.innerHTML = '<div class="admin-card">Memuat...</div>';
+      try {
+        var res = await adminFetch('/api/admin/monitor');
+        var j = await res.json();
+        if (!res.ok || !j.success) throw new Error(j.error || ('HTTP ' + res.status));
+        var s = j.stats || {}, h = j.health || {};
+
+        var items = [];
+        var add = function (name, level, text) { items.push({ name: name, level: level, text: text }); };
+        add('Database', h.db_ms < 1500 ? 'ok' : 'warn', cnNum(h.db_ms) + ' ms');
+        var lag = cnLagBizDays(h.latest_trade_date);
+        add('Data EOD', lag == null ? 'bad' : (lag === 0 ? 'ok' : (lag === 1 ? 'warn' : 'bad')),
+          (h.latest_trade_date || 'tidak ada data') + (lag == null ? '' : ' (tertinggal ' + lag + ' hari bursa; libur bursa belum dihitung)'));
+        add('Yahoo (harga)', h.yahoo && h.yahoo.ok ? 'ok' : 'bad', h.yahoo && h.yahoo.ok ? ('OK, ' + h.yahoo.ms + ' ms') : ('gagal (status ' + (h.yahoo ? h.yahoo.status : '-') + ')'));
+        if (!h.last_view_at) add('Pencatat kunjungan', 'warn', 'belum ada data (belum terpasang di produksi atau belum ada kunjungan)');
+        else {
+          var ageH = (Date.now() - new Date(h.last_view_at).getTime()) / 3600000;
+          add('Pencatat kunjungan', ageH < 24 ? 'ok' : 'warn', 'kunjungan terakhir ' + cnAgo(h.last_view_at));
+        }
+        var worst = items.some(function (i) { return i.level === 'bad'; }) ? 'bad' : (items.some(function (i) { return i.level === 'warn'; }) ? 'warn' : 'ok');
+        var col = { ok: '#00E676', warn: '#FFB300', bad: '#FF5252' };
+        var label = { ok: 'Semua normal', warn: 'Perlu perhatian', bad: 'Ada masalah' };
+        var healthHtml = '<div style="margin-bottom:8px;font-weight:700;color:' + col[worst] + '">&#9679; ' + label[worst] + '</div>' +
+          items.map(function (i) {
+            return '<div style="display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid #2a2f3e">' +
+              '<span>' + cnEsc(i.name) + '</span><span style="color:' + col[i.level] + ';text-align:right">' + cnEsc(i.text) + '</span></div>';
+          }).join('');
+
+        var userTiles = cnGrid([
+          cnTile('Total user', cnNum(s.total_users), 'baru 7 hari: ' + cnNum(s.new_users_7d)),
+          cnTile('User aktif 1 hari', cnNum(s.active_users_1d)),
+          cnTile('User aktif 7 hari', cnNum(s.active_users_7d)),
+          cnTile('User aktif 30 hari', cnNum(s.active_users_30d))
+        ]);
+        var trafficTiles = cnGrid([
+          cnTile('Page views hari ini', cnNum(s.views_today)),
+          cnTile('Page views 7 hari', cnNum(s.views_7d)),
+          cnTile('Page views 30 hari', cnNum(s.views_30d)),
+          cnTile('Pengunjung unik hari ini', cnNum(s.visitors_today)),
+          cnTile('Pengunjung unik 7 hari', cnNum(s.visitors_7d)),
+          cnTile('Pengunjung unik 30 hari', cnNum(s.visitors_30d))
+        ]);
+
+        var wibNow = new Date(Date.now() + 7 * 3600 * 1000);
+        var days = [];
+        for (var i = 13; i >= 0; i--) days.push(new Date(wibNow.getTime() - i * 86400000).toISOString().slice(0, 10));
+        var byDay = {};
+        (s.daily || []).forEach(function (r) { byDay[String(r.day).slice(0, 10)] = r; });
+        var maxV = 1;
+        days.forEach(function (d) { if (byDay[d] && Number(byDay[d].views) > maxV) maxV = Number(byDay[d].views); });
+        var bars = days.map(function (d) {
+          var r = byDay[d] || { views: 0, visitors: 0, users: 0 };
+          var hgt = Math.round((Number(r.views) / maxV) * 100);
+          return '<div style="flex:1;text-align:center" title="' + d + ': ' + r.views + ' views, ' + r.visitors + ' pengunjung, ' + r.users + ' user">' +
+            '<div style="font-size:9px;color:#8b93a7">' + (Number(r.views) || '') + '</div>' +
+            '<div style="height:' + hgt + 'px;min-height:1px;background:#00E5FF;border-radius:3px 3px 0 0"></div>' +
+            '<div style="font-size:9px;color:#8b93a7;margin-top:2px">' + d.slice(8, 10) + '/' + d.slice(5, 7) + '</div></div>';
+        }).join('');
+        var chart = '<div style="display:flex;align-items:flex-end;gap:4px;height:140px">' + bars + '</div>';
+
+        var top = (s.top_pages || []);
+        var topHtml = top.length ? ('<table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="color:#8b93a7;text-align:left"><th style="padding:6px 0">Halaman (7 hari)</th><th>Views</th><th>Pengunjung</th></tr>' +
+          top.map(function (r) { return '<tr style="border-top:1px solid #2a2f3e"><td style="padding:6px 0">' + cnEsc(r.path) + '</td><td>' + cnNum(r.views) + '</td><td>' + cnNum(r.visitors) + '</td></tr>'; }).join('') + '</table>')
+          : '<div style="color:#8b93a7">Belum ada data kunjungan.</div>';
+
+        body.innerHTML = cnSection('Health sistem', healthHtml) + cnSection('User', userTiles) + cnSection('Traffic', trafficTiles) +
+          cnSection('Page views 14 hari terakhir', chart) + cnSection('Halaman teratas', topHtml);
+        upd.textContent = 'diperbarui ' + new Date().toLocaleTimeString('id-ID');
+      } catch (err) {
+        body.innerHTML = '<div class="admin-card" style="color:#FF5252">Gagal memuat: ' + cnEsc(err.message) + '</div>';
+      }
+    }
+    async function loadForwardTab() {
+      var body = document.getElementById('fw-body');
+      var upd = document.getElementById('fw-updated');
+      body.innerHTML = '<div class="admin-card">Memuat...</div>';
+      try {
+        var res = await adminFetch('/api/admin/forward-test');
+        var j = await res.json();
+        if (!res.ok || !j.success) throw new Error(j.error || ('HTTP ' + res.status));
+        var d = j.data || {};
+        var names = { BREAKOUT_ASING: 'BREAKOUT + ASING AKUMULASI', BREAKDOWN: 'BREAKDOWN' };
+        var f = function (v, suf) { return v == null ? '-' : Number(v).toLocaleString('id-ID') + (suf || ''); };
+        var tiles = cnGrid([
+          cnTile('Hari tercatat', cnNum(d.days)),
+          cnTile('Catatan terakhir', cnEsc(d.last_log_date || '-'))
+        ]);
+        var sum = d.summary || [];
+        var sumHtml = sum.length ? ('<table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="color:#8b93a7;text-align:left"><th style="padding:6px 0">Sinyal</th><th>Hari</th><th>n</th><th>Naik %</th><th>Rata-rata %</th><th>vs universe (pp)</th><th></th></tr>' +
+          sum.map(function (r) {
+            var vs = r.vs_universe_pp == null ? '-' : f(r.vs_universe_pp);
+            var vsColor = r.vs_universe_pp == null ? '#8b93a7' : (Number(r.vs_universe_pp) > 0 ? '#00E676' : '#FF5252');
+            var note = Number(r.n) === 0 ? 'menunggu hasil' : (Number(r.n) < 30 ? 'sampel kecil' : '');
+            return '<tr style="border-top:1px solid #2a2f3e"><td style="padding:6px 0">' + cnEsc(names[r.verdict] || r.verdict) + '</td><td>' + r.horizon + '</td><td>' + cnNum(r.n) + '</td><td>' + f(r.up_pct) + '</td><td>' + f(r.avg_pct) + '</td><td style="color:' + vsColor + '">' + vs + '</td><td style="color:#FFB300">' + note + '</td></tr>';
+          }).join('') + '</table>') : '<div style="color:#8b93a7">Belum ada ringkasan.</div>';
+
+        var latest = d.latest || [];
+        var bo = latest.filter(function (r) { return r.verdict === 'BREAKOUT_ASING'; });
+        var bd = latest.filter(function (r) { return r.verdict === 'BREAKDOWN'; });
+        var boHtml = bo.length ? ('<table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="color:#8b93a7;text-align:left"><th style="padding:6px 0">Kode</th><th>Harga acuan</th><th>Rasio asing 20D</th><th>Nilai rata-rata (M)</th></tr>' +
+          bo.map(function (r) { return '<tr style="border-top:1px solid #2a2f3e"><td style="padding:6px 0"><b>' + cnEsc(r.stock_code) + '</b></td><td>' + cnNum(r.ref_close) + '</td><td>' + f(r.foreign_ratio) + '</td><td>' + (Number(r.avg_value_20d) / 1e9).toFixed(1) + '</td></tr>'; }).join('') + '</table>')
+          : '<div style="color:#8b93a7">Tidak ada.</div>';
+        var bdHtml = bd.length ? ('<div style="margin-bottom:6px;color:#8b93a7">' + bd.length + ' saham</div><div style="display:flex;flex-wrap:wrap;gap:6px">' +
+          bd.map(function (r) { return '<span style="background:#1a1f2e;border:1px solid #2a2f3e;border-radius:4px;padding:2px 6px;font-size:12px">' + cnEsc(r.stock_code) + '</span>'; }).join('') + '</div>')
+          : '<div style="color:#8b93a7">Tidak ada.</div>';
+
+        body.innerHTML = cnSection('Status pencatat', tiles) + cnSection('Ringkasan hasil (dibanding rata-rata saham likuid di hari yang sama)', sumHtml) +
+          cnSection('Sinyal terbaru: BREAKOUT + ASING AKUMULASI', boHtml) + cnSection('Sinyal terbaru: BREAKDOWN', bdHtml);
+        upd.textContent = 'diperbarui ' + new Date().toLocaleTimeString('id-ID');
+      } catch (err) {
+        body.innerHTML = '<div class="admin-card" style="color:#FF5252">Gagal memuat: ' + cnEsc(err.message) + '</div>';
+      }
+    }
+
     function switchAdminTab(tabName) {
       document.querySelectorAll('.admin-tab').forEach(t => {
         t.classList.toggle('active', t.dataset.tab === tabName);
@@ -1030,6 +1216,8 @@
         p.classList.toggle('active', p.id === 'tab-' + tabName);
       });
       if (tabName === 'signals') loadSignalsList();
+      if (tabName === 'forward') loadForwardTab();
+      if (tabName === 'monitor') loadMonitorTab();
     }
 
     // ============================================================

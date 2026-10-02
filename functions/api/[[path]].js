@@ -243,6 +243,99 @@ app.get('/api/public/summary/:code', async (c) => {
 // ============================================================
 // BATCH A: YAHOO QUOTE PROXY
 // ============================================================
+// ============================================================
+// KUNJUNGAN + MONITORING + FORWARD TEST
+// ============================================================
+async function cnRpc(env, fn) {
+  const t0 = Date.now();
+  const r = await fetch(env.SUPABASE_URL + '/rest/v1/rpc/' + fn, {
+    method: 'POST',
+    headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: 'Bearer ' + env.SUPABASE_SERVICE_ROLE_KEY, 'Content-Type': 'application/json' },
+    body: '{}'
+  });
+  if (!r.ok) throw new Error(fn + ' HTTP ' + r.status + ' ' + (await r.text()).slice(0, 200));
+  return { data: await r.json(), ms: Date.now() - t0 };
+}
+async function cnGetOne(env, query) {
+  const r = await fetch(env.SUPABASE_URL + '/rest/v1/' + query, {
+    headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: 'Bearer ' + env.SUPABASE_SERVICE_ROLE_KEY }
+  });
+  if (!r.ok) throw new Error('query HTTP ' + r.status);
+  const rows = await r.json();
+  return rows && rows[0] ? rows[0] : null;
+}
+async function cnYahooPing() {
+  const t0 = Date.now();
+  try {
+    const ctl = new AbortController();
+    const to = setTimeout(() => ctl.abort(), 5000);
+    const r = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/%5EJKSE?range=1d&interval=1d', {
+      headers: { 'User-Agent': 'Mozilla/5.0' }, signal: ctl.signal
+    });
+    clearTimeout(to);
+    return { ok: r.ok, status: r.status, ms: Date.now() - t0 };
+  } catch (e) {
+    return { ok: false, status: 0, ms: Date.now() - t0 };
+  }
+}
+
+// Publik: pencatat kunjungan (tanpa IP, tanpa query string)
+app.post('/api/track', async (c) => {
+  try {
+    const ua = c.req.header('User-Agent') || '';
+    if (/bot|crawl|spider|slurp|facebookexternalhit|headless|lighthouse|preview/i.test(ua)) return c.json({ ok: true });
+    const b = await c.req.json();
+    const path = String(b.path || '').split('?')[0].slice(0, 200);
+    const sid = String(b.sid || '').slice(0, 64);
+    if (path.charAt(0) !== '/' || /^\/admin/i.test(path) || sid.length < 8) return c.json({ ok: true });
+    const uid = /^[0-9a-f-]{36}$/i.test(String(b.uid || '')) ? b.uid : null;
+    const row = { path: path, session_id: sid, user_id: uid, referrer: String(b.ref || '').slice(0, 200) || null };
+    await fetch(c.env.SUPABASE_URL + '/rest/v1/page_views', {
+      method: 'POST',
+      headers: { apikey: c.env.SUPABASE_SERVICE_ROLE_KEY, Authorization: 'Bearer ' + c.env.SUPABASE_SERVICE_ROLE_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify(row)
+    });
+    return c.json({ ok: true });
+  } catch (e) {
+    return c.json({ ok: true });
+  }
+});
+
+app.get('/api/admin/monitor', async (c) => {
+  try {
+    const env = c.env;
+    const [stats, eod, lastView, yahoo] = await Promise.all([
+      cnRpc(env, 'admin_monitor_stats'),
+      cnGetOne(env, 'daily_stock_data?select=trade_date&order=trade_date.desc&limit=1'),
+      cnGetOne(env, 'page_views?select=viewed_at&order=viewed_at.desc&limit=1'),
+      cnYahooPing()
+    ]);
+    return c.json({
+      success: true,
+      stats: stats.data,
+      health: {
+        db_ms: stats.ms,
+        latest_trade_date: eod ? eod.trade_date : null,
+        last_view_at: lastView ? lastView.viewed_at : null,
+        yahoo: yahoo,
+        server_time: new Date().toISOString()
+      }
+    });
+  } catch (err) {
+    console.error('[admin-monitor]', err);
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
+
+app.get('/api/admin/forward-test', async (c) => {
+  try {
+    const r = await cnRpc(c.env, 'admin_forward_summary');
+    return c.json({ success: true, data: r.data });
+  } catch (err) {
+    console.error('[admin-forward-test]', err);
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
 app.get('/api/yahoo/quote', async (c) => {
   try {
     const symbols = c.req.query('symbols') || '';

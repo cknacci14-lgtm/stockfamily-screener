@@ -318,6 +318,65 @@ async function requireAdmin(req, res, next) {
     });
   }
 }
+// === ADMIN MONITORING & FORWARD TEST ===
+async function cnRpc(fn) {
+  const t0 = Date.now();
+  const { data, error } = await supabase.rpc(fn);
+  if (error) throw new Error(fn + ': ' + error.message);
+  return { data: data, ms: Date.now() - t0 };
+}
+async function cnGetOne(table, col) {
+  const { data, error } = await supabase.from(table).select(col).order(col, { ascending: false }).limit(1);
+  if (error) throw new Error(error.message);
+  return data && data[0] ? data[0] : null;
+}
+async function cnYahooPing() {
+  const t0 = Date.now();
+  try {
+    const ctl = new AbortController();
+    const to = setTimeout(() => ctl.abort(), 5000);
+    const r = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/%5EJKSE?range=1d&interval=1d', {
+      headers: { 'User-Agent': 'Mozilla/5.0' }, signal: ctl.signal
+    });
+    clearTimeout(to);
+    return { ok: r.ok, status: r.status, ms: Date.now() - t0 };
+  } catch (e) {
+    return { ok: false, status: 0, ms: Date.now() - t0 };
+  }
+}
+app.get('/api/admin/monitor', requireAdmin, async (req, res) => {
+  try {
+    const [stats, eod, lastView, yahoo] = await Promise.all([
+      cnRpc('admin_monitor_stats'),
+      cnGetOne('daily_stock_data', 'trade_date'),
+      cnGetOne('page_views', 'viewed_at'),
+      cnYahooPing()
+    ]);
+    res.json({
+      success: true,
+      stats: stats.data,
+      health: {
+        db_ms: stats.ms,
+        latest_trade_date: eod ? eod.trade_date : null,
+        last_view_at: lastView ? lastView.viewed_at : null,
+        yahoo: yahoo,
+        server_time: new Date().toISOString()
+      }
+    });
+  } catch (err) {
+    console.error('[admin-monitor]', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+app.get('/api/admin/forward-test', requireAdmin, async (req, res) => {
+  try {
+    const r = await cnRpc('admin_forward_summary');
+    res.json({ success: true, data: r.data });
+  } catch (err) {
+    console.error('[admin-forward-test]', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 app.get('/api/admin/stats', requireAdmin, async (req, res) => {
   try {
     const { data: lastBatch } = await supabase.from('upload_batches').select('*').order('trade_date', { ascending: false }).limit(1).maybeSingle();
