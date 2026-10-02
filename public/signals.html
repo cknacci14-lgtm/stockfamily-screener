@@ -570,7 +570,7 @@ function renderSignalCard(s) {
         
         function entryRow(price, weight, hitAt, idx) {
           if (price == null) return '';
-          var icon = hitAt ? 'âœ…' : 'â³';
+          var icon = hitAt ? '✓' : '→';
           var status = hitAt ? 'Kena' : 'Belum';
           var dateStr = hitAt ? new Date(hitAt).toLocaleDateString('id-ID', {day:'2-digit',month:'short'}) : '';
           var color = hitAt ? '#10b981' : '#6b7280';
