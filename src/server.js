@@ -1609,6 +1609,7 @@ app.get('/api/public/summary/:code', async (req, res) => {
       netForeignToday,
 
       netForeign20d,
+      foreignRatio20d: grossForeign20d > 0 ? netForeign20d / grossForeign20d : 0,
 
       bandarScore:
         Math.max(

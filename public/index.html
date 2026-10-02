@@ -3071,7 +3071,7 @@ function renderMode() {
   }
   const isDay = sfMode === 'day';
   box.style.display = isDay ? 'none' : '';
-  if (head) head.style.display = isDay ? 'none' : '';
+  if (head) { if (isDay) head.style.setProperty('display', 'none', 'important'); else head.style.removeProperty('display'); }
   day.style.display = isDay ? '' : 'none';
   ['modeSwing', 'modeDay'].forEach(function (id) {
     const b = document.getElementById(id);
@@ -3091,7 +3091,10 @@ function renderDay(box) {
   const last = cs[cs.length - 1], prev = cs[cs.length - 2];
   const todayWib = new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 10);
   const lastDay = new Date((Number(last.time) + 7 * 3600) * 1000).toISOString().slice(0, 10);
-  const live = lastDay === todayWib;
+  const wibNow = new Date(Date.now() + 7 * 3600 * 1000);
+  const minsNow = wibNow.getUTCHours() * 60 + wibNow.getUTCMinutes();
+  const wdNow = wibNow.getUTCDay();
+  const live = lastDay === todayWib && wdNow >= 1 && wdNow <= 5 && minsNow >= 540 && minsNow < 975;
   const ref = live ? prev : last, cur = live ? last : null;
   const H = Number(ref.high), L = Number(ref.low), C = Number(ref.close);
   const P = (H + L + C) / 3, R1 = 2 * P - L, S1 = 2 * P - H, R2 = P + (H - L), S2 = P - (H - L);
@@ -3117,7 +3120,7 @@ function renderDay(box) {
     const rp = v >= 1e12 ? (v / 1e12).toLocaleString('id-ID', { maximumFractionDigits: 2 }) + ' T' : (v / 1e9).toLocaleString('id-ID', { maximumFractionDigits: 0 }) + ' M';
     html += row('Asing EOD ' + (bd.date || ''), 'net ' + (n >= 0 ? 'beli' : 'jual') + ' &asymp; Rp ' + rp, n >= 0 ? G : R);
   }
-  html += '<div class="text-[9px] text-slate-500 italic">Level dihitung dari data harian (tertunda), bukan data intraday. Bukan rekomendasi.</div>';
+  html += '<div class="text-[9px] text-slate-500 italic">' + (live ? 'Level dari candle kemarin.' : 'Level untuk sesi berikutnya, dari candle ' + lastDay + '.') + ' Data harian (tertunda), bukan intraday. Bukan rekomendasi.</div>';
   box.innerHTML = html;
 }
 function renderSummaryBase() {
@@ -3159,10 +3162,11 @@ function renderSummaryBase() {
 
   // Kesimpulan
   let verdict, vcol;
-  if (dn && flowDir <= 0) { verdict = 'HINDARI / TUNGGU RECLAIM'; vcol = R; }
-  else if (up && flowDir >= 0) { verdict = 'SETUP SEARAH TREN'; vcol = G; }
+  if (/BREAKDOWN/.test(tr)) { verdict = 'WASPADA: BREAKDOWN'; vcol = R; }
+  else if (/BREAKOUT/.test(tr) && b && isFinite(Number(b.foreignRatio20d)) && Number(b.foreignRatio20d) > 0.1) { verdict = 'BREAKOUT + ASING AKUMULASI'; vcol = G; }
   else { verdict = 'NETRAL &mdash; TUNGGU KONFIRMASI'; vcol = A; }
-  set('sumVerdict', verdict, vcol);
+  const vnote = /BREAKDOWN/.test(verdict) ? 'Riwayat ±13 bulan: setelah kondisi ini harga rata-rata lebih lemah dari pasar.' : /ASING/.test(verdict) ? 'Riwayat ±13 bulan: lebih baik dari rata-rata pasar. Belum teruji ke depan, bukan jaminan.' : '';
+  set('sumVerdict', verdict + (vnote ? '<div style="font-size:9px;font-weight:400;opacity:.75;margin-top:2px">' + vnote + '</div>' : ''), vcol);
 
   // Trade plan
   const dash = '--';

@@ -229,6 +229,7 @@ app.get('/api/public/summary/:code', async (c) => {
       foreignSellToday: foreignSellToday,
       netForeignToday: netForeignToday,
       netForeign20d: netForeign20d,
+      foreignRatio20d: gross20 > 0 ? netForeign20d / gross20 : 0,
       isCurrentSession: true,
       dataStatus: 'CURRENT'
     });
