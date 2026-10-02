@@ -1767,24 +1767,106 @@
   load();
 })();
 
+    // CHARTNALIST_WATCHLIST_DB_BRIDGE
+    // Supabase watchlist_items = source of truth; localStorage = cache.
+    async function _wlGetUser() {
+      try {
+        const sb = window.chartnalistSupabase;
+        if (!sb) return null;
+        const { data: { user } } = await sb.auth.getUser();
+        return user || null;
+      } catch (_) { return null; }
+    }
+
+    async function _wlFetchCodesFromDB() {
+      try {
+        const sb = window.chartnalistSupabase;
+        if (!sb) return null;
+        const user = await _wlGetUser();
+        if (!user) return null;
+        const { data, error } = await sb
+          .from("watchlist_items")
+          .select("stock_code")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false });
+        if (error) return null;
+        return (data || []).map(r => String(r.stock_code || "").toUpperCase()).filter(Boolean);
+      } catch (_) { return null; }
+    }
+
+    async function _wlAddToDB(code) {
+      try {
+        const sb = window.chartnalistSupabase;
+        if (!sb) return false;
+        const user = await _wlGetUser();
+        if (!user) return false;
+        const { error } = await sb
+          .from("watchlist_items")
+          .insert({ user_id: user.id, stock_code: code });
+        return !error;
+      } catch (_) { return false; }
+    }
+
+    async function _wlRemoveFromDB(code) {
+      try {
+        const sb = window.chartnalistSupabase;
+        if (!sb) return false;
+        const user = await _wlGetUser();
+        if (!user) return false;
+        const { error } = await sb
+          .from("watchlist_items")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("stock_code", code);
+        return !error;
+      } catch (_) { return false; }
+    }
+
+    async function _wlSyncCacheFromDB() {
+      const codes = await _wlFetchCodesFromDB();
+      if (codes === null) return false;
+      try { localStorage.setItem("watchlist", JSON.stringify(codes)); } catch (_) {}
+      return true;
+    }
+
+    async function _wlMigrateLocalToDB() {
+      try {
+        const sb = window.chartnalistSupabase;
+        if (!sb) return;
+        const user = await _wlGetUser();
+        if (!user) return;
+        const existing = await _wlFetchCodesFromDB();
+        if (existing && existing.length > 0) {
+          try { localStorage.setItem("watchlist", JSON.stringify(existing)); } catch (_) {}
+          return;
+        }
+        let local = [];
+        try {
+          const parsed = JSON.parse(localStorage.getItem("watchlist") || "[]");
+          if (Array.isArray(parsed)) {
+            local = parsed.map(item => {
+              if (typeof item === "string") return String(item).toUpperCase();
+              return String(item?.code || item?.stockCode || item?.symbol || "").toUpperCase();
+            }).filter(Boolean);
+          }
+        } catch (_) {}
+        if (local.length > 0) {
+          const rows = local.map(c => ({ user_id: user.id, stock_code: c }));
+          const { error } = await sb.from("watchlist_items").insert(rows);
+          if (!error) console.log("[watchlist] migrated " + local.length + " codes to DB");
+        }
+      } catch (_) {}
+    }
+
     function getWatchlistCodes() {
       try {
-        const saved = JSON.parse(
-          localStorage.getItem("watchlist") || "[]"
-        );
-
+        const saved = JSON.parse(localStorage.getItem("watchlist") || "[]");
         if (!Array.isArray(saved)) return [];
-
-        return saved
-          .map(item => {
-            if (typeof item === "string") return item;
-            return item?.code || item?.stockCode || item?.symbol;
-          })
-          .filter(Boolean)
-          .map(code => String(code).toUpperCase());
-      } catch (_) {
-        return [];
-      }
+        return saved.map(item => {
+          if (typeof item === "string") return item;
+          return item?.code || item?.stockCode || item?.symbol;
+        }).filter(Boolean).map(code => String(code).toUpperCase());
+      } catch (_) { return []; }
     }
 
     function isInSmartwatchlist(stockCode) {
@@ -1795,93 +1877,56 @@
     function updateSmartwatchlistButton() {
       const button = document.getElementById("smartwatchlistBtn");
       if (!button) return;
-
       const code = String(
         window.stockCode ||
         document.getElementById("ticker")?.textContent ||
         ""
       ).trim().toUpperCase();
-
       const added = isInSmartwatchlist(code);
-
       button.classList.toggle("is-added", added);
       button.setAttribute("aria-pressed", String(added));
-      button.textContent = added
-        ? "? IN SMARTWATCHLIST"
-        : "ADD TO SMARTWATCHLIST";
+      button.textContent = added ? "✓ IN SMARTWATCHLIST" : "ADD TO SMARTWATCHLIST";
     }
 
-    function toggleSmartwatchlist() {
+    async function toggleSmartwatchlist() {
       const code = String(
         window.stockCode ||
         document.getElementById("ticker")?.textContent ||
         ""
       ).trim().toUpperCase();
-
-      if (!code || code === "?") return;
-
+      if (!code || code === "—") return;
       let saved = [];
-
       try {
-        const parsed = JSON.parse(
-          localStorage.getItem("watchlist") || "[]"
-        );
-
+        const parsed = JSON.parse(localStorage.getItem("watchlist") || "[]");
         saved = Array.isArray(parsed) ? parsed : [];
-      } catch (_) {
-        saved = [];
-      }
-
-      const normalized = saved
-        .map(item => {
-          if (typeof item === "string") {
-            return {
-              raw: item,
-              code: String(item).toUpperCase()
-            };
-          }
-
-          return {
-            raw: item,
-            code: String(
-              item?.code ||
-              item?.stockCode ||
-              item?.symbol ||
-              ""
-            ).toUpperCase()
-          };
-        });
-
+      } catch (_) { saved = []; }
+      const normalized = saved.map(item => {
+        if (typeof item === "string") return { raw: item, code: String(item).toUpperCase() };
+        return { raw: item, code: String(item?.code || item?.stockCode || item?.symbol || "").toUpperCase() };
+      });
       const exists = normalized.some(item => item.code === code);
-
       if (exists) {
         saved = saved.filter(item => {
-          const itemCode =
-            typeof item === "string"
-              ? item
-              : item?.code || item?.stockCode || item?.symbol;
-
+          const itemCode = typeof item === "string" ? item : (item?.code || item?.stockCode || item?.symbol);
           return String(itemCode || "").toUpperCase() !== code;
         });
       } else {
         saved.push(code);
       }
-
-      localStorage.setItem("watchlist", JSON.stringify(saved));
+      try { localStorage.setItem("watchlist", JSON.stringify(saved)); } catch (_) {}
       updateSmartwatchlistButton();
+      if (exists) { await _wlRemoveFromDB(code); } else { await _wlAddToDB(code); }
     }
 
     document.addEventListener("DOMContentLoaded", () => {
       const button = document.getElementById("smartwatchlistBtn");
-
       if (!button) return;
-
-      button.addEventListener(
-        "click",
-        toggleSmartwatchlist
-      );
-
-      updateSmartwatchlistButton();
+      button.addEventListener("click", toggleSmartwatchlist);
+      (async () => {
+        await _wlMigrateLocalToDB();
+        await _wlSyncCacheFromDB();
+        updateSmartwatchlistButton();
+      })();
     });
 
   </script>
