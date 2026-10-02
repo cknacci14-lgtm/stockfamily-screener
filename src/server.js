@@ -1610,6 +1610,7 @@ app.get('/api/public/summary/:code', async (req, res) => {
 
       netForeign20d,
       foreignRatio20d: grossForeign20d > 0 ? netForeign20d / grossForeign20d : 0,
+      avgValue20d: trailing20.reduce((s, r) => s + (Number(r.value) || 0), 0) / Math.max(1, trailing20.length),
 
       bandarScore:
         Math.max(

@@ -3020,7 +3020,12 @@
   // ============================================================
   // LOAD BANDARMOLOGY
   // ============================================================
-  function fmtFlow(shares, price, signed) {
+  function sfSmallM(v) {
+  if (v >= 1e9) return (v / 1e9).toLocaleString('id-ID', { maximumFractionDigits: 0 }) + ' M';
+  if (v >= 1e6) return Math.round(v / 1e6).toLocaleString('id-ID') + ' jt';
+  return '<1 jt';
+}
+function fmtFlow(shares, price, signed) {
   const n = Number(shares) || 0;
   const sign = n < 0 ? '-' : (signed ? '+' : '');
   const abs = Math.abs(n);
@@ -3030,7 +3035,7 @@
     const v = abs * p;
     const rp = v >= 1e12
       ? (v / 1e12).toLocaleString('id-ID', { maximumFractionDigits: 2 }) + ' T'
-      : (v / 1e9).toLocaleString('id-ID', { maximumFractionDigits: 0 }) + ' M';
+      : sfSmallM(v);
     out += '<span style="display:block;text-align:right;opacity:.65;font-size:9px">&asymp;Rp ' + rp + '</span>';
   }
   return out;
@@ -3117,7 +3122,7 @@ function renderDay(box) {
   if (bd && bd.hasData !== false && String(bd.code || '').toUpperCase() === String(s.code || '').toUpperCase() && bd.netForeignToday != null) {
     const n = Number(bd.netForeignToday) || 0;
     const v = Math.abs(n) * (Number(bd.close) || px || 0);
-    const rp = v >= 1e12 ? (v / 1e12).toLocaleString('id-ID', { maximumFractionDigits: 2 }) + ' T' : (v / 1e9).toLocaleString('id-ID', { maximumFractionDigits: 0 }) + ' M';
+    const rp = v >= 1e12 ? (v / 1e12).toLocaleString('id-ID', { maximumFractionDigits: 2 }) + ' T' : sfSmallM(v);
     html += row('Asing EOD ' + (bd.date || ''), 'net ' + (n >= 0 ? 'beli' : 'jual') + ' &asymp; Rp ' + rp, n >= 0 ? G : R);
   }
   html += '<div class="text-[9px] text-slate-500 italic">' + (live ? 'Level dari candle kemarin.' : 'Level untuk sesi berikutnya, dari candle ' + lastDay + '.') + ' Data harian (tertunda), bukan intraday. Bukan rekomendasi.</div>';
@@ -3147,7 +3152,7 @@ function renderSummaryBase() {
     const n = Number(b.netForeign20d) || 0;
     flowDir = n > 0 ? 1 : n < 0 ? -1 : 0;
     const v = Math.abs(n) * (Number(b.close) || close || 0);
-    const rp = v >= 1e12 ? (v / 1e12).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' T' : (v / 1e9).toLocaleString('id-ID', { maximumFractionDigits: 0 }) + ' M';
+    const rp = v >= 1e12 ? (v / 1e12).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' T' : sfSmallM(v);
     flowTxt = 'Asing net ' + (n >= 0 ? 'beli' : 'jual') + ' 20D &asymp; Rp ' + rp + ' <span style="opacity:.6">(EOD ' + (b.date || '') + ')</span>';
   }
   set('sumFlow', flowTxt, flowDir > 0 ? '#00E676' : flowDir < 0 ? '#FF5252' : '#94A3B8');
@@ -3161,11 +3166,12 @@ function renderSummaryBase() {
   if (isFinite(close) && atr) set('sumRisk', 'ATR(14) ' + (atr / close * 100).toFixed(1) + '% &asymp; ' + fmtRp(Math.round(atr)) + ' / hari', N);
 
   // Kesimpulan
+  const inScope = !!(b && Number(b.avgValue20d) >= 8e9);
   let verdict, vcol;
-  if (/BREAKDOWN/.test(tr)) { verdict = 'WASPADA: BREAKDOWN'; vcol = R; }
-  else if (/BREAKOUT/.test(tr) && b && isFinite(Number(b.foreignRatio20d)) && Number(b.foreignRatio20d) > 0.1) { verdict = 'BREAKOUT + ASING AKUMULASI'; vcol = G; }
+  if (/BREAKDOWN/.test(tr) && inScope) { verdict = 'WASPADA: BREAKDOWN'; vcol = R; }
+  else if (/BREAKOUT/.test(tr) && inScope && b && isFinite(Number(b.foreignRatio20d)) && Number(b.foreignRatio20d) > 0.1) { verdict = 'BREAKOUT + ASING AKUMULASI'; vcol = G; }
   else { verdict = 'NETRAL &mdash; TUNGGU KONFIRMASI'; vcol = A; }
-  const vnote = /BREAKDOWN/.test(verdict) ? 'Riwayat ±13 bulan: setelah kondisi ini harga rata-rata lebih lemah dari pasar.' : /ASING/.test(verdict) ? 'Riwayat ±13 bulan: lebih baik dari rata-rata pasar. Belum teruji ke depan, bukan jaminan.' : '';
+  const vnote = (!inScope && b) ? 'Di luar cakupan uji riwayat (kurang likuid): label berbasis bukti tidak ditampilkan.' : /BREAKDOWN/.test(verdict) ? 'Riwayat ±13 bulan: setelah kondisi ini harga rata-rata lebih lemah dari pasar.' : /ASING/.test(verdict) ? 'Riwayat ±13 bulan: lebih baik dari rata-rata pasar. Belum teruji ke depan, bukan jaminan.' : '';
   set('sumVerdict', verdict + (vnote ? '<div style="font-size:9px;font-weight:400;opacity:.75;margin-top:2px">' + vnote + '</div>' : ''), vcol);
 
   // Trade plan
