@@ -40,12 +40,21 @@ jobs:
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: node scripts/qbs-paper-trade-track.js
 
+      - name: Build Signal Center snapshot
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: node scripts/build-signal-center-snapshot.js
+
       - name: Commit updated screener + paper trade log
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/screener_results.json public/results/screener_results.json
           git add public/results/paper-trade-log.json
+          git add data/signal-center-snapshot.json
+          git add public/data/signal-center-snapshot.json
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
