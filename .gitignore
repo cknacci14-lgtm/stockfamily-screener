@@ -49,3 +49,10 @@ cek-*.txt
 cek-*.css
 
 .wrangler/
+
+# Watchlist fix backups (local only)
+public/*.bak-*
+public/*.watchlist-preview*
+
+backtest-results/
+scripts/alpha-trinity-*.js

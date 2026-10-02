@@ -1,0 +1,52 @@
+name: Verdict Forward Log
+
+on:
+  schedule:
+    # 21:00 WIB (14:00 UTC), Senin-Jumat
+    - cron: '0 14 * * 1-5'
+    # 07:30 WIB (00:30 UTC), Selasa-Sabtu: menangkap data yang diunggah malam atau pagi
+    - cron: '30 0 * * 2-6'
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'Tanggal data (YYYY-MM-DD), kosongkan untuk tanggal terbaru'
+        required: false
+        default: ''
+
+concurrency:
+  group: verdict-forward-log
+  cancel-in-progress: false
+
+jobs:
+  log:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: '1'
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: '1'
+        run: npm install --omit=dev --no-audit --no-fund --ignore-scripts
+
+      - name: Run forward log
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          DATE_ARG: ${{ inputs.date }}
+        run: |
+          if [ -n "$DATE_ARG" ]; then
+            [[ "$DATE_ARG" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || { echo "Format tanggal salah"; exit 1; }
+            node scripts/verdict-forward-log.js "--date=$DATE_ARG"
+          else
+            node scripts/verdict-forward-log.js
+          fi
