@@ -94,9 +94,12 @@ export function detectPullback(
   const liquidityReady =
     liquidity.state === "HEALTHY";
 
+  /* Reject pullbacks where price already ran far above SMA20. */
+  const notExtended = !Number.isFinite(sma20) || close <= sma20! * 1.10;
   const confirmed =
     trendIntact &&
     locationValid &&
+    notExtended &&
     sellingPressureContracting &&
     rangeControlled &&
     structureIntact &&

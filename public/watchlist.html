@@ -393,6 +393,7 @@
 .flag-badge{display:inline-block;margin-top:4px;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:800;letter-spacing:.06em;border:1px solid}
 .flag-badge.stale{color:#ffb020;border-color:rgba(255,176,32,.45);background:rgba(255,176,32,.08)}
 .flag-badge.wide{color:#ff4d4d;border-color:rgba(255,77,77,.4);background:rgba(255,77,77,.08)}
+.flag-badge.suspend{color:#ff4d4d;border-color:rgba(255,77,77,.5);background:rgba(255,77,77,.12)}
 .stop-sub{margin-top:3px;font-size:10px;font-weight:600;opacity:.8}
 .stop-sub .flag-badge{margin-top:0;margin-left:4px}
 .rr-value {
@@ -956,7 +957,7 @@ tbody tr:hover{
             <a class="ticker-link" href="/stock.html?code=${encodeURIComponent(row.stockCode)}">
               <div class="ticker">${esc(row.stockCode)}</div>
               <div class="name">${esc(row.stockName || "")}</div>
-              ${row.dataStale ? `<div class="flag-badge stale" title="Data terakhir ${esc(row.latestTradeDate)} (${esc(row.staleDays)} hari tertinggal)">DATA BASI</div>` : ""}
+              ${staleBadge(row)}
             </a>
           </td>
 
@@ -1000,6 +1001,15 @@ tbody tr:hover{
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
       });
+    }
+
+    function staleBadge(row) {
+      const idle = Number(row.idleSessions);
+      const last = esc(row.latestTradeDate || "");
+      if (idle >= 3) return '<div class="flag-badge suspend" title="Tidak ada transaksi ' + idle + ' sesi sejak ' + last + '. Sinyal tidak bisa ditindaklanjuti.">SUSPEND</div>';
+      if (idle >= 1) return '<div class="flag-badge stale" title="Tidak ada transaksi pada ' + idle + ' sesi terakhir (candle valid terakhir ' + last + ')">TANPA TRANSAKSI</div>';
+      if (row.dataStale) return '<div class="flag-badge stale" title="Data terakhir ' + last + ' (' + esc(row.staleDays) + ' hari tertinggal)">DATA BASI</div>';
+      return "";
     }
 
     function formatStop(row) {

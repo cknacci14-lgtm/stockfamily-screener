@@ -1117,6 +1117,22 @@ function computeSmartwatchlist(stocks, history, marketDate) {
   }
   const mktT = mkt ? toDay(mkt) : null;
 
+  /*
+   * Trading-activity flags. Placeholder rows (volume 0, OHLC 0) are dropped by
+   * normalizeRows, so count the sessions that exist after the last valid candle.
+   */
+  const idByCode = new Map(stocks.map(s => [String(s.code).trim().toUpperCase(), String(s.id)]));
+  const wantedIds = new Set(
+    output.map(r => idByCode.get(String(r.stockCode).trim().toUpperCase())).filter(Boolean)
+  );
+  const datesById = new Map();
+  for (const r of history) {
+    const sid = String(r.stock_id);
+    if (!wantedIds.has(sid)) continue;
+    if (!datesById.has(sid)) datesById.set(sid, new Set());
+    datesById.get(sid).add(String(r.trade_date).slice(0, 10));
+  }
+
   for (const row of output) {
     const lt = toDay(row.latestTradeDate);
     row.staleDays =
@@ -1124,6 +1140,17 @@ function computeSmartwatchlist(stocks, history, marketDate) {
         ? Math.max(0, Math.round((mktT - lt) / dayMs))
         : null;
     row.dataStale = row.staleDays !== null && row.staleDays > 5;
+    const sid = idByCode.get(String(row.stockCode).trim().toUpperCase());
+    const lastValid = String(row.latestTradeDate).slice(0, 10);
+    let idle = 0;
+    if (sid && datesById.has(sid)) {
+      for (const d of datesById.get(sid)) {
+        if (d > lastValid && (!mkt || d <= mkt)) idle++;
+      }
+    }
+    row.idleSessions = idle;
+    row.noTrade = idle >= 1;
+    row.suspended = idle >= 3;
 
     const p = Number(row.price);
     const inv = Number(row.invalidation);

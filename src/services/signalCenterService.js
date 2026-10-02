@@ -168,6 +168,8 @@ async function calculateSignalCenter(normalized, cacheKey) {
   const result = await buildSmartwatchlist(normalized);
 
   const signals = (result?.stocks || [])
+    // Stocks that did not trade in the latest session cannot be acted on.
+    .filter(row => !(row.idleSessions >= 1))
     .map(cleanSignal)
     .sort((a, b) => {
       const ar = rankSignal(a);
