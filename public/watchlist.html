@@ -1024,6 +1024,36 @@ tbody tr:hover{
       refreshBtn.disabled = true;
       refreshBtn.textContent = "LOADING...";
 
+      // CHARTNALIST_WATCHLIST_DB_SYNC
+      // Wait for auth client, then refresh localStorage cache from DB.
+      if (!window.chartnalistSupabase) {
+        await new Promise((resolve) => {
+          const t = setTimeout(resolve, 4000);
+          window.addEventListener("chartnalist:auth-ready", () => {
+            clearTimeout(t); resolve();
+          }, { once: true });
+        });
+      }
+      try {
+        const sb = window.chartnalistSupabase;
+        if (sb) {
+          const { data: { user } } = await sb.auth.getUser();
+          if (user) {
+            const { data, error } = await sb
+              .from("watchlist_items")
+              .select("stock_code")
+              .eq("user_id", user.id)
+              .order("created_at", { ascending: false });
+            if (!error) {
+              const codes = (data || [])
+                .map(r => String(r.stock_code || "").toUpperCase())
+                .filter(Boolean);
+              try { localStorage.setItem("watchlist", JSON.stringify(codes)); } catch (_) {}
+            }
+          }
+        }
+      } catch (_) {}
+
       try {
         /*
          * The persistent localStorage watchlist remains the user's universe.

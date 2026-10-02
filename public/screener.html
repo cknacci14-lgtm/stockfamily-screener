@@ -1541,121 +1541,122 @@
   </script>
 
 <script id="chartnalist-phase10-watch">
-function chartnalistPhase10IsWatched(ticker) {
-  const code = String(ticker || "")
-    .trim()
-    .toUpperCase();
-
-  if (!code || code === "—") return false;
-
+// CHARTNALIST_WATCHLIST_DB_BRIDGE (screener)
+async function _wlSGetUser() {
   try {
-    const saved = JSON.parse(
-      localStorage.getItem("watchlist") || "[]"
-    );
+    const sb = window.chartnalistSupabase;
+    if (!sb) return null;
+    const { data: { user } } = await sb.auth.getUser();
+    return user || null;
+  } catch (_) { return null; }
+}
 
+async function _wlSFetchCodesFromDB() {
+  try {
+    const sb = window.chartnalistSupabase;
+    if (!sb) return null;
+    const user = await _wlSGetUser();
+    if (!user) return null;
+    const { data, error } = await sb
+      .from("watchlist_items")
+      .select("stock_code")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+    if (error) return null;
+    return (data || []).map(r => String(r.stock_code || "").toUpperCase()).filter(Boolean);
+  } catch (_) { return null; }
+}
+
+async function _wlSAddToDB(code) {
+  try {
+    const sb = window.chartnalistSupabase;
+    if (!sb) return false;
+    const user = await _wlSGetUser();
+    if (!user) return false;
+    const { error } = await sb
+      .from("watchlist_items")
+      .insert({ user_id: user.id, stock_code: code });
+    return !error;
+  } catch (_) { return false; }
+}
+
+async function _wlSSyncCacheFromDB() {
+  const codes = await _wlSFetchCodesFromDB();
+  if (codes === null) return false;
+  try { localStorage.setItem("watchlist", JSON.stringify(codes)); } catch (_) {}
+  return true;
+}
+
+function chartnalistPhase10IsWatched(ticker) {
+  const code = String(ticker || "").trim().toUpperCase();
+  if (!code || code === "—") return false;
+  try {
+    const saved = JSON.parse(localStorage.getItem("watchlist") || "[]");
     if (!Array.isArray(saved)) return false;
-
     return saved.some(item => {
-      if (typeof item === "string") {
-        return item.trim().toUpperCase() === code;
-      }
-
-      const itemCode =
-        item?.code ||
-        item?.stockCode ||
-        item?.symbol ||
-        "";
-
-      return String(itemCode)
-        .trim()
-        .toUpperCase() === code;
+      if (typeof item === "string") return item.trim().toUpperCase() === code;
+      const itemCode = item?.code || item?.stockCode || item?.symbol || "";
+      return String(itemCode).trim().toUpperCase() === code;
     });
-  } catch {
-    return false;
-  }
+  } catch { return false; }
 }
 
 function chartnalistPhase10SyncWatchButtons() {
-  document
-    .querySelectorAll(".chartnalist-watch-btn")
-    .forEach(button => {
-      const ticker = String(
-        button?.dataset?.watchTicker || ""
-      )
-        .trim()
-        .toUpperCase();
-
-      if (!ticker) return;
-
-      const watched =
-        chartnalistPhase10IsWatched(ticker);
-
-      button.textContent =
-        watched ? "✓ WATCHED" : "+ WATCH";
-
-      button.dataset.watched =
-        watched ? "true" : "false";
-
-      button.disabled = watched;
-
-      button.setAttribute(
-        "title",
-        watched
-          ? "Already in Smartwatchlist"
-          : "Add to Smartwatchlist"
-      );
-    });
+  document.querySelectorAll(".chartnalist-watch-btn").forEach(button => {
+    const ticker = String(button?.dataset?.watchTicker || "").trim().toUpperCase();
+    if (!ticker) return;
+    const watched = chartnalistPhase10IsWatched(ticker);
+    button.textContent = watched ? "✓ WATCHED" : "+ WATCH";
+    button.dataset.watched = watched ? "true" : "false";
+    button.disabled = watched;
+    button.setAttribute("title", watched ? "Already in Smartwatchlist" : "Add to Smartwatchlist");
+  });
 }
-function chartnalistPhase10ToggleWatch(button) {
-  const ticker = String(button?.dataset?.watchTicker || "")
-    .trim()
-    .toUpperCase();
 
+async function chartnalistPhase10ToggleWatch(button) {
+  const ticker = String(button?.dataset?.watchTicker || "").trim().toUpperCase();
   if (!ticker || ticker === "—") return;
-
   let watchlist = [];
-
   try {
-    const saved = JSON.parse(
-      localStorage.getItem("watchlist") || "[]"
-    );
-
+    const saved = JSON.parse(localStorage.getItem("watchlist") || "[]");
     watchlist = Array.isArray(saved) ? saved : [];
-  } catch {
-    watchlist = [];
-  }
-
+  } catch { watchlist = []; }
   const exists = watchlist.some(item => {
-    if (typeof item === "string") {
-      return item.toUpperCase() === ticker;
-    }
-
-    const code =
-      item?.code ||
-      item?.stockCode ||
-      item?.symbol ||
-      "";
-
+    if (typeof item === "string") return item.toUpperCase() === ticker;
+    const code = item?.code || item?.stockCode || item?.symbol || "";
     return String(code).toUpperCase() === ticker;
   });
-
   if (!exists) {
     watchlist.push({ code: ticker });
-
-    localStorage.setItem(
-      "watchlist",
-      JSON.stringify(watchlist)
-    );
+    try { localStorage.setItem("watchlist", JSON.stringify(watchlist)); } catch (_) {}
   }
-
   button.textContent = "✓ WATCHED";
   button.dataset.watched = "true";
   button.disabled = true;
-  button.setAttribute(
-    "title",
-    "Already in Smartwatchlist"
-  );
+  button.setAttribute("title", "Already in Smartwatchlist");
+  // Persist to DB
+  await _wlSAddToDB(ticker);
 }
+
+// Init: sync DB -> cache, then update buttons on auth-ready
+(async () => {
+  const run = async () => {
+    await _wlSSyncCacheFromDB();
+    chartnalistPhase10SyncWatchButtons();
+  };
+  if (window.chartnalistSupabase) {
+    await run();
+  } else {
+    window.addEventListener("chartnalist:auth-ready", run, { once: true });
+    // Fallback: retry a few times
+    let n = 0;
+    const iv = setInterval(async () => {
+      n++;
+      if (window.chartnalistSupabase) { clearInterval(iv); await run(); }
+      if (n > 20) clearInterval(iv);
+    }, 500);
+  }
+})();
 </script>
 <script id="research-detail-js">
 function qbsGate(label,value,pass,detail){
