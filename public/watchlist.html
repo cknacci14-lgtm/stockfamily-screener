@@ -390,6 +390,11 @@
   background:rgba(255,77,77,.07);
   border:1px solid rgba(255,77,77,.18);
 }
+.flag-badge{display:inline-block;margin-top:4px;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:800;letter-spacing:.06em;border:1px solid}
+.flag-badge.stale{color:#ffb020;border-color:rgba(255,176,32,.45);background:rgba(255,176,32,.08)}
+.flag-badge.wide{color:#ff4d4d;border-color:rgba(255,77,77,.4);background:rgba(255,77,77,.08)}
+.stop-sub{margin-top:3px;font-size:10px;font-weight:600;opacity:.8}
+.stop-sub .flag-badge{margin-top:0;margin-left:4px}
 .rr-value {
   font-weight:800;
   color:#F5F7F8;
@@ -806,7 +811,7 @@ tbody tr:hover{
             <th class="num" style="width:12%">INVALIDATION</th>
             <th class="num" style="width:9%">TARGET 1</th>
             <th class="num" style="width:9%">TARGET 2</th>
-            <th class="num" style="width:6%">R:R</th>
+            <th class="num" style="width:6%" title="Reward:risk ke Target 2">R:R T2</th>
             <th style="width:8%">RISK</th>
           </tr>
         </thead>
@@ -910,6 +915,7 @@ tbody tr:hover{
             <a class="ticker-link" href="/stock.html?code=${encodeURIComponent(row.stockCode)}">
               <div class="ticker">${esc(row.stockCode)}</div>
               <div class="name">${esc(row.stockName || "")}</div>
+              ${row.dataStale ? `<div class="flag-badge stale" title="Data terakhir ${esc(row.latestTradeDate)} (${esc(row.staleDays)} hari tertinggal)">DATA BASI</div>` : ""}
             </a>
           </td>
 
@@ -927,7 +933,7 @@ tbody tr:hover{
 
           <td class="num">${formatPrice(row.price)}</td>
           <td class="num">${formatPrice(row.trigger)}</td>
-          <td class="num">${formatPrice(row.invalidation)}</td>
+          <td class="num">${formatPrice(row.invalidation)}${formatStop(row)}</td>
           <td class="num">${formatPrice(row.target1)}</td>
           <td class="num">${formatPrice(row.target2)}</td>
           <td class="num">${formatRR(row.riskReward)}</td>
@@ -953,6 +959,17 @@ tbody tr:hover{
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
       });
+    }
+
+    function formatStop(row) {
+      if (row.stopDistancePct === null || row.stopDistancePct === undefined) return "";
+      const d = Number(row.stopDistancePct);
+      if (!Number.isFinite(d)) return "";
+      const label = "\u2212" + d.toLocaleString("id-ID", { maximumFractionDigits: 1 }) + "%";
+      const wide = row.stopWide
+        ? ' <span class="flag-badge wide" title="Stop lebih dari 15% dari harga">STOP LEBAR</span>'
+        : "";
+      return '<div class="stop-sub">' + label + wide + '</div>';
     }
 
     function formatRR(value) {
