@@ -85,6 +85,17 @@
         display: block;
       }
 
+      /* cn-mobile-chip */
+      @media (max-width: 820px) {
+        #chartnalist-user-menu { top: 10px; right: 12px; }
+        #chartnalist-user-trigger { height: 40px; padding: 0 10px; gap: 7px; }
+        #chartnalist-user-email { max-width: 130px; }
+        #chartnalist-user-dropdown { width: min(240px, calc(100vw - 24px)); }
+      }
+      @media (max-width: 480px) {
+        #chartnalist-user-email { display: none; }
+      }
+
       .chartnalist-user-meta {
         padding: 10px;
         margin-bottom: 5px;
