@@ -5,7 +5,8 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { sbFetch, getLatestTradeDate, rangeToStartDate } from '../_lib/supabase.js';
-import { calculateLatestForHistory, calculateHistoryForAllRows } from '../_lib/gemEngine.js';
+import { calculateLatestForHistory, calculateHistoryForAllRows } from '../_lib/gemEngine.js';
+import smartCore from '../../src/lib/smartwatchlist-core.js';
 
 const app = new Hono();
 
@@ -978,6 +979,37 @@ async function fetchSignalHistory(env, stockIds, latestDate) {
   return await sbFetch(env, query);
 }
 
+async function fetchHistoryWindow(env, stockIds, latestDate) {
+  if (!stockIds.length || !latestDate) return [];
+
+  const startD = new Date(latestDate + "T00:00:00Z");
+  startD.setUTCDate(startD.getUTCDate() - 460);
+  const start = startD.toISOString().slice(0, 10);
+
+  const fields =
+    "stock_id,trade_date,previous_price,open,first_trade,high,low,close,change_price,volume,value,frequency,offer,offer_volume,bid,bid_volume,foreign_sell,foreign_buy";
+  const PAGE = 1000;
+  const MAX_PAGES = 30;
+  const rows = [];
+
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const data = await sbFetch(
+      env,
+      "daily_stock_data?select=" + fields +
+        "&stock_id=in.(" + stockIds.join(",") + ")" +
+        "&trade_date=gte." + start +
+        "&trade_date=lte." + latestDate +
+        "&order=trade_date.asc,stock_id.asc" +
+        "&limit=" + PAGE + "&offset=" + (page * PAGE)
+    );
+    const batch = Array.isArray(data) ? data : [];
+    rows.push(...batch);
+    if (batch.length < PAGE) return rows;
+  }
+
+  throw new Error("Smartwatchlist history window exceeds page limit");
+}
+
 app.get("/api/public/smartwatchlist", async (c) => {
   try {
     const env = c.env;
@@ -993,33 +1025,21 @@ app.get("/api/public/smartwatchlist", async (c) => {
       });
     }
 
+    const latestDate = await getLatestTradeDate(env);
     const stocks = await fetchStockRows(env, codes);
+
     if (!stocks.length) {
-      return c.json({
-        success: true,
-        date: await getLatestTradeDate(env),
-        stocks: [],
-        count: 0
-      });
+      return c.json({ success: true, date: latestDate || null, stocks: [], count: 0 });
     }
 
-    const latestDate = await getLatestTradeDate(env);
-    const rows = await fetchSignalHistory(
-      env,
-      stocks.map(s => s.id),
-      latestDate
-    );
+    const history = await fetchHistoryWindow(env, stocks.map(s => s.id), latestDate);
+    const { stocks: output } = smartCore.computeSmartwatchlist(stocks, history);
 
-    // Cloudflare adapter intentionally stays read-only.
-    // Signal Engine remains authoritative in the application runtime.
     return c.json({
       success: true,
-      date: latestDate,
-      stocks: [],
-      count: 0,
-      mode: "SIGNAL_ENGINE_ADAPTER",
-      message:
-        "Cloudflare adapter route is installed; authoritative Signal Engine execution is pending runtime bridge."
+      date: latestDate || null,
+      stocks: output,
+      count: output.length
     });
   } catch (err) {
     console.error("[smartwatchlist]", err);
@@ -1032,7 +1052,6 @@ app.get("/api/public/smartwatchlist", async (c) => {
     }, 500);
   }
 });
-
 app.get("/api/public/signal-center", async (c) => {
   try {
     const url = new URL(c.req.url);
