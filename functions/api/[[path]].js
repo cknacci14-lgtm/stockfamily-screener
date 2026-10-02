@@ -230,6 +230,7 @@ app.get('/api/public/summary/:code', async (c) => {
       netForeignToday: netForeignToday,
       netForeign20d: netForeign20d,
       foreignRatio20d: gross20 > 0 ? netForeign20d / gross20 : 0,
+      avgValue20d: last20.reduce((s, r) => s + (Number(r.value) || 0), 0) / Math.max(1, last20.length),
       isCurrentSession: true,
       dataStatus: 'CURRENT'
     });
