@@ -165,7 +165,29 @@ function writeSnapshot(payload) {
 }
 
 async function calculateSignalCenter(normalized, cacheKey) {
-  const result = await buildSmartwatchlist(normalized);
+  const SC_CHUNK = 50;
+  const scStocks = [];
+  let scDate = null;
+  for (let i = 0; i < normalized.length; i += SC_CHUNK) {
+    const part = normalized.slice(i, i + SC_CHUNK);
+    let lastError = null;
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      try {
+        const res = await buildSmartwatchlist(part);
+        scStocks.push(...(res?.stocks || []));
+        scDate = res?.date || scDate;
+        lastError = null;
+        break;
+      } catch (error) {
+        lastError = error;
+        await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
+      }
+    }
+    if (lastError) {
+      throw lastError instanceof Error ? lastError : new Error(lastError?.message || String(lastError));
+    }
+  }
+  const result = { date: scDate, stocks: scStocks };
 
   const signals = (result?.stocks || [])
     // Stocks that did not trade in the latest session cannot be acted on.
