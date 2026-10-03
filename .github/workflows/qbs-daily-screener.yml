@@ -58,5 +58,11 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "chore(qbs): daily screener + paper trade refresh $(date -u +%Y-%m-%d)"
-            git push
+            for i in 1 2 3; do
+              if git pull --rebase origin main && git push; then exit 0; fi
+              echo "push attempt $i failed, retrying..."
+              git rebase --abort 2>/dev/null || true
+              sleep 5
+            done
+            exit 1
           fi
