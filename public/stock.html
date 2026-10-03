@@ -822,7 +822,9 @@
 </style>
 <!-- CHARTNALIST_PHASE6_3_AUTH_BOOTSTRAP -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/chartnalist-bt.js"></script>
 <script src="/assets/chartnalist-app-auth.js"></script>
+<script src="/assets/retrace-overlay.js?v=1"></script>
 </head>
 
 <body>
@@ -1036,6 +1038,70 @@
   let sma20Series = null;
   let sma50Series = null;
   let tradePlanLines = [];
+  /* ---- Retrace overlay (informational only, not a trading signal) ---- */
+  let retraceHandle = null;
+  let retraceOn = false;
+  let retraceResult = null;
+  try { retraceOn = localStorage.getItem('cn_retrace') === '1'; } catch (e) {}
+
+  function retraceFmtTime(t) {
+    if (typeof t === 'number') return new Date(t * 1000).toISOString().slice(0, 10);
+    if (t && typeof t === 'object') return t.year + '-' + String(t.month).padStart(2, '0') + '-' + String(t.day).padStart(2, '0');
+    return String(t || '');
+  }
+
+  function clearRetraceOverlay() {
+    if (retraceHandle) { try { retraceHandle.remove(); } catch (e) {} retraceHandle = null; }
+  }
+
+  function ensureRetraceBar() {
+    let bar = document.getElementById('retraceBar');
+    if (bar) return bar;
+    const chartEl = document.getElementById('chart');
+    if (!chartEl || !chartEl.parentNode) return null;
+    if (!document.getElementById('retraceStyle')) {
+      const st = document.createElement('style');
+      st.id = 'retraceStyle';
+      st.textContent =
+        '.retrace-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0;font-size:12px;color:#9aa3aa}' +
+        '.retrace-btn{height:26px;padding:0 10px;border:1px solid rgba(255,255,255,.14);border-radius:8px;background:transparent;color:#d6dde3;font-size:11px;font-weight:700;letter-spacing:.05em;cursor:pointer}' +
+        '.retrace-btn.on{border-color:#ffb020;color:#ffb020;background:rgba(255,176,32,.1)}' +
+        '.retrace-btn:disabled{opacity:.4;cursor:default}';
+      document.head.appendChild(st);
+    }
+    bar = document.createElement('div');
+    bar.id = 'retraceBar';
+    bar.className = 'retrace-bar';
+    bar.innerHTML = '<button type="button" class="retrace-btn" title="Zona retrace Fibonacci 0,5 / 0,618 / 0,81 dari leg naik terakhir. Informasi, bukan sinyal.">RETRACE</button><span></span>';
+    chartEl.parentNode.insertBefore(bar, chartEl);
+    bar.querySelector('button').addEventListener('click', function () {
+      retraceOn = !retraceOn;
+      try { localStorage.setItem('cn_retrace', retraceOn ? '1' : '0'); } catch (e) {}
+      paintRetrace();
+    });
+    return bar;
+  }
+
+  function paintRetrace() {
+    clearRetraceOverlay();
+    const bar = ensureRetraceBar();
+    if (!bar) return;
+    const btn = bar.querySelector('button');
+    const txt = bar.querySelector('span');
+    if (!retraceResult || typeof ChartnalistRetrace === 'undefined') { txt.textContent = ''; btn.disabled = true; return; }
+    btn.disabled = false;
+    btn.classList.toggle('on', retraceOn);
+    txt.textContent = ChartnalistRetrace.summary(retraceResult) + ' \u00b7 data s.d. ' + retraceFmtTime(retraceResult.lastTime);
+    if (retraceOn && candleSeries) retraceHandle = ChartnalistRetrace.apply(candleSeries, retraceResult);
+  }
+
+  function drawRetraceOverlay(candles) {
+    try {
+      if (typeof ChartnalistRetrace === 'undefined') return;
+      retraceResult = ChartnalistRetrace.compute(candles);
+      paintRetrace();
+    } catch (e) { console.warn('[retrace]', e); }
+  }
 
   const fmt = value => {
     const n = Number(value);
@@ -1477,6 +1543,7 @@
     const useHLCMode = hasUnavailableOpen;
 
     candleSeries.setData(candleData);
+    drawRetraceOverlay(candleData);
     closeSeries.setData(closeData);
     highSeries.setData(highData);
     lowSeries.setData(lowData);
@@ -1524,6 +1591,12 @@
 
     if (candleSeries) {
       candleSeries.setMarkers(_btMarkers);
+try {
+      if (window.CNBT && Array.isArray(data.candles) && data.candles.length) {
+        var _btCtx = window.CNBT.build(data);
+        candleSeries.setMarkers(window.CNBT.markers(_btRows.filter(function (b) { return Number(b.volume) > 0; }), _btCtx, { limit: 10, timeAs: 'date', sizeBase: 1 }));
+      }
+    } catch (e) { console.warn('[BT markers]', e); }
     }
 
     if (useHLCMode) {
@@ -1747,7 +1820,7 @@
       currentRange = button.dataset.range || "6mo";
 
       if (chart) {
-        candleSeries.setData([]);
+        candleSeries.setData([]); clearRetraceOverlay();
         closeSeries.setData([]);
         highSeries.setData([]);
         lowSeries.setData([]);
