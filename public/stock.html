@@ -1594,7 +1594,7 @@
 try {
       if (window.CNBT && Array.isArray(data.candles) && data.candles.length) {
         var _btCtx = window.CNBT.build(data);
-        candleSeries.setMarkers(window.CNBT.markers(_btRows.filter(function (b) { return Number(b.volume) > 0; }), _btCtx, { limit: 10, timeAs: 'date', sizeBase: 1 }));
+        candleSeries.setMarkers(window.CNBT.markers(_btRows.filter(function (b) { return Number(b.volume) > 0; }), _btCtx, { limit: 10, timeAs: 'date', sizeBase: 1, rank: 'scale' }));
       }
     } catch (e) { console.warn('[BT markers]', e); }
     }

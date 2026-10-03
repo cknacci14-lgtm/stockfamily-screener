@@ -5,6 +5,7 @@
     var path = (location.pathname || '/').slice(0, 200);
     if (/^\/admin/i.test(path)) return;
     if (navigator.webdriver) return;
+    try { if (localStorage.getItem('cn_skip') === '1') return; } catch (e) {}
     var last = null;
     try { last = JSON.parse(sessionStorage.getItem('cn_last') || 'null'); } catch (e) {}
     if (last && last.p === path && Date.now() - last.t < 30000) return;

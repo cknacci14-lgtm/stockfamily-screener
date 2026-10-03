@@ -597,7 +597,8 @@
 .bt-bars-wrapper { overflow: visible !important; }
 </style>    <!-- CHARTNALIST_PHASE5_AUTH -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="/assets/chartnalist-app-auth.js"></script>
+    <script src="/assets/chartnalist-bt.js"></script>
+<script src="/assets/chartnalist-app-auth.js"></script>
 </head>
 <body class="bg-idx-bg text-slate-200 font-sans antialiased h-screen flex flex-col select-none">
 
@@ -1580,7 +1581,7 @@
         <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border"><span class="text-slate-400">Target 1</span><span id="tpT1" class="font-bold text-idx-green">--</span></div>
         <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border"><span class="text-slate-400">Target 2</span><span id="tpT2" class="font-bold text-idx-green">--</span></div>
         <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border"><span class="text-slate-400">Risk / Reward</span><span id="tpRR" class="font-bold text-slate-300">--</span></div>
-        <div class="text-[9px] text-slate-500 italic">Heuristik swing + ATR(14), bukan rekomendasi.</div>
+        <div class="text-[9px] text-slate-500 italic">Heuristik swing + ATR(14), bukan rekomendasi. Uji riwayat 5 tahun (150 saham likuid, tahan maks 10 hari): target 1 tercapai sebelum stop di sekitar 38% kasus, stop tersentuh lebih dulu di sekitar 39%, hasil rata-rata sekitar -0,45% per transaksi setelah biaya (mendekati 0 sebelum biaya). Berfungsi sebagai pembatas rugi, belum terbukti sebagai penghasil untung.</div>
       </div>
     </div>
 
@@ -1603,7 +1604,7 @@
           <span class="text-slate-400">RSI (14)</span><span id="structRsi" class="font-bold text-slate-300">--</span>
         </div>
         <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border">
-          <span class="text-slate-400">VWAP (window)</span><span id="structVwap" class="font-bold text-idx-amber">--</span>
+          <span class="text-slate-400">VWAP 20 hari</span><span id="structVwap" class="font-bold text-idx-amber">--</span>
         </div>
       </div>
     </div>
@@ -1758,6 +1759,7 @@
         Memuat status data...
       </div>
       <div style="display:flex; gap:4px; margin-bottom:6px; font-size:9px;">
+        <button id="btSortScale" onclick="setBTSort('scale')" style="flex:1; padding:3px 6px; border-radius:3px; background:rgba(100,116,139,0.15); color:#64748B; border:1px solid rgba(100,116,139,0.3); cursor:pointer; font-weight:600;">Skala</button>
         <button id="btSortVol" onclick="setBTSort('volume')" style="flex:1; padding:3px 6px; border-radius:3px; background:rgba(0,229,255,0.15); color:#00E5FF; border:1px solid rgba(0,229,255,0.3); cursor:pointer; font-weight:600;">📊 Top Volume</button>
         <button id="btSortDate" onclick="setBTSort('date')" style="flex:1; padding:3px 6px; border-radius:3px; background:rgba(100,116,139,0.15); color:#64748B; border:1px solid rgba(100,116,139,0.3); cursor:pointer; font-weight:600;">📅 Terbaru</button>
       </div>
@@ -2045,6 +2047,20 @@
     const rs = avgGain / avgLoss;
 
     return 100 - (100 / (1 + rs));
+  }
+
+  function calcRollingVWAP(candles, volumeByTime, win) {
+    const out = [];
+    for (let i = 0; i < candles.length; i++) {
+      let pv = 0, vv = 0;
+      for (let j = Math.max(0, i - win + 1); j <= i; j++) {
+        const v = volumeByTime.get(candles[j].time) || 0;
+        pv += ((candles[j].high + candles[j].close + candles[j].low) / 3) * v;
+        vv += v;
+      }
+      out.push({ time: candles[i].time, value: vv > 0 ? pv / vv : candles[i].close });
+    }
+    return out;
   }
 
   function calcAnchoredVWAP(candles, volumeByTime) {
@@ -2616,8 +2632,8 @@
       const [py, pm] = peakMonth.split('-');
       const peakLabel = monthLabels[parseInt(pm)-1] + ' ' + py;
       
-      const fmtVol = (n) => n >= 1e9 ? (n/1e9).toFixed(2)+'B' : n >= 1e6 ? (n/1e6).toFixed(0)+'M' : (n/1e3).toFixed(0)+'K';
-      const fmtVal = (n) => n >= 1e12 ? (n/1e12).toFixed(2)+' T' : n >= 1e9 ? (n/1e9).toFixed(1)+' B' : (n/1e6).toFixed(0)+' M';
+      const fmtVol = (n) => n >= 1e9 ? (n/1e9).toFixed(2)+'mlr' : n >= 1e6 ? (n/1e6).toFixed(0)+'jt' : (n/1e3).toFixed(0)+'rb';
+      const fmtVal = (n) => n >= 1e12 ? (n/1e12).toFixed(2)+' T' : n >= 1e9 ? (n/1e9).toFixed(1)+' M' : (n/1e6).toFixed(0)+' jt';
       
       summaryGrid.innerHTML = `
         <div class="bt-summary-item"><span class="label">Total BT</span><span class="value">${totalBT}x</span></div>
@@ -2830,6 +2846,124 @@
     }
   }
 
+  // ---- Block Trade Intel v2: label tanpa masa depan, daftar bisa diperluas ----
+  window.btState = { sort: 'scale', period: 'all', limit: 5 };
+  let btCtx = null;
+
+  function btFiltered() {
+    const st = window.btState;
+    let all = (currentBTData.trades || []).slice();
+    if (st.period !== 'all' && btCtx && btCtx.candleArr.length) {
+      const d = new Date(btCtx.candleArr[btCtx.candleArr.length - 1].time + 'T00:00:00Z');
+      d.setUTCDate(d.getUTCDate() - Number(st.period));
+      const cutoff = d.toISOString().slice(0, 10);
+      all = all.filter(function (b) { return String(b.time) >= cutoff; });
+    }
+    if (st.sort === 'scale' && btCtx) all.forEach(function (b) { const x = CNBT.classify(b, btCtx).scale; b._sc = x == null ? -1 : x; });
+    all.sort(function (a, b) {
+      if (st.sort === 'scale') return (b._sc == null ? -1 : b._sc) - (a._sc == null ? -1 : a._sc);
+      return st.sort === 'volume' ? Number(b.volume) - Number(a.volume) : String(b.time).localeCompare(String(a.time));
+    });
+    return all;
+  }
+
+  function btMarkersUpdate() {
+    if (!btCtx || !window.CNBT) return;
+    currentMarkers = CNBT.markers(btFiltered(), btCtx, { limit: 10, timeAs: 'sec', sizeBase: 1.5, rank: window.btState.sort === 'scale' ? 'scale' : 'volume' });
+    candleSeries.setMarkers(showBlockTrade ? currentMarkers : []);
+  }
+
+  function btRender() {
+    const container = document.getElementById('btTableContainer');
+    if (!container) return;
+    const st = window.btState;
+    const all = btFiltered();
+    const shown = all.slice(0, st.limit);
+    const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    const fmtDate = function (t) { const p = String(t).slice(0, 10).split('-'); return p[2] + ' ' + months[Number(p[1]) - 1] + ' ' + p[0].slice(2); };
+    const fmtRp = function (n) {
+      n = Number(n) || 0;
+      if (n >= 1e12) return 'Rp ' + (n / 1e12).toFixed(2) + ' T';
+      if (n >= 1e9) return 'Rp ' + (n / 1e9).toFixed(2) + ' M';
+      if (n >= 1e6) return 'Rp ' + (n / 1e6).toFixed(1) + ' jt';
+      return 'Rp ' + n.toLocaleString('id-ID');
+    };
+    const btn = function (on) {
+      return 'flex:1;padding:2px 4px;border-radius:3px;cursor:pointer;font-weight:600;border:1px solid ' + (on ? 'rgba(0,229,255,.3)' : 'rgba(100,116,139,.3)') + ';background:' + (on ? 'rgba(0,229,255,.15)' : 'rgba(100,116,139,.15)') + ';color:' + (on ? '#00E5FF' : '#64748B');
+    };
+    let html = '<div style="display:flex;gap:4px;margin-bottom:6px;font-size:9px">';
+    [['30', '30 hari'], ['90', '90 hari'], ['all', '1 tahun']].forEach(function (p) {
+      html += '<button onclick="btSetPeriod(\'' + p[0] + '\')" style="' + btn(st.period === p[0]) + '">' + p[1] + '</button>';
+    });
+    html += '</div>';
+    if (!shown.length) html += '<div class="text-[10px] text-slate-500 italic text-center py-3">Tidak ada block trade pada periode ini</div>';
+    shown.forEach(function (bt) {
+      const cl = btCtx ? CNBT.classify(bt, btCtx) : { dir: 0, position: null, scale: null, fwd: null };
+      const cls = cl.dir > 0 ? 'akum' : (cl.dir < 0 ? 'dist' : 'neutral');
+      const icon = cl.dir > 0 ? '&#9650;' : (cl.dir < 0 ? '&#9660;' : '&#9670;');
+      const lbl = cl.dir > 0 ? 'CANDLE NAIK' : (cl.dir < 0 ? 'CANDLE TURUN' : 'CANDLE DATAR');
+      const zone = cl.position == null ? '' : (cl.position <= 35 ? ' (zona bawah)' : (cl.position >= 65 ? ' (zona atas)' : ' (tengah)'));
+      const fwdTxt = cl.fwd == null ? 'menunggu' : (cl.fwd >= 0 ? '+' : '') + cl.fwd.toFixed(2) + '%';
+      const fwdCol = cl.fwd == null ? '#64748B' : (cl.fwd >= 0 ? '#00E676' : '#FF5252');
+      html += '<div class="bt-card ' + cls + '">';
+      html += '<div class="bt-header"><span class="bt-date">' + fmtDate(bt.time) + '</span><span class="bt-badge ' + cls + '">' + icon + ' ' + lbl + '</span></div>';
+      html += '<div class="bt-row"><span>Volume</span><span>' + CNBT.volText(bt.volume) + ' lbr</span></div>';
+      html += '<div class="bt-row"><span>Nilai</span><span>' + fmtRp(bt.value) + '</span></div>';
+      if (cl.scale != null) html += '<div class="bt-row"><span>Skala</span><span>' + cl.scale.toFixed(1).replace('.', ',') + 'x vol. harian</span></div>';
+      if (cl.position != null) html += '<div class="bt-row"><span>Posisi 30 hari</span><span>' + cl.position + '%' + zone + '</span></div>';
+      html += '<div class="bt-row" title="Hasil sesudah kejadian: informasi, bukan dasar label"><span>Setelah 3 hari</span><span style="color:' + fwdCol + '">' + fwdTxt + '</span></div>';
+      html += '</div>';
+    });
+    if (all.length > shown.length) html += '<button onclick="btMore()" style="' + btn(false) + ';width:100%;margin-top:4px">Tampilkan lebih banyak (' + shown.length + ' dari ' + all.length + ')</button>';
+    if (st.limit > 5 && shown.length > 5) html += '<button onclick="btLess()" style="' + btn(false) + ';width:100%;margin-top:4px">Ringkas</button>';
+    html += '<div style="font-size:9px;color:#64748B;margin-top:6px;font-style:italic">Label = arah candle pada hari kejadian. Hasil sesudahnya hanya informasi. Uji riwayat 9 bulan: belum ada bukti block trade memprediksi arah harga.</div>';
+    container.innerHTML = html;
+  }
+
+  function renderBlockTradeTable() { btRender(); }
+
+  window.btMore = function () { window.btState.limit += 15; btRender(); };
+  window.btLess = function () { window.btState.limit = 5; btRender(); };
+  window.btSetPeriod = function (p) { window.btState.period = p; window.btState.limit = 5; btRender(); btMarkersUpdate(); };
+  window.setBTSort = function (mode) {
+    window.btState.sort = mode; window.btState.limit = 5; currentBTSort = mode; setTimeout(btMarkersUpdate, 0);
+    const on = 'rgba(0,229,255,0.15)', off = 'rgba(100,116,139,0.15)';
+    [[document.getElementById('btSortScale'), mode === 'scale'], [document.getElementById('btSortVol'), mode === 'volume'], [document.getElementById('btSortDate'), mode === 'date']].forEach(function (x) {
+      if (!x[0]) return;
+      x[0].style.background = x[1] ? on : off;
+      x[0].style.color = x[1] ? '#00E5FF' : '#64748B';
+      x[0].style.borderColor = x[1] ? 'rgba(0,229,255,0.3)' : 'rgba(100,116,139,0.3)';
+    });
+    btRender();
+  };
+
+  async function loadBlockTradeMarkers(code) {
+    try {
+      const data = await apiGet('/api/public/history/' + encodeURIComponent(code) + '?range=1y');
+      if (!data.success || !data.nonRegular || !data.nonRegular.length) {
+        candleSeries.setMarkers([]);
+        currentMarkers = [];
+        currentBTData = { trades: [], candleArr: [], candleMap: new Map() };
+        btCtx = null;
+        const c0 = document.getElementById('btTableContainer');
+        if (c0) c0.innerHTML = '<div class="text-[10px] text-slate-500 italic text-center py-3">Tidak ada data block trade signifikan</div>';
+        return;
+      }
+      btCtx = CNBT.build(data);
+      const valid = data.nonRegular.filter(function (nr) { return Number(nr.volume) > 0; });
+      currentBTData = { trades: valid, candleArr: btCtx.candleArr, candleMap: new Map() };
+      window.btState.limit = 5;
+      btRender();
+      btMarkersUpdate();
+      updateBTFreshness(data.candles, valid);
+      window.setBTSort(window.btState.sort);
+    } catch (err) {
+      console.error('[loadBlockTradeMarkers]', err);
+      candleSeries.setMarkers([]);
+      currentMarkers = [];
+    }
+  }
+
   window.toggleBlockTrade = function() {
     showBlockTrade = !showBlockTrade;
     candleSeries.setMarkers(showBlockTrade ? currentMarkers : []);
@@ -2862,7 +2996,7 @@
       volumeSeries.setData(cleanVolumes);
 
       const volumeByTime = new Map(cleanVolumes.map(v => [v.time, v.value]));
-      const vwapData = calcAnchoredVWAP(latestCandles, volumeByTime);
+      const vwapData = calcRollingVWAP(latestCandles, volumeByTime, 20);
       vwapSeries.setData(vwapData);
       loadGemHistory(code);
       loadBlockTradeMarkers(code);
@@ -2871,6 +3005,7 @@
       loadFundamental(code);
 
       chart.priceScale('right').applyOptions({ autoScale: true });
+      chart.applyOptions({ localization: { priceFormatter: function (p) { return p < 0 ? '' : p.toFixed(2); } } });
       // fitContent hanya sekali di awal, setelah itu biarkan user yang zoom
       if (!window._chartFitted) {
         chart.timeScale().fitContent();
@@ -2888,8 +3023,8 @@
         const up = /BULL|BREAKOUT/.test(tv), dn = /BEAR|BREAKDOWN/.test(tv);
         tEl.className = 'font-bold ' + (up ? 'text-idx-green' : dn ? 'text-idx-red' : (tv === '--' ? 'text-slate-300' : 'text-idx-amber'));
       })();
-      document.getElementById('structSwingHigh').innerText = structure?.lastHigh ? fmtRp(structure.lastHigh) : '--';
-      document.getElementById('structSwingLow').innerText = structure?.lastLow ? fmtRp(structure.lastLow) : '--';
+      (function () { const lc = Number(latestCandles[latestCandles.length - 1].close); const f = function (v) { if (!v) return '--'; const d = (v / lc - 1) * 100; return fmtRp(v) + ' <span style="opacity:.6;font-size:9px">(' + (d >= 0 ? '+' : '') + d.toFixed(1) + '%)</span>'; }; document.getElementById('structSwingHigh').innerHTML = f(structure && structure.lastHigh); document.getElementById('structSwingLow').innerHTML = f(structure && structure.lastLow); })();
+      
       document.getElementById('structRsi').innerText = rsi != null ? rsi.toFixed(1) : '--';
       document.getElementById('structVwap').innerText = lastVwap != null ? fmtRp(Math.round(lastVwap)) : '--';
       window._sf = { candles: latestCandles, code: code, structure: structure, rsi: rsi, vwap: lastVwap, atr: calcATR(latestCandles, 14), close: Number(latestCandles[latestCandles.length - 1].close) };
@@ -3063,6 +3198,71 @@ var sfMode = 'swing';
 try { sfMode = localStorage.getItem('sfMode') || 'swing'; } catch (e) {}
 function setSumMode(m) { sfMode = m; try { localStorage.setItem('sfMode', m); } catch (e) {} renderMode(); }
 function renderSummary() { renderSummaryBase(); renderMode(); }
+var sfCalcState = { dirty: false, code: null, loaded: false };
+function sfCalcSave() {
+  try {
+    localStorage.setItem('cnCalc', JSON.stringify({ m: document.getElementById('calcModal').value, r: document.getElementById('calcRisk').value }));
+  } catch (e) {}
+}
+function sfCalcDirty() { sfCalcState.dirty = true; sfCalcRecalc(); }
+function sfCalcRecalc() {
+  var out = document.getElementById('calcOut');
+  if (!out) return;
+  var modal = parseFloat(document.getElementById('calcModal').value);
+  var risk = parseFloat(document.getElementById('calcRisk').value);
+  var entry = parseFloat(document.getElementById('calcEntry').value);
+  var stop = parseFloat(document.getElementById('calcStop').value);
+  var f = function (n) { return Math.round(n).toLocaleString('id-ID'); };
+  if (!(modal > 0) || !(risk > 0) || !(entry > 0) || !(stop > 0)) { out.innerHTML = 'Isi modal, risiko, entry, dan stop.'; return; }
+  if (stop >= entry) { out.innerHTML = 'Stop harus di bawah entry (posisi beli).'; return; }
+  var perShare = entry - stop;
+  var lotRisk = Math.floor(modal * risk / 100 / perShare / 100);
+  var lotCap = Math.floor(modal / (entry * 100));
+  var lot = Math.min(lotRisk, lotCap);
+  if (lot < 1) {
+    out.innerHTML = lotCap < 1 ? 'Modal tidak cukup untuk 1 lot.' : 'Risiko terlalu kecil untuk 1 lot: 1 lot berisiko Rp ' + f(perShare * 100) + ' (' + (perShare * 100 / modal * 100).toFixed(2) + '% modal).';
+    return;
+  }
+  var value = lot * 100 * entry;
+  var loss = lot * 100 * perShare + value * 0.004;
+  out.innerHTML = '<b>' + lot + ' lot</b> (' + f(lot * 100) + ' lembar)<br>Nilai posisi Rp ' + f(value) + ' (' + (value / modal * 100).toFixed(0) + '% modal)<br>Rugi bila stop kena &asymp; Rp ' + f(loss) + ' (' + (loss / modal * 100).toFixed(2) + '% modal, termasuk biaya 0,4%)' + (lotCap < lotRisk ? '<br><span style="color:#FFB300">Dibatasi oleh modal.</span>' : '');
+}
+function sfCalcSync() {
+  var s = window._sf, p = window._sfPlan;
+  var box = document.getElementById('sfCalc');
+  if (!box) {
+    var tp = document.getElementById('tpStatus');
+    var anchor = document.getElementById('dayBox') || (tp && tp.parentElement);
+    if (!anchor || !anchor.parentNode) return;
+    box = document.createElement('div');
+    box.id = 'sfCalc';
+    box.className = 'p-2 rounded bg-idx-panel/60 border border-idx-border';
+    box.style.marginTop = '8px';
+    var inp = 'width:100%;margin-top:2px;background:#0b0e14;border:1px solid #2a2f3e;color:#e5e7eb;border-radius:4px;padding:3px 6px;font-size:11px;';
+    var lab = 'font-size:9px;color:#8b93a7;display:block;';
+    box.innerHTML = '<div style="font-size:10px;color:#00E5FF;font-weight:700;margin-bottom:4px">KALKULATOR POSISI</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">' +
+      '<label style="' + lab + '">Modal (Rp)<input id="calcModal" type="number" min="0" step="100000" oninput="sfCalcSave();sfCalcRecalc()" style="' + inp + '"></label>' +
+      '<label style="' + lab + '">Risiko per transaksi (%)<input id="calcRisk" type="number" min="0" step="0.1" oninput="sfCalcSave();sfCalcRecalc()" style="' + inp + '"></label>' +
+      '<label style="' + lab + '">Entry (Rp)<input id="calcEntry" type="number" min="0" oninput="sfCalcDirty()" style="' + inp + '"></label>' +
+      '<label style="' + lab + '">Stop (Rp)<input id="calcStop" type="number" min="0" oninput="sfCalcDirty()" style="' + inp + '"></label>' +
+      '</div><div id="calcOut" style="font-size:11px;margin-top:6px;color:#CBD5E1"></div>' +
+      '<div style="font-size:9px;color:#8b93a7;margin-top:4px;font-style:italic">Gap pembukaan bisa membuat rugi melebihi stop. Bukan rekomendasi.</div>';
+    anchor.parentNode.insertBefore(box, anchor.nextSibling);
+  }
+  if (!sfCalcState.loaded) {
+    sfCalcState.loaded = true;
+    try {
+      var o = JSON.parse(localStorage.getItem('cnCalc') || 'null');
+      if (o) { document.getElementById('calcModal').value = o.m || ''; document.getElementById('calcRisk').value = o.r || ''; }
+    } catch (e) {}
+    if (!document.getElementById('calcRisk').value) document.getElementById('calcRisk').value = '1';
+  }
+  var eEl = document.getElementById('calcEntry'), sEl = document.getElementById('calcStop');
+  if (s && s.code !== sfCalcState.code) { sfCalcState.code = s.code; sfCalcState.dirty = false; }
+  if (!sfCalcState.dirty) { eEl.value = p ? p.entry : ''; sEl.value = p ? p.stop : ''; }
+  sfCalcRecalc();
+}
 function renderMode() {
   const tp = document.getElementById('tpStatus');
   if (!tp) return;
@@ -3085,6 +3285,7 @@ function renderMode() {
     b.style.cssText = 'font-size:9px;padding:1px 6px;border-radius:3px;cursor:pointer;border:1px solid rgba(0,229,255,.4);' + (on ? 'background:rgba(0,229,255,.2);color:#00E5FF;' : 'background:transparent;color:#64748B;');
   });
   if (isDay) renderDay(day);
+  sfCalcSync();
 }
 function renderDay(box) {
   const s = window._sf;
@@ -3171,11 +3372,11 @@ function renderSummaryBase() {
   if (/BREAKDOWN/.test(tr) && inScope) { verdict = 'WASPADA: BREAKDOWN'; vcol = R; }
   else if (/BREAKOUT/.test(tr) && inScope && b && isFinite(Number(b.foreignRatio20d)) && Number(b.foreignRatio20d) > 0.1) { verdict = 'BREAKOUT + ASING AKUMULASI'; vcol = G; }
   else { verdict = 'NETRAL &mdash; TUNGGU KONFIRMASI'; vcol = A; }
-  const vnote = (!inScope && b) ? 'Di luar cakupan uji riwayat (kurang likuid): label berbasis bukti tidak ditampilkan.' : /BREAKDOWN/.test(verdict) ? 'Riwayat ±13 bulan: setelah kondisi ini harga rata-rata lebih lemah dari pasar.' : /ASING/.test(verdict) ? 'Riwayat ±13 bulan: lebih baik dari rata-rata pasar. Belum teruji ke depan, bukan jaminan.' : '';
+  const vnote = (!inScope && b) ? 'Di luar cakupan uji riwayat (kurang likuid): label berbasis bukti tidak ditampilkan.' : /BREAKDOWN/.test(verdict) ? 'Riwayat ±13 bulan: harga setelah kondisi ini lebih lemah dari pasar. Uji 5 tahun: tidak konsisten antar tahun.' : /ASING/.test(verdict) ? 'Riwayat ±13 bulan: lebih baik dari rata-rata pasar. Belum teruji ke depan, bukan jaminan.' : '';
   set('sumVerdict', verdict + (vnote ? '<div style="font-size:9px;font-weight:400;opacity:.75;margin-top:2px">' + vnote + '</div>' : ''), vcol);
 
   // Trade plan
-  const dash = '--';
+  const dash = '--'; window._sfPlan = null;
   ['tpEntry', 'tpStop', 'tpT1', 'tpT2', 'tpRR'].forEach(function (id) { set(id, dash); });
   const lastLow = Number(st.lastLow), lastHigh = Number(st.lastHigh), prevHigh = Number(st.prevHigh);
   if (!isFinite(close) || !atr) { set('tpStatus', 'Data belum cukup untuk trade plan.'); return; }
@@ -3193,12 +3394,13 @@ function renderSummaryBase() {
     t1 = sfRound(t1, 'down'); t2 = sfRound(t2, 'down');
     const rr = risk > 0 ? (t1 - entry) / risk : 0;
     const pc = function (a) { return ((a - entry) / entry * 100).toFixed(1) + '%'; };
+    window._sfPlan = { entry: entry, stop: stop };
     set('tpEntry', fmtRp(entry) + ' <span style="opacity:.6;font-size:9px">harga terakhir</span>');
     set('tpStop', fmtRp(stop) + ' <span style="opacity:.7;font-size:9px">' + pc(stop) + '</span>');
     set('tpT1', fmtRp(t1) + ' <span style="opacity:.7;font-size:9px">+' + pc(t1) + '</span>');
     set('tpT2', fmtRp(t2) + ' <span style="opacity:.7;font-size:9px">+' + pc(t2) + '</span>');
-    set('tpRR', '1 : ' + rr.toFixed(1), rr >= 2 ? G : rr >= 1.5 ? A : R);
-    set('tpStatus', rr >= 1.5 ? 'Layak dipantau. Pasang stop sebelum entry.' : 'R/R tipis. Lebih baik tunggu pullback.');
+    set('tpRR', '1 : ' + rr.toFixed(1) + ' <span style="opacity:.6;font-size:9px">tertulis</span>', N);
+    set('tpStatus', 'Level teknikal untuk manajemen risiko, bukan sinyal beli. Pasang stop sebelum entry.' + (rr < 1.5 ? ' R/R tipis.' : ''));
   }
 }
   async function loadBandarmology(code) {
