@@ -4,12 +4,12 @@
   "regime": "Neutral-",
   "regimeDetails": {
     "regime": "Neutral-",
-    "pctUp": 0.26366559485530544,
-    "meanFnet": -403254.98392282956,
-    "universeSize": 311
+    "pctUp": 0.5286195286195287,
+    "meanFnet": -819139.7306397307,
+    "universeSize": 297
   },
-  "generatedAt": "2026-10-01T16:52:55.832Z",
-  "lastSync": "1/10/2026, 23.52.55",
+  "generatedAt": "2026-10-05T00:48:59.159Z",
+  "lastSync": "5/10/2026, 07.48.59",
   "total": 0,
   "data": []
 }
