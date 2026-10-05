@@ -394,7 +394,7 @@ tr:last-child td {
         base = row.riskReward == null ? '\u2014' : fmt(row.riskReward) + 'R';
       }
       const badge = row.planStale
-        ? '<div class="flag-badge plan" title="Harga sudah jauh di atas trigger atau Target 1 terlewati. Rencana entry tidak lagi berlaku.">RENCANA USANG</div>'
+        ? '<div class="flag-badge plan" title="Reward:risk dari harga sekarang di bawah 1R atau Target 1 terlewati. Rencana entry tidak lagi berlaku.">RENCANA USANG</div>'
         : '';
       return base + badge;
     }

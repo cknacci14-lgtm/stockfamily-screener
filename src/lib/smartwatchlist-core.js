@@ -7,7 +7,7 @@
 const { evaluateStockSignal } = require("./signal-engine");
 
 const HISTORY_DAYS = 260;
-const PLAN_STALE_GAP_PCT = 5;
+const PLAN_MIN_RR = 1;
 function num(value) {
   const n = Number(value);
   return Number.isFinite(n)
@@ -1170,10 +1170,10 @@ function computeSmartwatchlist(stocks, history, marketDate) {
       Number.isFinite(p) && Number.isFinite(inv) && Number.isFinite(t1) && p > inv
         ? Math.round(((t1 - p) / (p - inv)) * 100) / 100
         : null;
-    /* Entry plan is stale once Target 1 is behind us or price ran far above the trigger. */
+    /* Entry plan is stale once Target 1 is behind us or reward:risk from the current price drops below 1R. */
     row.planStale =
       row.status === "TARGET" ||
-      (row.entryGapPct !== null && row.entryGapPct > PLAN_STALE_GAP_PCT);
+      (row.rrFromPrice !== null && row.rrFromPrice < PLAN_MIN_RR);
   }
 
   return { stocks: output, latestDate };

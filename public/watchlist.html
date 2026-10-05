@@ -959,7 +959,7 @@ tbody tr:hover{
               <div class="ticker">${esc(row.stockCode)}</div>
               <div class="name">${esc(row.stockName || "")}</div>
               ${staleBadge(row)}
-              ${row.planStale ? '<div class="flag-badge plan" title="Harga sudah jauh di atas trigger atau Target 1 terlewati. Rencana entry tidak lagi berlaku.">RENCANA USANG</div>' : ""}
+              ${row.planStale ? '<div class="flag-badge plan" title="Reward:risk dari harga sekarang di bawah 1R atau Target 1 terlewati. Rencana entry tidak lagi berlaku.">RENCANA USANG</div>' : ""}
             </a>
           </td>
 

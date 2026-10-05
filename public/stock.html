@@ -643,7 +643,7 @@
   color:#626B72;
 }
 @media (max-width:640px) {
-  .execution-grid { grid-template-columns:1fr; }
+  .execution-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
 </style>
 <!-- CHARTNALIST_PHASE6_3_CANONICAL_SIDEBAR -->
@@ -825,6 +825,11 @@
 <script src="/assets/chartnalist-bt.js"></script>
 <script src="/assets/chartnalist-app-auth.js"></script>
 <script src="/assets/retrace-overlay.js?v=1"></script>
+<style id="cn-mobile-stock">
+@media (max-width: 820px) {
+  body { padding-top: 60px !important; }
+}
+</style>
 </head>
 
 <body>
@@ -927,7 +932,7 @@
     </div>
 
     <div class="execution-item">
-      <div class="execution-label">Risk / Reward</div>
+      <div class="execution-label" title="Reward:risk dari harga sekarang ke Target 1">R:R T1 (harga sekarang)</div>
       <div id="executionRR" class="execution-value">—</div>
     </div>
   </div>
@@ -979,7 +984,7 @@
           </div>
 
           <div class="plan-item" style="grid-column:1 / -1;border-right:0">
-            <div class="plan-label">Risk / Reward</div>
+            <div class="plan-label" title="Reward:risk dari harga sekarang ke Target 1">R:R T1 (harga sekarang)</div>
             <div class="plan-value" id="planRR">—</div>
           </div>
         </div>
@@ -1209,7 +1214,7 @@
     $("planRisk").textContent = signal.riskLevel || "—";
     $("planTarget1").textContent = fmt(signal.target1);
     $("planTarget2").textContent = fmt(signal.target2);
-    $("planRR").textContent = fmtRR(signal.riskReward);
+    $("planRR").textContent = (signal.rrFromPrice != null && Number.isFinite(Number(signal.rrFromPrice))) ? (Number(signal.rrFromPrice) <= 0 ? "T1 lewat" : fmtRR(signal.rrFromPrice)) : fmtRR(signal.riskReward);
 
     $("eStructure").textContent =
       signal.structure?.state ||
@@ -2065,12 +2070,14 @@ function renderExecutionMonitor(signal, currentPrice) {
   target2El.textContent = monitorFmt(plan.target2);
 
   riskEl.textContent = signal.riskLevel || plan.riskLevel || "—";
-  rrEl.textContent = monitorFmtRR(plan.riskReward);
+  const rrNow = Number(signal.rrFromPrice);
+  rrEl.textContent = (signal.rrFromPrice != null && Number.isFinite(rrNow)) ? (rrNow <= 0 ? "T1 lewat" : monitorFmtRR(rrNow)) : monitorFmtRR(plan.riskReward);
 
   const date = signal.latestTradeDate || signal.updatedAt || "";
   metaEl.textContent = date
     ? "Signal Engine output • " + date
     : "Signal Engine output.";
+  if (signal.planStale) metaEl.textContent += " \u2022 RENCANA USANG";
 
   monitor.hidden = false;
 }
