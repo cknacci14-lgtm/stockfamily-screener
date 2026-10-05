@@ -301,6 +301,16 @@ app.post('/api/track', async (c) => {
   }
 });
 
+async function cnArjumInfo(env) {
+  try {
+    const day = new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 10);
+    const res = await Promise.all([
+      cnGetOne(env, 'api_usage?select=count&provider=eq.arjum&day=eq.' + day),
+      cnGetOne(env, 'broker_summary_daily?select=trade_date&order=trade_date.desc&limit=1')
+    ]);
+    return { used_today: res[0] ? res[0].count : 0, limit: 1000, last_broker_date: res[1] ? res[1].trade_date : null };
+  } catch (e) { return { error: e.message }; }
+}
 app.get('/api/admin/monitor', async (c) => {
   try {
     const env = c.env;
@@ -318,6 +328,7 @@ app.get('/api/admin/monitor', async (c) => {
         latest_trade_date: eod ? eod.trade_date : null,
         last_view_at: lastView ? lastView.viewed_at : null,
         yahoo: yahoo,
+        arjum: await cnArjumInfo(env),
         server_time: new Date().toISOString()
       }
     });

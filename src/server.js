@@ -344,6 +344,14 @@ async function cnYahooPing() {
     return { ok: false, status: 0, ms: Date.now() - t0 };
   }
 }
+async function cnArjumInfo() {
+  try {
+    const day = new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 10);
+    const u = await supabase.from('api_usage').select('count').eq('provider', 'arjum').eq('day', day).maybeSingle();
+    const b = await supabase.from('broker_summary_daily').select('trade_date').order('trade_date', { ascending: false }).limit(1);
+    return { used_today: u.data ? u.data.count : 0, limit: 1000, last_broker_date: (b.data && b.data[0]) ? b.data[0].trade_date : null };
+  } catch (e) { return { error: e.message }; }
+}
 app.get('/api/admin/monitor', requireAdmin, async (req, res) => {
   try {
     const [stats, eod, lastView, yahoo] = await Promise.all([
@@ -360,6 +368,7 @@ app.get('/api/admin/monitor', requireAdmin, async (req, res) => {
         latest_trade_date: eod ? eod.trade_date : null,
         last_view_at: lastView ? lastView.viewed_at : null,
         yahoo: yahoo,
+        arjum: await cnArjumInfo(),
         server_time: new Date().toISOString()
       }
     });

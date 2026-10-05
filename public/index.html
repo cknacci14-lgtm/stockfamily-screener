@@ -3254,6 +3254,62 @@ function renderSummaryBase() {
     }
   }
 
+  window._bkMore = false;
+  function bkToggle() { window._bkMore = !window._bkMore; bkRender(); }
+  function bkRefPrice(r, d) {
+    const s = window._sf;
+    if (!s || String(s.code).toUpperCase() !== String(d.code).toUpperCase()) return { px: null, label: '' };
+    if (Array.isArray(s.candles)) {
+      for (let i = s.candles.length - 1; i >= 0; i--) {
+        const c = s.candles[i];
+        if (new Date((Number(c.time) + 7 * 3600) * 1000).toISOString().slice(0, 10) === r.trade_date) return { px: Number(c.close), label: 'penutupan ' + r.trade_date };
+      }
+    }
+    return { px: Number(s.close), label: 'harga sekarang' };
+  }
+  function bkRow(b, side, px) {
+    const avg = side === 'buy' ? b.bavg : b.savg;
+    const diff = (px && avg) ? (avg / px - 1) * 100 : null;
+    const col = side === 'buy' ? '#00E676' : '#FF5252';
+    return '<div style="display:flex;justify-content:space-between;gap:6px;padding:2px 0;border-top:1px solid rgba(100,116,139,.2);white-space:nowrap" title="' + bkEsc(b.n) + (avg ? ' | rata-rata ' + Math.round(avg).toLocaleString('id-ID') : '') + '">' +
+      '<span style="overflow:hidden;text-overflow:ellipsis"><b>' + bkEsc(b.c) + '</b> <span style="opacity:.6;font-size:9px">' + bkEsc(bkShort(b.n)) + '</span></span>' +
+      '<span style="color:' + col + '">' + (side === 'buy' ? '+' : '-') + bkRp(b.nval).replace('Rp ', '') +
+      ' <span style="opacity:.75;font-size:9px;color:#CBD5E1">@' + (avg ? Math.round(avg).toLocaleString('id-ID') : '-') + (diff != null ? ' ' + (diff >= 0 ? '+' : '') + diff.toFixed(1).replace('.', ',') + '%' : '') + '</span></span></div>';
+  }
+  function bkRender() {
+    const el = document.getElementById('brokerBody');
+    const dl = document.getElementById('brokerDateLabel');
+    const d = window._bk;
+    if (!el || !d) return;
+    const r = d.row;
+    if (!r) {
+      el.innerHTML = '<div style="color:#8b93a7">Belum ada data broker untuk saham ini (saat ini hanya 200 saham paling likuid).</div>';
+      if (dl) dl.textContent = '';
+      return;
+    }
+    if (dl) dl.textContent = 'EOD ' + r.trade_date;
+    const n = window._bkMore ? 5 : 3;
+    const tv = Number(r.total_value) || 0;
+    const pb = tv > 0 ? Number(r.top3_buy_net) / tv * 100 : null;
+    const ps = tv > 0 ? Math.abs(Number(r.top3_sell_net)) / tv * 100 : null;
+    const ref = bkRefPrice(r, d);
+    const btn = 'width:100%;margin-top:4px;padding:2px 4px;border-radius:3px;cursor:pointer;font-size:9px;font-weight:600;border:1px solid rgba(100,116,139,.3);background:rgba(100,116,139,.15);color:#94A3B8';
+    el.style.color = '';
+    el.innerHTML = '<div style="font-size:10px;color:#8b93a7;margin-bottom:4px">Nilai transaksi ' + bkRp(tv) + ' &middot; ' + (r.broker_count || 0) + ' broker</div>' +
+      '<div style="font-size:10px;color:#00E676;font-weight:700">Net beli terbesar</div>' +
+      (r.top_buyers || []).slice(0, n).map(function (b) { return bkRow(b, 'buy', ref.px); }).join('') +
+      '<div style="font-size:10px;color:#FF5252;font-weight:700;margin-top:6px">Net jual terbesar</div>' +
+      (r.top_sellers || []).slice(0, n).map(function (b) { return bkRow(b, 'sell', ref.px); }).join('') +
+      '<button onclick="bkToggle()" style="' + btn + '">' + (window._bkMore ? 'Ringkas' : 'Tampilkan 5 teratas') + '</button>' +
+      '<div style="font-size:10px;margin-top:6px;color:#CBD5E1">3 teratas: beli ' + bkRp(r.top3_buy_net) + (pb != null ? ' (' + pb.toFixed(1).replace('.', ',') + '%)' : '') +
+      ' &middot; jual ' + bkRp(r.top3_sell_net) + (ps != null ? ' (' + ps.toFixed(1).replace('.', ',') + '%)' : '') + ' dari nilai</div>' +
+      (ref.px ? '<div style="font-size:9px;color:#64748B;margin-top:3px">% = rata-rata dibanding ' + ref.label + ' (Rp ' + Math.round(ref.px).toLocaleString('id-ID') + ')</div>' : '') +
+      '<div style="font-size:9px;color:#64748B;margin-top:4px;font-style:italic">Data broker EOD dari penyedia pihak ketiga. Informasi, bukan sinyal beli atau jual.</div>';
+    if (ref.px == null) {
+      setTimeout(function () { if (window._bk === d && window._sf && String(window._sf.code).toUpperCase() === String(d.code).toUpperCase()) bkRender(); }, 1500);
+    }
+  }
+
   async function loadBandarmology(code) {
     try {
       const data = await apiGet(`/api/public/summary/${encodeURIComponent(code)}`);

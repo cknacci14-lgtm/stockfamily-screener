@@ -1114,6 +1114,14 @@
         add('Data EOD', lag == null ? 'bad' : (lag === 0 ? 'ok' : (lag === 1 ? 'warn' : 'bad')),
           (h.latest_trade_date || 'tidak ada data') + (lag == null ? '' : ' (tertinggal ' + lag + ' hari bursa; libur bursa belum dihitung)'));
         add('Yahoo (harga)', h.yahoo && h.yahoo.ok ? 'ok' : 'bad', h.yahoo && h.yahoo.ok ? ('OK, ' + h.yahoo.ms + ' ms') : ('gagal (status ' + (h.yahoo ? h.yahoo.status : '-') + ')'));
+        if (h.arjum && !h.arjum.error) {
+          const used = Number(h.arjum.used_today) || 0, lim = Number(h.arjum.limit) || 1000;
+          add('Kuota Arjum', used < 700 ? 'ok' : (used < 900 ? 'warn' : 'bad'), cnNum(used) + ' dari ' + cnNum(lim) + ' request hari ini (hanya yang dicatat pekerja kita)');
+          const bl = h.arjum.last_broker_date;
+          add('Data broker', !bl ? 'warn' : (bl === h.latest_trade_date ? 'ok' : 'warn'), bl ? (bl + (bl === h.latest_trade_date ? '' : ' (berbeda dari data EOD ' + h.latest_trade_date + ')')) : 'belum ada data');
+        } else if (h.arjum && h.arjum.error) {
+          add('Kuota Arjum', 'warn', 'gagal dibaca: ' + h.arjum.error);
+        }
         if (!h.last_view_at) add('Pencatat kunjungan', 'warn', 'belum ada data (belum terpasang di produksi atau belum ada kunjungan)');
         else {
           var ageH = (Date.now() - new Date(h.last_view_at).getTime()) / 3600000;
