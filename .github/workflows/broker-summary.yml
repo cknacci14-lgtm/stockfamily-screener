@@ -1,0 +1,41 @@
+name: Broker Summary Fetch
+
+on:
+  schedule:
+    # 21:30 WIB (14:30 UTC), Senin-Jumat
+    - cron: '30 14 * * 1-5'
+    # 08:00 WIB (01:00 UTC), Selasa-Sabtu: menangkap data yang terlambat masuk
+    - cron: '0 1 * * 2-6'
+  workflow_dispatch:
+
+concurrency:
+  group: broker-summary
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: '1'
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: '1'
+        run: npm install --omit=dev --no-audit --no-fund --ignore-scripts
+
+      - name: Fetch broker summary
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          ARJUM_API_KEY: ${{ secrets.ARJUM_API_KEY }}
+        run: node scripts/fetch-broker-summary.js

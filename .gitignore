@@ -56,3 +56,7 @@ public/*.watchlist-preview*
 
 backtest-results/
 scripts/alpha-trinity-*.js
+
+ambil_*.ps1
+*_sample.json
+broker_*.json

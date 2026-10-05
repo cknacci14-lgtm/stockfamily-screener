@@ -1636,6 +1636,14 @@
       </div>
       <!-- Catatan internal dihapus -->
     </div>
+    <div class="p-3 border-b border-idx-border shrink-0">
+      <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between cursor-pointer select-none" onclick="togglePanel('brokerPanel', this)">
+        <span class="flex items-center gap-1.5"><i class="fa-solid fa-building-columns"></i> Broker Summary <span id="brokerDateLabel" class="text-slate-500 font-normal normal-case">--</span></span>
+        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+      </h2>
+      <div id="brokerPanel" class="text-[11px]"><div id="brokerBody" style="color:#8b93a7">Memuat...</div></div>
+    </div>
+
     <!-- GEM Score Panel -->
     <div class="p-3 border-b border-idx-border shrink-0">
       <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between cursor-pointer select-none" onclick="togglePanel('gemPanel', this)">
@@ -2063,18 +2071,6 @@
     return out;
   }
 
-  function calcAnchoredVWAP(candles, volumeByTime) {
-    let cumPV = 0, cumVol = 0;
-    const out = [];
-    for (const c of candles) {
-      const vol = volumeByTime.get(c.time) || 0;
-      const typical = (c.high + c.close + c.low) / 3;
-      cumPV += typical * vol;
-      cumVol += vol;
-      out.push({ time: c.time, value: cumVol > 0 ? cumPV / cumVol : c.close });
-    }
-    return out;
-  }
 
   function calcMarketStructure(candles) {
     if (!Array.isArray(candles) || candles.length < 7) {
@@ -2265,97 +2261,6 @@
     badge.style.color = color;
     badge.style.fontWeight = '600';
     badge.title = 'Candle terakhir: ' + lastCandle + ' | BT terakhir: ' + lastBT;
-  }
-  // === RENDER BLOCK TRADE INTELLIGENCE TABLE ===
-  function renderBlockTradeTable(btList, candleArr, candleMap) {
-    const container = document.getElementById('btTableContainer');
-    if (!container) return;
-
-    if (!btList || !btList.length) {
-      container.innerHTML = '<div class="text-[10px] text-slate-500 italic text-center py-3">Tidak ada data block trade signifikan</div>';
-      return;
-    }
-
-    const classMap = {
-      'AKUMULASI': { cls: 'akum', icon: '▲', label: 'AKUMULASI', color: '#00E676' },
-      'DISTRIBUSI': { cls: 'dist', icon: '▼', label: 'DISTRIBUSI', color: '#FF5252' },
-      'BULLISH CONFIRM': { cls: 'bull', icon: '▲', label: 'BULLISH', color: '#00E5FF' },
-      'BEARISH CONFIRM': { cls: 'bear', icon: '▼', label: 'BEARISH', color: '#FFB300' },
-      'NEUTRAL': { cls: 'neutral', icon: '◆', label: 'NEUTRAL', color: '#A855F7' }
-    };
-
-    function classifyBT(bt) {
-      const idx = candleMap.get(String(bt.time));
-      if (!idx) return { type: 'NEUTRAL', position: 50, fwdReturn: 0 };
-
-      const c = candleArr[idx.index];
-      const open = Number(c.open), close = Number(c.close);
-      const isBullish = close > open;
-
-      const lookback = candleArr.slice(Math.max(0, idx.index - 30), idx.index + 1);
-      const hi = Math.max(...lookback.map(x => Number(x.high)));
-      const lo = Math.min(...lookback.map(x => Number(x.low)));
-      const range = hi - lo;
-      const position = range > 0 ? ((close - lo) / range) * 100 : 50;
-
-      const forward = candleArr.slice(idx.index + 1, idx.index + 4);
-      let fwdReturn = 0;
-      if (forward.length > 0) {
-        const avgClose = forward.reduce((s, x) => s + Number(x.close), 0) / forward.length;
-        fwdReturn = ((avgClose - close) / close) * 100;
-      }
-
-      let type = 'NEUTRAL';
-      if (position >= 65 && fwdReturn < -0.5) type = 'DISTRIBUSI';
-      else if (position <= 35 && fwdReturn > 0.5) type = 'AKUMULASI';
-      else if (isBullish && fwdReturn > 0) type = 'BULLISH CONFIRM';
-      else if (!isBullish && fwdReturn < 0) type = 'BEARISH CONFIRM';
-
-      return { type, position: Math.round(position), fwdReturn: fwdReturn.toFixed(2) };
-    }
-
-    const fmt = (n) => {
-      if (n >= 1e12) return 'Rp ' + (n/1e12).toFixed(2) + ' T';
-      if (n >= 1e9) return 'Rp ' + (n/1e9).toFixed(2) + ' B';
-      if (n >= 1e6) return 'Rp ' + (n/1e6).toFixed(1) + ' M';
-      return 'Rp ' + Number(n).toLocaleString('id-ID');
-    };
-
-    const fmtVol = (n) => {
-      if (n >= 1e9) return (n/1e9).toFixed(1) + 'B';
-      if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
-      if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
-      return String(n);
-    };
-
-    const fmtDate = (t) => {
-      const d = new Date(t + 'T00:00:00+07:00');
-      const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-      return d.getDate().toString().padStart(2,'0') + ' ' + months[d.getMonth()] + ' ' + String(d.getFullYear()).slice(-2);
-    };
-
-    let html = '';
-    btList.forEach(bt => {
-      const cls = classifyBT(bt);
-      const meta = classMap[cls.type] || classMap['NEUTRAL'];
-      const fwdSign = cls.fwdReturn >= 0 ? '+' : '';
-      const fwdColor = cls.fwdReturn >= 0 ? '#00E676' : '#FF5252';
-
-      html += '<div class="bt-card ' + meta.cls + '">';
-      html += '  <div class="bt-header">';
-      html += '    <span class="bt-date">' + fmtDate(bt.time) + '</span>';
-      html += '    <span class="bt-badge ' + meta.cls + '">' + meta.icon + ' ' + meta.label + '</span>';
-      html += '  </div>';
-      html += '  <div class="bt-row"><span>Volume</span><span>' + fmtVol(bt.volume) + ' lbr</span></div>';
-      html += '  <div class="bt-row"><span>Nilai</span><span>' + fmt(bt.value) + '</span></div>';
-      html += '  <div class="bt-detail">';
-      html += '    <span>📊 Posisi: ' + cls.position + '%</span>';
-      html += '    <span style="color:' + fwdColor + '">📈 Fwd 3D: ' + fwdSign + cls.fwdReturn + '%</span>';
-      html += '  </div>';
-      html += '</div>';
-    });
-
-    container.innerHTML = html;
   }
   // === MOBILE DETECT ===
   window.isMobile = function() {
@@ -2711,140 +2616,8 @@
   let currentBTSort = 'volume';
   let currentBTData = { trades: [], candleArr: [], candleMap: new Map() };
 
-  window.setBTSort = function(mode) {
-    currentBTSort = mode;
-    // Update styling tombol
-    const btnVol = document.getElementById('btSortVol');
-    const btnDate = document.getElementById('btSortDate');
-    if (mode === 'volume') {
-      if(btnVol) { btnVol.style.background = 'rgba(0,229,255,0.15)'; btnVol.style.color = '#00E5FF'; btnVol.style.borderColor = 'rgba(0,229,255,0.3)'; }
-      if(btnDate) { btnDate.style.background = 'rgba(100,116,139,0.15)'; btnDate.style.color = '#64748B'; btnDate.style.borderColor = 'rgba(100,116,139,0.3)'; }
-    } else {
-      if(btnVol) { btnVol.style.background = 'rgba(100,116,139,0.15)'; btnVol.style.color = '#64748B'; btnVol.style.borderColor = 'rgba(100,116,139,0.3)'; }
-      if(btnDate) { btnDate.style.background = 'rgba(0,229,255,0.15)'; btnDate.style.color = '#00E5FF'; btnDate.style.borderColor = 'rgba(0,229,255,0.3)'; }
-    }
-    // Render ulang dengan data yang sudah di-cache
-    if (currentBTData.trades.length) {
-      const sorted = [...currentBTData.trades].sort((a,b) => {
-        if (mode === 'volume') return Number(b.volume) - Number(a.volume);
-        return String(b.time).localeCompare(String(a.time));  // Terbaru dulu
-      }).slice(0, 5);
-      renderBlockTradeTable(sorted, currentBTData.candleArr, currentBTData.candleMap);
-    }
-  };
   let showBlockTrade = true;
 
-  async function loadBlockTradeMarkers(code) {
-    try {
-      const data = await apiGet('/api/public/history/' + encodeURIComponent(code) + '?range=1y');
-      if (!data.success || !data.nonRegular || !data.nonRegular.length) {
-        candleSeries.setMarkers([]);
-        currentMarkers = [];
-        return;
-      }
-
-      // Buat map candle berdasarkan tanggal untuk lookup cepat
-      const candleMap = new Map();
-      const candleArr = (data.candles || []).map(c => ({ ...c, time: String(c.time) }));
-      candleArr.forEach((c, i) => candleMap.set(c.time, { ...c, index: i }));
-
-      // Simpan semua trade (untuk toggle sorting)
-      const allValidTrades = data.nonRegular.filter(nr => Number(nr.volume) > 0);
-      currentBTData = { trades: allValidTrades, candleArr: candleArr, candleMap: candleMap };
-
-      // Sortir sesuai mode aktif (default: volume)
-      const allTrades = [...allValidTrades].sort((a, b) => {
-        if (currentBTSort === 'volume') return Number(b.volume) - Number(a.volume);
-        return String(b.time).localeCompare(String(a.time));
-      }).slice(0, 5);
-
-      const maxVol = Math.max(...allTrades.map(nr => Number(nr.volume)), 1);
-
-      // Helper: klasifikasi Block Trade
-      function classifyBT(bt) {
-        const idx = candleMap.get(String(bt.time));
-        if (!idx) return { type: 'NEUTRAL', color: '#A855F7', label: '◇' };
-
-        const c = candleArr[idx.index];
-        const open = Number(c.open), close = Number(c.close);
-        const isBullish = close > open;
-
-        // Posisi harga relatif terhadap 30 hari terakhir
-        const lookback = candleArr.slice(Math.max(0, idx.index - 30), idx.index + 1);
-        const hi = Math.max(...lookback.map(x => Number(x.high)));
-        const lo = Math.min(...lookback.map(x => Number(x.low)));
-        const range = hi - lo;
-        const position = range > 0 ? ((close - lo) / range) * 100 : 50;
-
-        // Forward return 3 hari ke depan
-        const forward = candleArr.slice(idx.index + 1, idx.index + 4);
-        let fwdReturn = 0;
-        if (forward.length > 0) {
-          const avgClose = forward.reduce((s, x) => s + Number(x.close), 0) / forward.length;
-          fwdReturn = ((avgClose - close) / close) * 100;
-        }
-
-        // Rule-based classification
-        if (position >= 65 && fwdReturn < -0.5) {
-          return { type: 'DISTRIBUSI', color: '#FF5252', label: '▼DIST' };
-        }
-        if (position <= 35 && fwdReturn > 0.5) {
-          return { type: 'AKUMULASI', color: '#00E676', label: '▲AKUM' };
-        }
-        if (isBullish && fwdReturn > 0) {
-          return { type: 'BULLISH CONFIRM', color: '#00E5FF', label: '▲BULL' };
-        }
-        if (!isBullish && fwdReturn < 0) {
-          return { type: 'BEARISH CONFIRM', color: '#FFB300', label: '▼BEAR' };
-        }
-        return { type: 'NEUTRAL', color: '#A855F7', label: '◇' };
-      }
-
-      currentMarkers = allTrades.map(nr => {
-        const vol = Number(nr.volume);
-        const ratio = vol / maxVol;
-        const timeSec = Math.floor(new Date(nr.time + 'T00:00:00+07:00').getTime() / 1000);
-        const volText = vol >= 1e9 ? (vol/1e9).toFixed(1) + 'B' 
-                       : vol >= 1e6 ? (vol/1e6).toFixed(0) + 'M' 
-                       : (vol/1e3).toFixed(0) + 'K';
-
-        const cls = classifyBT(nr);
-
-        return {
-          time: timeSec,
-          position: 'aboveBar',
-          color: cls.color,
-          shape: 'arrowDown',
-          text: cls.label + ' ' + volText,
-          size: 1.5 + (ratio * 1.5)
-        };
-      });
-
-      if (showBlockTrade) {
-        candleSeries.setMarkers(currentMarkers);
-      } else {
-        candleSeries.setMarkers([]);
-      }
-
-      // Render tabel Block Trade Intelligence di sidebar
-      renderBlockTradeTable(allTrades, candleArr, candleMap);
-
-      // Update badge freshness
-      updateBTFreshness(data.candles, allValidTrades);
-
-      // Log untuk debugging
-      console.log('=== BLOCK TRADE CLASSIFICATION ===');
-      allTrades.forEach((nr, i) => {
-        const cls = classifyBT(nr);
-        console.log(`${nr.time} | ${(nr.volume/1e6).toFixed(1)}M | ${cls.type}`);
-      });
-
-    } catch (err) {
-      console.error('[loadBlockTradeMarkers]', err);
-      candleSeries.setMarkers([]);
-      currentMarkers = [];
-    }
-  }
 
   // ---- Block Trade Intel v2: label tanpa masa depan, daftar bisa diperluas ----
   window.btState = { sort: 'scale', period: 'all', limit: 5 };
@@ -3403,6 +3176,84 @@ function renderSummaryBase() {
     set('tpStatus', 'Level teknikal untuk manajemen risiko, bukan sinyal beli. Pasang stop sebelum entry.' + (rr < 1.5 ? ' R/R tipis.' : ''));
   }
 }
+  function bkEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]; }); }
+  function bkRp(n) {
+    n = Math.abs(Number(n) || 0);
+    if (n >= 1e12) return 'Rp ' + (n / 1e12).toLocaleString('id-ID', { maximumFractionDigits: 2 }) + ' T';
+    if (n >= 1e9) return 'Rp ' + (n / 1e9).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' M';
+    return 'Rp ' + Math.round(n / 1e6).toLocaleString('id-ID') + ' jt';
+  }
+  function bkShort(n) { return String(n || '').replace(/^PT\s+/i, '').replace(/\s*SEKURITAS( INDONESIA)?/i, '').replace(/\s+INDONESIA$/i, '').trim().slice(0, 20); }
+  async function bkToken() {
+    for (let i = 0; i < 12; i++) {
+      const sb = window.chartnalistSupabase;
+      if (sb && sb.auth && sb.auth.getSession) {
+        const r = await sb.auth.getSession();
+        return r && r.data && r.data.session ? r.data.session.access_token : null;
+      }
+      await new Promise(function (r) { setTimeout(r, 250); });
+    }
+    return null;
+  }
+  function bkRow(b, side, px) {
+    const avg = side === 'buy' ? b.bavg : b.savg;
+    const diff = (px && avg) ? (avg / px - 1) * 100 : null;
+    const col = side === 'buy' ? '#00E676' : '#FF5252';
+    return '<div style="display:flex;justify-content:space-between;gap:6px;padding:3px 0;border-top:1px solid rgba(100,116,139,.2)" title="' + bkEsc(b.n) + '">' +
+      '<span><b>' + bkEsc(b.c) + '</b> <span style="opacity:.6;font-size:9px">' + bkEsc(bkShort(b.n)) + '</span></span>' +
+      '<span style="text-align:right;color:' + col + '">' + (side === 'buy' ? '+' : '-') + bkRp(b.nval) +
+      '<br><span style="opacity:.65;font-size:9px;color:#CBD5E1">rata-rata ' + (avg ? Math.round(avg).toLocaleString('id-ID') : '-') +
+      (diff != null ? ' (' + (diff >= 0 ? '+' : '') + diff.toFixed(1).replace('.', ',') + '%)' : '') + '</span></span></div>';
+  }
+  function bkRender() {
+    const el = document.getElementById('brokerBody');
+    const dl = document.getElementById('brokerDateLabel');
+    const d = window._bk;
+    if (!el || !d) return;
+    const r = d.row;
+    if (!r) {
+      el.innerHTML = '<div style="color:#8b93a7">Belum ada data broker untuk saham ini (saat ini hanya 200 saham paling likuid).</div>';
+      if (dl) dl.textContent = '';
+      return;
+    }
+    if (dl) dl.textContent = 'EOD ' + r.trade_date;
+    const tv = Number(r.total_value) || 0;
+    const pb = tv > 0 ? Number(r.top3_buy_net) / tv * 100 : null;
+    const ps = tv > 0 ? Math.abs(Number(r.top3_sell_net)) / tv * 100 : null;
+    const px = (window._sf && String(window._sf.code).toUpperCase() === String(d.code).toUpperCase()) ? window._sf.close : null;
+    el.style.color = '';
+    el.innerHTML = '<div style="font-size:10px;color:#8b93a7;margin-bottom:4px">Nilai transaksi ' + bkRp(tv) + ' &middot; ' + (r.broker_count || 0) + ' broker</div>' +
+      '<div style="font-size:10px;color:#00E676;font-weight:700">Net beli terbesar</div>' +
+      (r.top_buyers || []).slice(0, 5).map(function (b) { return bkRow(b, 'buy', px); }).join('') +
+      '<div style="font-size:10px;color:#FF5252;font-weight:700;margin-top:6px">Net jual terbesar</div>' +
+      (r.top_sellers || []).slice(0, 5).map(function (b) { return bkRow(b, 'sell', px); }).join('') +
+      '<div style="font-size:10px;margin-top:6px;color:#CBD5E1">3 teratas: beli ' + bkRp(r.top3_buy_net) + (pb != null ? ' (' + pb.toFixed(1).replace('.', ',') + '% dari nilai)' : '') +
+      ' &middot; jual ' + bkRp(r.top3_sell_net) + (ps != null ? ' (' + ps.toFixed(1).replace('.', ',') + '%)' : '') + '</div>' +
+      '<div style="font-size:9px;color:#64748B;margin-top:4px;font-style:italic">Data broker EOD dari penyedia pihak ketiga. Informasi, bukan sinyal beli atau jual.</div>';
+    if (px == null) {
+      setTimeout(function () { if (window._bk === d && window._sf && String(window._sf.code).toUpperCase() === String(d.code).toUpperCase()) bkRender(); }, 1500);
+    }
+  }
+  async function loadBrokerSummary(code) {
+    const el = document.getElementById('brokerBody');
+    if (!el) return;
+    el.style.color = '#8b93a7';
+    el.innerHTML = 'Memuat...';
+    try {
+      const token = await bkToken();
+      if (!token) { el.innerHTML = 'Login untuk melihat data broker.'; return; }
+      const res = await fetch('/api/broker/' + encodeURIComponent(code), { headers: { Authorization: 'Bearer ' + token } });
+      const j = await res.json();
+      if (!res.ok || !j.success) throw new Error(j.error || ('HTTP ' + res.status));
+      if (String(code).toUpperCase() !== String(activeCode).toUpperCase()) return;
+      window._bk = { code: code, row: (j.rows && j.rows[0]) || null };
+      bkRender();
+    } catch (err) {
+      el.style.color = '#FF5252';
+      el.innerHTML = 'Gagal memuat: ' + bkEsc(err.message);
+    }
+  }
+
   async function loadBandarmology(code) {
     try {
       const data = await apiGet(`/api/public/summary/${encodeURIComponent(code)}`);
@@ -3648,6 +3499,7 @@ function renderSummaryBase() {
     loadQuoteHeader(activeCode);
     loadBandarmology(activeCode);
     loadGemScore(activeCode);
+    loadBrokerSummary(activeCode);
     loadBidOfferFromSupabase(activeCode);
     loadFundamental(activeCode);
     loadHistoricalBT(activeCode);

@@ -377,6 +377,30 @@ app.get('/api/admin/forward-test', requireAdmin, async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 });
+// === BROKER SUMMARY (wajib login; membaca tabel sendiri) ===
+async function cnRequireUser(req) {
+  const m = (req.headers.authorization || '').match(/^Bearer\s+(.+)$/i);
+  if (!m) return null;
+  const { data, error } = await supabase.auth.getUser(m[1]);
+  return (error || !data || !data.user) ? null : data.user;
+}
+app.get('/api/broker/:code', async (req, res) => {
+  try {
+    const user = await cnRequireUser(req);
+    if (!user) return res.status(401).json({ success: false, error: 'Login diperlukan' });
+    const code = String(req.params.code || '').trim().toUpperCase();
+    if (!/^[A-Z0-9]{3,6}$/.test(code)) return res.status(400).json({ success: false, error: 'Kode tidak valid' });
+    const { data, error } = await supabase.from('broker_summary_daily')
+      .select('trade_date,stock_code,total_value,broker_count,top_buyers,top_sellers,top3_buy_net,top3_sell_net')
+      .eq('stock_code', code).order('trade_date', { ascending: false }).limit(10);
+    if (error) throw error;
+    res.set('Cache-Control', 'private, max-age=300');
+    res.json({ success: true, code: code, rows: data || [] });
+  } catch (err) {
+    console.error('[broker]', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 app.get('/api/admin/stats', requireAdmin, async (req, res) => {
   try {
     const { data: lastBatch } = await supabase.from('upload_batches').select('*').order('trade_date', { ascending: false }).limit(1).maybeSingle();

@@ -336,6 +336,36 @@ app.get('/api/admin/forward-test', async (c) => {
     return c.json({ success: false, error: err.message }, 500);
   }
 });
+// ============================================================
+// BROKER SUMMARY (wajib login; membaca tabel sendiri, tanpa request ke penyedia)
+// ============================================================
+async function cnRequireUser(c) {
+  const m = (c.req.header('Authorization') || '').match(/^Bearer\s+(.+)$/i);
+  if (!m) return null;
+  const r = await fetch(c.env.SUPABASE_URL + '/auth/v1/user', {
+    headers: { Authorization: 'Bearer ' + m[1], apikey: c.env.SUPABASE_SERVICE_ROLE_KEY }
+  });
+  if (!r.ok) return null;
+  return await r.json();
+}
+app.get('/api/broker/:code', async (c) => {
+  try {
+    const user = await cnRequireUser(c);
+    if (!user) return c.json({ success: false, error: 'Login diperlukan' }, 401);
+    const code = String(c.req.param('code') || '').trim().toUpperCase();
+    if (!/^[A-Z0-9]{3,6}$/.test(code)) return c.json({ success: false, error: 'Kode tidak valid' }, 400);
+    const r = await fetch(c.env.SUPABASE_URL + '/rest/v1/broker_summary_daily?select=trade_date,stock_code,total_value,broker_count,top_buyers,top_sellers,top3_buy_net,top3_sell_net&stock_code=eq.' + code + '&order=trade_date.desc&limit=10', {
+      headers: { apikey: c.env.SUPABASE_SERVICE_ROLE_KEY, Authorization: 'Bearer ' + c.env.SUPABASE_SERVICE_ROLE_KEY }
+    });
+    if (!r.ok) throw new Error('query HTTP ' + r.status);
+    const rows = await r.json();
+    c.header('Cache-Control', 'private, max-age=300');
+    return c.json({ success: true, code: code, rows: rows });
+  } catch (err) {
+    console.error('[broker]', err);
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
 app.get('/api/yahoo/quote', async (c) => {
   try {
     const symbols = c.req.query('symbols') || '';
