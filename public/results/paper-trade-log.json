@@ -1961,6 +1961,76 @@
       "status": "COMPLETE",
       "created_at": "2026-10-01T01:17:26.828Z",
       "source": "backtest-seed"
+    },
+    "PGAS_2026-10-05": {
+      "ticker": "PGAS",
+      "label": "A",
+      "regime": "Supportive",
+      "signal_date": "2026-10-05",
+      "signal_close": 1410,
+      "entry_price": null,
+      "entry_date": null,
+      "exit_price": null,
+      "exit_date": null,
+      "return_pct": null,
+      "status": "PENDING",
+      "created_at": "2026-10-05T21:25:41.095Z"
+    },
+    "PANI_2026-10-05": {
+      "ticker": "PANI",
+      "label": "A",
+      "regime": "Supportive",
+      "signal_date": "2026-10-05",
+      "signal_close": 4660,
+      "entry_price": null,
+      "entry_date": null,
+      "exit_price": null,
+      "exit_date": null,
+      "return_pct": null,
+      "status": "PENDING",
+      "created_at": "2026-10-05T21:25:41.095Z"
+    },
+    "BREN_2026-10-05": {
+      "ticker": "BREN",
+      "label": "A",
+      "regime": "Supportive",
+      "signal_date": "2026-10-05",
+      "signal_close": 2950,
+      "entry_price": null,
+      "entry_date": null,
+      "exit_price": null,
+      "exit_date": null,
+      "return_pct": null,
+      "status": "PENDING",
+      "created_at": "2026-10-05T21:25:41.095Z"
+    },
+    "SMGR_2026-10-05": {
+      "ticker": "SMGR",
+      "label": "A",
+      "regime": "Supportive",
+      "signal_date": "2026-10-05",
+      "signal_close": 1520,
+      "entry_price": null,
+      "entry_date": null,
+      "exit_price": null,
+      "exit_date": null,
+      "return_pct": null,
+      "status": "PENDING",
+      "created_at": "2026-10-05T21:25:41.095Z"
+    },
+    "EKAD_2026-10-05": {
+      "ticker": "EKAD",
+      "label": "A",
+      "regime": "Supportive",
+      "signal_date": "2026-10-05",
+      "signal_close": 386,
+      "entry_price": null,
+      "entry_date": null,
+      "exit_price": null,
+      "exit_date": null,
+      "return_pct": null,
+      "status": "PENDING",
+      "created_at": "2026-10-05T21:25:41.095Z"
     }
   },
   "runs": [
@@ -1987,7 +2057,13 @@
       "new_signals": 0,
       "completed": 0,
       "total_entries": 140
+    },
+    {
+      "timestamp": "2026-10-05T21:25:48.504Z",
+      "new_signals": 5,
+      "completed": 0,
+      "total_entries": 145
     }
   ],
-  "last_run": "2026-10-05T00:48:59.292Z"
+  "last_run": "2026-10-05T21:25:48.504Z"
 }
