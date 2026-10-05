@@ -394,6 +394,7 @@
 .flag-badge.stale{color:#ffb020;border-color:rgba(255,176,32,.45);background:rgba(255,176,32,.08)}
 .flag-badge.wide{color:#ff4d4d;border-color:rgba(255,77,77,.4);background:rgba(255,77,77,.08)}
 .flag-badge.suspend{color:#ff4d4d;border-color:rgba(255,77,77,.5);background:rgba(255,77,77,.12)}
+.flag-badge.plan{color:#ff9f43;border-color:rgba(255,159,67,.5);background:rgba(255,159,67,.1)}
 .stop-sub{margin-top:3px;font-size:10px;font-weight:600;opacity:.8}
 .stop-sub .flag-badge{margin-top:0;margin-left:4px}
 .rr-value {
@@ -795,7 +796,7 @@ tbody tr:hover{
   .signal-table tr[data-code] > td:nth-child(8)  { order: 9; }
   .signal-table tr[data-code] > td:nth-child(8)::before  { content: "Target 2"; }
   .signal-table tr[data-code] > td:nth-child(9)  { order: 10; }
-  .signal-table tr[data-code] > td:nth-child(9)::before  { content: "R:R T2"; }
+  .signal-table tr[data-code] > td:nth-child(9)::before  { content: "R:R T1"; }
   .signal-table tr:not([data-code]) > td { display: block; }
 }
 </style>
@@ -853,7 +854,7 @@ tbody tr:hover{
             <th class="num" style="width:12%">INVALIDATION</th>
             <th class="num" style="width:9%">TARGET 1</th>
             <th class="num" style="width:9%">TARGET 2</th>
-            <th class="num" style="width:6%" title="Reward:risk ke Target 2">R:R T2</th>
+            <th class="num" style="width:6%" title="Reward:risk dari harga sekarang ke Target 1">R:R T1</th>
             <th style="width:8%">RISK</th>
           </tr>
         </thead>
@@ -958,6 +959,7 @@ tbody tr:hover{
               <div class="ticker">${esc(row.stockCode)}</div>
               <div class="name">${esc(row.stockName || "")}</div>
               ${staleBadge(row)}
+              ${row.planStale ? '<div class="flag-badge plan" title="Harga sudah jauh di atas trigger atau Target 1 terlewati. Rencana entry tidak lagi berlaku.">RENCANA USANG</div>' : ""}
             </a>
           </td>
 
@@ -978,7 +980,7 @@ tbody tr:hover{
           <td class="num">${formatPrice(row.invalidation)}${formatStop(row)}</td>
           <td class="num">${formatPrice(row.target1)}</td>
           <td class="num">${formatPrice(row.target2)}</td>
-          <td class="num">${formatRR(row.riskReward)}</td>
+          <td class="num">${formatRRCell(row)}</td>
           <td class="risk-cell">
             <span class="risk-badge ${esc(row.riskLevel || "")}">
               ${esc(row.riskLevel || "—")}
@@ -1021,6 +1023,13 @@ tbody tr:hover{
         ? ' <span class="flag-badge wide" title="Stop lebih dari 15% dari harga">STOP LEBAR</span>'
         : "";
       return '<div class="stop-sub">' + label + wide + '</div>';
+    }
+
+    function formatRRCell(row) {
+      const r = Number(row.rrFromPrice);
+      if (!Number.isFinite(r)) return formatRR(row.riskReward);
+      if (r <= 0) return '<span title="Target 1 sudah terlewati">T1 lewat</span>';
+      return (Math.round(r * 100) / 100) + "R";
     }
 
     function formatRR(value) {
