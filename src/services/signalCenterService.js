@@ -70,6 +70,9 @@ function cleanSignal(row) {
     riskReward: cleanNumber(row.riskReward),
 
     riskLevel: row.riskLevel || null,
+    entryGapPct: cleanNumber(row.entryGapPct),
+    rrFromPrice: cleanNumber(row.rrFromPrice),
+    planStale: row.planStale === true,
 
     structure: row.structure || null,
     participation: row.participation || null,

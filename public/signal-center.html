@@ -263,6 +263,10 @@ tr:last-child td {
       text-underline-offset: 3px;
     }
 </style>
+<style id="cn-plan-badge">
+.flag-badge{display:inline-block;margin-top:4px;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:800;letter-spacing:.06em;border:1px solid}
+.flag-badge.plan{color:#ff9f43;border-color:rgba(255,159,67,.5);background:rgba(255,159,67,.1)}
+</style>
 </head>
 
 <body>
@@ -333,7 +337,7 @@ tr:last-child td {
           <th>INVALIDATION</th>
           <th>TARGET 1</th>
           <th>TARGET 2</th>
-          <th>R:R</th>
+          <th title="Reward:risk dari harga sekarang ke Target 1">R:R T1</th>
           <th>RISK</th>
           <th>UPDATED</th>
         </tr>
@@ -381,6 +385,20 @@ tr:last-child td {
     $('countInvalidated').textContent = count('INVALIDATED');
   }
 
+  function rrCell(row) {
+      const r = Number(row.rrFromPrice);
+      let base;
+      if (row.rrFromPrice != null && Number.isFinite(r)) {
+        base = r <= 0 ? '<span title="Target 1 sudah terlewati">T1 lewat</span>' : fmt(r) + 'R';
+      } else {
+        base = row.riskReward == null ? '\u2014' : fmt(row.riskReward) + 'R';
+      }
+      const badge = row.planStale
+        ? '<div class="flag-badge plan" title="Harga sudah jauh di atas trigger atau Target 1 terlewati. Rencana entry tidak lagi berlaku.">RENCANA USANG</div>'
+        : '';
+      return base + badge;
+    }
+
   function render() {
     const rows = filter === 'ALL'
       ? signals
@@ -426,7 +444,7 @@ tr:last-child td {
         <td class="number">${fmt(row.invalidation)}</td>
         <td class="number">${fmt(row.target1)}</td>
         <td class="number">${fmt(row.target2)}</td>
-        <td class="number">${row.riskReward == null ? '—' : `${fmt(row.riskReward)}R`}</td>
+        <td class="number">${rrCell(row)}</td>
         <td class="${riskClass}">${row.riskLevel || '—'}</td>
         <td>${row.updatedAt ? new Date(row.updatedAt).toLocaleTimeString() : '—'}</td>
       `;
