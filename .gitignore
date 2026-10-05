@@ -60,3 +60,8 @@ scripts/alpha-trinity-*.js
 ambil_*.ps1
 *_sample.json
 broker_*.json
+
+archive/
+public/* - Copy.html
+scripts/qbs-pullback-*.js
+scripts/patch-*.js
