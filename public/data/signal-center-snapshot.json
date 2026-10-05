@@ -7,7 +7,7 @@
       "stockCode": "MBSS",
       "stockName": "Mitrabahtera Segara Sejati Tbk.",
       "setup": "BREAKOUT",
-      "status": "TRIGGERED",
+      "status": "TARGET",
       "price": 3630,
       "trigger": 2920,
       "invalidation": 2857.2,
@@ -37,10 +37,10 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-05T00:51:29.195Z"
+      "updatedAt": "2026-10-05T00:54:57.419Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-10-05T00:51:29.195Z"
+  "generatedAt": "2026-10-05T00:54:57.419Z"
 }

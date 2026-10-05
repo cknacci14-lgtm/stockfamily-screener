@@ -282,13 +282,26 @@ export function evaluateStockSignal(
     Number.isFinite(tradePlan.invalidation) &&
     input.close <= tradePlan.invalidation!;
 
-  const status = determineInitialStatus({
+  const baseStatus = determineInitialStatus({
     setup:
       setup ?? "ACCUMULATION",
     detected: setupDetected,
     triggerReached,
     invalidated,
   });
+  /*
+   * A trade plan whose Target 1 is already behind the current price is
+   * not actionable. Report it as TARGET instead of TRIGGERED.
+   */
+  const targetReached =
+    setupDetected &&
+    tradePlan !== null &&
+    Number.isFinite(tradePlan.target1) &&
+    input.close >= tradePlan.target1!;
+  const status =
+    baseStatus === "TRIGGERED" && targetReached
+      ? "TARGET"
+      : baseStatus;
 
   const signal: StockSignal = {
     stockCode: input.stockCode,
