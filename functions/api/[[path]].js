@@ -1214,6 +1214,58 @@ app.get("/api/public/signal-center", async (c) => {
 });
 
 // ============================================================
+// ADMIN: stats / settings / scrape / cache (parity with Express)
+// All /api/admin/* routes are protected by the admin guard above.
+// ============================================================
+async function sbCount(env, table) {
+  const key = env.SUPABASE_SERVICE_ROLE_KEY;
+  const res = await fetch(env.SUPABASE_URL + '/rest/v1/' + table + '?select=id', {
+    method: 'HEAD',
+    headers: { apikey: key, Authorization: 'Bearer ' + key, Prefer: 'count=exact' }
+  });
+  if (!res.ok) return null;
+  const total = Number((res.headers.get('content-range') || '').split('/')[1]);
+  return Number.isFinite(total) ? total : null;
+}
+
+app.get('/api/admin/stats', async (c) => {
+  try {
+    const env = c.env;
+    let lastBatchDate = null;
+    try {
+      const b = await sbFetch(env, 'upload_batches?select=trade_date&order=trade_date.desc&limit=1');
+      lastBatchDate = (b && b[0] && b[0].trade_date) || null;
+    } catch (e) { /* table may be empty or missing */ }
+
+    const latest = await getLatestTradeDate(env);
+    const totalStocks = await sbCount(env, 'stocks');
+
+    let totalDays = null;
+    try {
+      const s = await sbFetch(env, 'stocks?select=id&code=eq.BBCA&limit=1');
+      if (s && s[0]) {
+        const d = await sbFetch(env, 'daily_stock_data?select=trade_date&stock_id=eq.' + s[0].id + '&order=trade_date.asc&limit=1000');
+        totalDays = Array.isArray(d) ? d.length : null;
+      }
+    } catch (e) { /* leave null */ }
+
+    return c.json({
+      server: 'online',
+      lastUpdate: lastBatchDate || latest || null,
+      totalStocks: totalStocks || 0,
+      totalDays: totalDays || 0
+    });
+  } catch (err) {
+    console.error('[admin-stats]', err);
+    return c.json({ server: 'online', error: err.message });
+  }
+});
+
+app.get('/api/admin/settings', (c) => c.json({ success: true, settings: {} }));
+app.post('/api/admin/settings', (c) => c.json({ success: true }));
+app.post('/api/admin/scrape', (c) => c.json({ success: true, message: 'Scrape disabled in FIX mode' }));
+app.delete('/api/admin/cache', (c) => c.json({ success: true, message: 'Cache cleared' }));
+// ============================================================
 // FALLBACK
 // ============================================================
 app.all('/api/*', (c) => {

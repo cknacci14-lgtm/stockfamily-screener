@@ -685,6 +685,11 @@
     // Server tetap memverifikasi profiles.role === "admin".
     // ============================================================
     async function getAdminAccessToken() {
+      var waitedMs = 0;
+      while (!window.chartnalistSupabase && waitedMs < 10000) {
+        await new Promise(function (resolve) { setTimeout(resolve, 100); });
+        waitedMs += 100;
+      }
       if (!window.chartnalistSupabase) {
         throw new Error('Chartnalist authentication belum siap.');
       }
