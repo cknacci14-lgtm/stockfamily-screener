@@ -2077,7 +2077,7 @@ function renderExecutionMonitor(signal, currentPrice) {
   metaEl.textContent = date
     ? "Signal Engine output • " + date
     : "Signal Engine output.";
-  if (signal.planStale) metaEl.textContent += " \u2022 RENCANA USANG";
+  if (signal.planStale) metaEl.textContent += " \u2022 TELAT ENTRY" + (signal.maxEntry != null ? " (entry maks " + monitorFmt(signal.maxEntry) + ")" : "");
 
   monitor.hidden = false;
 }

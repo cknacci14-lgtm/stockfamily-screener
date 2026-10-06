@@ -73,6 +73,7 @@ function cleanSignal(row) {
     entryGapPct: cleanNumber(row.entryGapPct),
     rrFromPrice: cleanNumber(row.rrFromPrice),
     planStale: row.planStale === true,
+    maxEntry: cleanNumber(row.maxEntry),
 
     structure: row.structure || null,
     participation: row.participation || null,

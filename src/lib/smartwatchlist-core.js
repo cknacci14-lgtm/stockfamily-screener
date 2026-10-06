@@ -1174,6 +1174,11 @@ function computeSmartwatchlist(stocks, history, marketDate) {
     row.planStale =
       row.status === "TARGET" ||
       (row.rrFromPrice !== null && row.rrFromPrice < PLAN_MIN_RR);
+    /* Highest entry price that still leaves PLAN_MIN_RR reward per unit of risk to Target 1. */
+    row.maxEntry =
+      Number.isFinite(t1) && Number.isFinite(inv) && t1 > inv
+        ? Math.round(((t1 + PLAN_MIN_RR * inv) / (1 + PLAN_MIN_RR)) * 100) / 100
+        : null;
   }
 
   return { stocks: output, latestDate };
