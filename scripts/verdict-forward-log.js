@@ -69,6 +69,31 @@ async function logSignals(target, codeById) {
   console.log('  BREAKDOWN: ' + names('BREAKDOWN'));
 }
 
+async function logBrokerDay(d, codeById) {
+  const MINV = Number(process.env.BROKER_MIN_VALUE || 25e9);
+  const q = await sb.from('broker_summary_daily').select('stock_code,total_value,top3_buy_net,top3_sell_net').eq('trade_date', d).gte('total_value', MINV).limit(1000);
+  if (q.error) { console.log('Radar broker ' + d + ' dilewati: ' + q.error.message); return; }
+  const rows = (q.data || []).map(r => ({ code: r.stock_code, v: Number(r.total_value), score: (Number(r.top3_buy_net) + Number(r.top3_sell_net)) / Number(r.total_value) * 100 })).filter(r => isFinite(r.score));
+  if (rows.length < 10) return;
+  const acc = rows.filter(r => r.score > 0).sort((a, b) => b.score - a.score).slice(0, 5);
+  const dist = rows.filter(r => r.score < 0).sort((a, b) => a.score - b.score).slice(0, 5);
+  const idByCode = new Map();
+  codeById.forEach((code, id) => idByCode.set(code, id));
+  const ids = acc.concat(dist).map(r => idByCode.get(r.code)).filter(Boolean);
+  if (!ids.length) return;
+  const px = await sb.from('daily_stock_data').select('stock_id,close').eq('trade_date', d).in('stock_id', ids);
+  const closeById = new Map((px.data || []).map(p => [String(p.stock_id), Number(p.close)]));
+  const mk = (arr, verdict) => arr.map(r => ({ log_date: d, stock_code: r.code, verdict: verdict, ref_close: closeById.get(String(idByCode.get(r.code))), foreign_ratio_20d: null, avg_value_20d: r.v })).filter(x => x.ref_close > 0);
+  const out = mk(acc, 'BROKER_ACC').concat(mk(dist, 'BROKER_DIST'));
+  if (!out.length) return;
+  const r = await sb.from('verdict_forward_log').upsert(out, { onConflict: 'log_date,stock_code,verdict', ignoreDuplicates: true });
+  if (r.error) throw new Error(r.error.message);
+  console.log('Radar broker dicatat ' + d + ': akumulasi ' + acc.map(x => x.code).join(', ') + ' | distribusi ' + dist.map(x => x.code).join(', '));
+}
+async function logBrokerCatchUp(cal, codeById) {
+  for (const d of cal.slice(-6)) await logBrokerDay(d, codeById);
+}
+
 async function fillReturns(cal, codeById) {
   for (const h of HZ) {
     const col = 'ret_' + h + 'd';
@@ -120,6 +145,7 @@ async function summary() {
   const cal = (await fetchAll(() => sb.from('daily_stock_data').select('trade_date').eq('stock_id', bbca.id).order('trade_date'))).map(r => r.trade_date);
   const target = argDate || cal[cal.length - 1];
   await logSignals(target, codeById);
+  await logBrokerCatchUp(cal, codeById);
   await fillReturns(cal, codeById);
   await summary();
 })().catch(e => { console.error('ERROR:', e.message); process.exit(1); });

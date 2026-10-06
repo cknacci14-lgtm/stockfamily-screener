@@ -1644,6 +1644,14 @@
       <div id="brokerPanel" class="text-[11px]"><div id="brokerBody" style="color:#8b93a7">Memuat...</div></div>
     </div>
 
+    <div class="p-3 border-b border-idx-border shrink-0">
+      <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between cursor-pointer select-none" onclick="togglePanel('radarPanel', this)">
+        <span class="flex items-center gap-1.5"><i class="fa-solid fa-satellite-dish"></i> Broker Radar <span id="radarDateLabel" class="text-slate-500 font-normal normal-case"></span></span>
+        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+      </h2>
+      <div id="radarPanel" class="text-[11px]"><div id="radarBody" style="color:#8b93a7">Memuat...</div></div>
+    </div>
+
     <!-- GEM Score Panel -->
     <div class="p-3 border-b border-idx-border shrink-0">
       <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between cursor-pointer select-none" onclick="togglePanel('gemPanel', this)">
@@ -3310,6 +3318,47 @@ function renderSummaryBase() {
     }
   }
 
+  function radarRow(x, side) {
+    const col = side === 'acc' ? '#00E676' : '#FF5252';
+    const sc = Number(x.score) || 0;
+    return '<div class="cn-radar-row" data-code="' + bkEsc(x.stock_code) + '" style="display:flex;justify-content:space-between;gap:6px;padding:3px 0;border-top:1px solid rgba(100,116,139,.2);cursor:pointer;white-space:nowrap" title="Pembeli terbesar ' + bkEsc(x.top_buyer || '-') + ', penjual terbesar ' + bkEsc(x.top_seller || '-') + '">' +
+      '<span><b>' + bkEsc(x.stock_code) + '</b> <span style="opacity:.6;font-size:9px">' + bkEsc(x.top_buyer || '-') + '/' + bkEsc(x.top_seller || '-') + '</span></span>' +
+      '<span style="color:' + col + '">' + (sc >= 0 ? '+' : '') + sc.toFixed(1).replace('.', ',') + '% <span style="opacity:.75;font-size:9px;color:#CBD5E1">' + bkRp(x.top3_buy_net).replace('Rp ', '') + ' vs ' + bkRp(x.top3_sell_net).replace('Rp ', '') + '</span></span></div>';
+  }
+  function radarRender() {
+    const el = document.getElementById('radarBody');
+    const dl = document.getElementById('radarDateLabel');
+    const d = window._radar;
+    if (!el || !d) return;
+    if (dl) dl.textContent = d.date ? 'EOD ' + d.date : '';
+    const list = function (arr, side) {
+      return (arr && arr.length) ? arr.map(function (x) { return radarRow(x, side); }).join('') : '<div style="color:#8b93a7;font-size:10px">Tidak ada.</div>';
+    };
+    el.style.color = '';
+    el.innerHTML = '<div style="font-size:10px;color:#00E676;font-weight:700">Akumulasi terkonsentrasi</div>' + list(d.acc, 'acc') +
+      '<div style="font-size:10px;color:#FF5252;font-weight:700;margin-top:6px">Distribusi terkonsentrasi</div>' + list(d.dist, 'dist') +
+      '<div style="font-size:9px;color:#64748B;margin-top:6px;line-height:1.4">Skor = (net 3 pembeli teratas &minus; net 3 penjual teratas) &divide; nilai transaksi. Positif: pembeli besar menyerap dari banyak penjual kecil; negatif: sebaliknya. Dari ' + (d.universe || 0) + ' saham dengan nilai transaksi minimal Rp 25 M. Klik baris untuk membuka saham. Informasi, bukan sinyal beli atau jual, dan belum teruji prediksinya.</div>';
+    el.querySelectorAll('.cn-radar-row').forEach(function (n) {
+      n.addEventListener('click', function () { if (typeof selectTicker === 'function') selectTicker(n.getAttribute('data-code')); });
+    });
+  }
+  async function loadBrokerRadar() {
+    const el = document.getElementById('radarBody');
+    if (!el) return;
+    try {
+      const token = await bkToken();
+      if (!token) { el.innerHTML = 'Login untuk melihat radar broker.'; return; }
+      const res = await fetch('/api/broker-radar', { headers: { Authorization: 'Bearer ' + token } });
+      const j = await res.json();
+      if (!res.ok || !j.success) throw new Error(j.error || ('HTTP ' + res.status));
+      window._radar = j.data;
+      radarRender();
+    } catch (err) {
+      el.style.color = '#FF5252';
+      el.innerHTML = 'Gagal memuat: ' + bkEsc(err.message);
+    }
+  }
+
   async function loadBandarmology(code) {
     try {
       const data = await apiGet(`/api/public/summary/${encodeURIComponent(code)}`);
@@ -3556,6 +3605,7 @@ function renderSummaryBase() {
     loadBandarmology(activeCode);
     loadGemScore(activeCode);
     loadBrokerSummary(activeCode);
+    if (!window._radarLoaded) { window._radarLoaded = true; loadBrokerRadar(); }
     loadBidOfferFromSupabase(activeCode);
     loadFundamental(activeCode);
     loadHistoricalBT(activeCode);

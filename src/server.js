@@ -1,4 +1,4 @@
-// src/server.js - FIX V2.4 - Express v5 Safe Routing
+﻿// src/server.js - FIX V2.4 - Express v5 Safe Routing
 const fs = require('fs');
 const express = require('express');
 const path = require('path');
@@ -30,7 +30,7 @@ try {
   backtestEngine = require('./engine/backtestEngine');
   console.log('[OK] Backtest Engine loaded');
 } catch (e) { 
-    console.error('â Backtest Engine:', e.message);
+    console.error('Ã¢ Backtest Engine:', e.message);
 }
 
 app.use((req, res, next) => {
@@ -393,6 +393,10 @@ async function cnRequireUser(req) {
   const { data, error } = await supabase.auth.getUser(m[1]);
   return (error || !data || !data.user) ? null : data.user;
 }
+app.use(['/api/broker', '/api/broker-radar'], (req, res, next) => {
+  if (String(process.env.BROKER_ENABLED || '').toLowerCase() === 'off') return res.status(503).json({ success: false, error: 'Fitur broker sedang dinonaktifkan' });
+  next();
+});
 app.get('/api/broker/:code', async (req, res) => {
   try {
     const user = await cnRequireUser(req);
@@ -407,6 +411,18 @@ app.get('/api/broker/:code', async (req, res) => {
     res.json({ success: true, code: code, rows: data || [] });
   } catch (err) {
     console.error('[broker]', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+app.get('/api/broker-radar', async (req, res) => {
+  try {
+    const user = await cnRequireUser(req);
+    if (!user) return res.status(401).json({ success: false, error: 'Login diperlukan' });
+    const r = await cnRpc('broker_radar_latest');
+    res.set('Cache-Control', 'private, max-age=300');
+    res.json({ success: true, data: r.data });
+  } catch (err) {
+    console.error('[broker-radar]', err);
     res.status(500).json({ success: false, error: err.message });
   }
 });
@@ -773,7 +789,7 @@ app.get('/api/public/watchlist', async (req, res) => {
 
 
 /*
- * CHARTNALIST — Signal Center
+ * CHARTNALIST â€” Signal Center
  *
  * Adapter/view endpoint only.
  * Signal Engine remains authoritative.
@@ -1432,6 +1448,181 @@ app.get('/api/public/signals', async (req, res) => {
 
 // ============================================================
 
+ï»¿app.get('/api/public/signals/performance', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('signals')
+      .select('*')
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+
+    const signals = data || [];
+    const outcomes = ['TP1', 'TP2', 'TP3', 'SL'];
+
+    const settled = signals
+      .filter(s => outcomes.includes(s.outcome))
+      .map(s => {
+        const entry = Number(s.actual_entry_avg ?? s.entry_avg);
+        const exit =
+          s.outcome === 'TP1' ? Number(s.target_1) :
+          s.outcome === 'TP2' ? Number(s.target_2) :
+          s.outcome === 'TP3' ? Number(s.target_3) :
+          Number(s.stop_loss);
+
+        const hitAt =
+          s.outcome === 'TP1' ? (s.tp1_hit_at || s.closed_at) :
+          s.outcome === 'TP2' ? (s.tp2_hit_at || s.closed_at) :
+          s.outcome === 'TP3' ? (s.tp3_hit_at || s.closed_at) :
+          (s.sl_hit_at || s.closed_at);
+
+        const startAt = s.entry_hit_at || s.published_at || s.created_at;
+
+        const pl =
+          Number.isFinite(entry) && entry > 0 && Number.isFinite(exit)
+            ? ((exit - entry) / entry) * 100
+            : null;
+
+        const holdingDays =
+          startAt && hitAt
+            ? Math.max(0, new Date(hitAt) - new Date(startAt)) / 86400000
+            : null;
+
+        return { signal: s, pl, hitAt, holdingDays };
+      })
+      .filter(x => Number.isFinite(x.pl) && x.hitAt)
+      .sort((a, b) => new Date(a.hitAt) - new Date(b.hitAt));
+
+    const profit = settled.filter(x => x.pl > 0);
+    const loss = settled.filter(x => x.pl < 0);
+
+    const totalPL = settled.reduce((a, x) => a + x.pl, 0);
+    const grossProfit = profit.reduce((a, x) => a + x.pl, 0);
+    const grossLoss = loss.reduce((a, x) => a + x.pl, 0);
+
+    const average = arr =>
+      arr.length
+        ? arr.reduce((a, x) => a + x, 0) / arr.length
+        : null;
+
+    const averageTP = average(
+      settled.filter(x => x.signal.outcome !== 'SL').map(x => x.pl)
+    );
+
+    const averageSL = average(
+      settled.filter(x => x.signal.outcome === 'SL').map(x => x.pl)
+    );
+
+    const averageRR = average(
+      settled
+        .map(x => Number(x.signal.risk_reward))
+        .filter(Number.isFinite)
+    );
+
+    const averageHoldingDays = average(
+      settled
+        .map(x => x.holdingDays)
+        .filter(Number.isFinite)
+    );
+
+    let consecutiveProfit = 0;
+    let consecutiveLoss = 0;
+    let currentProfit = 0;
+    let currentLoss = 0;
+
+    for (const x of settled) {
+      if (x.pl > 0) {
+        currentProfit++;
+        currentLoss = 0;
+        consecutiveProfit = Math.max(consecutiveProfit, currentProfit);
+      } else {
+        currentLoss++;
+        currentProfit = 0;
+        consecutiveLoss = Math.max(consecutiveLoss, currentLoss);
+      }
+    }
+
+    const first = settled[0]?.hitAt;
+    const last = settled[settled.length - 1]?.hitAt;
+
+    const elapsedDays = first && last
+      ? Math.max(1, (new Date(last) - new Date(first)) / 86400000)
+      : 1;
+
+    let cumulative = 0;
+
+    const growth = settled.map(x => {
+      cumulative += x.pl;
+
+      return {
+        date: x.hitAt,
+        pl_pct: x.pl,
+        cumulative_pl_pct: cumulative
+      };
+    });
+
+    const frequencyMap = new Map();
+
+    for (const x of settled) {
+      if (!x.hitAt) continue;
+
+      const d = new Date(x.hitAt);
+      if (Number.isNaN(d.getTime())) continue;
+
+      const key = d.toISOString().slice(0, 7);
+      frequencyMap.set(key, (frequencyMap.get(key) || 0) + 1);
+    }
+
+    const frequency = Array.from(frequencyMap.entries())
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([key, settledCount]) => {
+        const [year, month] = key.split('-');
+
+        return {
+          month: new Date(Date.UTC(Number(year), Number(month) - 1, 1))
+            .toLocaleDateString('en-US', {
+              month: 'short',
+              year: 'numeric',
+              timeZone: 'UTC'
+            }),
+          settled: settledCount
+        };
+      });
+
+    res.json({
+      success: true,
+      stats: {
+        running: signals.filter(s => ['PUBLISHED', 'ACTIVE'].includes(s.status)).length,
+        active: signals.filter(s => s.status === 'ACTIVE').length,
+        settled: settled.length,
+        wins: profit.length,
+        losses: loss.length,
+        totalPL,
+        grossProfit,
+        grossLoss,
+        avgPL: settled.length ? totalPL / settled.length : null,
+        averageRR,
+        averageTP,
+        averageSL,
+        averageHoldingDays,
+        averageSettledPerMonth: settled.length / (elapsedDays / 30.4375),
+        averageSettledPerWeek: settled.length / (elapsedDays / 7),
+        consecutiveProfit,
+        consecutiveLoss
+      },
+      growth,
+      frequency
+    });
+  } catch (err) {
+    console.error('[signals-performance]', err);
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+
+
 app.get('/api/public/history/:code', async (req, res) => {
   try {
     const code = String(req.params.code || '').trim().toUpperCase();
@@ -1888,3 +2079,4 @@ if (require.main === module) {
 }
 
 module.exports = app;
+

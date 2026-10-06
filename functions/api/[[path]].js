@@ -1,11 +1,12 @@
-// ============================================================
+﻿// ============================================================
 // Cloudflare Pages Function - API Router (Batch A + B)
 // ============================================================
 
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { sbFetch, getLatestTradeDate, rangeToStartDate } from '../_lib/supabase.js';
-import { calculateLatestForHistory, calculateHistoryForAllRows } from '../_lib/gemEngine.js';
+import { calculateLatestForHistory, calculateHistoryForAllRows } from '../_lib/gemEngine.js';
+
 import smartCore from '../../src/lib/smartwatchlist-core.js';
 
 const app = new Hono();
@@ -359,6 +360,14 @@ async function cnRequireUser(c) {
   if (!r.ok) return null;
   return await r.json();
 }
+app.use('/api/broker/*', async (c, next) => {
+  if (String(c.env.BROKER_ENABLED || '').toLowerCase() === 'off') return c.json({ success: false, error: 'Fitur broker sedang dinonaktifkan' }, 503);
+  await next();
+});
+app.use('/api/broker-radar', async (c, next) => {
+  if (String(c.env.BROKER_ENABLED || '').toLowerCase() === 'off') return c.json({ success: false, error: 'Fitur broker sedang dinonaktifkan' }, 503);
+  await next();
+});
 app.get('/api/broker/:code', async (c) => {
   try {
     const user = await cnRequireUser(c);
@@ -374,6 +383,18 @@ app.get('/api/broker/:code', async (c) => {
     return c.json({ success: true, code: code, rows: rows });
   } catch (err) {
     console.error('[broker]', err);
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
+app.get('/api/broker-radar', async (c) => {
+  try {
+    const user = await cnRequireUser(c);
+    if (!user) return c.json({ success: false, error: 'Login diperlukan' }, 401);
+    const r = await cnRpc(c.env, 'broker_radar_latest');
+    c.header('Cache-Control', 'private, max-age=300');
+    return c.json({ success: true, data: r.data });
+  } catch (err) {
+    console.error('[broker-radar]', err);
     return c.json({ success: false, error: err.message }, 500);
   }
 });
@@ -504,117 +525,332 @@ app.get('/api/public/signals/performance', async (c) => {
     const env = c.env;
     const signals = await sbFetch(env, 'signals?select=*&order=created_at.asc');
     const all = signals || [];
-    
-    const closed = all.filter(s => s.status === 'CLOSED' && s.outcome);
-    const active = all.filter(s => s.status === 'ACTIVE');
+
+    const ACTIVE_STATUSES = ['PUBLISHED', 'ACTIVE'];
+    const WIN_OUTCOMES = ['TP1', 'TP2', 'TP3'];
+
     const published = all.filter(s => s.status === 'PUBLISHED');
+    const active = all.filter(s => s.status === 'ACTIVE');
     const expired = all.filter(s => s.status === 'EXPIRED');
-    
-    const wins = closed.filter(s => ['TP1','TP2','TP3'].includes(s.outcome));
+
+    const closed = all.filter(s =>
+      s.status === 'CLOSED' &&
+      ['TP1', 'TP2', 'TP3', 'SL'].includes(s.outcome)
+    );
+
+    const wins = closed.filter(s => WIN_OUTCOMES.includes(s.outcome));
     const losses = closed.filter(s => s.outcome === 'SL');
-    const winRate = closed.length ? (wins.length / closed.length) * 100 : 0;
-    
-    let totalReturnPct = 0, returnCount = 0;
-    let totalDays = 0, daysCount = 0;
-    
-    closed.forEach(s => {
-      if (!s.entry_avg) return;
-      let exitPrice = null;
-      if (s.outcome === 'TP1') exitPrice = s.target_1;
-      else if (s.outcome === 'TP2') exitPrice = s.target_2;
-      else if (s.outcome === 'TP3') exitPrice = s.target_3;
-      else if (s.outcome === 'SL') exitPrice = s.stop_loss;
-      if (exitPrice) {
-        totalReturnPct += ((exitPrice - s.entry_avg) / s.entry_avg) * 100;
-        returnCount++;
-      }
-      if (s.entry_hit_at && s.closed_at) {
-        totalDays += (new Date(s.closed_at) - new Date(s.entry_hit_at)) / (1000*60*60*24);
-        daysCount++;
+
+    const num = v => {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : null;
+    };
+
+    const getExitPrice = s => {
+      if (s.outcome === 'TP1') return num(s.target_1);
+      if (s.outcome === 'TP2') return num(s.target_2);
+      if (s.outcome === 'TP3') return num(s.target_3);
+      if (s.outcome === 'SL') return num(s.stop_loss);
+      return null;
+    };
+
+    const getSettlementAt = s => {
+      if (s.outcome === 'TP1') return s.tp1_hit_at || s.closed_at || null;
+      if (s.outcome === 'TP2') return s.tp2_hit_at || s.closed_at || null;
+      if (s.outcome === 'TP3') return s.tp3_hit_at || s.closed_at || null;
+      if (s.outcome === 'SL') return s.sl_hit_at || s.closed_at || null;
+      return s.closed_at || null;
+    };
+
+    const getLifecycleStart = s =>
+      s.activated_at ||
+      s.published_at ||
+      s.created_at ||
+      null;
+
+    const getRealizedPct = s => {
+      const entry = num(s.entry_avg);
+      const exit = getExitPrice(s);
+
+      if (entry === null || entry <= 0 || exit === null) return null;
+
+      return ((exit - entry) / entry) * 100;
+    };
+
+    const getHoldingDays = s => {
+      const start = getLifecycleStart(s);
+      const end = getSettlementAt(s);
+
+      if (!start || !end) return null;
+
+      const ms = new Date(end) - new Date(start);
+      if (!Number.isFinite(ms) || ms < 0) return null;
+
+      return ms / (1000 * 60 * 60 * 24);
+    };
+
+    const settled = closed
+      .map(s => ({
+        signal: s,
+        settlementAt: getSettlementAt(s),
+        realizedPct: getRealizedPct(s),
+        holdingDays: getHoldingDays(s)
+      }))
+      .filter(x => x.settlementAt && x.realizedPct !== null)
+      .sort((a, b) =>
+        new Date(a.settlementAt) - new Date(b.settlementAt)
+      );
+
+    const settledReturns = settled.map(x => x.realizedPct);
+
+    const totalPL = settledReturns.reduce((sum, v) => sum + v, 0);
+    const grossProfit = settledReturns
+      .filter(v => v > 0)
+      .reduce((sum, v) => sum + v, 0);
+    const grossLoss = settledReturns
+      .filter(v => v < 0)
+      .reduce((sum, v) => sum + v, 0);
+
+    const avgPL = settledReturns.length
+      ? totalPL / settledReturns.length
+      : 0;
+
+    const avgHoldingDays = settled.length
+      ? settled.reduce((sum, x) => sum + (x.holdingDays || 0), 0) / settled.length
+      : 0;
+
+    const tpReturns = settled
+      .filter(x => WIN_OUTCOMES.includes(x.signal.outcome))
+      .map(x => x.realizedPct);
+
+    const slReturns = settled
+      .filter(x => x.signal.outcome === 'SL')
+      .map(x => x.realizedPct);
+
+    const averageTP = tpReturns.length
+      ? tpReturns.reduce((a, b) => a + b, 0) / tpReturns.length
+      : 0;
+
+    const averageSL = slReturns.length
+      ? slReturns.reduce((a, b) => a + b, 0) / slReturns.length
+      : 0;
+
+    const averageRR = closed.length
+      ? closed
+          .map(s => num(s.risk_reward))
+          .filter(v => v !== null)
+          .reduce((sum, v, _, arr) => sum + v / arr.length, 0)
+      : 0;
+
+    const winRate = closed.length
+      ? (wins.length / closed.length) * 100
+      : 0;
+
+    // Settlement frequency.
+    let averageSettledPerMonth = 0;
+    let averageSettledPerWeek = 0;
+
+    if (settled.length >= 1) {
+      const first = new Date(settled[0].settlementAt);
+      const last = new Date(settled[settled.length - 1].settlementAt);
+
+      const days = Math.max(
+        1,
+        (last - first) / (1000 * 60 * 60 * 24)
+      );
+
+      const months = Math.max(1, days / 30.4375);
+      const weeks = Math.max(1, days / 7);
+
+      averageSettledPerMonth = settled.length / months;
+      averageSettledPerWeek = settled.length / weeks;
+    }
+
+    // Consecutive profit / loss based strictly on settlement chronology.
+    let currentProfit = 0;
+    let currentLoss = 0;
+    let maxProfitStreak = 0;
+    let maxLossStreak = 0;
+
+    settled.forEach(x => {
+      if (x.realizedPct > 0) {
+        currentProfit++;
+        currentLoss = 0;
+        maxProfitStreak = Math.max(maxProfitStreak, currentProfit);
+      } else if (x.realizedPct < 0) {
+        currentLoss++;
+        currentProfit = 0;
+        maxLossStreak = Math.max(maxLossStreak, currentLoss);
+      } else {
+        currentProfit = 0;
+        currentLoss = 0;
       }
     });
-    
-    const avgReturn = returnCount > 0 ? totalReturnPct / returnCount : 0;
-    const avgDays = daysCount > 0 ? totalDays / daysCount : 0;
-    
+
+    // Cumulative realized P/L %.
+    const growth = [];
+    let cumulativePL = 0;
+
+    settled.forEach(x => {
+      cumulativePL += x.realizedPct;
+
+      growth.push({
+        date: x.settlementAt.slice(0, 10),
+        cumulative_pl_pct: Math.round(cumulativePL * 100) / 100,
+        signal_count: 1,
+        ticker: x.signal.ticker,
+        outcome: x.signal.outcome,
+        realized_pl_pct: Math.round(x.realizedPct * 100) / 100
+      });
+    });
+
+    // Monthly signal frequency for the performance view.
+    const monthlyMap = {};
+
+    settled.forEach(x => {
+      const key = x.settlementAt.slice(0, 7);
+
+      if (!monthlyMap[key]) {
+        monthlyMap[key] = {
+          month: key,
+          settled: 0,
+          cumulative_pl_pct: null
+        };
+      }
+
+      monthlyMap[key].settled++;
+    });
+
+    let runningPL = 0;
+
+    Object.keys(monthlyMap).sort().forEach(month => {
+      const monthRows = settled.filter(x =>
+        x.settlementAt.slice(0, 7) === month
+      );
+
+      monthRows.forEach(x => {
+        runningPL += x.realizedPct;
+      });
+
+      monthlyMap[month].cumulative_pl_pct =
+        Math.round(runningPL * 100) / 100;
+    });
+
+    const frequency = Object.values(monthlyMap);
+
     const byStatus = {
-      PUBLISHED: published.length, ACTIVE: active.length,
-      CLOSED: closed.length, EXPIRED: expired.length
+      PUBLISHED: published.length,
+      ACTIVE: active.length,
+      CLOSED: closed.length,
+      EXPIRED: expired.length
     };
-    
+
     const byOutcome = {
       TP3: closed.filter(s => s.outcome === 'TP3').length,
       TP2: closed.filter(s => s.outcome === 'TP2').length,
       TP1: closed.filter(s => s.outcome === 'TP1').length,
       SL: closed.filter(s => s.outcome === 'SL').length
     };
-    
+
     const byTicker = {};
+
     all.forEach(s => {
-      if (!byTicker[s.ticker]) byTicker[s.ticker] = { ticker: s.ticker, total: 0, wins: 0 };
+      if (!s.ticker) return;
+
+      if (!byTicker[s.ticker]) {
+        byTicker[s.ticker] = {
+          ticker: s.ticker,
+          total: 0,
+          wins: 0
+        };
+      }
+
       byTicker[s.ticker].total++;
-      if (s.outcome && ['TP1','TP2','TP3'].includes(s.outcome)) byTicker[s.ticker].wins++;
-    });
-    
-    const growth = [];
-    let cumPips = 0;
-    const closedSorted = closed.filter(s => s.closed_at && s.entry_avg).sort((a,b) => 
-      new Date(a.closed_at) - new Date(b.closed_at)
-    );
-    closedSorted.forEach(s => {
-      let exitPrice = null;
-      if (s.outcome === 'TP1') exitPrice = s.target_1;
-      else if (s.outcome === 'TP2') exitPrice = s.target_2;
-      else if (s.outcome === 'TP3') exitPrice = s.target_3;
-      else if (s.outcome === 'SL') exitPrice = s.stop_loss;
-      if (exitPrice) {
-        cumPips += exitPrice - s.entry_avg;
-        growth.push({
-          date: s.closed_at.slice(0, 10), pips: Math.round(cumPips),
-          ticker: s.ticker, outcome: s.outcome
-        });
+
+      if (WIN_OUTCOMES.includes(s.outcome)) {
+        byTicker[s.ticker].wins++;
       }
     });
-    
-    const recentClosed = closed
-      .filter(s => s.closed_at)
-      .sort((a,b) => new Date(b.closed_at) - new Date(a.closed_at))
+
+    const recentClosed = settled
+      .slice()
+      .reverse()
       .slice(0, 10)
-      .map(s => {
-        let exitPrice = null;
-        if (s.outcome === 'TP1') exitPrice = s.target_1;
-        else if (s.outcome === 'TP2') exitPrice = s.target_2;
-        else if (s.outcome === 'TP3') exitPrice = s.target_3;
-        else if (s.outcome === 'SL') exitPrice = s.stop_loss;
-        const retPct = (exitPrice && s.entry_avg) ? ((exitPrice - s.entry_avg) / s.entry_avg) * 100 : null;
-        const days = (s.entry_hit_at && s.closed_at)
-          ? Math.round((new Date(s.closed_at) - new Date(s.entry_hit_at)) / (1000*60*60*24))
-          : null;
+      .map(x => {
+        const s = x.signal;
+
         return {
-          id: s.id, ticker: s.ticker, outcome: s.outcome,
-          entry_avg: s.entry_avg, exit_price: exitPrice,
-          return_pct: retPct, days: days, closed_at: s.closed_at,
-          risk_reward: s.risk_reward
+          id: s.id,
+          ticker: s.ticker,
+          outcome: s.outcome,
+          entry_avg: num(s.entry_avg),
+          exit_price: getExitPrice(s),
+          return_pct: Math.round(x.realizedPct * 100) / 100,
+          days: Math.round((x.holdingDays || 0) * 10) / 10,
+          settlement_at: x.settlementAt,
+          closed_at: s.closed_at,
+          risk_reward: num(s.risk_reward)
         };
       });
-    
+
     return c.json({
       success: true,
+
       stats: {
-        total: all.length, closed: closed.length, active: active.length,
-        published: published.length, expired: expired.length,
-        wins: wins.length, losses: losses.length,
+        total: all.length,
+        closed: closed.length,
+        settled: settled.length,
+        active: active.length,
+        running: published.length + active.length,
+        published: published.length,
+        expired: expired.length,
+
+        wins: wins.length,
+        losses: losses.length,
+
         winRate: Math.round(winRate * 10) / 10,
-        avgReturn: Math.round(avgReturn * 100) / 100,
-        avgDays: Math.round(avgDays * 10) / 10
+
+        totalPL: Math.round(totalPL * 100) / 100,
+        grossProfit: Math.round(grossProfit * 100) / 100,
+        grossLoss: Math.round(grossLoss * 100) / 100,
+        avgPL: Math.round(avgPL * 100) / 100,
+
+        averageTP: Math.round(averageTP * 100) / 100,
+        averageSL: Math.round(averageSL * 100) / 100,
+
+        averageRR: Math.round(averageRR * 100) / 100,
+
+        avgDays: Math.round(avgHoldingDays * 10) / 10,
+        averageHoldingDays: Math.round(avgHoldingDays * 10) / 10,
+
+        averageSettledPerMonth:
+          Math.round(averageSettledPerMonth * 100) / 100,
+
+        averageSettledPerWeek:
+          Math.round(averageSettledPerWeek * 100) / 100,
+
+        consecutiveProfit: maxProfitStreak,
+        consecutiveLoss: maxLossStreak
       },
-      byStatus, byOutcome,
-      byTicker: Object.values(byTicker).sort((a,b) => b.total - a.total).slice(0, 10),
-      growth, recentClosed
+
+      byStatus,
+      byOutcome,
+
+      byTicker: Object.values(byTicker)
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 10),
+
+      growth,
+      frequency,
+      recentClosed
     });
+
   } catch (err) {
     console.error('[performance]', err);
-    return c.json({ success: false, error: err.message }, 500);
+    return c.json({
+      success: false,
+      error: err.message
+    }, 500);
   }
 });
 

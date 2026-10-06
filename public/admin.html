@@ -1200,7 +1200,7 @@
         var j = await res.json();
         if (!res.ok || !j.success) throw new Error(j.error || ('HTTP ' + res.status));
         var d = j.data || {};
-        var names = { BREAKOUT_ASING: 'BREAKOUT + ASING AKUMULASI', BREAKDOWN: 'BREAKDOWN' };
+        var names = { BREAKOUT_ASING: 'BREAKOUT + ASING AKUMULASI', BREAKDOWN: 'BREAKDOWN', BROKER_ACC: 'RADAR BROKER: AKUMULASI (top 5)', BROKER_DIST: 'RADAR BROKER: DISTRIBUSI (top 5)' };
         var f = function (v, suf) { return v == null ? '-' : Number(v).toLocaleString('id-ID') + (suf || ''); };
         var tiles = cnGrid([
           cnTile('Hari tercatat', cnNum(d.days)),
