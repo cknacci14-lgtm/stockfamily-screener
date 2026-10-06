@@ -1225,6 +1225,74 @@ app.get("/api/public/signal-center", async (c) => {
 });
 
 // ============================================================
+// ADMIN: daily-summary (same response shape as Express)
+// ============================================================
+async function sbAll(env, path) {
+  const PAGE = 1000;
+  const out = [];
+  for (let page = 0; page < 5; page++) {
+    const data = await sbFetch(env, path + '&limit=' + PAGE + '&offset=' + (page * PAGE));
+    const batch = Array.isArray(data) ? data : [];
+    out.push(...batch);
+    if (batch.length < PAGE) break;
+  }
+  return out;
+}
+
+app.get('/api/admin/daily-summary', async (c) => {
+  try {
+    const env = c.env;
+    const latestDate = await getLatestTradeDate(env);
+    if (!latestDate) {
+      return c.json({
+        success: true, hasData: false, totalStocks: 0, activeStocks: 0,
+        totalValue: 0, totalVolume: 0, files: [], stocks: []
+      });
+    }
+
+    const rows = await sbAll(env,
+      'daily_stock_data?select=stock_id,trade_date,close,volume,value&trade_date=eq.' + latestDate +
+      '&order=value.desc,stock_id.asc');
+    const stockRows = await sbAll(env, 'stocks?select=id,code&order=id.asc');
+    const codeMap = {};
+    stockRows.forEach(s => { codeMap[s.id] = s.code; });
+
+    const stocks = rows.map(r => ({
+      code: codeMap[r.stock_id] || '-',
+      close: Number(r.close) || 0,
+      volume: Number(r.volume) || 0,
+      value: Number(r.value) || 0
+    }));
+    const totalStocks = stocks.length;
+    const activeStocks = stocks.filter(s => s.volume > 0).length;
+    const totalValue = stocks.reduce((sum, s) => sum + s.value, 0);
+    const totalVolume = stocks.reduce((sum, s) => sum + s.volume, 0);
+
+    let batches = [];
+    try {
+      const b = await sbFetch(env, 'upload_batches?select=*&order=trade_date.desc&limit=20');
+      batches = Array.isArray(b) ? b : [];
+    } catch (e) { batches = []; }
+    const files = batches.map(b => ({ name: b.filename, count: b.row_count, date: b.trade_date }));
+
+    return c.json({
+      success: true,
+      hasData: true,
+      lastUpdated: latestDate,
+      totalStocks, activeStocks, totalValue, totalVolume,
+      files, stocks,
+      totalDays: 1,
+      totalRows: totalStocks,
+      firstDate: latestDate,
+      lastDate: latestDate,
+      recentBatches: batches
+    });
+  } catch (err) {
+    console.error('[admin-daily-summary]', err);
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
+// ============================================================
 // ADMIN: stats / settings / scrape / cache (parity with Express)
 // All /api/admin/* routes are protected by the admin guard above.
 // ============================================================

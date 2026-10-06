@@ -411,6 +411,17 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>try { localStorage.setItem('cn_skip', '1'); } catch (e) {}</script>
 <script src="/assets/chartnalist-app-auth.js"></script>
+<style id="cn-mobile-admin">
+@media (max-width: 820px) {
+  html, body { max-width: 100%; overflow-x: hidden; }
+  .main { min-width: 0; }
+  .admin-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
+  .admin-tab { flex: 0 0 auto; white-space: nowrap; padding: 10px 14px; }
+  .admin-card { padding: 16px; max-width: 100%; }
+  .admin-card .row label { min-width: 0; }
+  .admin-card input, .admin-card select, .admin-card textarea { max-width: 100%; }
+}
+</style>
 </head>
 <body>
   <!-- Sidebar di-inject oleh stockfamily-sidebar.js -->
