@@ -1,6 +1,6 @@
 {
   "success": true,
-  "date": "2026-10-05",
+  "date": "2026-10-06",
   "count": 9,
   "signals": [
     {
@@ -8,16 +8,17 @@
       "stockName": "Berdikari Pondasi Perkasa Tbk.",
       "setup": "BREAKOUT",
       "status": "TRIGGERED",
-      "price": 184,
-      "trigger": 173,
-      "invalidation": 160.36,
-      "target1": 191.96,
-      "target2": 204.6,
+      "price": 210,
+      "trigger": 186,
+      "invalidation": 165.46,
+      "target1": 216.8,
+      "target2": 237.34,
       "riskReward": 2.5,
       "riskLevel": "HIGH",
-      "entryGapPct": 6.4,
-      "rrFromPrice": 0.34,
+      "entryGapPct": 12.9,
+      "rrFromPrice": 0.15,
       "planStale": true,
+      "maxEntry": 191.13,
       "structure": {
         "state": "BULLISH",
         "label": "Bullish structure",
@@ -31,7 +32,7 @@
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": 0.00014638628165358048,
+        "value": 0.00010212973978174226,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
@@ -40,23 +41,64 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-05T21:29:43.400Z"
+      "updatedAt": "2026-10-06T19:01:06.862Z"
+    },
+    {
+      "stockCode": "BDMN",
+      "stockName": "Bank Danamon Indonesia Tbk.",
+      "setup": "BREAKOUT",
+      "status": "TRIGGERED",
+      "price": 4910,
+      "trigger": 4790,
+      "invalidation": 4484.64,
+      "target1": 5248.04,
+      "target2": 5553.39,
+      "riskReward": 2.5,
+      "riskLevel": "MEDIUM",
+      "entryGapPct": 2.5,
+      "rrFromPrice": 0.79,
+      "planStale": true,
+      "maxEntry": 4866.34,
+      "structure": {
+        "state": "BULLISH",
+        "label": "Bullish structure",
+        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
+      },
+      "participation": {
+        "state": "IMPROVING",
+        "label": "Participation improving",
+        "explanation": "Multiple trading-activity measures are materially above their recent baseline."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": -0.000011820624731358134,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HEALTHY",
+        "label": "Healthy liquidity",
+        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-10-06T19:01:06.862Z"
     },
     {
       "stockCode": "CSMI",
       "stockName": "Cipta Selera Murni Tbk.",
       "setup": "BREAKOUT",
       "status": "TRIGGERED",
-      "price": 412,
-      "trigger": 354,
-      "invalidation": 242.04,
-      "target1": 521.95,
-      "target2": 633.91,
+      "price": 515,
+      "trigger": 414,
+      "invalidation": 286.14,
+      "target1": 605.79,
+      "target2": 733.64,
       "riskReward": 2.5,
       "riskLevel": "HIGH",
-      "entryGapPct": 16.4,
-      "rrFromPrice": 0.65,
+      "entryGapPct": 24.4,
+      "rrFromPrice": 0.4,
       "planStale": true,
+      "maxEntry": 445.97,
       "structure": {
         "state": "BULLISH",
         "label": "Bullish structure",
@@ -70,7 +112,7 @@
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": -0.000010591984333968453,
+        "value": 0.000005177626507841363,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
@@ -79,218 +121,24 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-05T21:29:43.400Z"
-    },
-    {
-      "stockCode": "MITI",
-      "stockName": "Mitra Investindo Tbk.",
-      "setup": "BREAKOUT",
-      "status": "TRIGGERED",
-      "price": 350,
-      "trigger": 324,
-      "invalidation": 239.71,
-      "target1": 450.43,
-      "target2": 534.71,
-      "riskReward": 2.5,
-      "riskLevel": "HIGH",
-      "entryGapPct": 8,
-      "rrFromPrice": 0.91,
-      "planStale": true,
-      "structure": {
-        "state": "BULLISH",
-        "label": "Bullish structure",
-        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
-      },
-      "participation": {
-        "state": "IMPROVING",
-        "label": "Participation improving",
-        "explanation": "Multiple trading-activity measures are materially above their recent baseline."
-      },
-      "flow": {
-        "state": "NEUTRAL",
-        "label": "Foreign flow neutral",
-        "value": 0.000006707287334192675,
-        "explanation": "Foreign activity does not provide a decisive contextual signal."
-      },
-      "liquidity": {
-        "state": "HEALTHY",
-        "label": "Healthy liquidity",
-        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
-      },
-      "signalDate": null,
-      "updatedAt": "2026-10-05T21:29:43.400Z"
-    },
-    {
-      "stockCode": "PKPK",
-      "stockName": "Paragon Karya Perkasa Tbk.",
-      "setup": "BREAKOUT",
-      "status": "TRIGGERED",
-      "price": 6800,
-      "trigger": 6350,
-      "invalidation": 5096.43,
-      "target1": 8230.36,
-      "target2": 9483.93,
-      "riskReward": 2.5,
-      "riskLevel": "HIGH",
-      "entryGapPct": 7.1,
-      "rrFromPrice": 0.84,
-      "planStale": true,
-      "structure": {
-        "state": "BULLISH",
-        "label": "Bullish structure",
-        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
-      },
-      "participation": {
-        "state": "IMPROVING",
-        "label": "Participation improving",
-        "explanation": "Multiple trading-activity measures are materially above their recent baseline."
-      },
-      "flow": {
-        "state": "NEUTRAL",
-        "label": "Foreign flow neutral",
-        "value": 0.00001902729465327354,
-        "explanation": "Foreign activity does not provide a decisive contextual signal."
-      },
-      "liquidity": {
-        "state": "HEALTHY",
-        "label": "Healthy liquidity",
-        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
-      },
-      "signalDate": null,
-      "updatedAt": "2026-10-05T21:29:43.400Z"
-    },
-    {
-      "stockCode": "AADI",
-      "stockName": "Adaro Andalan Indonesia Tbk.",
-      "setup": "PULLBACK",
-      "status": "TRIGGERED",
-      "price": 11950,
-      "trigger": 11732.5,
-      "invalidation": 10725,
-      "target1": 13243.75,
-      "target2": 14251.25,
-      "riskReward": 2.5,
-      "riskLevel": "HIGH",
-      "entryGapPct": 1.9,
-      "rrFromPrice": 1.06,
-      "planStale": false,
-      "structure": {
-        "state": "BULLISH",
-        "label": "Bullish structure",
-        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
-      },
-      "participation": {
-        "state": "CONTRACTING",
-        "label": "Participation contracting",
-        "explanation": "Multiple trading-activity measures are below their recent baseline."
-      },
-      "flow": {
-        "state": "NEUTRAL",
-        "label": "Foreign flow neutral",
-        "value": 0.00001329987186508487,
-        "explanation": "Foreign activity does not provide a decisive contextual signal."
-      },
-      "liquidity": {
-        "state": "HEALTHY",
-        "label": "Healthy liquidity",
-        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
-      },
-      "signalDate": null,
-      "updatedAt": "2026-10-05T21:29:43.400Z"
-    },
-    {
-      "stockCode": "AKRA",
-      "stockName": "AKR Corporindo Tbk.",
-      "setup": "PULLBACK",
-      "status": "TRIGGERED",
-      "price": 1500,
-      "trigger": 1480.25,
-      "invalidation": 1405,
-      "target1": 1593.13,
-      "target2": 1668.38,
-      "riskReward": 2.5,
-      "riskLevel": "MEDIUM",
-      "entryGapPct": 1.3,
-      "rrFromPrice": 0.98,
-      "planStale": true,
-      "structure": {
-        "state": "BULLISH",
-        "label": "Bullish structure",
-        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
-      },
-      "participation": {
-        "state": "CONTRACTING",
-        "label": "Participation contracting",
-        "explanation": "Multiple trading-activity measures are below their recent baseline."
-      },
-      "flow": {
-        "state": "NEUTRAL",
-        "label": "Foreign flow neutral",
-        "value": -0.00019109213467013007,
-        "explanation": "Foreign activity does not provide a decisive contextual signal."
-      },
-      "liquidity": {
-        "state": "HEALTHY",
-        "label": "Healthy liquidity",
-        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
-      },
-      "signalDate": null,
-      "updatedAt": "2026-10-05T21:29:43.400Z"
-    },
-    {
-      "stockCode": "ERAA",
-      "stockName": "Erajaya Swasembada Tbk.",
-      "setup": "PULLBACK",
-      "status": "TRIGGERED",
-      "price": 620,
-      "trigger": 604.25,
-      "invalidation": 570,
-      "target1": 655.63,
-      "target2": 689.88,
-      "riskReward": 2.5,
-      "riskLevel": "MEDIUM",
-      "entryGapPct": 2.6,
-      "rrFromPrice": 0.71,
-      "planStale": true,
-      "structure": {
-        "state": "BULLISH",
-        "label": "Bullish structure",
-        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
-      },
-      "participation": {
-        "state": "CONTRACTING",
-        "label": "Participation contracting",
-        "explanation": "Multiple trading-activity measures are below their recent baseline."
-      },
-      "flow": {
-        "state": "NEUTRAL",
-        "label": "Foreign flow neutral",
-        "value": 0.00024222217407506635,
-        "explanation": "Foreign activity does not provide a decisive contextual signal."
-      },
-      "liquidity": {
-        "state": "HEALTHY",
-        "label": "Healthy liquidity",
-        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
-      },
-      "signalDate": null,
-      "updatedAt": "2026-10-05T21:29:43.400Z"
+      "updatedAt": "2026-10-06T19:01:06.862Z"
     },
     {
       "stockCode": "KDTN",
       "stockName": "Puri Sentul Permai Tbk.",
       "setup": "BREAKOUT",
-      "status": "TARGET",
-      "price": 530,
-      "trigger": 444,
-      "invalidation": 391.72,
-      "target1": 522.42,
-      "target2": 574.7,
+      "status": "TRIGGERED",
+      "price": 655,
+      "trigger": 530,
+      "invalidation": 424.29,
+      "target1": 688.57,
+      "target2": 794.29,
       "riskReward": 2.5,
       "riskLevel": "HIGH",
-      "entryGapPct": 19.4,
-      "rrFromPrice": -0.05,
+      "entryGapPct": 23.6,
+      "rrFromPrice": 0.15,
       "planStale": true,
+      "maxEntry": 556.43,
       "structure": {
         "state": "BULLISH",
         "label": "Bullish structure",
@@ -304,7 +152,7 @@
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": 0.00007831703506616868,
+        "value": 0.000037072344789838384,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
@@ -313,23 +161,24 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-05T21:29:43.400Z"
+      "updatedAt": "2026-10-06T19:01:06.862Z"
     },
     {
-      "stockCode": "MBSS",
-      "stockName": "Mitrabahtera Segara Sejati Tbk.",
+      "stockCode": "POLA",
+      "stockName": "Pool Advista Finance Tbk.",
       "setup": "BREAKOUT",
-      "status": "TARGET",
-      "price": 4400,
-      "trigger": 3630,
-      "invalidation": 3276.43,
-      "target1": 4160.36,
-      "target2": 4513.93,
+      "status": "TRIGGERED",
+      "price": 110,
+      "trigger": 103,
+      "invalidation": 76.75,
+      "target1": 142.38,
+      "target2": 168.63,
       "riskReward": 2.5,
       "riskLevel": "HIGH",
-      "entryGapPct": 21.2,
-      "rrFromPrice": -0.21,
+      "entryGapPct": 6.8,
+      "rrFromPrice": 0.97,
       "planStale": true,
+      "maxEntry": 109.57,
       "structure": {
         "state": "BULLISH",
         "label": "Bullish structure",
@@ -343,7 +192,7 @@
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": -0.000010616906264096734,
+        "value": 0.0000804657935981331,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
@@ -352,10 +201,170 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-05T21:29:43.400Z"
+      "updatedAt": "2026-10-06T19:01:06.862Z"
+    },
+    {
+      "stockCode": "SMDR",
+      "stockName": "Samudera Indonesia  Tbk.",
+      "setup": "BREAKOUT",
+      "status": "TRIGGERED",
+      "price": 428,
+      "trigger": 414,
+      "invalidation": 372.57,
+      "target1": 476.14,
+      "target2": 517.57,
+      "riskReward": 2.5,
+      "riskLevel": "HIGH",
+      "entryGapPct": 3.4,
+      "rrFromPrice": 0.87,
+      "planStale": true,
+      "maxEntry": 424.36,
+      "structure": {
+        "state": "BULLISH",
+        "label": "Bullish structure",
+        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
+      },
+      "participation": {
+        "state": "IMPROVING",
+        "label": "Participation improving",
+        "explanation": "Multiple trading-activity measures are materially above their recent baseline."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": 0.00033715233852448884,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HEALTHY",
+        "label": "Healthy liquidity",
+        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-10-06T19:01:06.862Z"
+    },
+    {
+      "stockCode": "AALI",
+      "stockName": "Astra Agro Lestari Tbk.",
+      "setup": "PULLBACK",
+      "status": "TRIGGERED",
+      "price": 8525,
+      "trigger": 8241.25,
+      "invalidation": 7675,
+      "target1": 9090.63,
+      "target2": 9656.88,
+      "riskReward": 2.5,
+      "riskLevel": "MEDIUM",
+      "entryGapPct": 3.4,
+      "rrFromPrice": 0.67,
+      "planStale": true,
+      "maxEntry": 8382.81,
+      "structure": {
+        "state": "BULLISH",
+        "label": "Bullish structure",
+        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
+      },
+      "participation": {
+        "state": "NEUTRAL",
+        "label": "Normal participation",
+        "explanation": "Trading activity is not showing a decisive expansion or contraction."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": 0.000017395705440877692,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HEALTHY",
+        "label": "Healthy liquidity",
+        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-10-06T19:01:06.862Z"
+    },
+    {
+      "stockCode": "AYAM",
+      "stockName": "Janu Putra Sejahtera Tbk.",
+      "setup": "PULLBACK",
+      "status": "TRIGGERED",
+      "price": 530,
+      "trigger": 500.5,
+      "invalidation": 464,
+      "target1": 555.25,
+      "target2": 591.75,
+      "riskReward": 2.5,
+      "riskLevel": "HIGH",
+      "entryGapPct": 5.9,
+      "rrFromPrice": 0.38,
+      "planStale": true,
+      "maxEntry": 509.63,
+      "structure": {
+        "state": "BULLISH",
+        "label": "Bullish structure",
+        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
+      },
+      "participation": {
+        "state": "NEUTRAL",
+        "label": "Normal participation",
+        "explanation": "Trading activity is not showing a decisive expansion or contraction."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": 0.00009545801099971364,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HEALTHY",
+        "label": "Healthy liquidity",
+        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-10-06T19:01:06.862Z"
+    },
+    {
+      "stockCode": "ITMG",
+      "stockName": "Indo Tambangraya Megah Tbk.",
+      "setup": "PULLBACK",
+      "status": "TRIGGERED",
+      "price": 26100,
+      "trigger": 25746.25,
+      "invalidation": 24575,
+      "target1": 27503.13,
+      "target2": 28674.38,
+      "riskReward": 2.5,
+      "riskLevel": "MEDIUM",
+      "entryGapPct": 1.4,
+      "rrFromPrice": 0.92,
+      "planStale": true,
+      "maxEntry": 26039.07,
+      "structure": {
+        "state": "IMPROVING",
+        "label": "Structure improving",
+        "explanation": "Price remains above the main short/intermediate trend references with increasing price activity."
+      },
+      "participation": {
+        "state": "NEUTRAL",
+        "label": "Normal participation",
+        "explanation": "Trading activity is not showing a decisive expansion or contraction."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": -0.00001293449472468773,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HEALTHY",
+        "label": "Healthy liquidity",
+        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-10-06T19:01:06.862Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-10-05T21:29:43.400Z"
+  "generatedAt": "2026-10-06T19:01:06.862Z"
 }
