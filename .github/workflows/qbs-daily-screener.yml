@@ -2,8 +2,8 @@ name: QBS Daily Screener
 
 on:
   schedule:
-    # 20:30 WIB = 13:30 UTC, Monday-Friday (daily data lands about 17:30-19:30 WIB)
-    - cron: '30 13 * * 1-5'
+    # 20:17 WIB = 13:17 UTC (off the :00/:30 peaks), Monday-Friday (daily data lands about 17:30-19:30 WIB)
+    - cron: '17 13 * * 1-5'
   workflow_dispatch:  # manual trigger
 
 jobs:
