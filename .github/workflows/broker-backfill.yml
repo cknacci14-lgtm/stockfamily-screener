@@ -1,0 +1,39 @@
+name: Broker Backfill Sample
+
+on:
+  schedule:
+    # 12:30 WIB (05:30 UTC), Senin-Jumat. Nonaktifkan workflow ini setelah tugas selesai.
+    - cron: '30 5 * * 1-5'
+  workflow_dispatch:
+
+concurrency:
+  group: broker-backfill
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: '1'
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: '1'
+        run: npm install --omit=dev --no-audit --no-fund --ignore-scripts
+
+      - name: Backfill broker sample
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          ARJUM_API_KEY: ${{ secrets.ARJUM_API_KEY }}
+        run: node scripts/backfill-broker-sample.js
