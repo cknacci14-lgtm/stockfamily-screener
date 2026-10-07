@@ -292,7 +292,21 @@ tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{
           <div style="font-size: 10px; color: #6b7280;">LIVE TRADING SIGNALS</div>
         </div>
       </div>
-      <button onclick="loadSignals()" class="filter-btn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+      <div class="signals-header-actions">
+  <button
+    id="openSignalPerformance"
+    type="button"
+    class="filter-btn"
+    onclick="openSignalPerformance()">
+    <i class="fa-solid fa-chart-line"></i>
+    Signal Performance
+  </button>
+
+  <button onclick="loadSignals()" class="filter-btn">
+    <i class="fa-solid fa-rotate"></i>
+    Refresh
+  </button>
+</div>
     </div>
   </header>
 
@@ -335,6 +349,435 @@ tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{
       </div>
     </div>
 
+<style id="signal-performance-css">
+.signal-performance {
+  margin-top: 28px;
+  padding-top: 8px;
+}
+
+.performance-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.performance-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  color: #00E5FF;
+  text-transform: uppercase;
+}
+
+.performance-title {
+  margin-top: 5px;
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #f5f7f8;
+}
+
+.performance-subtitle {
+  margin-top: 5px;
+  font-size: 12px;
+  color: #7f8994;
+}
+
+.performance-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(260px, .8fr);
+  gap: 16px;
+}
+
+.performance-panel {
+  background: #131722;
+  border: 1px solid #2A2E39;
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.performance-panel-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .8px;
+  color: #d7dde3;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.performance-chart-wrap {
+  position: relative;
+  height: 250px;
+  width: 100%;
+}
+
+.performance-chart {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.performance-empty {
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #68727d;
+  font-size: 12px;
+}
+
+.performance-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.performance-mini {
+  background: #10141a;
+  border: 1px solid #252b34;
+  border-radius: 9px;
+  padding: 12px;
+}
+
+.performance-mini-label {
+  font-size: 10px;
+  color: #737d88;
+  text-transform: uppercase;
+  letter-spacing: .45px;
+}
+
+.performance-mini-value {
+  margin-top: 7px;
+  font-size: 18px;
+  line-height: 1.1;
+  font-weight: 700;
+  color: #f5f7f8;
+}
+
+.performance-mini-value.positive {
+  color: #10b981;
+}
+
+.performance-mini-value.negative {
+  color: #ef4444;
+}
+
+.performance-summary {
+  margin-top: 16px;
+}
+
+.performance-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.performance-summary-item {
+  background: #10141a;
+  border: 1px solid #252b34;
+  border-radius: 9px;
+  padding: 12px;
+}
+
+.performance-summary-label {
+  font-size: 10px;
+  line-height: 1.35;
+  color: #737d88;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+
+.performance-summary-value {
+  margin-top: 6px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #e8edf2;
+}
+
+.performance-summary-value.positive {
+  color: #10b981;
+}
+
+.performance-summary-value.negative {
+  color: #ef4444;
+}
+
+.performance-frequency {
+  margin-top: 16px;
+}
+
+.performance-frequency-row {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr) 45px;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.performance-frequency-month {
+  font-size: 10px;
+  color: #7f8994;
+}
+
+.performance-frequency-bar {
+  height: 6px;
+  border-radius: 99px;
+  background: #252b34;
+  overflow: hidden;
+}
+
+.performance-frequency-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: #00E5FF;
+}
+
+.performance-frequency-value {
+  font-size: 10px;
+  text-align: right;
+  color: #aeb7c0;
+}
+
+.performance-status {
+  margin-top: 10px;
+  min-height: 16px;
+  font-size: 10px;
+  color: #68727d;
+}
+
+@media (max-width: 900px) {
+  .performance-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .performance-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .performance-summary-grid,
+  .performance-mini-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .performance-head {
+    align-items: flex-start;
+  }
+}
+</style>
+<style id="signal-performance-modal-css">
+#signalPerformance {
+  display: none !important;
+}
+
+#signalPerformance.performance-modal-open {
+  display: block !important;
+  position: fixed !important;
+  z-index: 9999 !important;
+
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+
+  width: min(1400px, 94vw) !important;
+  height: min(900px, 90vh) !important;
+
+  margin: 0 !important;
+  padding: 24px !important;
+
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+
+  background: #0B0E14 !important;
+  border: 1px solid #2A2E39 !important;
+  border-radius: 14px !important;
+
+  box-shadow:
+    0 24px 80px rgba(0,0,0,.65),
+    0 0 0 100vmax rgba(0,0,0,.72) !important;
+}
+
+#signalPerformance .performance-head {
+  position: sticky;
+  top: -24px;
+  z-index: 3;
+  padding-top: 4px;
+  padding-bottom: 18px;
+  background: #0B0E14;
+}
+
+#signalPerformance .performance-close-wrap {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+}
+
+#signalPerformance .performance-close {
+  width: 36px;
+  height: 36px;
+
+  border: 1px solid #303641;
+  border-radius: 8px;
+
+  background: #151922;
+  color: #AAB2BC;
+
+  cursor: pointer;
+}
+
+#signalPerformance .performance-close:hover {
+  color: #FFFFFF;
+  background: #1C222D;
+}
+
+.signals-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+</style>
+<section id="signalPerformance" class="signal-performance" aria-label="Signal Performance">
+
+  <div class="performance-close-wrap">
+  <button
+    id="closeSignalPerformance"
+    type="button"
+    class="performance-close"
+    onclick="closeSignalPerformance()"
+    aria-label="Close Signal Performance">
+    <i class="fa-solid fa-xmark"></i>
+  </button>
+</div>
+<div class="performance-head">
+    <div>
+      <div class="performance-kicker">Signal Performance</div>
+      <div class="performance-title">Growth Signal</div>
+      <div class="performance-subtitle">
+        Cumulative realized P/L dari signal yang sudah settled.
+      </div>
+    </div>
+  </div>
+
+  <div class="performance-grid">
+
+    <div class="performance-panel">
+      <div class="performance-panel-title">Cumulative P/L Growth</div>
+
+      <div id="performanceChartWrap" class="performance-chart-wrap">
+        <canvas id="performanceChart" class="performance-chart"></canvas>
+      </div>
+
+      <div id="performanceStatus" class="performance-status">
+        Memuat performance...
+      </div>
+    </div>
+
+    <div class="performance-panel">
+      <div class="performance-panel-title">Signal Outcome</div>
+
+      <div class="performance-mini-grid">
+
+        <div class="performance-mini">
+          <div class="performance-mini-label">Running / Active</div>
+          <div id="perfRunning" class="performance-mini-value">—</div>
+        </div>
+
+        <div class="performance-mini">
+          <div class="performance-mini-label">Profit / Settled</div>
+          <div id="perfProfit" class="performance-mini-value positive">—</div>
+        </div>
+
+        <div class="performance-mini">
+          <div class="performance-mini-label">Loss / Settled</div>
+          <div id="perfLoss" class="performance-mini-value negative">—</div>
+        </div>
+      </div>
+
+      <div class="performance-frequency">
+        <div class="performance-panel-title">Signal Frequency</div>
+        <div id="performanceFrequency">
+          <div class="performance-status">Memuat frequency...</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="performance-summary">
+    <div class="performance-panel">
+      <div class="performance-panel-title">Performance Summary</div>
+
+      <div class="performance-summary-grid">
+
+        <div class="performance-summary-item">
+          <div class="performance-summary-label">Total P/L</div>
+          <div id="perfTotalPL" class="performance-summary-value">—</div>
+        </div>
+
+        <div class="performance-summary-item">
+          <div class="performance-summary-label">Average R:R</div>
+          <div id="perfAverageRR" class="performance-summary-value">—</div>
+        </div>
+
+        <div class="performance-summary-item">
+          <div class="performance-summary-label">Average Settled / Month</div>
+          <div id="perfAvgMonth" class="performance-summary-value">—</div>
+        </div>
+
+        <div class="performance-summary-item">
+          <div class="performance-summary-label">Average Holding Period</div>
+          <div id="perfAvgHolding" class="performance-summary-value">—</div>
+        </div>
+
+        <div class="performance-summary-item">
+          <div class="performance-summary-label">Average TP</div>
+          <div id="perfAverageTP" class="performance-summary-value positive">—</div>
+        </div>
+
+        <div class="performance-summary-item">
+          <div class="performance-summary-label">Average SL</div>
+          <div id="perfAverageSL" class="performance-summary-value negative">—</div>
+        </div>
+
+        <div class="performance-summary-item">
+          <div class="performance-summary-label">Consecutive Profit</div>
+          <div id="perfConsecutiveProfit" class="performance-summary-value">—</div>
+        </div>
+
+        <div class="performance-summary-item">
+          <div class="performance-summary-label">Consecutive Loss</div>
+          <div id="perfConsecutiveLoss" class="performance-summary-value">—</div>
+        </div>
+
+        <div class="performance-summary-item">
+          <div class="performance-summary-label">Average Settled / Week</div>
+          <div id="perfAvgWeek" class="performance-summary-value">—</div>
+        </div>
+
+        <div class="performance-summary-item">
+          <div class="performance-summary-label">Gross Profit</div>
+          <div id="perfGrossProfit" class="performance-summary-value positive">—</div>
+        </div>
+
+        <div class="performance-summary-item">
+          <div class="performance-summary-label">Gross Loss</div>
+          <div id="perfGrossLoss" class="performance-summary-value negative">—</div>
+        </div>
+
+        <div class="performance-summary-item">
+          <div class="performance-summary-label">Average P/L</div>
+          <div id="perfAvgPL" class="performance-summary-value">—</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</section>
   </main>
 
   <footer style="max-width: 1100px; margin: 40px auto 0; padding: 24px 16px; text-align: center; font-size: 10px; color: #4b5563; border-top: 1px solid #1e222d;">
@@ -412,9 +855,17 @@ async function fetchPrices(tickers) {
 // ============================================================
 // P/L CALC
 // ============================================================
+function rrDisplay(s) {
+  var base = Number(s.actual_entry_avg || s.entry_avg), sl = Number(s.stop_loss), t1 = Number(s.target_1);
+  if (base && sl && t1 && base > sl) {
+    var rr = (t1 - base) / (base - sl);
+    if (isFinite(rr) && rr > 0) return rr.toFixed(2) + 'R';
+  }
+  return s.risk_reward ? Number(s.risk_reward).toFixed(2) + 'R' : '-';
+}
 function computePL(s, currentPrice) {
   if (!currentPrice || !s.entry_avg) return null;
-  var entryAvg = Number(s.entry_avg);
+  var entryAvg = Number(s.actual_entry_avg || s.entry_avg);
   var cp = Number(currentPrice);
   if (!entryAvg || !cp) return null;
   var plPct = ((cp - entryAvg) / entryAvg) * 100;
@@ -559,7 +1010,7 @@ function renderSignalCard(s) {
         '</div>' +
         '<div style="text-align: right;">' +
           '<div style="font-size: 10px; color: #6b7280; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Risk / Reward</div>' +
-          '<div class="mono" style="font-size: 18px; font-weight: 800; color: #fbbf24;">' + (s.risk_reward ? Number(s.risk_reward).toFixed(2) + 'R' : '—') + '</div>' +
+          '<div class="mono" style="font-size: 18px; font-weight: 800; color: #fbbf24;">' + rrDisplay(s) + '</div>' +
         '</div>' +
       '</div>' +
 
@@ -701,7 +1152,7 @@ async function loadSignals() {
     document.getElementById('statTotal').textContent = allSignals.length;
     document.getElementById('statActive').textContent = allSignals.filter(function(s) { return s.status === 'ACTIVE'; }).length;
 
-    var closed = allSignals.filter(function(s) { return ['TP1','TP2','TP3','SL'].indexOf(s.outcome) >= 0; });
+    var closed = allSignals.filter(function(s) { return s.status === 'CLOSED' && ['TP1','TP2','TP3','SL'].indexOf(s.outcome) >= 0; });
     var wins = closed.filter(function(s) { return ['TP1','TP2','TP3'].indexOf(s.outcome) >= 0; }).length;
     document.getElementById('statWinRate').textContent = closed.length ? Math.round(wins / closed.length * 100) + '%' : '—';
     document.getElementById('statUpdated').textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
@@ -762,7 +1213,425 @@ document.addEventListener('keydown', function(e) {
 </div>
 
 <script src="/assets/chartnalist-track.js" defer></script>
+<script id="signal-performance-js">
+(function () {
+  "use strict";
+
+  var performanceData = null;
+
+  function perfEl(id) {
+    return document.getElementById(id);
+  }
+
+  function perfNum(value, fallback) {
+    var n = Number(value);
+    return Number.isFinite(n) ? n : (fallback == null ? 0 : fallback);
+  }
+
+  function perfPct(value) {
+    var n = perfNum(value);
+    return (n >= 0 ? "+" : "") + n.toFixed(2) + "%";
+  }
+
+  function perfDays(value) {
+    var n = perfNum(value);
+    return n.toFixed(1) + "d";
+  }
+
+  function setPerfValue(id, value, className) {
+    var el = perfEl(id);
+    if (!el) return;
+    el.textContent = value;
+    el.classList.remove("positive", "negative");
+    if (className) el.classList.add(className);
+  }
+
+  function renderPerformanceStats(stats) {
+    setPerfValue(
+      "perfRunning",
+      perfNum(stats.running) + " / " + perfNum(stats.active)
+    );
+
+    setPerfValue(
+      "perfProfit",
+      perfNum(stats.wins) + " / " + perfNum(stats.settled)
+    );
+
+    setPerfValue(
+      "perfLoss",
+      perfNum(stats.losses) + " / " + perfNum(stats.settled)
+    );
+
+    setPerfValue(
+      "perfTotalPL",
+      perfPct(stats.totalPL),
+      stats.totalPL >= 0 ? "positive" : "negative"
+    );
+
+    setPerfValue(
+      "perfAverageRR",
+      perfNum(stats.averageRR).toFixed(2) + "R"
+    );
+
+    setPerfValue(
+      "perfAvgMonth",
+      perfNum(stats.averageSettledPerMonth).toFixed(2)
+    );
+
+    setPerfValue(
+      "perfAvgHolding",
+      perfDays(stats.averageHoldingDays)
+    );
+
+    setPerfValue(
+      "perfAverageTP",
+      perfPct(stats.averageTP),
+      stats.averageTP >= 0 ? "positive" : "negative"
+    );
+
+    setPerfValue(
+      "perfAverageSL",
+      perfPct(stats.averageSL),
+      stats.averageSL >= 0 ? "positive" : "negative"
+    );
+
+    setPerfValue(
+      "perfConsecutiveProfit",
+      perfNum(stats.consecutiveProfit).toString()
+    );
+
+    setPerfValue(
+      "perfConsecutiveLoss",
+      perfNum(stats.consecutiveLoss).toString()
+    );
+
+    setPerfValue(
+      "perfAvgWeek",
+      perfNum(stats.averageSettledPerWeek).toFixed(2)
+    );
+
+    setPerfValue(
+      "perfGrossProfit",
+      perfPct(stats.grossProfit),
+      stats.grossProfit >= 0 ? "positive" : "negative"
+    );
+
+    setPerfValue(
+      "perfGrossLoss",
+      perfPct(stats.grossLoss),
+      stats.grossLoss >= 0 ? "positive" : "negative"
+    );
+
+    setPerfValue(
+      "perfAvgPL",
+      perfPct(stats.avgPL),
+      stats.avgPL >= 0 ? "positive" : "negative"
+    );
+  }
+
+  function renderFrequency(rows) {
+    var container = perfEl("performanceFrequency");
+    if (!container) return;
+
+    if (!Array.isArray(rows) || !rows.length) {
+      container.innerHTML = '<div class="performance-status">Belum ada settled signal.</div>';
+      return;
+    }
+
+    var max = 0;
+
+    rows.forEach(function (row) {
+      max = Math.max(max, perfNum(row.settled));
+    });
+
+    if (max <= 0) max = 1;
+
+    container.innerHTML = rows.map(function (row) {
+      var month = String(row.month || "—");
+      var count = perfNum(row.settled);
+      var pct = Math.max(0, Math.min(100, count / max * 100));
+
+      return (
+        '<div class="performance-frequency-row">' +
+          '<div class="performance-frequency-month">' + month + '</div>' +
+          '<div class="performance-frequency-bar">' +
+            '<div class="performance-frequency-fill" style="width:' + pct.toFixed(1) + '%"></div>' +
+          '</div>' +
+          '<div class="performance-frequency-value">' + count + '</div>' +
+        '</div>'
+      );
+    }).join("");
+  }
+
+  function renderChart(rows) {
+    var wrap = perfEl("performanceChartWrap");
+    var canvas = perfEl("performanceChart");
+
+    if (!wrap || !canvas) return;
+
+    if (!Array.isArray(rows) || !rows.length) {
+      wrap.innerHTML = '<div class="performance-empty">Belum ada settled signal untuk chart.</div>';
+      return;
+    }
+
+    var dpr = window.devicePixelRatio || 1;
+    var rect = wrap.getBoundingClientRect();
+    var width = Math.max(320, Math.floor(rect.width));
+    var height = Math.max(220, Math.floor(rect.height));
+
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+
+    var ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, width, height);
+
+    var pad = {
+      left: 48,
+      right: 16,
+      top: 16,
+      bottom: 30
+    };
+
+    var plotW = width - pad.left - pad.right;
+    var plotH = height - pad.top - pad.bottom;
+
+    var values = rows.map(function (r) {
+      return perfNum(r.cumulative_pl_pct);
+    });
+
+    var min = Math.min(0, Math.min.apply(null, values));
+    var max = Math.max(0, Math.max.apply(null, values));
+
+    if (min === max) {
+      min -= 1;
+      max += 1;
+    }
+
+    var range = max - min;
+
+    function x(i) {
+      if (rows.length === 1) return pad.left + plotW / 2;
+      return pad.left + (i / (rows.length - 1)) * plotW;
+    }
+
+    function y(v) {
+      return pad.top + ((max - v) / range) * plotH;
+    }
+
+    ctx.font = "10px Arial";
+    ctx.textBaseline = "middle";
+
+    // Grid + labels
+    for (var g = 0; g <= 4; g++) {
+      var value = max - (range * g / 4);
+      var gy = y(value);
+
+      ctx.strokeStyle = "#252b34";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, gy);
+      ctx.lineTo(width - pad.right, gy);
+      ctx.stroke();
+
+      ctx.fillStyle = "#68727d";
+      ctx.textAlign = "right";
+      ctx.fillText(value.toFixed(1) + "%", pad.left - 8, gy);
+    }
+
+    // Zero line
+    var zeroY = y(0);
+    ctx.strokeStyle = "#4b5563";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, zeroY);
+    ctx.lineTo(width - pad.right, zeroY);
+    ctx.stroke();
+
+    // Area
+    ctx.beginPath();
+    ctx.moveTo(x(0), zeroY);
+
+    rows.forEach(function (row, i) {
+      ctx.lineTo(x(i), y(perfNum(row.cumulative_pl_pct)));
+    });
+
+    ctx.lineTo(x(rows.length - 1), zeroY);
+    ctx.closePath();
+
+    ctx.fillStyle = "rgba(0,229,255,0.06)";
+    ctx.fill();
+
+    // Line
+    ctx.beginPath();
+
+    rows.forEach(function (row, i) {
+      var px = x(i);
+      var py = y(perfNum(row.cumulative_pl_pct));
+
+      if (i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    });
+
+    ctx.strokeStyle = "#00E5FF";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Points
+    rows.forEach(function (row, i) {
+      var px = x(i);
+      var py = y(perfNum(row.cumulative_pl_pct));
+
+      ctx.beginPath();
+      ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = "#00E5FF";
+      ctx.fill();
+    });
+
+    // X labels: first, middle, last
+    var indexes = [0];
+
+    if (rows.length > 2) {
+      indexes.push(Math.floor((rows.length - 1) / 2));
+    }
+
+    if (rows.length > 1) {
+      indexes.push(rows.length - 1);
+    }
+
+    ctx.fillStyle = "#68727d";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+
+    indexes.forEach(function (i) {
+      var label = String(rows[i].date || "").slice(0, 10);
+      ctx.fillText(label, x(i), height - pad.bottom + 10);
+    });
+  }
+
+  async function loadSignalPerformance() {
+    var status = perfEl("performanceStatus");
+
+    try {
+      var res = await fetch("/api/public/signals/performance", {
+        cache: "no-store"
+      });
+
+      if (!res.ok) {
+        throw new Error("HTTP " + res.status);
+      }
+
+      var data = await res.json();
+
+      if (!data || !data.success) {
+        throw new Error((data && data.error) || "Performance API gagal");
+      }
+
+      performanceData = data;
+
+      renderPerformanceStats(data.stats || {});
+      renderFrequency(data.frequency || []);
+      renderChart(data.growth || []);
+
+      if (status) {
+        status.textContent =
+          "Updated " +
+          new Date().toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit"
+          });
+      }
+    } catch (err) {
+      console.error("[signals-performance]", err);
+
+      if (status) {
+        status.textContent = "Performance belum dapat dimuat.";
+      }
+
+      var freq = perfEl("performanceFrequency");
+      if (freq) {
+        freq.innerHTML =
+          '<div class="performance-status">Performance API tidak tersedia.</div>';
+      }
+    }
+  }
+
+  window.loadSignalPerformance = loadSignalPerformance;
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", loadSignalPerformance);
+  } else {
+    loadSignalPerformance();
+  }
+
+  window.addEventListener("resize", function () {
+    if (performanceData && performanceData.growth) {
+      renderChart(performanceData.growth);
+    }
+  });
+})();
+</script>
+<script id="signal-performance-modal-js">
+(function () {
+
+  window.openSignalPerformance = function () {
+    const el = document.getElementById('signalPerformance');
+
+    if (!el) return;
+
+    el.classList.add('performance-modal-open');
+    el.setAttribute('aria-hidden', 'false');
+
+    document.body.dataset.signalPerformanceOverflow =
+      document.body.style.overflow || '';
+
+    document.body.style.overflow = 'hidden';
+
+    if (typeof window.loadSignalPerformance === 'function') {
+      window.loadSignalPerformance();
+    }
+
+    setTimeout(function () {
+      window.dispatchEvent(new Event('resize'));
+    }, 50);
+  };
+
+  window.closeSignalPerformance = function () {
+    const el = document.getElementById('signalPerformance');
+
+    if (!el) return;
+
+    el.classList.remove('performance-modal-open');
+    el.setAttribute('aria-hidden', 'true');
+
+    document.body.style.overflow =
+      document.body.dataset.signalPerformanceOverflow || '';
+
+    delete document.body.dataset.signalPerformanceOverflow;
+  };
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key !== 'Escape') return;
+
+    const el = document.getElementById('signalPerformance');
+
+    if (
+      el &&
+      el.classList.contains('performance-modal-open')
+    ) {
+      window.closeSignalPerformance();
+    }
+  });
+
+})();
+</script>
 </body>
 </html>
+
+
 
 
