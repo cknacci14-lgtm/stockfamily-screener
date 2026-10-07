@@ -212,10 +212,18 @@ async function calculateSignalCenter(normalized, cacheKey) {
       return 0;
     });
 
+  const allRows = result?.stocks || [];
+  const filteredInfo = {
+    considered: allRows.length,
+    noTrade: allRows.filter(row => row.idleSessions >= 1).length,
+    lateEntry: allRows.filter(row => !(row.idleSessions >= 1) && row.planStale).length,
+  };
+
   const payload = {
     success: true,
     date: result?.date || null,
     count: signals.length,
+    filtered: filteredInfo,
     signals,
     source: 'Signal Engine → Smartwatchlist Adapter',
     mode: 'SIGNAL_MONITOR',

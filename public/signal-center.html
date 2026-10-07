@@ -267,6 +267,37 @@ tr:last-child td {
 .flag-badge{display:inline-block;margin-top:4px;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:800;letter-spacing:.06em;border:1px solid}
 .flag-badge.plan{color:#ff9f43;border-color:rgba(255,159,67,.5);background:rgba(255,159,67,.1)}
 </style>
+<script id="cn-empty-note">
+(function () {
+  var orig = window.fetch;
+  if (!orig) return;
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
+  window.fetch = function () {
+    var p = orig.apply(this, arguments);
+    try {
+      var a = arguments[0];
+      var u = String((a && a.url) || a || '');
+      if (u.indexOf('/api/public/signal-center') !== -1) {
+        p.then(function (r) { return r.clone().json(); }).then(function (d) {
+          if (!d || Number(d.count) !== 0) return;
+          var el = document.getElementById('empty');
+          if (!el) return;
+          var f = d.filtered || null;
+          var html = '<strong>Tidak ada sinyal yang masih layak entry' + (d.date ? ' per ' + esc(d.date) : '') + '.</strong>';
+          if (f && f.considered > 0) {
+            html += '<br>Dari ' + esc(f.considered) + ' setup yang terdeteksi: ' + esc(f.lateEntry) +
+              ' disaring karena telat entry (potensi untung ke Target 1 lebih kecil dari risiko) dan ' + esc(f.noTrade) +
+              ' karena tidak bertransaksi pada sesi terakhir.';
+          }
+          html += '<br>Saham yang menekan resistansi dengan volatilitas menyempit (WATCH) muncul di sini saat memenuhi syarat.';
+          el.innerHTML = html;
+        }).catch(function () {});
+      }
+    } catch (e) {}
+    return p;
+  };
+})();
+</script>
 </head>
 
 <body>
