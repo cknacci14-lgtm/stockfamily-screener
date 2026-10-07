@@ -73,6 +73,7 @@ function cleanSignal(row) {
     entryGapPct: cleanNumber(row.entryGapPct),
     rrFromPrice: cleanNumber(row.rrFromPrice),
     planStale: row.planStale === true,
+    preBreakout: row.preBreakout === true,
     maxEntry: cleanNumber(row.maxEntry),
 
     structure: row.structure || null,
@@ -196,6 +197,8 @@ async function calculateSignalCenter(normalized, cacheKey) {
   const signals = (result?.stocks || [])
     // Stocks that did not trade in the latest session cannot be acted on.
     .filter(row => !(row.idleSessions >= 1))
+    // Late entries (reward below risk from the current price) are not actionable either.
+    .filter(row => !row.planStale)
     .map(cleanSignal)
     .sort((a, b) => {
       const ar = rankSignal(a);

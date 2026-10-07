@@ -8,6 +8,7 @@ const liquidity_1 = require("./evidence/liquidity");
 const breakout_1 = require("./setups/breakout");
 const pullback_1 = require("./setups/pullback");
 const accumulation_1 = require("./setups/accumulation");
+const prebreakout_1 = require("./setups/prebreakout");
 const trade_plan_1 = require("./risk/trade-plan");
 const signal_status_1 = require("./signal-status");
 function now() {
@@ -91,6 +92,16 @@ function evaluateStockSignal(input) {
         flow,
         liquidity,
     });
+    const preBreakout = (0, prebreakout_1.detectPreBreakout)({
+        close: input.close,
+        previousHigh20: input.previousHigh20,
+        sma20: input.sma20,
+        sma50: input.sma50,
+        trCompression: input.trCompression,
+        medianValue20: input.medianValue20,
+    });
+    let isPreBreakout = false;
+
     /*
      * Setup selection.
      *
@@ -120,6 +131,12 @@ function evaluateStockSignal(input) {
         setupDetected = true;
         trigger = accumulation.trigger;
     }
+    else if (preBreakout.detected) {
+        setup = "BREAKOUT";
+        setupDetected = true;
+        trigger = preBreakout.trigger;
+        isPreBreakout = true;
+    }
     /*
      * No confirmed setup means there is no trade plan.
      */
@@ -128,7 +145,7 @@ function evaluateStockSignal(input) {
             close: input.close,
             setup,
             trigger,
-            support: input.sma50,
+            support: isPreBreakout ? input.low10 : input.sma50,
             resistance: input.high20,
             recentLow: input.recentLow,
             recentHigh: input.recentHigh,

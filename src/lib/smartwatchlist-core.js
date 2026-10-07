@@ -536,6 +536,28 @@ function downsideDeviation(
   );
 }
 
+function trCompression(rows) {
+  if (rows.length < 21) return undefined;
+  const trs = [];
+  for (let i = rows.length - 20; i < rows.length; i++) {
+    const h = num(rows[i].high);
+    const l = num(rows[i].low);
+    const pc = num(rows[i - 1].close);
+    if (!Number.isFinite(h) || !Number.isFinite(l) || !Number.isFinite(pc)) return undefined;
+    trs.push(Math.max(h - l, Math.abs(h - pc), Math.abs(l - pc)));
+  }
+  const avg = (a) => a.reduce((s, v) => s + v, 0) / a.length;
+  const base = avg(trs);
+  if (!(base > 0)) return undefined;
+  return avg(trs.slice(-5)) / base;
+}
+
+function medianValue20(rows) {
+  const vals = last(rows, 20).map(r => num(r.value)).filter(Number.isFinite).sort((a, b) => a - b);
+  if (!vals.length) return undefined;
+  const m = vals.length >> 1;
+  return vals.length % 2 ? vals[m] : (vals[m - 1] + vals[m]) / 2;
+}
 function buildInput(
   rows,
   stock
@@ -751,6 +773,15 @@ function buildInput(
 
     atr:
       atr(rows, 14),
+
+    low10:
+      lowest(rows, "low", 10),
+
+    trCompression:
+      trCompression(rows),
+
+    medianValue20:
+      medianValue20(rows),
   };
 
   return input;
@@ -1160,6 +1191,7 @@ function computeSmartwatchlist(stocks, history, marketDate) {
         ? Math.round(((p - inv) / p) * 1000) / 10
         : null;
     row.stopWide = row.stopDistancePct !== null && row.stopDistancePct > 15;
+    row.preBreakout = row.setup === "BREAKOUT" && row.status === "WATCH";
     const trig = Number(row.trigger);
     const t1 = Number(row.target1);
     row.entryGapPct =

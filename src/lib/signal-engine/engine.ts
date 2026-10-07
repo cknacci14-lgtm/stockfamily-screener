@@ -25,6 +25,7 @@ import {
 import {
   detectAccumulation,
 } from "./setups/accumulation";
+import { detectPreBreakout } from "./setups/prebreakout";
 
 import {
   buildTradePlan,
@@ -80,6 +81,9 @@ export interface SignalEngineInput {
   historyDays?: number;
 
   atr?: number;
+  low10?: number;
+  trCompression?: number;
+  medianValue20?: number;
 }
 
 export interface SignalEngineResult {
@@ -190,6 +194,16 @@ export function evaluateStockSignal(
     liquidity,
   });
 
+  const preBreakout = detectPreBreakout({
+    close: input.close,
+    previousHigh20: input.previousHigh20,
+    sma20: input.sma20,
+    sma50: input.sma50,
+    trCompression: input.trCompression,
+    medianValue20: input.medianValue20,
+  });
+  let isPreBreakout = false;
+
   /*
    * Setup selection.
    *
@@ -218,6 +232,12 @@ export function evaluateStockSignal(
     setupDetected = true;
     trigger = accumulation.trigger;
   }
+  else if (preBreakout.detected) {
+    setup = "BREAKOUT";
+    setupDetected = true;
+    trigger = preBreakout.trigger;
+    isPreBreakout = true;
+  }
 
   /*
    * No confirmed setup means there is no trade plan.
@@ -228,7 +248,7 @@ export function evaluateStockSignal(
           close: input.close,
           setup,
           trigger,
-          support: input.sma50,
+          support: isPreBreakout ? input.low10 : input.sma50,
           resistance: input.high20,
           recentLow: input.recentLow,
           recentHigh: input.recentHigh,
