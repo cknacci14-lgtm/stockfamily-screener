@@ -2,7 +2,7 @@ name: Monitor Signals
 
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '*/15 2-9 * * 1-5'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -13,6 +13,10 @@ on:
         options:
           - 'false'
           - 'true'
+
+concurrency:
+  group: monitor-signals
+  cancel-in-progress: false
 
 jobs:
   monitor:
