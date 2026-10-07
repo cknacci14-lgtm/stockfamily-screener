@@ -3359,6 +3359,51 @@ function renderSummaryBase() {
     }
   }
 
+  async function loadBrokerSummary(code) {
+    const el = document.getElementById('brokerBody');
+    const dl = document.getElementById('brokerDateLabel');
+    if (!el) return;
+    el.style.color = '#8b93a7';
+    el.innerHTML = 'Memuat...';
+    try {
+      const token = await bkToken();
+      if (!token) { el.innerHTML = 'Login untuk melihat data broker.'; return; }
+      const head = { Authorization: 'Bearer ' + token };
+      const get = async function () {
+        const res = await fetch('/api/broker/' + encodeURIComponent(code), { headers: head });
+        const j = await res.json();
+        if (!res.ok || !j.success) throw new Error(j.error || ('HTTP ' + res.status));
+        return (j.rows && j.rows[0]) || null;
+      };
+      let row = await get();
+      let note = '';
+      const ref = window._radar && window._radar.date;
+      const ageDays = row ? (Date.now() - new Date(row.trade_date + 'T00:00:00Z').getTime()) / 86400000 : null;
+      const stale = row && ((ref && row.trade_date < ref) || ageDays > 5);
+      if (!row || stale) {
+        el.innerHTML = 'Mengambil data broker...';
+        const fr = await fetch('/api/broker-fill/' + encodeURIComponent(code), { method: 'POST', headers: head });
+        const fj = await fr.json().catch(function () { return {}; });
+        if (fr.ok && fj.success && (fj.filled || fj.cached)) row = await get();
+        else if (fj.unavailable) note = 'Data broker tanggal terbaru belum tersedia dari penyedia.';
+        else if (!fr.ok && fj.error) note = fj.error;
+      }
+      if (String(code).toUpperCase() !== String(activeCode).toUpperCase()) return;
+      const usable = row && Number(row.broker_count) > 0;
+      window._bk = { code: code, row: usable ? row : null };
+      if (!usable) {
+        if (dl) dl.textContent = '';
+        el.style.color = '#8b93a7';
+        el.innerHTML = bkEsc(note || (row ? 'Tidak ada transaksi broker untuk saham ini pada tanggal terbaru.' : 'Belum ada data broker untuk saham ini.'));
+        return;
+      }
+      bkRender();
+    } catch (err) {
+      el.style.color = '#FF5252';
+      el.innerHTML = 'Gagal memuat: ' + bkEsc(err.message);
+    }
+  }
+
   async function loadBandarmology(code) {
     try {
       const data = await apiGet(`/api/public/summary/${encodeURIComponent(code)}`);

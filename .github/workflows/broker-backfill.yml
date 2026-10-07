@@ -36,4 +36,5 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           ARJUM_API_KEY: ${{ secrets.ARJUM_API_KEY }}
+          BF_CAP: '600'
         run: node scripts/backfill-broker-sample.js

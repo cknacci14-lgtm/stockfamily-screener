@@ -1,4 +1,4 @@
-﻿// src/server.js - FIX V2.4 - Express v5 Safe Routing
+// src/server.js - FIX V2.4 - Express v5 Safe Routing
 const fs = require('fs');
 const express = require('express');
 const path = require('path');
@@ -30,7 +30,7 @@ try {
   backtestEngine = require('./engine/backtestEngine');
   console.log('[OK] Backtest Engine loaded');
 } catch (e) { 
-    console.error('Ã¢ Backtest Engine:', e.message);
+    console.error('â Backtest Engine:', e.message);
 }
 
 app.use((req, res, next) => {
@@ -426,6 +426,54 @@ app.get('/api/broker-radar', async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 });
+function cnSummarizeBroker(code, j) {
+  const rows = (j.brokers || []).map(b => ({ c: b.broker_code, n: b.broker_name, nval: +b.nval || 0, bval: +b.bval || 0, bvol: +b.bvol || 0, sval: +b.sval || 0, svol: +b.svol || 0 }));
+  const total = rows.reduce((s, x) => s + x.bval, 0);
+  const shape = x => ({ c: x.c, n: x.n, nval: Math.round(x.nval), bval: Math.round(x.bval), sval: Math.round(x.sval),
+    bavg: x.bvol > 0 ? Math.round(x.bval / x.bvol * 100) / 100 : null, savg: x.svol > 0 ? Math.round(x.sval / x.svol * 100) / 100 : null });
+  const buyers = rows.filter(x => x.nval > 0).sort((a, b) => b.nval - a.nval).slice(0, 10);
+  const sellers = rows.filter(x => x.nval < 0).sort((a, b) => a.nval - b.nval).slice(0, 10);
+  return {
+    trade_date: j.broker_end_date, stock_code: code, total_value: Math.round(total), broker_count: rows.length,
+    top_buyers: buyers.map(shape), top_sellers: sellers.map(shape),
+    top3_buy_net: Math.round(buyers.slice(0, 3).reduce((s, x) => s + x.nval, 0)),
+    top3_sell_net: Math.round(sellers.slice(0, 3).reduce((s, x) => s + x.nval, 0))
+  };
+}
+app.use('/api/broker-fill', (req, res, next) => {
+  if (String(process.env.BROKER_ENABLED || '').toLowerCase() === 'off') return res.status(503).json({ success: false, error: 'Fitur broker sedang dinonaktifkan' });
+  next();
+});
+app.post('/api/broker-fill/:code', async (req, res) => {
+  try {
+    const user = await cnRequireUser(req);
+    if (!user) return res.status(401).json({ success: false, error: 'Login diperlukan' });
+    const code = String(req.params.code || '').trim().toUpperCase();
+    if (!/^[A-Z0-9]{3,6}$/.test(code)) return res.status(400).json({ success: false, error: 'Kode tidak valid' });
+    if (!process.env.ARJUM_API_KEY) return res.status(503).json({ success: false, error: 'Penyedia data belum dikonfigurasi' });
+    const lt = await supabase.from('daily_stock_data').select('trade_date').order('trade_date', { ascending: false }).limit(1);
+    const day = lt.data && lt.data[0] ? lt.data[0].trade_date : null;
+    if (!day) return res.status(503).json({ success: false, error: 'Data harian belum ada' });
+    const have = await supabase.from('broker_summary_daily').select('trade_date').eq('stock_code', code).eq('trade_date', day).limit(1);
+    if (have.data && have.data.length) return res.json({ success: true, cached: true });
+    const mine = await supabase.rpc('api_usage_add', { p_provider: 'fill:' + user.id, p_n: 1 });
+    if (Number(mine.data) > 15) return res.status(429).json({ success: false, error: 'Batas pengisian data harian tercapai (15 saham per hari)' });
+    const wib = new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 10);
+    const uq = await supabase.from('api_usage').select('count').eq('provider', 'arjum').eq('day', wib).maybeSingle();
+    if ((uq.data ? Number(uq.data.count) : 0) >= 800) return res.status(503).json({ success: false, error: 'Kuota data penyedia hari ini hampir habis, coba lagi besok' });
+    await supabase.rpc('api_usage_add', { p_provider: 'arjum', p_n: 1 });
+    const r = await fetch('https://stock.arjum.com/api/broker-summary/' + encodeURIComponent(code) + '?all_data=true', { headers: { 'X-API-Key': process.env.ARJUM_API_KEY, Accept: 'application/json' } });
+    if (!r.ok) return res.status(502).json({ success: false, error: 'Penyedia data menjawab HTTP ' + r.status });
+    const j = await r.json();
+    if (j.broker_end_date !== day) return res.json({ success: true, unavailable: true });
+    const up = await supabase.from('broker_summary_daily').upsert(cnSummarizeBroker(code, j), { onConflict: 'trade_date,stock_code' });
+    if (up.error) throw up.error;
+    res.json({ success: true, filled: true });
+  } catch (err) {
+    console.error('[broker-fill]', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 app.get('/api/admin/stats', requireAdmin, async (req, res) => {
   try {
     const { data: lastBatch } = await supabase.from('upload_batches').select('*').order('trade_date', { ascending: false }).limit(1).maybeSingle();
@@ -789,7 +837,7 @@ app.get('/api/public/watchlist', async (req, res) => {
 
 
 /*
- * CHARTNALIST â€” Signal Center
+ * CHARTNALIST — Signal Center
  *
  * Adapter/view endpoint only.
  * Signal Engine remains authoritative.
@@ -1448,7 +1496,7 @@ app.get('/api/public/signals', async (req, res) => {
 
 // ============================================================
 
-ï»¿app.get('/api/public/signals/performance', async (req, res) => {
+﻿app.get('/api/public/signals/performance', async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('signals')
@@ -2079,4 +2127,3 @@ if (require.main === module) {
 }
 
 module.exports = app;
-

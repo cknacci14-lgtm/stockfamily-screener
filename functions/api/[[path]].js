@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // Cloudflare Pages Function - API Router (Batch A + B)
 // ============================================================
 
@@ -398,6 +398,71 @@ app.get('/api/broker-radar', async (c) => {
     return c.json({ success: false, error: err.message }, 500);
   }
 });
+async function cnRpcArgs(env, fn, args) {
+  const r = await fetch(env.SUPABASE_URL + '/rest/v1/rpc/' + fn, {
+    method: 'POST',
+    headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: 'Bearer ' + env.SUPABASE_SERVICE_ROLE_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify(args)
+  });
+  if (!r.ok) throw new Error(fn + ' HTTP ' + r.status);
+  return await r.json();
+}
+async function cnUpsertBroker(env, row) {
+  const r = await fetch(env.SUPABASE_URL + '/rest/v1/broker_summary_daily?on_conflict=trade_date,stock_code', {
+    method: 'POST',
+    headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: 'Bearer ' + env.SUPABASE_SERVICE_ROLE_KEY, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=minimal' },
+    body: JSON.stringify(row)
+  });
+  if (!r.ok) throw new Error('simpan HTTP ' + r.status + ' ' + (await r.text()).slice(0, 120));
+}
+function cnSummarizeBroker(code, j) {
+  const rows = (j.brokers || []).map(b => ({ c: b.broker_code, n: b.broker_name, nval: +b.nval || 0, bval: +b.bval || 0, bvol: +b.bvol || 0, sval: +b.sval || 0, svol: +b.svol || 0 }));
+  const total = rows.reduce((s, x) => s + x.bval, 0);
+  const shape = x => ({ c: x.c, n: x.n, nval: Math.round(x.nval), bval: Math.round(x.bval), sval: Math.round(x.sval),
+    bavg: x.bvol > 0 ? Math.round(x.bval / x.bvol * 100) / 100 : null, savg: x.svol > 0 ? Math.round(x.sval / x.svol * 100) / 100 : null });
+  const buyers = rows.filter(x => x.nval > 0).sort((a, b) => b.nval - a.nval).slice(0, 10);
+  const sellers = rows.filter(x => x.nval < 0).sort((a, b) => a.nval - b.nval).slice(0, 10);
+  return {
+    trade_date: j.broker_end_date, stock_code: code, total_value: Math.round(total), broker_count: rows.length,
+    top_buyers: buyers.map(shape), top_sellers: sellers.map(shape),
+    top3_buy_net: Math.round(buyers.slice(0, 3).reduce((s, x) => s + x.nval, 0)),
+    top3_sell_net: Math.round(sellers.slice(0, 3).reduce((s, x) => s + x.nval, 0))
+  };
+}
+app.use('/api/broker-fill/*', async (c, next) => {
+  if (String(c.env.BROKER_ENABLED || '').toLowerCase() === 'off') return c.json({ success: false, error: 'Fitur broker sedang dinonaktifkan' }, 503);
+  await next();
+});
+app.post('/api/broker-fill/:code', async (c) => {
+  try {
+    const user = await cnRequireUser(c);
+    if (!user) return c.json({ success: false, error: 'Login diperlukan' }, 401);
+    const code = String(c.req.param('code') || '').trim().toUpperCase();
+    if (!/^[A-Z0-9]{3,6}$/.test(code)) return c.json({ success: false, error: 'Kode tidak valid' }, 400);
+    const env = c.env;
+    if (!env.ARJUM_API_KEY) return c.json({ success: false, error: 'Penyedia data belum dikonfigurasi' }, 503);
+    const latest = await cnGetOne(env, 'daily_stock_data?select=trade_date&order=trade_date.desc&limit=1');
+    if (!latest) return c.json({ success: false, error: 'Data harian belum ada' }, 503);
+    const day = latest.trade_date;
+    const have = await cnGetOne(env, 'broker_summary_daily?select=trade_date&stock_code=eq.' + code + '&trade_date=eq.' + day);
+    if (have) return c.json({ success: true, cached: true });
+    const mine = await cnRpcArgs(env, 'api_usage_add', { p_provider: 'fill:' + user.id, p_n: 1 });
+    if (Number(mine) > 15) return c.json({ success: false, error: 'Batas pengisian data harian tercapai (15 saham per hari)' }, 429);
+    const wib = new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 10);
+    const usage = await cnGetOne(env, 'api_usage?select=count&provider=eq.arjum&day=eq.' + wib);
+    if ((usage ? Number(usage.count) : 0) >= 800) return c.json({ success: false, error: 'Kuota data penyedia hari ini hampir habis, coba lagi besok' }, 503);
+    await cnRpcArgs(env, 'api_usage_add', { p_provider: 'arjum', p_n: 1 });
+    const r = await fetch('https://stock.arjum.com/api/broker-summary/' + encodeURIComponent(code) + '?all_data=true', { headers: { 'X-API-Key': env.ARJUM_API_KEY, Accept: 'application/json' } });
+    if (!r.ok) return c.json({ success: false, error: 'Penyedia data menjawab HTTP ' + r.status }, 502);
+    const j = await r.json();
+    if (j.broker_end_date !== day) return c.json({ success: true, unavailable: true });
+    await cnUpsertBroker(env, cnSummarizeBroker(code, j));
+    return c.json({ success: true, filled: true });
+  } catch (err) {
+    console.error('[broker-fill]', err);
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
 app.get('/api/yahoo/quote', async (c) => {
   try {
     const symbols = c.req.query('symbols') || '';
@@ -506,7 +571,8 @@ app.get('/api/public/signals', async (c) => {
     
     let query = 'signals?select=*&status=in.(PUBLISHED,ACTIVE,CLOSED,EXPIRED)&order=published_at.desc&limit=100';
     if (statusFilter) {
-      query = 'signals?select=*&status=eq.' + statusFilter + '&order=published_at.desc&limit=100';
+      const st = String(statusFilter).toUpperCase();
+if (['PUBLISHED', 'ACTIVE', 'CLOSED', 'EXPIRED'].includes(st)) query = 'signals?select=*&status=eq.' + st + '&order=published_at.desc&limit=100';
     }
     
     const signals = await sbFetch(env, query);
@@ -523,7 +589,7 @@ app.get('/api/public/signals', async (c) => {
 app.get('/api/public/signals/performance', async (c) => {
   try {
     const env = c.env;
-    const signals = await sbFetch(env, 'signals?select=*&order=created_at.asc');
+    const signals = await sbFetch(env, 'signals?select=*&status=neq.DRAFT&order=created_at.asc');
     const all = signals || [];
 
     const ACTIVE_STATUSES = ['PUBLISHED', 'ACTIVE'];
@@ -563,13 +629,13 @@ app.get('/api/public/signals/performance', async (c) => {
     };
 
     const getLifecycleStart = s =>
-      s.activated_at ||
+      s.entry_hit_at || s.activated_at ||
       s.published_at ||
       s.created_at ||
       null;
 
     const getRealizedPct = s => {
-      const entry = num(s.entry_avg);
+      const entry = num(s.actual_entry_avg || s.entry_avg);
       const exit = getExitPrice(s);
 
       if (entry === null || entry <= 0 || exit === null) return null;
@@ -1035,6 +1101,27 @@ function validateSignalInput(body) {
   if (![e1, sl, tp1].every(Number.isFinite)) errors.push('Entry, stop loss, dan target harus berupa angka');
   if (sl >= e1) errors.push('Stop loss harus lebih rendah dari entry');
   if (tp1 <= e1) errors.push('Target 1 harus lebih tinggi dari entry');
+  (function () {
+    const tickOf = p => p < 200 ? 1 : p < 500 ? 2 : p < 2000 ? 5 : p < 5000 ? 10 : 25;
+    const px = v => (v === undefined || v === null || v === '') ? null : Number(v);
+    const ent = [px(body.entry_1), px(body.entry_2), px(body.entry_3)].filter(v => v !== null);
+    const tps = [px(body.target_1), px(body.target_2), px(body.target_3)].filter(v => v !== null);
+    const lv = ent.concat([sl], tps);
+    if (!lv.every(v => Number.isFinite(v))) { errors.push('Semua level harus berupa angka'); return; }
+    lv.forEach(v => {
+      const t = tickOf(v);
+      if (Math.abs(v / t - Math.round(v / t)) > 1e-9) errors.push('Harga ' + v + ' bukan kelipatan fraksi harga IDX (' + t + ')');
+    });
+    ent.forEach((v, i) => {
+      if (v <= sl) errors.push('Entry ' + (i + 1) + ' harus di atas stop loss');
+      if (i > 0 && v > ent[i - 1]) errors.push('Entry harus menurun (E1 >= E2 >= E3)');
+    });
+    tps.forEach((v, i) => { if (i > 0 && v <= tps[i - 1]) errors.push('Target harus menaik (T1 < T2 < T3)'); });
+    if (ent.length === 3) {
+      const w = (Number(body.entry_1_pct) || 30) + (Number(body.entry_2_pct) || 30) + (Number(body.entry_3_pct) || 40);
+      if (Math.round(w) !== 100) errors.push('Bobot entry harus berjumlah 100');
+    }
+  })();
   return errors;
 }
 
@@ -1163,6 +1250,8 @@ app.patch('/api/admin/signals/:id', async (c) => {
     allowed.forEach(k => { if (body[k] !== undefined) updateData[k] = body[k]; });
     
     const merged = { ...existing[0], ...updateData };
+    const vErr = validateSignalInput(merged);
+    if (vErr.length) return c.json({ success: false, error: vErr.join(', ') }, 400);
     updateData.entry_avg = calcEntryAvg(merged);
     updateData.risk_reward = calcRR(merged);
     
