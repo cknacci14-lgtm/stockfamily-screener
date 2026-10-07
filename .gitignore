@@ -65,3 +65,9 @@ archive/
 public/* - Copy.html
 scripts/qbs-pullback-*.js
 scripts/patch-*.js
+
+# backup dan hasil audit
+*.bak*
+*.before-*
+audit-signals-*
+signals-ui-audit.txt
