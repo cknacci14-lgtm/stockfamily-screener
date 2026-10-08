@@ -290,6 +290,7 @@ tr:last-child td {
             html += '<br>Dari ' + esc(f.considered) + ' setup yang terdeteksi: ' + esc(f.lateEntry) +
               ' disaring karena telat entry (potensi untung ke Target 1 lebih kecil dari risiko) dan ' + esc(f.noTrade) +
               ' karena tidak bertransaksi pada sesi terakhir.';
+          if (f && f.wideStop > 0) { html += ' ' + esc(f.wideStop) + ' lagi disaring karena stop lebih dari 25% dari harga.'; }
           }
           html += '<br>Saham yang menekan resistansi dengan volatilitas menyempit (WATCH) muncul di sini saat memenuhi syarat.';
           el.innerHTML = html;

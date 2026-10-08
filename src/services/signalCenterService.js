@@ -55,6 +55,8 @@ function cleanNumber(value) {
   return Number.isFinite(n) ? n : null;
 }
 
+const MAX_STOP_PCT = 25;
+
 function cleanSignal(row) {
   return {
     stockCode: String(row.stockCode || '').trim().toUpperCase(),
@@ -201,6 +203,8 @@ async function calculateSignalCenter(normalized, cacheKey) {
     .filter(row => !(row.idleSessions >= 1))
     // Late entries (reward below risk from the current price) are not actionable either.
     .filter(row => !row.planStale)
+    // A stop wider than MAX_STOP_PCT makes position sizing impractical.
+    .filter(row => !(row.stopDistancePct > MAX_STOP_PCT))
     .map(cleanSignal)
     .sort((a, b) => {
       const ar = rankSignal(a);
@@ -219,6 +223,7 @@ async function calculateSignalCenter(normalized, cacheKey) {
     considered: allRows.length,
     noTrade: allRows.filter(row => row.idleSessions >= 1).length,
     lateEntry: allRows.filter(row => !(row.idleSessions >= 1) && row.planStale).length,
+  wideStop: allRows.filter(row => !(row.idleSessions >= 1) && !row.planStale && row.stopDistancePct > MAX_STOP_PCT).length,
   };
 
   const payload = {
