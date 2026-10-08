@@ -395,6 +395,7 @@
 .flag-badge.wide{color:#ff4d4d;border-color:rgba(255,77,77,.4);background:rgba(255,77,77,.08)}
 .flag-badge.suspend{color:#ff4d4d;border-color:rgba(255,77,77,.5);background:rgba(255,77,77,.12)}
 .flag-badge.plan{color:#ff9f43;border-color:rgba(255,159,67,.5);background:rgba(255,159,67,.1)}
+.flag-badge.pre{color:#4dd0ff;border-color:rgba(77,208,255,.5);background:rgba(77,208,255,.1)}
 .stop-sub{margin-top:3px;font-size:10px;font-weight:600;opacity:.8}
 .stop-sub .flag-badge{margin-top:0;margin-left:4px}
 .rr-value {
@@ -959,6 +960,7 @@ tbody tr:hover{
               <div class="ticker">${esc(row.stockCode)}</div>
               <div class="name">${esc(row.stockName || "")}</div>
               ${staleBadge(row)}
+              ${row.preBreakout ? '<div class="flag-badge pre" title="Harga masih di bawah trigger. Menunggu close di atas trigger.">PRA-BREAKOUT</div>' : ""}
               ${row.planStale ? '<div class="flag-badge plan" title="Harga sudah di atas batas entry wajar: potensi untung ke Target 1 lebih kecil dari risiko ke stop (di bawah 1 banding 1), atau Target 1 sudah terlewati.">TELAT ENTRY' + (row.maxEntry != null ? ' \u00b7 maks ' + formatPrice(row.maxEntry) : '') + '</div>' : ""}
             </a>
           </td>

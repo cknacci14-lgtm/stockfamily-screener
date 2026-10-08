@@ -266,6 +266,8 @@ tr:last-child td {
 <style id="cn-plan-badge">
 .flag-badge{display:inline-block;margin-top:4px;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:800;letter-spacing:.06em;border:1px solid}
 .flag-badge.plan{color:#ff9f43;border-color:rgba(255,159,67,.5);background:rgba(255,159,67,.1)}
+.flag-badge.pre{color:#4dd0ff;border-color:rgba(77,208,255,.5);background:rgba(77,208,255,.1)}
+.flag-badge.wide{color:#ff4d4d;border-color:rgba(255,77,77,.4);background:rgba(255,77,77,.08)}
 </style>
 <script id="cn-empty-note">
 (function () {
@@ -427,7 +429,14 @@ tr:last-child td {
       const badge = row.planStale
         ? '<div class="flag-badge plan" title="Harga sudah di atas batas entry wajar: potensi untung ke Target 1 lebih kecil dari risiko ke stop (di bawah 1 banding 1), atau Target 1 sudah terlewati.">TELAT ENTRY' + (row.maxEntry != null ? ' \u00b7 maks ' + fmt(row.maxEntry) : '') + '</div>'
         : '';
-      return base + badge;
+      let extra = '';
+      if (row.preBreakout) {
+        extra += '<div class="flag-badge pre" title="Harga masih di bawah trigger. R:R di kolom ini dihitung dari harga sekarang. Jika menunggu harga menembus trigger, R:R ke Target 1 = 1,5R.">PRA-BREAKOUT' + (row.trigger != null ? ' \u00b7 trigger ' + fmt(row.trigger) : '') + '</div>';
+      }
+      if (row.stopWide) {
+        extra += '<div class="flag-badge wide" title="Stop lebih dari 15% dari harga.">STOP LEBAR' + (row.stopDistancePct != null ? ' \u00b7 ' + fmt(row.stopDistancePct) + '%' : '') + '</div>';
+      }
+      return base + badge + extra;
     }
 
   function render() {

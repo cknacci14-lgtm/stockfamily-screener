@@ -74,6 +74,8 @@ function cleanSignal(row) {
     rrFromPrice: cleanNumber(row.rrFromPrice),
     planStale: row.planStale === true,
     preBreakout: row.preBreakout === true,
+    stopDistancePct: cleanNumber(row.stopDistancePct),
+    stopWide: row.stopWide === true,
     maxEntry: cleanNumber(row.maxEntry),
 
     structure: row.structure || null,
