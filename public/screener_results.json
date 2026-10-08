@@ -4,12 +4,12 @@
   "regime": "Weak",
   "regimeDetails": {
     "regime": "Weak",
-    "pctUp": 0.3374233128834356,
-    "meanFnet": -2925456.7484662575,
-    "universeSize": 326
+    "pctUp": 0.2175226586102719,
+    "meanFnet": -2761532.6283987914,
+    "universeSize": 331
   },
-  "generatedAt": "2026-10-07T19:23:18.805Z",
-  "lastSync": "8/10/2026, 02.23.18",
+  "generatedAt": "2026-10-08T19:19:25.552Z",
+  "lastSync": "9/10/2026, 02.19.25",
   "total": 0,
   "data": []
 }

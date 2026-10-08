@@ -1,70 +1,75 @@
 {
   "success": true,
-  "date": "2026-10-07",
-  "count": 3,
+  "date": "2026-10-08",
+  "count": 4,
   "filtered": {
-    "considered": 10,
+    "considered": 9,
     "noTrade": 4,
-    "lateEntry": 3
+    "lateEntry": 1,
+    "wideStop": 0
   },
   "signals": [
     {
-      "stockCode": "PCAR",
-      "stockName": "Prima Cakrawala Abadi Tbk.",
+      "stockCode": "BSML",
+      "stockName": "Bintang Samudera Mandiri Lines Tbk.",
       "setup": "BREAKOUT",
-      "status": "TRIGGERED",
-      "price": 80,
-      "trigger": 75,
-      "invalidation": 52.68,
-      "target1": 108.48,
-      "target2": 130.8,
+      "status": "WATCH",
+      "price": 560,
+      "trigger": 575,
+      "invalidation": 535.71,
+      "target1": 633.93,
+      "target2": 673.21,
       "riskReward": 2.5,
-      "riskLevel": "HIGH",
-      "entryGapPct": 6.7,
-      "rrFromPrice": 1.04,
+      "riskLevel": "MEDIUM",
+      "entryGapPct": -2.6,
+      "rrFromPrice": 3.04,
       "planStale": false,
-      "preBreakout": false,
-      "maxEntry": 80.58,
+      "preBreakout": true,
+      "stopDistancePct": 4.3,
+      "stopWide": false,
+      "maxEntry": 584.82,
       "structure": {
         "state": "BULLISH",
         "label": "Bullish structure",
         "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
       },
       "participation": {
-        "state": "IMPROVING",
-        "label": "Participation improving",
-        "explanation": "Multiple trading-activity measures are materially above their recent baseline."
+        "state": "CONTRACTING",
+        "label": "Participation contracting",
+        "explanation": "Multiple trading-activity measures are below their recent baseline."
       },
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": 0.0001614504144508272,
+        "value": 0.00013550931413322412,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
-        "state": "HEALTHY",
-        "label": "Healthy liquidity",
-        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
+        "state": "THIN",
+        "label": "Thin liquidity",
+        "explanation": "Trading activity is materially below the minimum liquidity baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-07T19:26:56.416Z"
+      "updatedAt": "2026-10-08T19:22:26.643Z"
     },
     {
       "stockCode": "SGER",
       "stockName": "Sumber Global Energy Tbk.",
       "setup": "BREAKOUT",
       "status": "WATCH",
-      "price": 765,
+      "price": 760,
       "trigger": 785,
       "invalidation": 694.82,
       "target1": 920.27,
       "target2": 1010.45,
       "riskReward": 2.5,
       "riskLevel": "HIGH",
-      "entryGapPct": -2.5,
-      "rrFromPrice": 2.21,
+      "entryGapPct": -3.2,
+      "rrFromPrice": 2.46,
       "planStale": false,
       "preBreakout": true,
+      "stopDistancePct": 8.6,
+      "stopWide": false,
       "maxEntry": 807.55,
       "structure": {
         "state": "NEUTRAL",
@@ -72,14 +77,14 @@
         "explanation": "Price structure does not currently show a decisive directional condition."
       },
       "participation": {
-        "state": "NEUTRAL",
-        "label": "Normal participation",
-        "explanation": "Trading activity is not showing a decisive expansion or contraction."
+        "state": "CONTRACTING",
+        "label": "Participation contracting",
+        "explanation": "Multiple trading-activity measures are below their recent baseline."
       },
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": -0.000003707158147950197,
+        "value": 0.000001685644174072374,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
@@ -88,25 +93,70 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-07T19:26:56.416Z"
+      "updatedAt": "2026-10-08T19:22:26.643Z"
     },
     {
       "stockCode": "ULTJ",
       "stockName": "Ultrajaya Milk Industry & Trading Company Tbk.",
-      "setup": "ACCUMULATION",
+      "setup": "BREAKOUT",
       "status": "WATCH",
-      "price": 2070,
-      "trigger": null,
-      "invalidation": 1908.39,
-      "target1": 2312.41,
-      "target2": 2474.02,
+      "price": 2150,
+      "trigger": 2190,
+      "invalidation": 2059.64,
+      "target1": 2385.54,
+      "target2": 2515.89,
       "riskReward": 2.5,
-      "riskLevel": "HIGH",
-      "entryGapPct": 0,
-      "rrFromPrice": 1.5,
+      "riskLevel": "MEDIUM",
+      "entryGapPct": -1.8,
+      "rrFromPrice": 2.61,
+      "planStale": false,
+      "preBreakout": true,
+      "stopDistancePct": 4.2,
+      "stopWide": false,
+      "maxEntry": 2222.59,
+      "structure": {
+        "state": "IMPROVING",
+        "label": "Structure improving",
+        "explanation": "Price remains above the main short/intermediate trend references with increasing price activity."
+      },
+      "participation": {
+        "state": "NEUTRAL",
+        "label": "Normal participation",
+        "explanation": "Trading activity is not showing a decisive expansion or contraction."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": 0.000054091337315039935,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HEALTHY",
+        "label": "Healthy liquidity",
+        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-10-08T19:22:26.643Z"
+    },
+    {
+      "stockCode": "MPMX",
+      "stockName": "Mitra Pinasthika Mustika Tbk.",
+      "setup": "BREAKOUT",
+      "status": "INVALIDATED",
+      "price": 1025,
+      "trigger": 1060,
+      "invalidation": 1027.86,
+      "target1": 1108.21,
+      "target2": 1140.36,
+      "riskReward": 2.5,
+      "riskLevel": "MEDIUM",
+      "entryGapPct": -3.3,
+      "rrFromPrice": 0,
       "planStale": false,
       "preBreakout": false,
-      "maxEntry": 2110.4,
+      "stopDistancePct": 0,
+      "stopWide": false,
+      "maxEntry": 1068.03,
       "structure": {
         "state": "NEUTRAL",
         "label": "Neutral structure",
@@ -120,19 +170,19 @@
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": 0.00004099040518566886,
+        "value": -0.00011405405742085154,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
-        "state": "HEALTHY",
-        "label": "Healthy liquidity",
-        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
+        "state": "HIGH_RISK",
+        "label": "Elevated liquidity risk",
+        "explanation": "One or more execution-quality measures are below the preferred baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-07T19:26:56.416Z"
+      "updatedAt": "2026-10-08T19:22:26.643Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-10-07T19:26:56.416Z"
+  "generatedAt": "2026-10-08T19:22:26.643Z"
 }
