@@ -45,7 +45,16 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SIGNAL_LOG: '1'
         run: node scripts/build-signal-center-snapshot.js
+
+      - name: Signal performance report
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: node scripts/signal-performance.js report
 
       - name: Commit updated screener + paper trade log
         run: |
@@ -54,6 +63,7 @@ jobs:
           git add public/screener_results.json public/results/screener_results.json
           git add public/results/paper-trade-log.json
           git add public/data/signal-center-snapshot.json
+          git add public/data/signal-log.json public/data/signal-performance.json 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else

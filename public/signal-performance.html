@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Signal Performance</title>
+<style>
+:root{--bg:#050608;--panel:#0d1114;--line:rgba(255,255,255,.09);--text:#e8ecef;--muted:#8b949c;--green:#00d084;--cyan:#00d9ff;--red:#ff4d4d;--amber:#ffb020}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1200px;margin:0 auto;padding:26px 18px 70px}
+a{color:var(--cyan);text-decoration:none}
+.eyebrow{color:var(--cyan);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+h1{margin:6px 0 4px;font-size:30px;letter-spacing:-.01em}
+h2{margin:30px 0 10px;font-size:16px}
+.sub,.meta{color:var(--muted)}
+.meta{font-size:12px;margin-top:6px}
+.caveat{margin:18px 0 6px;padding:14px 18px;border:1px solid rgba(255,176,32,.35);background:rgba(255,176,32,.07);border-radius:12px;color:#f0d9a8;font-size:13px}
+.caveat ul{margin:6px 0 0;padding-left:18px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:16px 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.card b{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 10px}
+.btn{background:transparent;color:var(--text);border:1px solid var(--line);border-radius:9px;padding:7px 14px;font:inherit;font-size:12px;font-weight:700;letter-spacing:.05em;cursor:pointer}
+.btn.on{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,.08)}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:900px}
+th,td{padding:10px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+th:first-child,td:first-child,td.l,th.l{text-align:left}
+tr:last-child td{border-bottom:0}
+tr.sub td:first-child{padding-left:26px;color:var(--muted)}
+td.empty{text-align:center;padding:34px 16px;color:var(--muted);white-space:normal}
+.pos{color:var(--green)}.neg{color:var(--red)}
+.tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:800;letter-spacing:.05em;border:1px solid}
+.v-up{color:var(--green);border-color:rgba(0,208,132,.45);background:rgba(0,208,132,.08)}
+.v-down{color:var(--red);border-color:rgba(255,77,77,.45);background:rgba(255,77,77,.08)}
+.v-flat{color:var(--cyan);border-color:rgba(0,217,255,.4);background:rgba(0,217,255,.07)}
+.v-none{color:var(--muted);border-color:var(--line)}
+.note{color:var(--muted);font-size:12px;margin:8px 2px}
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Chartnalist</div>
+  <h1>Signal Performance</h1>
+  <div class="sub">Monitoring dan evaluasi sinyal. Bukan rekomendasi beli atau jual. <a href="/signal-center.html">Kembali ke Signal Center</a></div>
+  <div class="meta" id="meta">Memuat...</div>
+
+  <div class="caveat"><b>Baca dulu.</b>
+    <ul>
+      <li>Sumber <b>LIVE</b> dicatat otomatis oleh workflow harian sebelum hasilnya diketahui. Itu satu-satunya bukti di luar sampel.</li>
+      <li>Sumber <b>BACKFILL</b> adalah hitung ulang riwayat dengan aturan sekarang. Aturannya dipilih setelah melihat data yang sama (in-sample), jadi jangan dipakai sebagai bukti.</li>
+    </ul>
+    <ul id="caveats"></ul>
+  </div>
+
+  <div class="cards" id="cards"></div>
+
+  <h2>Ringkasan per kelompok</h2>
+  <div class="bar">
+    <button class="btn" id="srcLive" type="button">LIVE</button>
+    <button class="btn" id="srcBackfill" type="button">BACKFILL (in-sample)</button>
+    <span style="flex:1"></span>
+    <button class="btn" id="viewShown" type="button">TAMPIL DI SIGNAL CENTER</button>
+    <button class="btn" id="viewFiltered" type="button">DISARING</button>
+  </div>
+  <div class="scroll"><table>
+    <thead><tr>
+      <th>Kelompok</th><th>Sinyal</th><th>Tanggal</th>
+      <th title="Sinyal yang sudah punya data 10 sesi ke depan">n (10 sesi)</th>
+      <th title="Median return 10 sesi dikurangi median semua saham likuid pada tanggal yang sama, dalam poin persen">Excess median 10s</th>
+      <th title="Persen sinyal yang mengalahkan median pasar">Mengalahkan pasar</th>
+      <th title="Persen WATCH yang menembus trigger dalam 10 sesi">Terpicu</th>
+      <th title="Persen yang mencapai Target 1 sebelum stop">Capai T1</th>
+      <th>Kena stop</th>
+      <th title="Rata-rata hasil dalam kelipatan risiko (R) ke Target 1">Rata-rata R (T1)</th>
+      <th>Vonis</th>
+    </tr></thead>
+    <tbody id="groupBody"></tbody>
+  </table></div>
+  <div class="note">Persen "Capai T1" dan "Kena stop" tidak bisa dibandingkan antar kelompok karena jarak target dan stop berbeda. Bandingkan excess dan rata-rata R. Vonis hanya heuristik (minimal 30 sinyal dari 10 tanggal).</div>
+
+  <h2>Sinyal terbaru dan hasilnya</h2>
+  <div class="scroll"><table style="min-width:1000px">
+    <thead><tr>
+      <th>Tanggal</th><th class="l">Kode</th><th class="l">Kelompok</th><th class="l">Status</th><th class="l">Sumber</th>
+      <th>Harga</th><th>Trigger</th><th>Stop</th><th>Target 1</th><th class="l">Hasil</th><th>R ke T1</th><th>5 sesi</th><th>10 sesi</th>
+    </tr></thead>
+    <tbody id="recentBody"></tbody>
+  </table></div>
+</main>
+<script>
+(function () {
+  var data = null, source = 'live', shown = true;
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function has(v) { return v !== null && v !== undefined && isFinite(v); }
+  function fmt(v, d, sign) { if (!has(v)) return '\u2014'; var s = Number(v).toFixed(d); return (sign && Number(v) > 0 ? '+' : '') + s; }
+  function money(v) { return has(v) ? Number(v).toLocaleString('id-ID', { maximumFractionDigits: 2 }) : '\u2014'; }
+  function pct(v) { return has(v) ? v + '%' : '\u2014'; }
+  function cls(v) { return !has(v) ? '' : Number(v) > 0 ? 'pos' : Number(v) < 0 ? 'neg' : ''; }
+  function verdictTag(v) {
+    var c = v === 'DI ATAS PASAR' ? 'v-up' : v === 'DI BAWAH PASAR' ? 'v-down' : v === 'SEIMBANG' ? 'v-flat' : 'v-none';
+    return '<span class="tag ' + c + '">' + esc(v || '\u2014') + '</span>';
+  }
+  var OUT = { T1: 'Capai T1', STOP: 'Kena stop', KEDALUWARSA: 'Kedaluwarsa (20 sesi)', MENUNGGU: 'Menunggu', TIDAK_TERPICU: 'Tidak terpicu', GAGAL_SEBELUM_TRIGGER: 'Gagal sebelum trigger', T1_LEWAT: 'T1 sudah lewat' };
+
+  function renderCards() {
+    var s = data.sources || {};
+    function card(name, o, note) {
+      if (!o) return '<div class="card"><b>' + name + '</b><div class="sub">' + note + '</div></div>';
+      return '<div class="card"><b>' + name + '</b><div><span style="font-size:22px;font-weight:800">' + esc(o.entries) + '</span> setup tercatat, ' + esc(o.shown) + ' tampil</div><div class="sub">' + esc(o.from) + ' s.d. ' + esc(o.to) + '</div></div>';
+    }
+    $('cards').innerHTML = card('LIVE (di luar sampel)', s.live, 'Belum ada data. Pencatatan dimulai setelah workflow harian berikutnya berjalan.') + card('BACKFILL (in-sample)', s.backfill, 'Belum ada.');
+  }
+
+  function renderGroups() {
+    var rows = (data.groups || []).filter(function (g) { return g.source === source && g.shown === shown; });
+    var html = rows.map(function (g) {
+      var f = (g.fwd && g.fwd.h10) || {};
+      var t = g.trade || {};
+      var label = g.reason ? 'Disaring karena ' + g.reason : g.group;
+      return '<tr' + (g.reason ? ' class="sub"' : '') + '><td>' + esc(label) + '</td><td>' + esc(g.n) + '</td><td>' + esc(g.dates) + '</td><td>' + esc(f.n || 0) +
+        '</td><td class="' + cls(f.medExcess) + '">' + fmt(f.medExcess, 2, true) + '</td><td>' + pct(f.beat) + '</td><td>' + pct(t.trigPct) + '</td><td>' + pct(t.t1Pct) +
+        '</td><td>' + pct(t.stopPct) + '</td><td class="' + cls(t.avgR1) + '">' + fmt(t.avgR1, 2, true) + '</td><td>' + verdictTag(g.verdict) + '</td></tr>';
+    }).join('');
+    if (!html) {
+      html = '<tr><td colspan="11" class="empty">' + (source === 'live'
+        ? 'Belum ada data LIVE untuk pilihan ini. Pencatatan otomatis dimulai setelah workflow harian berjalan dengan pencatat aktif. Untuk perbandingan sementara, lihat BACKFILL.'
+        : 'Belum ada data untuk pilihan ini.') + '</td></tr>';
+    }
+    $('groupBody').innerHTML = html;
+  }
+
+  function renderRecent() {
+    var rows = data.recent || [];
+    $('recentBody').innerHTML = rows.length ? rows.map(function (r) {
+      return '<tr><td>' + esc(r.date) + '</td><td class="l"><a href="/stock.html?code=' + encodeURIComponent(r.code) + '">' + esc(r.code) + '</a></td><td class="l">' + esc(r.group) +
+        (r.repeat ? ' <span class="tag v-none" title="Muncul lagi dalam 7 hari. Tidak dihitung di ringkasan.">ULANG</span>' : '') + '</td><td class="l">' + esc(r.status) +
+        '</td><td class="l">' + esc(String(r.source || '').toUpperCase()) + '</td><td>' + money(r.price) + '</td><td>' + money(r.trigger) + '</td><td>' + money(r.stop) + '</td><td>' + money(r.target1) +
+        '</td><td class="l">' + esc(OUT[r.outcome] || '\u2014') + '</td><td class="' + cls(r.R1) + '">' + fmt(r.R1, 2, true) + '</td><td class="' + cls(r.ret5) + '">' + fmt(r.ret5, 1, true) + '%</td><td class="' + cls(r.ret10) + '">' + fmt(r.ret10, 1, true) + '%</td></tr>';
+    }).join('') : '<tr><td colspan="13" class="empty">Belum ada sinyal.</td></tr>';
+  }
+
+  function setActive() {
+    $('srcLive').classList.toggle('on', source === 'live');
+    $('srcBackfill').classList.toggle('on', source === 'backfill');
+    $('viewShown').classList.toggle('on', shown);
+    $('viewFiltered').classList.toggle('on', !shown);
+  }
+
+  $('srcLive').onclick = function () { source = 'live'; setActive(); renderGroups(); };
+  $('srcBackfill').onclick = function () { source = 'backfill'; setActive(); renderGroups(); };
+  $('viewShown').onclick = function () { shown = true; setActive(); renderGroups(); };
+  $('viewFiltered').onclick = function () { shown = false; setActive(); renderGroups(); };
+
+  fetch('/data/signal-performance.json?x=' + Date.now(), { cache: 'no-store' })
+    .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function (d) {
+      data = d;
+      var when = d.generatedAt ? new Date(d.generatedAt).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }) : '-';
+      $('meta').textContent = 'Dihitung ' + when + ' WIB, data pasar s.d. ' + (d.marketDate || '-');
+      $('caveats').innerHTML = (d.caveats || []).map(function (c) { return '<li>' + esc(c) + '</li>'; }).join('');
+      renderCards(); setActive(); renderGroups(); renderRecent();
+    })
+    .catch(function (e) {
+      $('meta').textContent = 'Data belum tersedia (' + e.message + '). Jalankan: node scripts/signal-performance.js report';
+    });
+})();
+</script>
+</body>
+</html>

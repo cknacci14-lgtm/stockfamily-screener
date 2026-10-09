@@ -55,6 +55,8 @@ function cleanNumber(value) {
   return Number.isFinite(n) ? n : null;
 }
 
+let lastConsidered = null;
+
 const MAX_STOP_PCT = 25;
 
 function cleanSignal(row) {
@@ -219,6 +221,7 @@ async function calculateSignalCenter(normalized, cacheKey) {
     });
 
   const allRows = result?.stocks || [];
+  lastConsidered = { date: result?.date || null, rows: allRows };
   const filteredInfo = {
     considered: allRows.length,
     noTrade: allRows.filter(row => row.idleSessions >= 1).length,
@@ -322,7 +325,13 @@ async function buildSignalCenter(codes = [], options = {}) {
   return refreshPromise;
 }
 
+function getLastConsidered() {
+  return lastConsidered;
+}
+
 module.exports = {
+  getLastConsidered,
+  MAX_STOP_PCT,
   buildSignalCenter,
   readSnapshot,
   writeSnapshot,

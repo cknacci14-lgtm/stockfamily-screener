@@ -52,6 +52,13 @@ const { buildSignalCenter } = require('../src/services/signalCenterService');
     }
 
     console.log('\n✅ Snapshot build complete');
+    try {
+      const perf = require('./signal-performance.js');
+      const svc = require('../src/services/signalCenterService');
+      perf.appendFromBuild(result, typeof svc.getLastConsidered === 'function' ? svc.getLastConsidered() : null);
+    } catch (logErr) {
+      console.warn('[signal-log] skipped:', logErr && logErr.message ? logErr.message : logErr);
+    }
     process.exitCode = 0;
   } catch (e) {
     console.error('ERROR:', e.message);
