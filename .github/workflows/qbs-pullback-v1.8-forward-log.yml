@@ -1,0 +1,53 @@
+name: QBS Pullback V1.8 Forward Log
+
+on:
+  schedule:
+    # 21:15 WIB (14:15 UTC), Senin-Jumat
+    - cron: '15 14 * * 1-5'
+    # 07:45 WIB (00:45 UTC), Selasa-Sabtu
+    - cron: '45 0 * * 2-6'
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'Tanggal data (YYYY-MM-DD), kosongkan untuk tanggal terbaru'
+        required: false
+        default: ''
+
+concurrency:
+  group: qbs-pullback-v1.8-forward-log
+  cancel-in-progress: false
+
+jobs:
+  log:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: '1'
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: '1'
+        run: npm install --omit=dev --no-audit --no-fund --ignore-scripts
+
+      - name: Run QBS Pullback V1.8 Forward Log
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          DATE_ARG: ${{ inputs.date }}
+        run: |
+          if [ -n "$DATE_ARG" ]; then
+            [[ "$DATE_ARG" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || { echo "Format tanggal salah"; exit 1; }
+            node scripts/qbs-pullback-v1.8-forward-log.js "--date=$DATE_ARG"
+          else
+            node scripts/qbs-pullback-v1.8-forward-log.js
+          fi
