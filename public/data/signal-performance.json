@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-10-09T08:24:14.966Z",
+ "generatedAt": "2026-10-09T18:55:03.049Z",
  "marketDate": "2026-10-08",
  "params": {
   "outcomeWindow": 20,
@@ -16,21 +16,182 @@
   "Excess adalah return dikurangi median return semua saham likuid pada tanggal dan horizon yang sama. Vonis memerlukan minimal 30 sinyal baru dari minimal 10 tanggal, dan hanya heuristik."
  ],
  "sources": {
-  "backfill": {
-   "entries": 841,
-   "shown": 414,
-   "from": "2026-07-15",
+  "live": {
+   "entries": 9,
+   "shown": 4,
+   "from": "2026-10-08",
    "to": "2026-10-08"
+  },
+  "backfill": {
+   "entries": 832,
+   "shown": 410,
+   "from": "2026-07-15",
+   "to": "2026-10-07"
   }
  },
  "groups": [
   {
+   "source": "live",
+   "shown": true,
+   "group": "SEMUA",
+   "n": 3,
+   "stocks": 3,
+   "dates": 1,
+   "fwd": {
+    "h5": {
+     "n": 0
+    },
+    "h10": {
+     "n": 0
+    },
+    "h20": {
+     "n": 0
+    }
+   },
+   "trade": {
+    "n": 0,
+    "t1Pct": null,
+    "stopPct": null,
+    "expPct": null,
+    "avgR1": null,
+    "avgR2": null,
+    "trigPct": null,
+    "pending": 2,
+    "t1Late": 0
+   },
+   "verdict": "BELUM CUKUP DATA"
+  },
+  {
+   "source": "live",
+   "shown": true,
+   "group": "PRA-BREAKOUT",
+   "n": 2,
+   "stocks": 2,
+   "dates": 1,
+   "fwd": {
+    "h5": {
+     "n": 0
+    },
+    "h10": {
+     "n": 0
+    },
+    "h20": {
+     "n": 0
+    }
+   },
+   "trade": {
+    "n": 0,
+    "t1Pct": null,
+    "stopPct": null,
+    "expPct": null,
+    "avgR1": null,
+    "avgR2": null,
+    "trigPct": null,
+    "pending": 2,
+    "t1Late": 0
+   },
+   "verdict": "BELUM CUKUP DATA"
+  },
+  {
+   "source": "live",
+   "shown": true,
+   "group": "BREAKOUT",
+   "n": 1,
+   "stocks": 1,
+   "dates": 1,
+   "fwd": {
+    "h5": {
+     "n": 0
+    },
+    "h10": {
+     "n": 0
+    },
+    "h20": {
+     "n": 0
+    }
+   },
+   "trade": {
+    "n": 0,
+    "t1Pct": null,
+    "stopPct": null,
+    "expPct": null,
+    "avgR1": null,
+    "avgR2": null,
+    "trigPct": null,
+    "pending": 0,
+    "t1Late": 0
+   },
+   "verdict": "BELUM CUKUP DATA"
+  },
+  {
+   "source": "live",
+   "shown": false,
+   "group": "SEMUA",
+   "n": 1,
+   "stocks": 1,
+   "dates": 1,
+   "fwd": {
+    "h5": {
+     "n": 0
+    },
+    "h10": {
+     "n": 0
+    },
+    "h20": {
+     "n": 0
+    }
+   },
+   "trade": {
+    "n": 0,
+    "t1Pct": null,
+    "stopPct": null,
+    "expPct": null,
+    "avgR1": null,
+    "avgR2": null,
+    "trigPct": null,
+    "pending": 1,
+    "t1Late": 0
+   },
+   "verdict": "BELUM CUKUP DATA"
+  },
+  {
+   "source": "live",
+   "shown": false,
+   "group": "BREAKOUT",
+   "n": 1,
+   "stocks": 1,
+   "dates": 1,
+   "fwd": {
+    "h5": {
+     "n": 0
+    },
+    "h10": {
+     "n": 0
+    },
+    "h20": {
+     "n": 0
+    }
+   },
+   "trade": {
+    "n": 0,
+    "t1Pct": null,
+    "stopPct": null,
+    "expPct": null,
+    "avgR1": null,
+    "avgR2": null,
+    "trigPct": null,
+    "pending": 1,
+    "t1Late": 0
+   },
+   "verdict": "BELUM CUKUP DATA"
+  },
+  {
    "source": "backfill",
    "shown": true,
    "group": "SEMUA",
-   "n": 221,
-   "stocks": 139,
-   "dates": 54,
+   "n": 218,
+   "stocks": 138,
+   "dates": 53,
    "fwd": {
     "h5": {
      "n": 212,
@@ -59,7 +220,7 @@
     "avgR1": 0.18,
     "avgR2": 0.21,
     "trigPct": 70,
-    "pending": 16,
+    "pending": 14,
     "t1Late": 0
    },
    "verdict": "DI ATAS PASAR"
@@ -68,9 +229,9 @@
    "source": "backfill",
    "shown": true,
    "group": "PRA-BREAKOUT",
-   "n": 117,
-   "stocks": 85,
-   "dates": 45,
+   "n": 115,
+   "stocks": 84,
+   "dates": 44,
    "fwd": {
     "h5": {
      "n": 112,
@@ -99,7 +260,7 @@
     "avgR1": 0.44,
     "avgR2": 0.45,
     "trigPct": 69,
-    "pending": 10,
+    "pending": 8,
     "t1Late": 0
    },
    "verdict": "DI ATAS PASAR"
@@ -108,9 +269,9 @@
    "source": "backfill",
    "shown": true,
    "group": "BREAKOUT",
-   "n": 72,
-   "stocks": 65,
-   "dates": 35,
+   "n": 71,
+   "stocks": 64,
+   "dates": 34,
    "fwd": {
     "h5": {
      "n": 70,
@@ -228,9 +389,9 @@
    "source": "backfill",
    "shown": false,
    "group": "SEMUA",
-   "n": 299,
-   "stocks": 201,
-   "dates": 59,
+   "n": 298,
+   "stocks": 200,
+   "dates": 58,
    "fwd": {
     "h5": {
      "n": 279,
@@ -259,7 +420,7 @@
     "avgR1": 0.05,
     "avgR2": 0.14,
     "trigPct": null,
-    "pending": 28,
+    "pending": 27,
     "t1Late": 48
    },
    "verdict": "SEIMBANG"
@@ -268,9 +429,9 @@
    "source": "backfill",
    "shown": false,
    "group": "BREAKOUT",
-   "n": 229,
-   "stocks": 176,
-   "dates": 58,
+   "n": 228,
+   "stocks": 175,
+   "dates": 57,
    "fwd": {
     "h5": {
      "n": 213,
@@ -299,7 +460,7 @@
     "avgR1": 0.01,
     "avgR2": 0.11,
     "trigPct": null,
-    "pending": 16,
+    "pending": 15,
     "t1Late": 48
    },
    "verdict": "SEIMBANG"
@@ -345,13 +506,45 @@
    "verdict": "DI ATAS PASAR"
   },
   {
+   "source": "live",
+   "shown": false,
+   "group": "SEMUA",
+   "reason": "TELAT ENTRY",
+   "n": 1,
+   "stocks": 1,
+   "dates": 1,
+   "fwd": {
+    "h5": {
+     "n": 0
+    },
+    "h10": {
+     "n": 0
+    },
+    "h20": {
+     "n": 0
+    }
+   },
+   "trade": {
+    "n": 0,
+    "t1Pct": null,
+    "stopPct": null,
+    "expPct": null,
+    "avgR1": null,
+    "avgR2": null,
+    "trigPct": null,
+    "pending": 1,
+    "t1Late": 0
+   },
+   "verdict": "BELUM CUKUP DATA"
+  },
+  {
    "source": "backfill",
    "shown": false,
    "group": "SEMUA",
    "reason": "TELAT ENTRY",
-   "n": 287,
-   "stocks": 196,
-   "dates": 59,
+   "n": 286,
+   "stocks": 195,
+   "dates": 58,
    "fwd": {
     "h5": {
      "n": 270,
@@ -380,7 +573,7 @@
     "avgR1": 0.05,
     "avgR2": 0.13,
     "trigPct": null,
-    "pending": 23,
+    "pending": 22,
     "t1Late": 48
    },
    "verdict": "SEIMBANG"
@@ -433,7 +626,7 @@
    "code": "BSML",
    "group": "PRA-BREAKOUT",
    "status": "WATCH",
-   "source": "backfill",
+   "source": "live",
    "repeat": false,
    "price": 560,
    "trigger": 575,
@@ -449,7 +642,7 @@
    "code": "MPMX",
    "group": "BREAKOUT",
    "status": "INVALIDATED",
-   "source": "backfill",
+   "source": "live",
    "repeat": false,
    "price": 1025,
    "trigger": 1060,
@@ -465,7 +658,7 @@
    "code": "SGER",
    "group": "PRA-BREAKOUT",
    "status": "WATCH",
-   "source": "backfill",
+   "source": "live",
    "repeat": true,
    "price": 760,
    "trigger": 785,
@@ -481,7 +674,7 @@
    "code": "ULTJ",
    "group": "PRA-BREAKOUT",
    "status": "WATCH",
-   "source": "backfill",
+   "source": "live",
    "repeat": false,
    "price": 2150,
    "trigger": 2190,

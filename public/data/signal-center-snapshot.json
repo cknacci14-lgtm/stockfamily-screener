@@ -50,7 +50,7 @@
         "explanation": "Trading activity is materially below the minimum liquidity baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-08T19:22:26.643Z"
+      "updatedAt": "2026-10-09T18:54:20.769Z"
     },
     {
       "stockCode": "SGER",
@@ -93,7 +93,7 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-08T19:22:26.643Z"
+      "updatedAt": "2026-10-09T18:54:20.769Z"
     },
     {
       "stockCode": "ULTJ",
@@ -136,7 +136,7 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-08T19:22:26.643Z"
+      "updatedAt": "2026-10-09T18:54:20.769Z"
     },
     {
       "stockCode": "MPMX",
@@ -179,10 +179,10 @@
         "explanation": "One or more execution-quality measures are below the preferred baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-08T19:22:26.643Z"
+      "updatedAt": "2026-10-09T18:54:20.769Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-10-08T19:22:26.643Z"
+  "generatedAt": "2026-10-09T18:54:20.769Z"
 }
