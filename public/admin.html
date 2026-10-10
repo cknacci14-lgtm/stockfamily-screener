@@ -1200,7 +1200,7 @@
         var j = await res.json();
         if (!res.ok || !j.success) throw new Error(j.error || ('HTTP ' + res.status));
         var d = j.data || {};
-        var names = { BREAKOUT_ASING: 'BREAKOUT + ASING AKUMULASI', BREAKDOWN: 'BREAKDOWN', BROKER_ACC: 'RADAR BROKER: AKUMULASI (top 5)', BROKER_DIST: 'RADAR BROKER: DISTRIBUSI (top 5)' };
+        var names = { BREAKOUT_ASING: 'BREAKOUT + ASING AKUMULASI', BREAKDOWN: 'BREAKDOWN', BROKER_ACC: 'RADAR BROKER: AKUMULASI (top 5)', BROKER_DIST: 'RADAR BROKER: DISTRIBUSI (top 5)', QBS_PULLBACK_V18: 'QBS PULLBACK V1.8' };
         var f = function (v, suf) { return v == null ? '-' : Number(v).toLocaleString('id-ID') + (suf || ''); };
         var tiles = cnGrid([
           cnTile('Hari tercatat', cnNum(d.days)),
@@ -1218,6 +1218,7 @@
         var latest = d.latest || [];
         var bo = latest.filter(function (r) { return r.verdict === 'BREAKOUT_ASING'; });
         var bd = latest.filter(function (r) { return r.verdict === 'BREAKDOWN'; });
+        var qbs = latest.filter(function (r) { return r.verdict === 'QBS_PULLBACK_V18'; });
         var boHtml = bo.length ? ('<table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="color:#8b93a7;text-align:left"><th style="padding:6px 0">Kode</th><th>Harga acuan</th><th>Rasio asing 20D</th><th>Nilai rata-rata (M)</th></tr>' +
           bo.map(function (r) { return '<tr style="border-top:1px solid #2a2f3e"><td style="padding:6px 0"><b>' + cnEsc(r.stock_code) + '</b></td><td>' + cnNum(r.ref_close) + '</td><td>' + f(r.foreign_ratio) + '</td><td>' + (Number(r.avg_value_20d) / 1e9).toFixed(1) + '</td></tr>'; }).join('') + '</table>')
           : '<div style="color:#8b93a7">Tidak ada.</div>';
@@ -1225,8 +1226,7 @@
           bd.map(function (r) { return '<span style="background:#1a1f2e;border:1px solid #2a2f3e;border-radius:4px;padding:2px 6px;font-size:12px">' + cnEsc(r.stock_code) + '</span>'; }).join('') + '</div>')
           : '<div style="color:#8b93a7">Tidak ada.</div>';
 
-        body.innerHTML = cnSection('Status pencatat', tiles) + cnSection('Ringkasan hasil (dibanding rata-rata saham likuid di hari yang sama)', sumHtml) +
-          cnSection('Sinyal terbaru: BREAKOUT + ASING AKUMULASI', boHtml) + cnSection('Sinyal terbaru: BREAKDOWN', bdHtml);
+        var qbsHtml = qbs.length ? ('<div style="margin-bottom:6px;color:#8b93a7">' + qbs.length + ' saham</div><div style="display:flex;flex-wrap:wrap;gap:6px">' + qbs.map(function (r) { return '<span style="background:#1a1f2e;border:1px solid #2a2f3e;border-radius:4px;padding:2px 6px;font-size:12px">' + cnEsc(r.stock_code) + '</span>'; }).join('') + '</div>') : '<div style="color:#8b93a7">Tidak ada.</div>'; body.innerHTML = cnSection('Status pencatat', tiles) + cnSection('Ringkasan hasil (dibanding rata-rata saham likuid di hari yang sama)', sumHtml) + cnSection('Sinyal terbaru: BREAKOUT + ASING AKUMULASI', boHtml) + cnSection('Sinyal terbaru: BREAKDOWN', bdHtml) + cnSection('Sinyal terbaru: QBS PULLBACK V1.8', qbsHtml);
         upd.textContent = 'diperbarui ' + new Date().toLocaleTimeString('id-ID');
       } catch (err) {
         body.innerHTML = '<div class="admin-card" style="color:#FF5252">Gagal memuat: ' + cnEsc(err.message) + '</div>';
