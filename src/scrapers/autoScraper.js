@@ -2,8 +2,6 @@
 const fs = require('fs');
 const path = require('path');
 const { getDailyDataFromYahoo } = require('../connectors/yahooConnector');
-const { getBrokerSummary } = require('../connectors/stockbitConnector');
-const { getSeasonality } = require('../connectors/arjumConnector');
 
 console.log('[AutoScraper] Memulai pengambilan data otomatis...');
 
