@@ -284,7 +284,7 @@ async function report() {
   const sorted = entries.slice().sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
   const lastSeen = new Map();
   for (const e of sorted) {
-    const key = e.code + '|' + groupOf(e);
+    const key = e.source + '|' + e.code + '|' + groupOf(e);
     const prev = lastSeen.get(key);
     e._repeat = prev !== undefined && dayDiff(prev, e.date) <= REPEAT_DAYS;
     lastSeen.set(key, e.date);

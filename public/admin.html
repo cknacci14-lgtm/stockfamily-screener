@@ -422,6 +422,13 @@
   .admin-card input, .admin-card select, .admin-card textarea { max-width: 100%; }
 }
 </style>
+<style id="cn-admin-topbar">
+@media (max-width: 820px) {
+  body { padding-top: 64px !important; }
+  body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; height: 60px; background: #0a0e17; border-bottom: 1px solid #2a2f3e; z-index: 90000; pointer-events: none; }
+  #sf-mobile-button { z-index: 99998 !important; }
+}
+</style>
 </head>
 <body>
   <!-- Sidebar di-inject oleh stockfamily-sidebar.js -->
