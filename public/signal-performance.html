@@ -161,7 +161,7 @@ td.empty{text-align:center;padding:34px 16px;color:var(--muted);white-space:norm
       data = d;
       var when = d.generatedAt ? new Date(d.generatedAt).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }) : '-';
       $('meta').textContent = 'Dihitung ' + when + ' WIB, data pasar s.d. ' + (d.marketDate || '-');
-      $('caveats').innerHTML = (d.caveats || []).map(function (c) { return '<li>' + esc(c) + '</li>'; }).join('');
+      $('caveats').innerHTML = (d.caveats || []).filter(function (c) { return String(c).indexOf("Sumber 'backfill'") !== 0; }).map(function (c) { return '<li>' + esc(c) + '</li>'; }).join('');
       renderCards(); setActive(); renderGroups(); renderRecent();
     })
     .catch(function (e) {
