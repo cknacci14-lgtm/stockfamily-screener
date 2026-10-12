@@ -1,15 +1,15 @@
 {
   "status": "success",
   "engine": "v3",
-  "regime": "Weak",
+  "regime": "Neutral-",
   "regimeDetails": {
-    "regime": "Weak",
-    "pctUp": 0.2175226586102719,
-    "meanFnet": -2761532.6283987914,
+    "regime": "Neutral-",
+    "pctUp": 0.17220543806646527,
+    "meanFnet": -627916.3141993958,
     "universeSize": 331
   },
-  "generatedAt": "2026-10-09T18:51:20.420Z",
-  "lastSync": "10/10/2026, 01.51.20",
+  "generatedAt": "2026-10-12T21:46:47.535Z",
+  "lastSync": "13/10/2026, 04.46.47",
   "total": 0,
   "data": []
 }
