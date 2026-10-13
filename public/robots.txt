@@ -1,0 +1,10 @@
+﻿User-agent: *
+Allow: /
+Allow: /landing
+Allow: /demo
+Disallow: /login
+Disallow: /register
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://chartnalis.web.id/sitemap.xml
