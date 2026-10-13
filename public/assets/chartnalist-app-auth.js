@@ -410,7 +410,7 @@
 
       // Guest mode support
       const params = new URLSearchParams(window.location.search);
-      const isGuest = params.get('guest') === '1';
+      const isGuest = params.get('guest') === '1' || location.pathname === '/demo' || location.pathname.startsWith('/demo/');
 
       if (!session?.user) {
         if (isGuest) {

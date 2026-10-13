@@ -3249,7 +3249,7 @@ function renderSummaryBase() {
     el.innerHTML = 'Memuat...';
     try {
       const token = await bkToken();
-      if (!token) { el.innerHTML = 'Login untuk melihat data broker.'; return; }
+      if (!token) { el.innerHTML = `<div style="padding:14px 12px;border:1px solid rgba(0,208,132,.25);border-radius:10px;background:rgba(0,208,132,.06);text-align:center"><div style="font-size:12px;color:#94a3b8;margin-bottom:10px">Login untuk melihat data broker.</div><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><a href="/register" style="padding:8px 12px;border-radius:8px;background:#00d084;color:#050607;font-weight:700;font-size:12px;text-decoration:none">Create account</a><a href="/login" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.15);color:#e2e8f0;font-weight:600;font-size:12px;text-decoration:none">Sign in</a></div></div>`; return; }
       const res = await fetch('/api/broker/' + encodeURIComponent(code), { headers: { Authorization: 'Bearer ' + token } });
       const j = await res.json();
       if (!res.ok || !j.success) throw new Error(j.error || ('HTTP ' + res.status));
@@ -3347,7 +3347,7 @@ function renderSummaryBase() {
     if (!el) return;
     try {
       const token = await bkToken();
-      if (!token) { el.innerHTML = 'Login untuk melihat radar broker.'; return; }
+      if (!token) { el.innerHTML = `<div style="padding:14px 12px;border:1px solid rgba(0,208,132,.25);border-radius:10px;background:rgba(0,208,132,.06);text-align:center"><div style="font-size:12px;color:#94a3b8;margin-bottom:10px">Login untuk melihat radar broker.</div><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><a href="/register" style="padding:8px 12px;border-radius:8px;background:#00d084;color:#050607;font-weight:700;font-size:12px;text-decoration:none">Create account</a><a href="/login" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.15);color:#e2e8f0;font-weight:600;font-size:12px;text-decoration:none">Sign in</a></div></div>`; return; }
       const res = await fetch('/api/broker-radar', { headers: { Authorization: 'Bearer ' + token } });
       const j = await res.json();
       if (!res.ok || !j.success) throw new Error(j.error || ('HTTP ' + res.status));
@@ -3367,10 +3367,10 @@ function renderSummaryBase() {
     el.innerHTML = 'Memuat...';
     try {
       const token = await bkToken();
-      if (!token) { el.innerHTML = 'Login untuk melihat data broker.'; return; }
+      if (!token) { el.innerHTML = `<div style="padding:14px 12px;border:1px solid rgba(0,208,132,.25);border-radius:10px;background:rgba(0,208,132,.06);text-align:center"><div style="font-size:12px;color:#94a3b8;margin-bottom:10px">Login untuk melihat data broker.</div><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><a href="/register" style="padding:8px 12px;border-radius:8px;background:#00d084;color:#050607;font-weight:700;font-size:12px;text-decoration:none">Create account</a><a href="/login" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.15);color:#e2e8f0;font-weight:600;font-size:12px;text-decoration:none">Sign in</a></div></div>`; return; }
       const head = { Authorization: 'Bearer ' + token };
       const get = async function () {
-        const res = await fetch('/api/broker/' + encodeURIComponent(code), { headers: head });
+        const res = await fetch('/api/broker/' + encodeURIComponent(code), { headers: head, cache: 'no-store' });
         const j = await res.json();
         if (!res.ok || !j.success) throw new Error(j.error || ('HTTP ' + res.status));
         return (j.rows && j.rows[0]) || null;
@@ -3379,7 +3379,7 @@ function renderSummaryBase() {
       let note = '';
       const ref = window._radar && window._radar.date;
       const ageDays = row ? (Date.now() - new Date(row.trade_date + 'T00:00:00Z').getTime()) / 86400000 : null;
-      const stale = row && ((ref && row.trade_date < ref) || ageDays > 5);
+      const stale = row && ((ref && row.trade_date < ref) || ageDays > 1);
       if (!row || stale) {
         el.innerHTML = 'Mengambil data broker...';
         const fr = await fetch('/api/broker-fill/' + encodeURIComponent(code), { method: 'POST', headers: head });
@@ -3390,6 +3390,12 @@ function renderSummaryBase() {
       }
       if (String(code).toUpperCase() !== String(activeCode).toUpperCase()) return;
       const usable = row && Number(row.broker_count) > 0;
+      if (usable && note) {
+        setTimeout(function () {
+          const b = document.getElementById('brokerBody');
+          if (b && window._bk && window._bk.code === code) b.insertAdjacentHTML('beforeend', '<div style="font-size:9px;color:#FFB300;margin-top:4px">' + bkEsc(note) + ' Menampilkan data ' + bkEsc(row.trade_date) + '.</div>');
+        }, 0);
+      }
       window._bk = { code: code, row: usable ? row : null };
       if (!usable) {
         if (dl) dl.textContent = '';
