@@ -431,8 +431,8 @@
           document.documentElement.classList.remove('chartnalist-auth-pending');
           const badge = document.createElement('div');
           badge.id = 'chartnalist-guest-badge';
-          badge.style.cssText = 'position:fixed;top:14px;right:18px;z-index:99999;padding:8px 12px;border-radius:10px;background:rgba(0,208,132,.12);border:1px solid rgba(0,208,132,.35);color:#00d084;font:650 12px Inter,system-ui,sans-serif;';
-          badge.innerHTML = 'Guest Mode · <a href="/register" style="color:#fff;text-decoration:underline">Create account</a>';
+          badge.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:99999;display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:999px;background:rgba(11,14,20,.92);border:1px solid rgba(0,208,132,.35);color:#00d084;font:650 12px Inter,system-ui,sans-serif;backdrop-filter:blur(12px);box-shadow:0 8px 30px rgba(0,0,0,.35)';
+          badge.innerHTML = '<span style="width:7px;height:7px;border-radius:50%;background:#00d084;box-shadow:0 0 10px rgba(0,208,132,.6)"></span><span>Guest Mode</span><span style="opacity:.35">·</span><a href="/register" style="color:#e2e8f0;text-decoration:none;border-bottom:1px solid rgba(226,232,240,.35)">Create account</a>';
           document.body.appendChild(badge);
           return;
         }
