@@ -1,123 +1,37 @@
 {
   "success": true,
-  "date": "2026-10-12",
-  "count": 3,
+  "date": "2026-10-13",
+  "count": 2,
   "filtered": {
-    "considered": 7,
+    "considered": 8,
     "noTrade": 1,
-    "lateEntry": 2,
-    "wideStop": 1
+    "lateEntry": 5,
+    "wideStop": 0
   },
   "signals": [
     {
-      "stockCode": "GULA",
-      "stockName": "Aman Agrindo Tbk.",
-      "setup": "BREAKOUT",
-      "status": "WATCH",
-      "price": 825,
-      "trigger": 855,
-      "invalidation": 788.04,
-      "target1": 955.45,
-      "target2": 1022.41,
+      "stockCode": "COCO",
+      "stockName": "Wahana Interfood Nusantara Tbk.",
+      "setup": "PULLBACK",
+      "status": "TRIGGERED",
+      "price": 119,
+      "trigger": 118.55,
+      "invalidation": 92.12,
+      "target1": 158.19,
+      "target2": 184.62,
       "riskReward": 2.5,
       "riskLevel": "HIGH",
-      "entryGapPct": -3.5,
-      "rrFromPrice": 3.53,
+      "entryGapPct": 0.4,
+      "rrFromPrice": 1.46,
       "planStale": false,
-      "preBreakout": true,
-      "stopDistancePct": 4.5,
-      "stopWide": false,
-      "maxEntry": 871.75,
+      "preBreakout": false,
+      "stopDistancePct": 22.6,
+      "stopWide": true,
+      "maxEntry": 125.16,
       "structure": {
-        "state": "NEUTRAL",
-        "label": "Neutral structure",
-        "explanation": "Price structure does not currently show a decisive directional condition."
-      },
-      "participation": {
-        "state": "NEUTRAL",
-        "label": "Normal participation",
-        "explanation": "Trading activity is not showing a decisive expansion or contraction."
-      },
-      "flow": {
-        "state": "NEUTRAL",
-        "label": "Foreign flow neutral",
-        "value": 0.00002605934146991701,
-        "explanation": "Foreign activity does not provide a decisive contextual signal."
-      },
-      "liquidity": {
-        "state": "HIGH_RISK",
-        "label": "Elevated liquidity risk",
-        "explanation": "One or more execution-quality measures are below the preferred baseline."
-      },
-      "signalDate": null,
-      "updatedAt": "2026-10-12T21:49:43.573Z"
-    },
-    {
-      "stockCode": "STAA",
-      "stockName": "Sumber Tani Agung Resources Tbk.",
-      "setup": "BREAKOUT",
-      "status": "WATCH",
-      "price": 1240,
-      "trigger": 1265,
-      "invalidation": 1174.82,
-      "target1": 1400.27,
-      "target2": 1490.45,
-      "riskReward": 2.5,
-      "riskLevel": "HIGH",
-      "entryGapPct": -2,
-      "rrFromPrice": 2.46,
-      "planStale": false,
-      "preBreakout": true,
-      "stopDistancePct": 5.3,
-      "stopWide": false,
-      "maxEntry": 1287.55,
-      "structure": {
-        "state": "NEUTRAL",
-        "label": "Neutral structure",
-        "explanation": "Price structure does not currently show a decisive directional condition."
-      },
-      "participation": {
-        "state": "NEUTRAL",
-        "label": "Normal participation",
-        "explanation": "Trading activity is not showing a decisive expansion or contraction."
-      },
-      "flow": {
-        "state": "NEUTRAL",
-        "label": "Foreign flow neutral",
-        "value": 0.00006895660921762673,
-        "explanation": "Foreign activity does not provide a decisive contextual signal."
-      },
-      "liquidity": {
-        "state": "HIGH_RISK",
-        "label": "Elevated liquidity risk",
-        "explanation": "One or more execution-quality measures are below the preferred baseline."
-      },
-      "signalDate": null,
-      "updatedAt": "2026-10-12T21:49:43.573Z"
-    },
-    {
-      "stockCode": "ULTJ",
-      "stockName": "Ultrajaya Milk Industry & Trading Company Tbk.",
-      "setup": "BREAKOUT",
-      "status": "WATCH",
-      "price": 2130,
-      "trigger": 2190,
-      "invalidation": 2072.14,
-      "target1": 2366.79,
-      "target2": 2484.64,
-      "riskReward": 2.5,
-      "riskLevel": "MEDIUM",
-      "entryGapPct": -2.7,
-      "rrFromPrice": 4.09,
-      "planStale": false,
-      "preBreakout": true,
-      "stopDistancePct": 2.7,
-      "stopWide": false,
-      "maxEntry": 2219.47,
-      "structure": {
-        "state": "NEUTRAL",
-        "label": "Neutral structure",
-        "explanation": "Price structure does not currently show a decisive directional condition."
+        "state": "IMPROVING",
+        "label": "Structure improving",
+        "explanation": "Price remains above the main short/intermediate trend references with increasing price activity."
       },
       "participation": {
         "state": "CONTRACTING",
@@ -127,7 +41,7 @@
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": 0.0000583664090721785,
+        "value": -0.000031795146763072686,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
@@ -136,10 +50,53 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-12T21:49:43.573Z"
+      "updatedAt": "2026-10-13T19:59:17.085Z"
+    },
+    {
+      "stockCode": "SRSN",
+      "stockName": "Indo Acidatama Tbk",
+      "setup": "PULLBACK",
+      "status": "TRIGGERED",
+      "price": 129,
+      "trigger": 128.55,
+      "invalidation": 100,
+      "target1": 171.38,
+      "target2": 199.93,
+      "riskReward": 2.5,
+      "riskLevel": "HIGH",
+      "entryGapPct": 0.4,
+      "rrFromPrice": 1.46,
+      "planStale": false,
+      "preBreakout": false,
+      "stopDistancePct": 22.5,
+      "stopWide": true,
+      "maxEntry": 135.69,
+      "structure": {
+        "state": "IMPROVING",
+        "label": "Structure improving",
+        "explanation": "Price remains above the main short/intermediate trend references with increasing price activity."
+      },
+      "participation": {
+        "state": "CONTRACTING",
+        "label": "Participation contracting",
+        "explanation": "Multiple trading-activity measures are below their recent baseline."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": 0.00011206315673368143,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HEALTHY",
+        "label": "Healthy liquidity",
+        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-10-13T19:59:17.085Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-10-12T21:49:43.573Z"
+  "generatedAt": "2026-10-13T19:59:17.085Z"
 }
