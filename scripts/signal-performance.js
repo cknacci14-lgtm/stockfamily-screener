@@ -19,8 +19,8 @@ const HORIZONS = [1, 3, 5, 10, 20];
 const OUTCOME_WINDOW = 20;
 const TRIGGER_WINDOW = 10;
 const REPEAT_DAYS = 7;
-const MIN_N = 30;
-const MIN_DATES = 10;
+const MIN_N = 100;
+const MIN_DATES = 20;
 const LIQ = 1e9;
 const FIELDS = 'stock_id,trade_date,previous_price,open,first_trade,high,low,close,change_price,volume,value,frequency,offer,offer_volume,bid,bid_volume,foreign_sell,foreign_buy';
 
