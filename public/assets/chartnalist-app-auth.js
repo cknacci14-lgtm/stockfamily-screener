@@ -408,7 +408,34 @@
         throw error;
       }
 
+      // Guest mode support
+      const params = new URLSearchParams(window.location.search);
+      const isGuest = params.get('guest') === '1';
+
       if (!session?.user) {
+        if (isGuest) {
+          window.chartnalistAuth = {
+            user: null,
+            profile: null,
+            role: 'guest',
+            plan: 'guest',
+            isGuest: true,
+            isAdmin: false,
+            isUser: false,
+            signOut: async () => {}
+          };
+          window.dispatchEvent(new CustomEvent('chartnalist:auth-ready', {
+            detail: { role: 'guest', plan: 'guest', isGuest: true }
+          }));
+          authResolved = true;
+          document.documentElement.classList.remove('chartnalist-auth-pending');
+          const badge = document.createElement('div');
+          badge.id = 'chartnalist-guest-badge';
+          badge.style.cssText = 'position:fixed;top:14px;right:18px;z-index:99999;padding:8px 12px;border-radius:10px;background:rgba(0,208,132,.12);border:1px solid rgba(0,208,132,.35);color:#00d084;font:650 12px Inter,system-ui,sans-serif;';
+          badge.innerHTML = 'Guest Mode · <a href="/register" style="color:#fff;text-decoration:underline">Create account</a>';
+          document.body.appendChild(badge);
+          return;
+        }
         window.location.replace(LOGIN_PATH);
         return;
       }
