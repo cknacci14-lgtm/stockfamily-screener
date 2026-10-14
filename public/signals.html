@@ -277,6 +277,129 @@ tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{
 <!-- CHARTNALIST_PHASE6_3_AUTH_BOOTSTRAP -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/chartnalist-app-auth.js"></script>
+<style id="cn-premium-conversion-v1">
+  .cn-premium-cta {
+    margin-top: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 18px;
+    border: 1px solid rgba(225, 201, 138, 0.55);
+    border-radius: 8px;
+    background: linear-gradient(145deg, #e1c98a 0%, #c5a866 45%, #96743c 100%);
+    color: #0b0e14;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform .16s ease, filter .16s ease;
+  }
+
+  .cn-premium-cta:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
+
+  .cn-premium-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(3, 5, 8, 0.78);
+    backdrop-filter: blur(8px);
+  }
+
+  .cn-premium-overlay.open {
+    display: flex;
+  }
+
+  .cn-premium-modal {
+    width: min(520px, 100%);
+    border: 1px solid rgba(225, 201, 138, 0.28);
+    border-radius: 16px;
+    background: #101315;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, .55);
+    overflow: hidden;
+  }
+
+  .cn-premium-modal-head {
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+  }
+
+  .cn-premium-kicker {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #c5a866;
+  }
+
+  .cn-premium-title {
+    margin-top: 7px;
+    font-size: 24px;
+    font-weight: 800;
+    color: #f5f7f8;
+  }
+
+  .cn-premium-subtitle {
+    margin-top: 7px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #9aa3aa;
+  }
+
+  .cn-premium-body {
+    padding: 20px 24px 24px;
+  }
+
+  .cn-premium-feature {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    color: #f5f7f8;
+    font-size: 13px;
+  }
+
+  .cn-premium-feature i {
+    margin-top: 2px;
+    color: #c5a866;
+  }
+
+  .cn-premium-note {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.035);
+    color: #7f8991;
+    font-size: 11px;
+    line-height: 1.55;
+  }
+
+  .cn-premium-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  .cn-premium-close {
+    min-height: 38px;
+    padding: 0 16px;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 8px;
+    background: transparent;
+    color: #9aa3aa;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+  }
+</style>
 </head>
 <body>
 
@@ -986,7 +1109,7 @@ function renderSignalCard(s) {
     var entries = [s.entry_1, s.entry_2, s.entry_3].filter(function(x) { return x != null; });
     var entryRange = '—';
     if (entries.length > 1) {
-      entryRange = fmtRp(Math.min.apply(null, entries)) + ' ”“ ' + fmtRp(Math.max.apply(null, entries));
+    entryRange = fmtRp(Math.min.apply(null, entries)) + ' – ' + fmtRp(Math.max.apply(null, entries));
     } else if (entries.length === 1) {
       entryRange = fmtRp(entries[0]);
     }
@@ -1142,8 +1265,30 @@ async function loadSignals() {
   container.innerHTML = '<div class="empty-state"><div class="loading-spinner"></div><div style="margin-top: 12px;">Memuat...</div></div>';
 
   try {
-    var res = await fetch('/api/public/signals');
+    var sessionResult = await window.chartnalistSupabase.auth.getSession();
+    var session = sessionResult.data && sessionResult.data.session;
+
+    if (!session || !session.access_token) {
+      const gate = document.createElement("div");
+      gate.style.cssText = "padding:24px;text-align:center;color:#94a3b8;font-size:13px";
+      gate.innerHTML = '<div style="margin-bottom:12px">Login untuk melihat signals.</div><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><a href="/register" style="padding:8px 14px;border-radius:8px;background:#00d084;color:#050607;font-weight:700;text-decoration:none">Create account</a><a href="/login" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.15);color:#e2e8f0;text-decoration:none">Sign in</a></div>';
+      var mount = document.querySelector("[data-signals-mount], #signalsRoot, #signals-list, main, .signals-page") || document.body;
+      if (mount) { mount.innerHTML = ""; mount.appendChild(gate); }
+      return;
+    }
+
+    var res = await fetch('/api/public/signals', {
+      headers: {
+        Authorization: 'Bearer ' + session.access_token
+      },
+      cache: 'no-store'
+    });
     var data = await res.json();
+
+    // CN_FREE_PREMIUM_GATE_V1
+    if (res.status === 403 && data.code === 'PREMIUM_REQUIRED') {
+      throw new Error('PREMIUM_REQUIRED');
+    }
     if (!data.success) throw new Error(data.error || 'Failed');
 
     allSignals = data.signals || [];
@@ -1177,6 +1322,20 @@ async function loadSignals() {
     }
   } catch (err) {
     console.error('[loadSignals]', err);
+
+    // CN_FREE_PREMIUM_GATE_V1
+    if (err.message === 'PREMIUM_REQUIRED') {
+      container.innerHTML =
+        '<div class="empty-state" style="padding: 64px 24px;">' +
+          '<i class="fa-solid fa-lock" style="font-size: 42px; color: #00e5ff;"></i>' +
+          '<div style="margin-top: 18px; font-size: 20px; font-weight: 700; color: #f5f7f8;">Premium Feature</div>' +
+          '<div style="margin-top: 8px; color: #9aa3aa; max-width: 520px; margin-left: auto; margin-right: auto;">Live Trading Signals tersedia untuk pengguna Premium.</div>' +
+          '<button type="button" class="cn-premium-cta" onclick="openPremiumConversion(&quot;signals&quot;)">' +
+            '<i class="fa-solid fa-crown"></i> Lihat Premium' +
+          '</button>' +
+        '</div>';
+      return;
+    }
     container.innerHTML = '<div class="empty-state">' +
       '<i class="fa-solid fa-exclamation-triangle" style="color: #ef4444;"></i>' +
       '<div style="margin-top: 12px; color: #ef4444;">Error: ' + safeText(err.message) + '</div>' +
@@ -1187,8 +1346,24 @@ async function loadSignals() {
 // ============================================================
 // INIT
 // ============================================================
-loadSignals();
-setInterval(loadSignals, 5 * 60 * 1000);
+
+// ============================================================
+// AUTH LIFECYCLE GUARD
+// Wait until Chartnalist Supabase auth is initialized.
+// ============================================================
+function runAfterChartnalistAuth(callback) {
+  if (window.chartnalistSupabase) {
+    callback();
+    return;
+  }
+
+  window.addEventListener("chartnalist:auth-ready", callback, { once: true });
+}
+
+runAfterChartnalistAuth(loadSignals);
+setInterval(function () {
+  runAfterChartnalistAuth(loadSignals);
+}, 5 * 60 * 1000);
 
 function openImageModal(src) {
   const modal = document.getElementById('imageModal');
@@ -1517,12 +1692,34 @@ document.addEventListener('keydown', function(e) {
     var status = perfEl("performanceStatus");
 
     try {
+      var sessionResult = await window.chartnalistSupabase.auth.getSession();
+      var session = sessionResult.data && sessionResult.data.session;
+
+      if (!session || !session.access_token) {
+      const gate = document.createElement("div");
+      gate.style.cssText = "padding:24px;text-align:center;color:#94a3b8;font-size:13px";
+      gate.innerHTML = '<div style="margin-bottom:12px">Login untuk melihat signals.</div><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><a href="/register" style="padding:8px 14px;border-radius:8px;background:#00d084;color:#050607;font-weight:700;text-decoration:none">Create account</a><a href="/login" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.15);color:#e2e8f0;text-decoration:none">Sign in</a></div>';
+      var mount = document.querySelector("[data-signals-mount], #signalsRoot, #signals-list, main, .signals-page") || document.body;
+      if (mount) { mount.innerHTML = ""; mount.appendChild(gate); }
+      return;
+    }
+
       var res = await fetch("/api/public/signals/performance", {
+        headers: {
+          Authorization: "Bearer " + session.access_token
+        },
         cache: "no-store"
       });
 
       if (!res.ok) {
-        throw new Error("HTTP " + res.status);
+        var errorData = await res.json().catch(function () { return {}; });
+
+        // CN_FREE_PREMIUM_GATE_V1
+        if (res.status === 403 && errorData.code === 'PREMIUM_REQUIRED') {
+          throw new Error('PREMIUM_REQUIRED');
+        }
+
+        throw new Error(errorData.error || ('HTTP ' + res.status));
       }
 
       var data = await res.json();
@@ -1548,6 +1745,26 @@ document.addEventListener('keydown', function(e) {
     } catch (err) {
       console.error("[signals-performance]", err);
 
+      // CN_FREE_PREMIUM_GATE_V1
+      if (err.message === 'PREMIUM_REQUIRED') {
+        if (status) status.textContent = 'Premium Feature';
+
+        var premiumFreq = perfEl('performanceFrequency');
+        if (premiumFreq) {
+          premiumFreq.innerHTML =
+            '<div class="performance-status" style="padding: 28px; text-align: center;">' +
+              '<i class="fa-solid fa-lock" style="font-size: 28px; color: #00e5ff;"></i>' +
+              '<div style="margin-top: 12px; font-weight: 700; color: #f5f7f8;">Premium Feature</div>' +
+              '<div style="margin-top: 6px; color: #9aa3aa;">Signal Performance tersedia untuk pengguna Premium.</div>' +
+              '<button type="button" class="cn-premium-cta" onclick="openPremiumConversion(&quot;performance&quot;)">' +
+                '<i class="fa-solid fa-crown"></i> Lihat Premium' +
+              '</button>' +
+            '</div>';
+        }
+
+        return;
+      }
+
       if (status) {
         status.textContent = "Performance belum dapat dimuat.";
       }
@@ -1562,11 +1779,13 @@ document.addEventListener('keydown', function(e) {
 
   window.loadSignalPerformance = loadSignalPerformance;
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", loadSignalPerformance);
-  } else {
-    loadSignalPerformance();
-  }
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", function () {
+    runAfterChartnalistAuth(loadSignalPerformance);
+  }, { once: true });
+} else {
+  runAfterChartnalistAuth(loadSignalPerformance);
+}
 
   window.addEventListener("resize", function () {
     if (performanceData && performanceData.growth) {
@@ -1629,8 +1848,92 @@ document.addEventListener('keydown', function(e) {
 
 })();
 </script>
+<!-- CN_PREMIUM_CONVERSION_V1 -->
+<div
+  id="cnPremiumConversion"
+  class="cn-premium-overlay"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="cnPremiumTitle"
+  onclick="if (event.target === this) closePremiumConversion()"
+>
+  <div class="cn-premium-modal">
+    <div class="cn-premium-modal-head">
+      <div class="cn-premium-kicker">Chartnalist Premium</div>
+      <div id="cnPremiumTitle" class="cn-premium-title">Trading Intelligence</div>
+      <div id="cnPremiumSubtitle" class="cn-premium-subtitle">
+        Akses fitur premium Chartnalist untuk membantu monitoring dan evaluasi trading.
+      </div>
+    </div>
+
+    <div class="cn-premium-body">
+      <div class="cn-premium-feature">
+        <i class="fa-solid fa-bolt"></i>
+        <div>
+          <strong>Live Trading Signals</strong><br>
+          <span style="color:#7f8991;">Akses signal trading yang dipublikasikan Chartnalist.</span>
+        </div>
+      </div>
+
+      <div class="cn-premium-feature">
+        <i class="fa-solid fa-chart-line"></i>
+        <div>
+          <strong>Signal Performance</strong><br>
+          <span style="color:#7f8991;">Analisis hasil signal, growth, frequency, dan statistik performance.</span>
+        </div>
+      </div>
+
+      <div class="cn-premium-note">
+        Informasi harga dan pembayaran Premium akan tersedia setelah sistem subscription dan payment Chartnalist siap.
+      </div>
+
+      <div class="cn-premium-actions">
+        <button type="button" class="cn-premium-close" onclick="closePremiumConversion()">
+          Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script id="cn-premium-conversion-js">
+(function () {
+  window.openPremiumConversion = function (feature) {
+    var modal = document.getElementById('cnPremiumConversion');
+    var subtitle = document.getElementById('cnPremiumSubtitle');
+
+    if (!modal) return;
+
+    if (feature === 'performance') {
+      subtitle.textContent =
+        'Signal Performance adalah fitur Premium untuk mengevaluasi hasil dan kualitas signal Chartnalist.';
+    } else {
+      subtitle.textContent =
+        'Live Trading Signals adalah fitur Premium untuk monitoring signal trading Chartnalist.';
+    }
+
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closePremiumConversion = function () {
+    var modal = document.getElementById('cnPremiumConversion');
+    if (!modal) return;
+
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') {
+      closePremiumConversion();
+    }
+  });
+})();
+</script>
 </body>
 </html>
+
 
 
 

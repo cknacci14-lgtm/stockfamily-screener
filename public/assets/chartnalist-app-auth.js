@@ -410,7 +410,10 @@
 
       // Guest mode support
       const params = new URLSearchParams(window.location.search);
-      const isGuest = params.get('guest') === '1' || location.pathname === '/demo' || location.pathname.startsWith('/demo/');
+      const isGuest = params.get('guest') === '1' || location.pathname === '/demo' || location.pathname.startsWith('/demo/') || sessionStorage.getItem('chartnalist_guest') === '1';
+      if (isGuest) {
+        try { sessionStorage.setItem('chartnalist_guest', '1'); } catch (e) {}
+      }
 
       if (!session?.user) {
         if (isGuest) {
