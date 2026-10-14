@@ -101,7 +101,7 @@ async function sendTelegram(message, opts) {
     parse_mode: 'HTML',
     disable_web_page_preview: true
   };
-  if (opts && opts.button !== false) {
+  if (!opts || opts.button !== false) {
     payload.reply_markup = { inline_keyboard: [[{ text: (opts && opts.buttonText) || 'Lihat Signal', url: (opts && opts.url) || SIGNALS_URL }]] };
   }
 
