@@ -18,7 +18,7 @@ tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{
 
   /* Stats */
   .stat-card { padding: 14px 16px; border-radius: 10px; background: #131722; border: 1px solid #2A2E39; }
-  .stat-label { font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 6px; }
+  .stat-label { font-size: 11px; color: #8b93a1; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 6px; }
   .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 800; }
   .stat-value.cyan { color: #00E5FF; }
   .stat-value.green { color: #10b981; }
@@ -50,7 +50,7 @@ tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{
   /* Price Grid */
   .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px; margin: 16px 0; padding: 16px; background: #0a0e17; border-radius: 8px; }
   .price-item { display: flex; flex-direction: column; gap: 4px; }
-  .price-label { font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  .price-label { font-size: 11px; color: #8b93a1; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
   .price-value { font-size: 14px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
   .price-value.entry { color: #00E5FF; }
   .price-value.sl { color: #ef4444; }
@@ -63,7 +63,7 @@ tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{
   .pl-block.loss { background: linear-gradient(90deg, rgba(239,68,68,0.08), transparent); border-left-color: #ef4444; }
   .pl-block.neutral { background: linear-gradient(90deg, rgba(107,114,128,0.05), transparent); border-left-color: #6b7280; }
   .pl-item { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-  .pl-label { font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  .pl-label { font-size: 11px; color: #8b93a1; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
   .pl-value { font-size: 15px; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: #e0e0e0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .pl-value.profit { color: #10b981; }
   .pl-value.loss { color: #ef4444; }
@@ -937,6 +937,12 @@ function safeText(v) {
   return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+function hitMark(at, color) {
+  if (!at) return '';
+  var d = new Date(at).toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta', day: '2-digit', month: 'short' });
+  return '<span style="font-size:10px;color:' + (color || '#10b981') + ';font-weight:600;">✓ Kena ' + d + '</span>';
+}
+
 function getStatusClass(s) {
   if (!s) return 'draft';
   var outcome = s.outcome || '';
@@ -1132,7 +1138,7 @@ function renderSignalCard(s) {
           '<div style="font-size: 12px; color: #6b7280; margin-top: 6px;">' + safeText(s.notes || '') + '</div>' +
         '</div>' +
         '<div style="text-align: right;">' +
-          '<div style="font-size: 10px; color: #6b7280; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">Risk / Reward</div>' +
+          '<div style="font-size: 10px; color: #6b7280; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">' + (s.actual_entry_avg ? 'R:R (entry aktual)' : 'Risk / Reward') + '</div>' +
           '<div class="mono" style="font-size: 18px; font-weight: 800; color: #fbbf24;">' + rrDisplay(s) + '</div>' +
         '</div>' +
       '</div>' +
@@ -1169,7 +1175,7 @@ function renderSignalCard(s) {
         if (actualAvg && actualAvg !== plannedAvg) {
           avgDisplay = '<div style="display:flex;justify-content:space-between;padding:8px 10px;background:rgba(16,185,129,0.08);border-radius:6px;border:1px solid rgba(16,185,129,0.3);margin-top:8px;">' +
             '<div><span style="color:#9ca3af;font-size:10px;">PLANNED AVG</span><br>' +
-            '<span class="mono" style="color:#6b7280;font-weight:700;font-size:14px;text-decoration:line-through;">' + fmtRp(plannedAvg) + '</span></div>' +
+            '<span class="mono" style="color:#9ca3af;font-weight:700;font-size:14px;">' + fmtRp(plannedAvg) + '</span></div>' +
             '<div style="text-align:right;"><span style="color:#10b981;font-size:10px;font-weight:600;">ACTUAL AVG (PARTIAL)</span><br>' +
             '<span class="mono" style="color:#10b981;font-weight:800;font-size:16px;">' + fmtRp(actualAvg) + '</span></div>' +
             '</div>';
@@ -1182,10 +1188,10 @@ function renderSignalCard(s) {
         
         // SL + TPs on separate row
         var slTpRow = '<div class="price-grid">';
-        slTpRow += '<div class="price-item"><span class="price-label">Stop Loss</span><span class="price-value sl">' + fmtRp(s.stop_loss) + '</span></div>';
-        slTpRow += '<div class="price-item"><span class="price-label">Target 1</span><span class="price-value tp">' + fmtRp(s.target_1) + '</span></div>';
-        if (s.target_2 != null) slTpRow += '<div class="price-item"><span class="price-label">Target 2</span><span class="price-value tp">' + fmtRp(s.target_2) + '</span></div>';
-        if (s.target_3 != null) slTpRow += '<div class="price-item"><span class="price-label">Target 3</span><span class="price-value tp">' + fmtRp(s.target_3) + '</span></div>';
+        slTpRow += '<div class="price-item"><span class="price-label">Stop Loss</span><span class="price-value sl">' + fmtRp(s.stop_loss) + '</span>' + hitMark(s.sl_hit_at, '#ef4444') + '</div>';
+        slTpRow += '<div class="price-item"><span class="price-label">Target 1</span><span class="price-value tp">' + fmtRp(s.target_1) + '</span>' + hitMark(s.tp1_hit_at) + '</div>';
+        if (s.target_2 != null) slTpRow += '<div class="price-item"><span class="price-label">Target 2</span><span class="price-value tp">' + fmtRp(s.target_2) + '</span>' + hitMark(s.tp2_hit_at) + '</div>';
+        if (s.target_3 != null) slTpRow += '<div class="price-item"><span class="price-label">Target 3</span><span class="price-value tp">' + fmtRp(s.target_3) + '</span>' + hitMark(s.tp3_hit_at) + '</div>';
         slTpRow += '</div>';
         
         return '<div style="margin:16px 0;">' + entryRows + avgDisplay + slTpRow + '</div>';
@@ -1299,8 +1305,26 @@ async function loadSignals() {
 
     var closed = allSignals.filter(function(s) { return s.status === 'CLOSED' && ['TP1','TP2','TP3','SL'].indexOf(s.outcome) >= 0; });
     var wins = closed.filter(function(s) { return ['TP1','TP2','TP3'].indexOf(s.outcome) >= 0; }).length;
-    document.getElementById('statWinRate').textContent = closed.length ? Math.round(wins / closed.length * 100) + '%' : '—';
-    document.getElementById('statUpdated').textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    var runningTp = allSignals.filter(function(s) { return s.status === 'ACTIVE' && /^TP[123]$/.test(s.outcome || ''); }).length;
+    document.getElementById('statWinRate').innerHTML = (closed.length ? Math.round(wins / closed.length * 100) + '%' : '—') +
+      '<div style="font-size:10px;font-weight:600;color:#8b93a1;margin-top:4px;font-family:inherit;">' +
+      (closed.length ? wins + '/' + closed.length + ' closed' : 'belum ada closed') +
+      (runningTp ? ' · ' + runningTp + ' aktif sudah TP' : '') + '</div>';
+    document.getElementById('statUpdated').textContent = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false }) + ' WIB';
+
+    var cnt = {
+      all: allSignals.length,
+      PUBLISHED: allSignals.filter(function(s) { return s.status === 'PUBLISHED'; }).length,
+      ACTIVE: allSignals.filter(function(s) { return s.status === 'ACTIVE'; }).length,
+      TP: allSignals.filter(function(s) { return ['TP1','TP2','TP3'].indexOf(s.outcome) >= 0; }).length,
+      SL: allSignals.filter(function(s) { return s.outcome === 'SL'; }).length
+    };
+    Array.prototype.forEach.call(document.querySelectorAll('.filter-btn[data-filter]'), function(b) {
+      var k = b.getAttribute('data-filter');
+      var sp = b.querySelector('.cn-count');
+      if (!sp) { sp = document.createElement('span'); sp.className = 'cn-count'; sp.style.cssText = 'margin-left:6px;opacity:.7;font-size:11px;'; b.appendChild(sp); }
+      sp.textContent = cnt[k];
+    });
 
     // RENDER dulu (tanpa harga)
     renderSignals();
