@@ -123,12 +123,14 @@ async function fetchYahoo(code) {
 
 // Mengembalikan { ok, price, open, low, high, date, source } atau { ok:false, reason }
 async function fetchMarketData(code) {
-  const [a, y] = await Promise.all([fetchArjum(code), fetchYahoo(code)]);
+  const y = await fetchYahoo(code);
   const today = todayWIB();
   const fresh = x => x && (FORCE || x.date === today);
+  // Arjum hanya cadangan bila Yahoo tidak segar (hemat kuota harian Arjum)
+  const a = fresh(y) ? null : await fetchArjum(code);
   let base = null;
-  if (fresh(a)) base = a;
-  else if (fresh(y)) base = y;
+  if (fresh(y)) base = y;
+  else if (fresh(a)) base = a;
   if (!base) {
     const any = a || y;
     return { ok: false, reason: any ? 'data basi (tanggal ' + (any.date || '?') + ')' : 'tidak ada harga' };
