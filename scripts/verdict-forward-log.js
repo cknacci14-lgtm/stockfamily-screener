@@ -1,7 +1,10 @@
 require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
 const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-const SCOPE = 8e9, PRE = 4e9, WARM = 60, HZ = [5, 10];
+const SCOPE = 8e9, PRE = 4e9, WARM = 60, HZ = [1, 3, 5, 10];
+// Modul zona demand bersifat opsional: kalau file tidak ada (mis. di-gitignore), skrip tetap jalan seperti biasa.
+let zone = null;
+try { zone = require('./zone-forward-log'); } catch (e) { if (e.code !== 'MODULE_NOT_FOUND') throw e; }
 const argDate = ((process.argv.find(a => a.startsWith('--date=')) || '').slice(7)) || '';
 
 async function fetchAll(build) {
@@ -79,12 +82,12 @@ async function logBrokerDay(d, codeById) {
   const dist = rows.filter(r => r.score < 0).sort((a, b) => a.score - b.score).slice(0, 5);
   const idByCode = new Map();
   codeById.forEach((code, id) => idByCode.set(code, id));
-  const ids = acc.concat(dist).map(r => idByCode.get(r.code)).filter(Boolean);
+  const ids = rows.map(r => idByCode.get(r.code)).filter(Boolean);
   if (!ids.length) return;
   const px = await sb.from('daily_stock_data').select('stock_id,close').eq('trade_date', d).in('stock_id', ids);
   const closeById = new Map((px.data || []).map(p => [String(p.stock_id), Number(p.close)]));
   const mk = (arr, verdict) => arr.map(r => ({ log_date: d, stock_code: r.code, verdict: verdict, ref_close: closeById.get(String(idByCode.get(r.code))), foreign_ratio_20d: null, avg_value_20d: r.v })).filter(x => x.ref_close > 0);
-  const out = mk(acc, 'BROKER_ACC').concat(mk(dist, 'BROKER_DIST'));
+  const out = mk(acc, 'BROKER_ACC').concat(mk(dist, 'BROKER_DIST')).concat(mk(rows, 'BROKER_BASE'));
   if (!out.length) return;
   const r = await sb.from('verdict_forward_log').upsert(out, { onConflict: 'log_date,stock_code,verdict', ignoreDuplicates: true });
   if (r.error) throw new Error(r.error.message);
@@ -120,7 +123,7 @@ async function fillReturns(cal, codeById) {
 }
 
 async function summary() {
-  const all = await fetchAll(() => sb.from('verdict_forward_log').select('log_date,verdict,ret_5d,ret_10d').order('id'));
+  const all = await fetchAll(() => sb.from('verdict_forward_log').select('log_date,verdict,ret_1d,ret_3d,ret_5d,ret_10d').order('id'));
   console.log('Hari tercatat: ' + new Set(all.map(r => r.log_date)).size);
   const avg = a => a.reduce((x, y) => x + y, 0) / a.length;
   const out = [];
@@ -146,6 +149,8 @@ async function summary() {
   const target = argDate || cal[cal.length - 1];
   await logSignals(target, codeById);
   await logBrokerCatchUp(cal, codeById);
+  if (zone) await zone.logRecent(sb, Array.from(new Set(cal.slice(-6).concat([target]))), codeById, fetchAll);
   await fillReturns(cal, codeById);
   await summary();
+  if (zone) await zone.summary(sb, fetchAll);
 })().catch(e => { console.error('ERROR:', e.message); process.exit(1); });

@@ -71,3 +71,7 @@ scripts/patch-*.js
 *.before-*
 audit-signals-*
 signals-ui-audit.txt
+
+scripts/zone-forward-log.js
+scripts/backtest-capitulation-*.js
+
