@@ -170,7 +170,10 @@ function checkSignalStatus(signal, md, nowIso) {
   // ---- ENTRY ----
   // low harian hanya dipakai bila signal sudah dipublish sebelum hari ini
   const published = signal.published_at ? wibDate(signal.published_at) : today;
-  const entryRangeOk = published < today && md.low != null;
+  // terbit sebelum bursa buka (< 09:00 WIB) = seluruh range hari ini terjadi setelah signal ada
+  const pubMins = signal.published_at ? (() => { const w = new Date(new Date(signal.published_at).getTime() + 7 * 3600 * 1000); return w.getUTCHours() * 60 + w.getUTCMinutes(); })() : null;
+  const publishedPreOpen = published === today && pubMins != null && pubMins < 9 * 60;
+  const entryRangeOk = (published < today || publishedPreOpen) && md.low != null;
   const lowEntry = entryRangeOk ? md.low : md.price;
 
   const entries = [1, 2, 3].map(i => ({
