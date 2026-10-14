@@ -1,47 +1,47 @@
 {
   "success": true,
-  "date": "2026-10-13",
-  "count": 2,
+  "date": "2026-10-14",
+  "count": 1,
   "filtered": {
-    "considered": 8,
+    "considered": 5,
     "noTrade": 1,
-    "lateEntry": 5,
-    "wideStop": 0
+    "lateEntry": 2,
+    "wideStop": 1
   },
   "signals": [
     {
-      "stockCode": "COCO",
-      "stockName": "Wahana Interfood Nusantara Tbk.",
-      "setup": "PULLBACK",
+      "stockCode": "PWON",
+      "stockName": "Pakuwon Jati Tbk.",
+      "setup": "BREAKOUT",
       "status": "TRIGGERED",
-      "price": 119,
-      "trigger": 118.55,
-      "invalidation": 92.12,
-      "target1": 158.19,
-      "target2": 184.62,
+      "price": 288,
+      "trigger": 284,
+      "invalidation": 267.2,
+      "target1": 309.2,
+      "target2": 326,
       "riskReward": 2.5,
-      "riskLevel": "HIGH",
-      "entryGapPct": 0.4,
-      "rrFromPrice": 1.46,
+      "riskLevel": "MEDIUM",
+      "entryGapPct": 1.4,
+      "rrFromPrice": 1.02,
       "planStale": false,
       "preBreakout": false,
-      "stopDistancePct": 22.6,
-      "stopWide": true,
-      "maxEntry": 125.16,
+      "stopDistancePct": 7.2,
+      "stopWide": false,
+      "maxEntry": 288.2,
       "structure": {
-        "state": "IMPROVING",
-        "label": "Structure improving",
-        "explanation": "Price remains above the main short/intermediate trend references with increasing price activity."
+        "state": "BULLISH",
+        "label": "Bullish structure",
+        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
       },
       "participation": {
-        "state": "CONTRACTING",
-        "label": "Participation contracting",
-        "explanation": "Multiple trading-activity measures are below their recent baseline."
+        "state": "IMPROVING",
+        "label": "Participation improving",
+        "explanation": "Multiple trading-activity measures are materially above their recent baseline."
       },
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": -0.000031795146763072686,
+        "value": 0.0008190005346955729,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
@@ -50,53 +50,10 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-13T19:59:17.085Z"
-    },
-    {
-      "stockCode": "SRSN",
-      "stockName": "Indo Acidatama Tbk",
-      "setup": "PULLBACK",
-      "status": "TRIGGERED",
-      "price": 129,
-      "trigger": 128.55,
-      "invalidation": 100,
-      "target1": 171.38,
-      "target2": 199.93,
-      "riskReward": 2.5,
-      "riskLevel": "HIGH",
-      "entryGapPct": 0.4,
-      "rrFromPrice": 1.46,
-      "planStale": false,
-      "preBreakout": false,
-      "stopDistancePct": 22.5,
-      "stopWide": true,
-      "maxEntry": 135.69,
-      "structure": {
-        "state": "IMPROVING",
-        "label": "Structure improving",
-        "explanation": "Price remains above the main short/intermediate trend references with increasing price activity."
-      },
-      "participation": {
-        "state": "CONTRACTING",
-        "label": "Participation contracting",
-        "explanation": "Multiple trading-activity measures are below their recent baseline."
-      },
-      "flow": {
-        "state": "NEUTRAL",
-        "label": "Foreign flow neutral",
-        "value": 0.00011206315673368143,
-        "explanation": "Foreign activity does not provide a decisive contextual signal."
-      },
-      "liquidity": {
-        "state": "HEALTHY",
-        "label": "Healthy liquidity",
-        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
-      },
-      "signalDate": null,
-      "updatedAt": "2026-10-13T19:59:17.085Z"
+      "updatedAt": "2026-10-14T18:05:02.388Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-10-13T19:59:17.085Z"
+  "generatedAt": "2026-10-14T18:05:02.388Z"
 }
