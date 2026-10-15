@@ -5435,6 +5435,10 @@ function togglePanel(panelId, headerEl) {
     }
 </style>
 <script src="/assets/chartnalist-track.js" defer></script>
+<style id="sf-polish34">
+#btnLevel, #btnBT { width: auto !important; min-width: 0 !important; padding: 0 8px !important; white-space: nowrap !important; font-size: 10px !important; line-height: 1 !important; border: 1px solid #2A2E39 !important; flex-shrink: 0; }
+#btnLevel:hover, #btnBT:hover { border-color: #00E5FF !important; color: #fff; }
+</style>
 <script id="sf-polish33">
 function sfPlanRows(show) {
   ['tpEntry', 'tpStop', 'tpT1', 'tpT2', 'tpRR'].forEach(function (id) {
@@ -5458,10 +5462,10 @@ function sfLevelLines() {
     window._sfLvLines.push(cs.createPriceLine({ price: price, color: color, lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: title }));
   };
   var st = s.structure || {};
-  add(st.lastHigh, '#00E676', 'Swing H');
-  add(st.lastLow, '#FF5252', 'Swing L');
+  add(isFinite(Number(st.lastHigh)) ? sfRound(Number(st.lastHigh)) : NaN, '#00E676', 'Swing H');
+  add(isFinite(Number(st.lastLow)) ? sfRound(Number(st.lastLow)) : NaN, '#FF5252', 'Swing L');
   var lv = sfDayLevels(s);
-  if (lv) {
+  if (lv && typeof sfMode !== 'undefined' && sfMode === 'day') {
     add(sfRound(lv.R1), '#80CBC4', 'R1');
     add(sfRound(lv.P), '#FFB300', 'Pivot');
     add(sfRound(lv.S1), '#EF9A9A', 'S1');
