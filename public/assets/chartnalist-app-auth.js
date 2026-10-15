@@ -458,6 +458,37 @@
       };
 
       renderUserMenu(session.user, currentProfile);
+      // --- First-login onboarding (once) ---
+      try {
+        if (!window.chartnalistAuth?.isGuest && !localStorage.getItem("chartnalist_onboarded")) {
+          const ov = document.createElement("div");
+          ov.id = "chartnalist-onboard";
+          ov.style.cssText = "position:fixed;inset:0;z-index:100000;background:rgba(5,6,7,.72);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)";
+          ov.innerHTML = `
+            <div style="width:min(420px,100%);background:#101418;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:22px 20px;box-shadow:0 24px 80px rgba(0,0,0,.45);font-family:Inter,system-ui,sans-serif;color:#f4f6f7">
+              <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#00d084;margin-bottom:8px">Welcome</div>
+              <div style="font-size:18px;font-weight:750;letter-spacing:-.02em;margin-bottom:8px">Mulai dari mana?</div>
+              <div style="font-size:13px;color:#8b959c;line-height:1.45;margin-bottom:18px">Pilih langkah pertama. Kamu bisa ganti kapan saja dari sidebar.</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <a href="/screener" data-ob="screener" style="display:block;padding:12px 14px;border-radius:10px;background:rgba(0,208,132,.12);border:1px solid rgba(0,208,132,.35);color:#00d084;font-weight:700;font-size:13px;text-decoration:none">Buka Screener</a>
+                <a href="/signals" data-ob="signals" style="display:block;padding:12px 14px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#e2e8f0;font-weight:650;font-size:13px;text-decoration:none">Lihat Signals</a>
+                <button type="button" data-ob="chart" style="padding:12px 14px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,.08);color:#8b959c;font-weight:600;font-size:13px;cursor:pointer">Tetap di chart</button>
+              </div>
+            </div>`;
+          const done = () => {
+            try { localStorage.setItem("chartnalist_onboarded", "1"); } catch (e) {}
+            ov.remove();
+          };
+          ov.addEventListener("click", (e) => {
+            const a = e.target.closest("[data-ob]");
+            if (!a) return;
+            done();
+            if (a.getAttribute("data-ob") === "chart") e.preventDefault();
+          });
+          document.body.appendChild(ov);
+        }
+      } catch (e) { console.warn("[onboard]", e); }
+
 
       window.dispatchEvent(
         new CustomEvent("chartnalist:auth-ready", {
