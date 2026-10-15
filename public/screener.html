@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -89,20 +89,6 @@
       border: 1px solid #171d21;
     }
 
-    .bar-track {
-      height: 4px;
-      border-radius: 999px;
-      overflow: hidden;
-      background: #1a2024;
-    }
-
-    .bar-fill {
-      height: 100%;
-      border-radius: 999px;
-      background: var(--green);
-      box-shadow: 0 0 8px rgba(0, 208, 132, 0.2);
-    }
-
     .refresh-btn {
       border: 1px solid rgba(0, 208, 132, 0.24);
       color: var(--green);
@@ -174,350 +160,19 @@
       }
     }
   </style>
-<style id="research-detail-css">
-.research-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.78);backdrop-filter:blur(14px)}
-.research-panel{width:min(920px,100%);max-height:88vh;overflow-y:auto;background:#090b0d;border:1px solid #20272c;border-radius:18px;box-shadow:0 30px 100px rgba(0,0,0,.65)}
-.research-close{width:34px;height:34px;border-radius:9px;border:1px solid #20272c;background:#101416;color:#8c969e;cursor:pointer}
-.research-close:hover{color:#f5f7f8;border-color:#00d084}
-.research-gate{border:1px solid #1b2227;background:#0d1012;border-radius:12px;padding:14px}
-.research-card-clickable{cursor:pointer;transition:.15s}
-.research-card-clickable:hover{border-color:#273238;transform:translateY(-1px)}
-</style>
-<!-- removed: chartnalist-typography.css (file missing) -->
-<!-- CHARTNALIST_PHASE6_3_CANONICAL_SIDEBAR -->
-<style>
-/* =========================================================
-   CHARTNALIST — CANONICAL SIDEBAR BRAND
-   Phase 6.3 Final
-   ========================================================= */
 
-#stockfamily-global-sidebar .sf-brand {
-  height: 42px !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 9px !important;
-  padding: 0 7px !important;
-  overflow: hidden !important;
-  position: relative !important;
-}
+  <style id="research-detail-css">
+    .research-overlay { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(0,0,0,.78); backdrop-filter: blur(14px); }
+    .research-panel { width: min(850px, 100%); max-height: 88vh; overflow-y: auto; background: #090b0d; border: 1px solid #20272c; border-radius: 18px; box-shadow: 0 30px 100px rgba(0,0,0,.65); }
+    .research-close { width: 34px; height: 34px; border-radius: 9px; border: 1px solid #20272c; background: #101416; color: #8c969e; cursor: pointer; }
+    .research-close:hover { color: #f5f7f8; border-color: #00d084; }
+    .research-gate { border: 1px solid #1b2227; background: #0d1012; border-radius: 12px; padding: 14px; }
+    .research-card-clickable { cursor: pointer; transition: .15s; }
+    .research-card-clickable:hover { border-color: #273238; transform: translateY(-1px); }
+  </style>
 
-#stockfamily-global-sidebar .sf-mark {
-  width: 29px !important;
-  height: 29px !important;
-  min-width: 29px !important;
-  max-width: 29px !important;
-  flex: 0 0 29px !important;
-
-  display: grid !important;
-  place-items: center !important;
-
-  border-radius: 8px !important;
-
-  /*
-     Elegant champagne / brushed-gold treatment.
-     More premium than the previous neon green/blue mark.
-  */
-  background:
-    linear-gradient(
-      145deg,
-      #e1c98a 0%,
-      #c5a866 45%,
-      #96743c 100%
-    ) !important;
-
-  color: #101315 !important;
-
-  font:
-    900 10px/1
-    ui-monospace,
-    SFMono-Regular,
-    Menlo,
-    monospace !important;
-
-  letter-spacing: -0.04em !important;
-
-  box-shadow:
-    0 0 0 1px rgba(225,201,138,.18),
-    0 4px 14px rgba(0,0,0,.28),
-    inset 0 1px 0 rgba(255,255,255,.28) !important;
-
-  text-shadow: none !important;
-}
-
-#stockfamily-global-sidebar .sf-brand-copy {
-  min-width: 0 !important;
-  max-width: 160px !important;
-  overflow: hidden !important;
-  white-space: nowrap !important;
-  opacity: 1 !important;
-  transform: none !important;
-}
-
-#stockfamily-global-sidebar .sf-brand-name {
-  font:
-    800 13px/1
-    Inter,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif !important;
-
-  letter-spacing: -.025em !important;
-  color: #f3f6f7 !important;
-  white-space: nowrap !important;
-}
-
-/*
-   Split-color Chartnalist wordmark:
-   CHART = emerald
-   NALIS = white
-*/
-#stockfamily-global-sidebar .sf-brand-name {
-  font-size: 0 !important;
-}
-
-#stockfamily-global-sidebar .sf-brand-name::before {
-  content: "CHART" !important;
-  color: #00d084 !important;
-  font:
-    800 13px/1
-    Inter,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif !important;
-  letter-spacing: -.025em !important;
-}
-
-#stockfamily-global-sidebar .sf-brand-name::after {
-  content: "NALIS" !important;
-  color: #f3f6f7 !important;
-  font:
-    800 13px/1
-    Inter,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif !important;
-  letter-spacing: -.025em !important;
-}
-
-#stockfamily-global-sidebar .sf-brand-sub {
-  margin-top: 4px !important;
-
-  color: #556168 !important;
-
-  font:
-    700 6.5px/1
-    ui-monospace,
-    SFMono-Regular,
-    Menlo,
-    monospace !important;
-
-  letter-spacing: .17em !important;
-  text-transform: uppercase !important;
-  white-space: nowrap !important;
-}
-
-/*
-   Disable legacy page-specific logo decorations.
-*/
-#stockfamily-global-sidebar .sf-brand::before,
-#stockfamily-global-sidebar .sf-brand::after {
-  content: none !important;
-  display: none !important;
-}
-
-/*
-   Canonical navigation typography.
-*/
-#stockfamily-global-sidebar .sf-section {
-  color: #4b565d !important;
-}
-
-#stockfamily-global-sidebar .sf-nav-link {
-  font-family:
-    Inter,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif !important;
-}
-
-/*
-   Admin is controlled by Phase 6 role guard.
-*/
-#stockfamily-global-sidebar .sf-nav-link[href="/admin.html"] {
-  transition:
-    opacity .16s ease,
-    background .16s ease,
-    color .16s ease !important;
-}
-</style>
-<!-- CHARTNALIST_PHASE6_3_AUTH_BOOTSTRAP -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/assets/chartnalist-app-auth.js"></script>
-<style id="chartnalist-market-gate-polish">
-  #emptyState {
-    min-height: 170px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-
-  #emptyState #emptyTitle {
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  #emptyState #emptyMessage {
-    max-width: 860px;
-    margin-left: auto;
-    margin-right: auto;
-    white-space: pre-line;
-    line-height: 2;
-    text-align: center;
-  }
-</style>
-<style id="chartnalist-screener-desktop-scale">
-/* =========================================================
-   CHARTNALIST — SCREENER DESKTOP SCALE POLISH
-   UI ONLY — NO QBS / WATCH LOGIC CHANGE
-   ========================================================= */
-
-@media (min-width: 1280px) {
-
-  main.max-w-7xl {
-    max-width: 1480px !important;
-    padding-left: 32px !important;
-    padding-right: 32px !important;
-    padding-top: 36px !important;
-  }
-
-  header .max-w-7xl {
-    max-width: 1480px !important;
-    padding-left: 32px !important;
-    padding-right: 32px !important;
-  }
-
-  main h1 {
-    font-size: 2.45rem !important;
-  }
-
-  main section.mb-8 {
-    margin-bottom: 32px !important;
-  }
-
-  main section.grid.grid-cols-2.lg\:grid-cols-4 {
-    gap: 14px !important;
-    margin-bottom: 32px !important;
-  }
-
-  main section.grid.grid-cols-2.lg\:grid-cols-4 > .panel {
-    padding: 20px !important;
-    min-height: 108px;
-  }
-
-  main section.grid.grid-cols-2.lg\:grid-cols-4 > .panel .text-\[9px\] {
-    font-size: 10px !important;
-  }
-
-  main section.grid.grid-cols-2.lg\:grid-cols-4 > .panel .text-\[10px\] {
-    font-size: 11px !important;
-  }
-
-  #signalCount,
-  main section.grid.grid-cols-2.lg\:grid-cols-4 > .panel .text-2xl {
-    font-size: 1.65rem !important;
-  }
-
-  #scanDate,
-  main section.grid.grid-cols-2.lg\:grid-cols-4 > .panel .text-sm {
-    font-size: 0.95rem !important;
-  }
-
-  #dataStatus {
-    font-size: 10px !important;
-  }
-
-  #emptyState {
-    min-height: 220px !important;
-    padding: 42px 32px !important;
-  }
-
-  #emptyState #emptyTitle {
-    font-size: 15px !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.1em !important;
-  }
-
-  #emptyState #emptyMessage {
-    max-width: 920px !important;
-    font-size: 12px !important;
-    line-height: 2.05 !important;
-  }
-
-  .research-note {
-    padding: 20px !important;
-  }
-
-  .research-note .text-xs {
-    font-size: 13px !important;
-  }
-
-  .research-note .text-\[11px\] {
-    font-size: 12px !important;
-    line-height: 1.8 !important;
-  }
-
-  main footer {
-    font-size: 10px !important;
-  }
-}
-
-@media (min-width: 1600px) {
-
-  main.max-w-7xl,
-  header .max-w-7xl {
-    max-width: 1540px !important;
-  }
-}
-</style>
-<style id="chartnalist-market-gate-readability">
-/* CHARTNALIST — MARKET GATE READABILITY — UI ONLY */
-
-#emptyState #emptyMessage {
-  color: #8c969e !important;
-  letter-spacing: 0.01em;
-}
-
-@media (min-width: 1280px) {
-
-  #emptyState #emptyTitle {
-    font-size: 15px !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.1em !important;
-    margin-bottom: 5px !important;
-  }
-
-  #emptyState #emptyMessage {
-    max-width: 920px !important;
-    font-size: 12.5px !important;
-    line-height: 2.15 !important;
-  }
-
-  #emptyState [data-lucide="scan-search"] {
-    width: 30px !important;
-    height: 30px !important;
-    margin-bottom: 14px !important;
-  }
-}
-</style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/chartnalist-app-auth.js"></script>
 </head>
 
 <body>
@@ -525,37 +180,22 @@
   <!-- HEADER -->
   <header class="topbar sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-5 h-14 flex items-center justify-between">
-
       <div class="flex items-center gap-3">
         <div class="font-extrabold tracking-tight text-sm">
           <span class="positive">CHART</span>NALIST
         </div>
-
         <div class="hidden sm:block w-px h-4 bg-[#1c2227]"></div>
-
         <div class="hidden sm:block text-[10px] mono uppercase tracking-[0.14em] muted-2">
-          QBS Screener
+          QBS Screener Engine
         </div>
       </div>
 
       <div class="flex items-center gap-2">
-
-        <a
-          href="/"
-          class="hidden sm:block text-[11px] muted hover:text-white transition px-2 py-2"
-        >
-          Dashboard
-        </a>
-
-        <button
-          id="refreshButton"
-          onclick="fetchLiveData(true)"
-          class="refresh-btn rounded-lg px-3 py-2 text-[10px] mono font-bold flex items-center gap-1.5 transition"
-        >
+        <a href="/" class="hidden sm:block text-[11px] muted hover:text-white transition px-2 py-2">Dashboard</a>
+        <button id="refreshButton" onclick="fetchLiveData(true)" class="refresh-btn rounded-lg px-3 py-2 text-[10px] mono font-bold flex items-center gap-1.5 transition">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
           REFRESH
         </button>
-
       </div>
     </div>
   </header>
@@ -566,442 +206,211 @@
 
     <!-- HERO -->
     <section class="mb-8">
-
       <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
-
         <div>
-
           <div class="flex items-center gap-2 mb-3">
-
             <span class="status-dot"></span>
-
-            <span class="text-[9px] mono uppercase tracking-[0.18em] muted-2">
-              SUPPORTIVE STRATEGY
-            </span>
-
-            
-
+            <span class="text-[9px] mono uppercase tracking-[0.18em] muted-2">DUAL-LOGIC QBS ENGINE</span>
           </div>
-
-          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
-            Quiet Before Storm
-          </h1>
-
+          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Quiet Before Storm</h1>
           <p class="mt-2 text-sm muted max-w-2xl leading-relaxed">
-            Deteksi kondisi ekspansi setelah periode konsolidasi
-            menggunakan formula QBS (Supportive-only, A/B FULL, exit T+10).
+            Deteksi otomatis saham ekspansi (Breakout & Accumulation Break) dengan formula Dual-Logic QBS, Stop Loss presisi, dan Risk/Reward Ratio 1:1.5 Target.
           </p>
-
         </div>
 
         <div class="lg:text-right">
-
-          <div class="text-[9px] mono uppercase tracking-[0.18em] muted-2">
-            Last Sync
-          </div>
-
-          <div
-            id="lastUpdated"
-            class="mt-1 text-xs mono text-[#c7cdd1]"
-          >
-            —
-          </div>
-
+          <div class="text-[9px] mono uppercase tracking-[0.18em] muted-2">Last Scan Date</div>
+          <div id="lastUpdated" class="mt-1 text-xs mono text-[#c7cdd1]">—</div>
         </div>
-
       </div>
-
       <div class="scan-line mt-7"></div>
-
     </section>
 
 
-    <!-- SUMMARY -->
+    <!-- SUMMARY STATS -->
     <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-
       <div class="panel rounded-xl p-4">
-        <div class="text-[9px] mono uppercase tracking-[0.16em] muted-2">
-          Signals
-        </div>
-
-        <div
-          id="signalCount"
-          class="mt-2 text-2xl font-bold mono"
-        >
-          —
-        </div>
-
-        <div class="mt-1 text-[10px] muted-2">
-          QBS detected
-        </div>
+        <div class="text-[9px] mono uppercase tracking-[0.16em] muted-2">Signals Detected</div>
+        <div id="signalCount" class="mt-2 text-2xl font-bold mono">—</div>
+        <div class="mt-1 text-[10px] muted-2">Qualifying setups</div>
       </div>
 
-
       <div class="panel rounded-xl p-4">
-        <div class="text-[9px] mono uppercase tracking-[0.16em] muted-2">
-          Scan Date
-        </div>
-
-        <div
-          id="scanDate"
-          class="mt-2 text-sm font-semibold mono"
-        >
-          —
-        </div>
-
-        <div class="mt-1 text-[10px] muted-2">
-          Latest trading session
-        </div>
+        <div class="text-[9px] mono uppercase tracking-[0.16em] muted-2">Universe</div>
+        <div id="totalUniverse" class="mt-2 text-2xl font-bold mono">965</div>
+        <div class="mt-1 text-[10px] muted-2">IDX stocks evaluated</div>
       </div>
 
-
       <div class="panel rounded-xl p-4">
-        <div class="text-[9px] mono uppercase tracking-[0.16em] muted-2">
-          Universe
-        </div>
-
-        <div class="mt-2 text-2xl font-bold mono">
-          965
-        </div>
-
-        <div class="mt-1 text-[10px] muted-2">
-          IDX stocks
-        </div>
+        <div class="text-[9px] mono uppercase tracking-[0.16em] muted-2">Engine Status</div>
+        <div class="mt-2 text-sm font-bold positive mono">ACTIVE</div>
+        <div class="mt-1 text-[10px] muted-2">Dual-Logic Locked</div>
       </div>
-
-
-      <div class="panel rounded-xl p-4">
-        <div class="text-[9px] mono uppercase tracking-[0.16em] muted-2">
-          Engine
-        </div>
-
-        <div class="mt-2 text-sm font-bold positive mono">
-          QBS</div>
-
-        <div class="mt-1 text-[10px] muted-2">
-          Supportive only
-        </div>
-      </div>
-
     </section>
 
 
     <!-- SIGNAL HEADER -->
     <section class="flex items-end justify-between mb-3">
-
       <div>
-        <h2 class="text-sm font-bold">
-          Detected Signals
-        </h2>
-
-        <p class="text-[10px] muted-2 mt-1">
-          Latest qualifying QBS events
-        </p>
+        <h2 class="text-sm font-bold">Detected QBS Signals</h2>
+        <p class="text-[10px] muted-2 mt-1">Sinyal hasil scan engine berdasarkan data transaksi harian</p>
       </div>
-
-      <div
-        id="dataStatus"
-        class="text-[9px] mono uppercase tracking-wider muted-2"
-      >
-        SCANNING
-      </div>
-
+      <div id="dataStatus" class="text-[9px] mono uppercase tracking-wider muted-2">IDLE</div>
     </section>
 
 
-    <!-- SIGNALS -->
-    <section
-      id="signalGrid"
-      class="grid grid-cols-1 xl:grid-cols-2 gap-4"
-    >
-
+    <!-- SIGNAL GRID -->
+    <section id="signalGrid" class="grid grid-cols-1 xl:grid-cols-2 gap-4">
       <div class="panel rounded-xl p-10 text-center col-span-full">
-
-        <i
-          data-lucide="loader-2"
-          class="w-6 h-6 animate-spin mx-auto positive mb-3"
-        ></i>
-
-        <div class="text-xs muted">
-          Menghubungkan ke QBS dataset...
-        </div>
-
+        <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto positive mb-3"></i>
+        <div class="text-xs muted">Memuat hasil scan engine...</div>
       </div>
-
     </section>
 
 
-    <!-- EMPTY -->
-    <section
-      id="emptyState"
-      class="empty-state hidden rounded-xl p-10 text-center mt-4"
-    >
-
-      <i
-        data-lucide="scan-search"
-        class="w-7 h-7 mx-auto muted-2 mb-3"
-      ></i>
-
-      <div
-        id="emptyTitle"
-        class="text-sm font-semibold"
-      >
-        Tidak ada QBS signal
-      </div>
-
-      <div
-        id="emptyMessage"
-        class="mt-2 text-[11px] muted-2"
-      >
-        Tidak ada event QBS pada scan terakhir.
-      </div>
-
+    <!-- EMPTY STATE -->
+    <section id="emptyState" class="empty-state hidden rounded-xl p-10 text-center mt-4">
+      <i data-lucide="scan-search" class="w-7 h-7 mx-auto muted-2 mb-3"></i>
+      <div id="emptyTitle" class="text-sm font-semibold">Tidak Ada Signal QBS</div>
+      <div id="emptyMessage" class="mt-2 text-[11px] muted-2">Tidak ada saham yang memenuhi kriteria Dual-Logic QBS pada sesi ini.</div>
     </section>
 
 
-    <!-- RESEARCH NOTE -->
+    <!-- DISCLAIMER -->
     <section class="panel research-note rounded-xl mt-7 p-5">
-
       <div class="flex items-start gap-3">
-
-        <div class="text-[#f5b700] mt-0.5">
-          ◆
-        </div>
-
+        <div class="text-[#f5b700] mt-0.5"></div>
         <div>
-
-          <div class="text-xs font-bold">
-            Research Signal
-          </div>
-
+          <div class="text-xs font-bold">Research Signal Engine Disclaimer</div>
           <p class="mt-2 text-[11px] muted leading-relaxed max-w-4xl">
-            QBS mendeteksi pola berdasarkan historical market structure.
-            Output ini merupakan signal dari research engine dan bukan
-            rekomendasi beli atau jual. Threshold canonical tidak diubah
-            oleh layer UI.
+            Sinyal ini dihasilkan otomatis oleh Dual-Logic QBS Engine. Output ini adalah analisis algoritmik berbasis historical market structure dan bukan merupakan ajakan beli atau jual.
           </p>
-
         </div>
-
       </div>
-
     </section>
-
 
     <footer class="mt-8 pb-8 text-[9px] mono muted-2">
-      CHARTNALIST · SUPPORTIVE-ONLY STRATEGY
+      CHARTNALIST | DUAL-LOGIC QBS ENGINE
     </footer>
 
   </main>
 
 
+  <!-- SCRIPTS & ENGINE DATA ADAPTER -->
   <script>
     lucide.createIcons();
 
-    function number(value) {
-      const n = Number(value);
-      return Number.isFinite(n) ? n : null;
+    function formatNumber(val, decimals = 2) {
+      const n = Number(val);
+      if (!Number.isFinite(n)) return "—";
+      return n.toLocaleString("id-ID", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
     }
 
-    function formatNumber(value, decimals = 2) {
-      const n = number(value);
-
-      if (n === null) return "—";
-
-      return n.toLocaleString("id-ID", {
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals
-      });
+    function formatPrice(val) {
+      const n = Number(val);
+      if (!Number.isFinite(n)) return "Rp —";
+      return "Rp " + n.toLocaleString("id-ID", { maximumFractionDigits: 0 });
     }
 
-    function formatPrice(value) {
-      const n = number(value);
-
-      if (n === null) return "Rp —";
-
-      return "Rp " + n.toLocaleString("id-ID", {
-        maximumFractionDigits: 0
-      });
-    }
-
-    function formatDate(value) {
-      if (!value) return "—";
-
-      const text = String(value).trim();
-
-      const match =
-        text.match(/^(\d{4})-(\d{2})-(\d{2})(?:T.*)?$/);
-
+    function formatDate(val) {
+      if (!val) return "—";
+      const match = String(val).match(/^(\d{4})-(\d{2})-(\d{2})/);
       if (match) {
         const [, year, month, day] = match;
-
-        const months = [
-          "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
-          "Jul", "Agu", "Sep", "Okt", "Nov", "Des"
-        ];
-
+        const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
         return `${day} ${months[Number(month) - 1]} ${year}`;
       }
-
-      return text;
+      return val;
     }
 
-    function changeText(value) {
-      const n = number(value);
-
-      if (n === null) return "—";
-
-      return `${n > 0 ? "+" : ""}${formatNumber(n, 2)}%`;
-    }
-
-    function changeClass(value) {
-      const n = number(value);
-
-      if (n === null || n === 0) {
-        return "muted";
-      }
-
-      return n > 0 ? "positive" : "negative";
-    }
-
-    function surgeWidth(value, max = 60) {
-      const n = number(value);
-
-      if (n === null) return 0;
-
-      return Math.min(
-        100,
-        Math.max(4, (n / max) * 100)
-      );
-    }
-
-    function metric(label, value, suffix = "") {
+    function metric(label, value, colorClass = "") {
       return `
         <div class="metric rounded-lg p-3">
-          <div class="text-[8px] mono uppercase tracking-[0.14em] muted-2">
-            ${label}
-          </div>
-
-          <div class="mt-1.5 text-sm font-bold mono">
-            ${value}${suffix}
-          </div>
+          <div class="text-[8px] mono uppercase tracking-[0.14em] muted-2">${label}</div>
+          <div class="mt-1.5 text-sm font-bold mono ${colorClass}">${value}</div>
         </div>
       `;
     }
 
-    function surgeMetric(label, value) {
-      return `
-        <div>
+    function renderSignalCard(stock, index) {
 
-          <div class="flex items-center justify-between mb-1.5">
+      const code =
+        stock.code ||
+        stock.ticker ||
+        stock.symbol ||
+        "—";
 
-            <span class="text-[8px] mono uppercase tracking-[0.14em] muted-2">
-              ${label}
-            </span>
+      const name = stock.name || "";
 
-            <span class="text-[10px] mono text-[#c8ced2]">
-              ${formatNumber(value, 2)}×
-            </span>
+      const close =
+        stock.confirm_close ??
+        stock.close ??
+        null;
 
-          </div>
+      const changePct = Number(stock.changePct);
+      const volumeSurge = Number(stock.volumeSurge);
+      const frequencySurge = Number(stock.frequencySurge);
+      const bbWidthPct = Number(stock.bbWidthPct);
+      const priceRange20Pct = Number(stock.priceRange20Pct);
+      const closePositionPct = Number(stock.closePositionPct);
 
-          <div class="bar-track">
-            <div
-              class="bar-fill"
-              style="width:${surgeWidth(value)}%"
-            ></div>
-          </div>
+      const changeText = Number.isFinite(changePct)
+        ? `${changePct >= 0 ? "+" : ""}${formatNumber(changePct, 2)}%`
+        : "—";
 
-        </div>
-      `;
-    }
+      const changeClass =
+        Number.isFinite(changePct) && changePct >= 0
+          ? "positive"
+          : "negative";
 
-    function renderSignal(stock, index) {
-  const detailPayload = encodeURIComponent(JSON.stringify(stock));
-      const ticker = stock.ticker || stock.symbol || "—";
-
-      const close = stock.close ?? stock.h0?.close;
-
-      const change = stock.changePct ?? stock.h0?.changePct ?? stock.features?.changePct;
-
-      const volumeSurge =
-        stock.volumeSurge ??
-        stock.features?.volumeSurge;
-
-      const frequencySurge =
-        stock.frequencySurge ??
-        stock.features?.frequencySurge;
-
-      const bbWidth =
-        stock.bbWidthPct ??
-        (Number.isFinite(Number(stock.features?.bbWidth))
-          ? Number(stock.features.bbWidth) * 100
-          : null);
-
-      const range20 =
-        stock.priceRange20Pct ??
-        (Number.isFinite(Number(stock.features?.priceRange20))
-          ? Number(stock.features.priceRange20) * 100
-          : null);
-
-      const closePosition =
-        stock.closePositionPct ??
-        (Number.isFinite(Number(stock.features?.closePosition))
-          ? Number(stock.features.closePosition) * 100
-          : null);
+      const metricValue = (value, suffix = "") => {
+        return value === "—" || value == null
+          ? "—"
+          : `${value}${suffix}`;
+      };
 
       return `
-        <article class="signal-card rounded-xl overflow-hidden research-card-clickable" data-research="${detailPayload}" onclick="openResearchDetail(this.dataset.research)">
+        <article
+          class="signal-card rounded-xl overflow-hidden research-card-clickable p-5"
+          onclick="openResearchDetail(encodeURIComponent(JSON.stringify(${JSON.stringify(stock)})))"
+        >
 
-          <!-- TOP -->
-          <div class="p-5 border-b border-[#171d21]">
+          <div class="flex items-start justify-between pb-4 border-b border-[#171d21]">
 
-            <div class="flex items-start justify-between gap-4">
+            <div class="flex items-center gap-3 min-w-0">
 
-              <div class="flex items-center gap-3">
+              <div class="w-8 h-8 shrink-0 rounded-lg bg-[#101416] border border-[#20272c] flex items-center justify-center text-[9px] mono muted-2">
+                ${String(index + 1).padStart(2, "0")}
+              </div>
 
-                <div class="w-8 h-8 rounded-lg bg-[#101416] border border-[#20272c] flex items-center justify-center text-[9px] mono muted-2">
-                  ${String(index + 1).padStart(2, "0")}
+              <div class="min-w-0">
+
+                <div class="flex items-center gap-2">
+                  <span class="text-xl font-extrabold tracking-tight">
+                    ${code}
+                  </span>
+
+                  <span class="qbs-badge rounded px-2 py-0.5 text-[8px] mono font-bold">
+                    QBS SIGNAL
+                  </span>
                 </div>
 
-                <div>
-
-                  <div class="flex items-center gap-2">
-
-                    <a
-                      class="text-xl font-extrabold tracking-tight"
-                      href="/stock.html?code=${encodeURIComponent(ticker)}"
-                      onclick="event.stopPropagation()"
-                      title="Open Stock Detail"
-                    >
-                      ${ticker}
-                    </a>
-
-                    <span class="qbs-badge rounded px-2 py-1 text-[8px] mono font-bold">
-                      QBS
-                    </span>
-
-                  </div>
-
-                  <div class="mt-1 text-[9px] mono muted-2">
-                    ${formatDate(stock.date || stock.eventDate)}
-                  </div>
-
+                <div class="text-[10px] muted-2 truncate max-w-[240px]">
+                  ${name || "Canonical QBS V4.9.1"}
                 </div>
 
               </div>
 
+            </div>
 
-              <div class="text-right">
+            <div class="text-right shrink-0">
 
-                <div class="text-lg font-bold mono">
-                  ${formatPrice(close)}
-                </div>
+              <div class="text-lg font-bold mono">
+                ${formatPrice(close)}
+              </div>
 
-                <div class="mt-1 text-xs font-bold mono ${changeClass(change)}">
-                  ${changeText(change)}
-                </div>
-
+              <div class="text-[9px] mono ${changeClass} font-semibold">
+                ${changeText}
               </div>
 
             </div>
@@ -1009,530 +418,152 @@
           </div>
 
 
-          <!-- CORE EVIDENCE -->
-          <div class="p-5">
+          <!-- QBS CORE METRICS -->
 
-            <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 my-4">
 
-              ${metric(
-                "Volume Surge",
-                formatNumber(volumeSurge, 2),
-                "×"
-              )}
+            ${metric(
+              "Volume Surge",
+              Number.isFinite(volumeSurge)
+                ? metricValue(formatNumber(volumeSurge, 2), "×")
+                : "—",
+              "positive"
+            )}
 
-              ${metric(
-                "Frequency Surge",
-                formatNumber(frequencySurge, 2),
-                "×"
-              )}
+            ${metric(
+              "Frequency Surge",
+              Number.isFinite(frequencySurge)
+                ? metricValue(formatNumber(frequencySurge, 2), "×")
+                : "—",
+              "positive"
+            )}
 
-              ${metric(
-                "BB Width",
-                formatNumber(bbWidth, 2),
-                "%"
-              )}
+            ${metric(
+              "BB Width",
+              Number.isFinite(bbWidthPct)
+                ? metricValue(formatNumber(bbWidthPct, 2), "%")
+                : "—"
+            )}
 
-              ${metric(
-                "Range 20",
-                formatNumber(range20, 2),
-                "%"
-              )}
+            ${metric(
+              "Range 20D",
+              Number.isFinite(priceRange20Pct)
+                ? metricValue(formatNumber(priceRange20Pct, 2), "%")
+                : "—"
+            )}
 
+          </div>
+
+
+          <!-- MARKET STRUCTURE -->
+
+          <div class="grid grid-cols-2 gap-2">
+
+            ${metric(
+              "Close Position",
+              Number.isFinite(closePositionPct)
+                ? metricValue(formatNumber(closePositionPct, 0), "%")
+                : "—",
+              Number.isFinite(closePositionPct) && closePositionPct >= 80
+                ? "positive"
+                : ""
+            )}
+
+            ${metric(
+              "Change",
+              Number.isFinite(changePct)
+                ? metricValue(formatNumber(changePct, 2), "%")
+                : "—",
+              changeClass
+            )}
+
+          </div>
+
+
+          <!-- FOOTER -->
+
+          <div class="pt-3 mt-4 border-t border-[#171d21] flex items-center justify-between gap-4">
+
+            <div class="text-[9px] mono muted-2">
+              <span class="text-white font-bold">
+                QBS DETECTED
+              </span>
+
+              <span class="mx-1">•</span>
+
+              ${stock.date ? formatDate(stock.date) : "Latest Session"}
             </div>
 
-
-            <div class="mt-5 space-y-4">
-
-              ${surgeMetric(
-                "Volume Expansion",
-                volumeSurge
-              )}
-
-              ${surgeMetric(
-                "Frequency Expansion",
-                frequencySurge
-              )}
-
-            </div>
-
-
-            <!-- FOOTER -->
-            <div class="mt-5 pt-4 border-t border-[#171d21] flex items-center justify-between">
-
-              <div>
-
-                <div class="text-[8px] mono uppercase tracking-[0.14em] muted-2">
-                  Close Position
-                </div>
-
-                <div class="mt-1 text-[11px] mono text-[#c6cdd1]">
-                  ${formatNumber(closePosition, 2)}%
-                </div>
-
-              </div>
-
-
-              <div class="text-right">
-
-                <div class="text-[8px] mono uppercase tracking-[0.14em] muted-2">
-                  Status
-                </div>
-
-                <div class="mt-1 text-[9px] mono positive font-bold">
-                  QBS DETECTED
-                </div>
-
-                <button
-                  type="button"
-                  class="chartnalist-watch-btn"
-                  data-watch-ticker="${ticker}"
-                  onclick="event.stopPropagation(); chartnalistPhase10ToggleWatch(this)"
-                  title="Add to Smartwatchlist"
-                >+ WATCH</button>
-
-              </div>
-
-            </div>
+            <button
+              type="button"
+              class="chartnalist-watch-btn text-[9px] mono px-2 py-1 rounded border border-[#20272c] hover:border-[#00d084]"
+              data-watch-ticker="${code}"
+              onclick="event.stopPropagation(); chartnalistPhase10ToggleWatch(this)"
+            >
+              + WATCH
+            </button>
 
           </div>
 
         </article>
       `;
     }
-
-    function showEmpty(title, message) {
-      const empty =
-        document.getElementById("emptyState");
-
-      document.getElementById(
-        "emptyTitle"
-      ).textContent = title;
-
-      document.getElementById(
-        "emptyMessage"
-      ).textContent = message;
-
-      empty.classList.remove("hidden");
-    }
-
-    function hideEmpty() {
-      document
-        .getElementById("emptyState")
-        .classList.add("hidden");
-    }
-
     async function fetchLiveData(force = false) {
-      const grid =
-        document.getElementById("signalGrid");
-
-      const status =
-        document.getElementById("dataStatus");
-
-      const refresh =
-        document.getElementById("refreshButton");
+      const grid = document.getElementById("signalGrid");
+      const status = document.getElementById("dataStatus");
+      const refresh = document.getElementById("refreshButton");
 
       refresh.disabled = true;
-
-      if (false && force) { /* static mode */
-        refresh.innerHTML = `
-          <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i>
-          LOADING
-        `;
-
-        lucide.createIcons();
-      }
-
       status.textContent = "SCANNING";
 
       try {
+        // Membaca file output hasil scan engine
+        const res = await fetch("/screener_results.json?v=" + Date.now(), { cache: "no-store" });
 
-        let res;
-
-        // Force canonical QBS V4.9.1 refresh when user clicks REFRESH.
-        if (false && force) { /* static mode */
-          const refreshRes =
-            await fetch(
-              "/api/qbs/refresh",
-              {
-                method: "POST",
-                cache: "no-store",
-                headers: {
-                  "Content-Type":
-                    "application/json"
-                }
-              }
-            );
-
-          if (!refreshRes.ok) {
-            const body =
-              await refreshRes.json()
-                .catch(() => ({}));
-
-            throw new Error(
-              body.error ||
-              "QBS refresh gagal."
-            );
-          }
+        if (!res || !res.ok) {
+          throw new Error("File hasil scan engine tidak ditemukan.");
         }
 
-        // Read fresh canonical QBS snapshot.
-        res =
-          await fetch(
-            "/screener_results.json?v=" + Date.now(),
-            {
-              cache: "no-store"
-            }
-          );
-
-        if (!res.ok) {
-          throw new Error(
-            "Backend screener belum dijalankan atau file JSON belum tersedia."
-          );
-        }
-
-        const rawData =
-          await res.json();
-        // ----------------------------------------------------
-        // CANONICAL QBS -> UI ADAPTER
-        // QBS V4.9.1 keeps calculated metrics inside
-        // event.features. The legacy card renderer expects
-        // those fields at event top-level.
-        // ----------------------------------------------------
-
-        const rawStocks =
-          Array.isArray(rawData)
-            ? rawData
-            : (
-                rawData.events ||
-                rawData.stocks ||
-                rawData.results ||
-                rawData.data ||
-                []
-              );
-
-        const stocks = rawStocks.map((event) => {
-          const f = event?.features || {};
-          const bar =
-            event?.bar ||
-            event?.snapshot ||
-            event?.ohlc ||
-            event?.data ||
-            {};
-
-          return {
-            ...event,
-
-            // Identity
-            symbol:
-              event.symbol ||
-              event.code ||
-              event.ticker ||
-              "—",
-
-            date:
-              event.eventDate ||
-              event.date ||
-              event.tradeDate ||
-              "",
-
-            // Price aliases used by legacy renderer
-            price:
-              event.price ??
-              event.currentPrice ??
-              event.lastPrice ??
-              event.close ??
-              bar.price ??
-              bar.close ??
-              f.price ??
-              f.close,
-
-            close:
-              event.close ??
-              event.lastPrice ??
-              event.currentPrice ??
-              bar.close ??
-              f.close,
-
-            lastPrice:
-              event.lastPrice ??
-              event.price ??
-              event.currentPrice ??
-              event.close ??
-              bar.close ??
-              f.close,
-
-            currentPrice:
-              event.currentPrice ??
-              event.price ??
-              event.lastPrice ??
-              event.close ??
-              bar.close ??
-              f.close,
-
-            // Change aliases
-            changePct:
-              event.changePct ??
-              event.changePercent ??
-              event.change ??
-              f.changePct ??
-              f.changePercent ??
-              f.change,
-
-            changePercent:
-              event.changePercent ??
-              event.changePct ??
-              event.change ??
-              f.changePct ??
-              f.changePercent ??
-              f.change,
-
-            change:
-              event.change ??
-              event.changePct ??
-              event.changePercent ??
-              f.change ??
-              f.changePct ??
-              f.changePercent,
-
-            // Canonical QBS features
-            volumeSurge:
-              event.volumeSurge ??
-              f.volumeSurge,
-
-            frequencySurge:
-              event.frequencySurge ??
-              f.frequencySurge,
-
-            bbWidth:
-              event.bbWidth ??
-              f.bbWidth,
-
-            priceRange20:
-              event.priceRange20 ??
-              f.priceRange20,
-
-            range20:
-              event.range20 ??
-              event.priceRange20 ??
-              f.range20 ??
-              f.priceRange20,
-
-            closePosition:
-              event.closePosition ??
-              f.closePosition,
-
-            candleRangePct:
-              event.candleRangePct ??
-              f.candleRangePct,
-
-            upperWickPct:
-              event.upperWickPct ??
-              f.upperWickPct,
-
-            lowerWickPct:
-              event.lowerWickPct ??
-              f.lowerWickPct,
-
-            // Raw market fields, when available
-            open:
-              event.open ??
-              bar.open ??
-              f.open,
-
-            high:
-              event.high ??
-              bar.high ??
-              f.high,
-
-            low:
-              event.low ??
-              bar.low ??
-              f.low,
-
-            volume:
-              event.volume ??
-              bar.volume ??
-              f.volume,
-
-            value:
-              event.value ??
-              bar.value ??
-              f.value,
-
-            frequency:
-              event.frequency ??
-              bar.frequency ??
-              f.frequency,
-
-            // Keep canonical nested structure intact
-            features: f,
-          };
-        });
+        const data = await res.json();
+        const results = data.results || data.signals || data.data || (Array.isArray(data) ? data : []);
+        const detectedScanDate =
+          (results[0] && results[0].date) ||
+          data.scan_date ||
+          data.scanDate ||
+          null;
 
         document.getElementById("lastUpdated").textContent =
-          (rawData.generatedAt ? new Date(rawData.generatedAt).toLocaleString("id-ID") : "—");
+          detectedScanDate
+            ? formatDate(detectedScanDate)
+            : "—";
 
-        document.getElementById(
-          "signalCount"
-        ).textContent =
-          stocks.length;
+        document.getElementById("signalCount").textContent = results.length;
+        if (data.total_universe) document.getElementById("totalUniverse").textContent = data.total_universe;
 
-        if (
-          !stocks ||
-          stocks.length === 0
-        ) {
-
+        if (results.length === 0) {
           grid.innerHTML = "";
-
-          const qbsTargetDate =
-            rawData?.targetDate || rawData?.generatedAt || "";
-
-          const qbsData =
-            rawData?.data?.[0] || {};
-
-          const symbolsEvaluated =
-            Number(qbsData.symbolsEvaluated);
-
-          const marketRegime =
-            String(rawData?.regime || "").trim();
-
-          const regimeDetails =
-            rawData?.regimeDetails || {};
-
-          const pctUp =
-            Number(regimeDetails.pctUp);
-
-          const meanFnet =
-            Number(regimeDetails.meanFnet);
-
-          const universeSize =
-            Number(regimeDetails.universeSize);
-
-          const isWeakMarketGate =
-            marketRegime.toLowerCase() === "weak";
-
-          const emptyTitle =
-            isWeakMarketGate
-              ? "MARKET GATE · WEAK"
-              : "NO QUALIFYING QBS EVENT";
-
-          const emptyMessage =
-            isWeakMarketGate
-              ? [
-                  "QBS scan completed, but the current market regime is not supportive for signal generation.",
-                  "",
-                  Number.isFinite(pctUp)
-                    ? `${(pctUp * 100).toFixed(2)}%  ·  STOCKS UP`
-                    : "",
-                  Number.isFinite(meanFnet)
-                    ? `${meanFnet.toLocaleString("en-US", {
-                        maximumFractionDigits: 0
-                      })}  ·  MEAN FOREIGN NET`
-                    : "",
-                  Number.isFinite(universeSize)
-                    ? `${universeSize.toLocaleString("en-US")}  ·  REGIME UNIVERSE`
-                    : "",
-                  "",
-                  "NO QBS EVENT GENERATED"
-                ]
-                  .filter(Boolean)
-                  .join("\n")
-              : [
-                  "Latest completed market session.",
-                  qbsTargetDate
-                    ? `Scan: ${formatDate(qbsTargetDate)}`
-                    : "Scan date unavailable.",
-                  Number.isFinite(symbolsEvaluated)
-                    ? `${symbolsEvaluated.toLocaleString("en-US")} symbols evaluated.`
-                    : "Symbol evaluation count unavailable.",
-                  "No event currently meets the canonical QBS detection contract."
-                ].join(" ");
-
-          showEmpty(
-            emptyTitle,
-            emptyMessage
-          );
-
-          document.getElementById(
-            "scanDate"
-          ).textContent =
-            qbsTargetDate
-              ? formatDate(qbsTargetDate)
-              : "—";
-
-          status.textContent =
-            "0 EVENTS DETECTED";
-
+          document.getElementById("emptyState").classList.remove("hidden");
+          status.textContent = "0 SIGNALS";
           return;
         }
 
-        hideEmpty();
+        document.getElementById("emptyState").classList.add("hidden");
+        grid.innerHTML = results.map(renderSignalCard).join("");
+        status.textContent = `${results.length} SIGNALS DETECTED`;
 
-        const scanDate =
-          rawData.targetDate ||
-          stocks.reduce(
-            (latest, stock) => {
-              const date =
-                stock.eventDate ||
-                stock.date ||
-                "";
+        if (window.chartnalistPhase10SyncWatchButtons) {
+          chartnalistPhase10SyncWatchButtons();
+        }
 
-              return date > latest
-                ? date
-                : latest;
-            },
-            ""
-          );
-
-        document.getElementById(
-          "scanDate"
-        ).textContent =
-          formatDate(scanDate);
-
-        grid.innerHTML =
-          stocks
-            .map(renderSignal)
-            .join("");
-
-        chartnalistPhase10SyncWatchButtons();
-
-        status.textContent =
-          `${stocks.length} SIGNAL${stocks.length === 1 ? "" : "S"} DETECTED`;
-
-      } catch (error) {
-
-        console.error(
-          "CHARTNALIST QBS Screener:",
-          error
-        );
-
+      } catch (err) {
+        console.error("QBS Screener Error:", err);
         grid.innerHTML = "";
-
-        document.getElementById(
-          "signalCount"
-        ).textContent = "—";
-
-        document.getElementById(
-          "scanDate"
-        ).textContent = "—";
-
-        showEmpty(
-          "Data tidak dapat dimuat",
-          "Pastikan /screener_results.json tersedia (dijalankan oleh cron harian)."
-        );
-
-        status.textContent =
-          "BACKEND ERROR";
-
+        document.getElementById("emptyState").classList.remove("hidden");
+        document.getElementById("emptyTitle").textContent = "Gagal Memuat Data Engine";
+        document.getElementById("emptyMessage").textContent = "Pastikan `/screener_results.json` tersedia dan dihasilkan oleh Canonical QBS V4.9.1.";
+        status.textContent = "ENGINE ERROR";
       } finally {
-
         refresh.disabled = false;
-
-        refresh.innerHTML = `
-          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-          REFRESH
-        `;
-
         lucide.createIcons();
       }
     }
@@ -1540,266 +571,84 @@
     fetchLiveData();
   </script>
 
-<script id="chartnalist-phase10-watch">
-// CHARTNALIST_WATCHLIST_DB_BRIDGE (screener)
-async function _wlSGetUser() {
-  try {
-    const sb = window.chartnalistSupabase;
-    if (!sb) return null;
-    const { data: { user } } = await sb.auth.getUser();
-    return user || null;
-  } catch (_) { return null; }
-}
+  <!-- RESEARCH DETAIL MODAL -->
+  <script id="research-detail-js">
+    function openResearchDetail(encoded) {
+      const s = JSON.parse(decodeURIComponent(encoded));
 
-async function _wlSFetchCodesFromDB() {
-  try {
-    const sb = window.chartnalistSupabase;
-    if (!sb) return null;
-    const user = await _wlSGetUser();
-    if (!user) return null;
-    const { data, error } = await sb
-      .from("watchlist_items")
-      .select("stock_code")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
-    if (error) return null;
-    return (data || []).map(r => String(r.stock_code || "").toUpperCase()).filter(Boolean);
-  } catch (_) { return null; }
-}
+      const old = document.getElementById("researchDetailOverlay");
+      if (old) old.remove();
 
-async function _wlSAddToDB(code) {
-  try {
-    const sb = window.chartnalistSupabase;
-    if (!sb) return false;
-    const user = await _wlSGetUser();
-    if (!user) return false;
-    const { error } = await sb
-      .from("watchlist_items")
-      .insert({ user_id: user.id, stock_code: code });
-    return !error;
-  } catch (_) { return false; }
-}
+      const overlay = document.createElement("div");
+      overlay.id = "researchDetailOverlay";
+      overlay.className = "research-overlay";
 
-async function _wlSSyncCacheFromDB() {
-  const codes = await _wlSFetchCodesFromDB();
-  if (codes === null) return false;
-  try { localStorage.setItem("watchlist", JSON.stringify(codes)); } catch (_) {}
-  return true;
-}
-
-function chartnalistPhase10IsWatched(ticker) {
-  const code = String(ticker || "").trim().toUpperCase();
-  if (!code || code === "—") return false;
-  try {
-    const saved = JSON.parse(localStorage.getItem("watchlist") || "[]");
-    if (!Array.isArray(saved)) return false;
-    return saved.some(item => {
-      if (typeof item === "string") return item.trim().toUpperCase() === code;
-      const itemCode = item?.code || item?.stockCode || item?.symbol || "";
-      return String(itemCode).trim().toUpperCase() === code;
-    });
-  } catch { return false; }
-}
-
-function chartnalistPhase10SyncWatchButtons() {
-  document.querySelectorAll(".chartnalist-watch-btn").forEach(button => {
-    const ticker = String(button?.dataset?.watchTicker || "").trim().toUpperCase();
-    if (!ticker) return;
-    const watched = chartnalistPhase10IsWatched(ticker);
-    button.textContent = watched ? "✓ WATCHED" : "+ WATCH";
-    button.dataset.watched = watched ? "true" : "false";
-    button.disabled = watched;
-    button.setAttribute("title", watched ? "Already in Smartwatchlist" : "Add to Smartwatchlist");
-  });
-}
-
-async function chartnalistPhase10ToggleWatch(button) {
-  const ticker = String(button?.dataset?.watchTicker || "").trim().toUpperCase();
-  if (!ticker || ticker === "—") return;
-  let watchlist = [];
-  try {
-    const saved = JSON.parse(localStorage.getItem("watchlist") || "[]");
-    watchlist = Array.isArray(saved) ? saved : [];
-  } catch { watchlist = []; }
-  const exists = watchlist.some(item => {
-    if (typeof item === "string") return item.toUpperCase() === ticker;
-    const code = item?.code || item?.stockCode || item?.symbol || "";
-    return String(code).toUpperCase() === ticker;
-  });
-  if (!exists) {
-    watchlist.push({ code: ticker });
-    try { localStorage.setItem("watchlist", JSON.stringify(watchlist)); } catch (_) {}
-  }
-  button.textContent = "✓ WATCHED";
-  button.dataset.watched = "true";
-  button.disabled = true;
-  button.setAttribute("title", "Already in Smartwatchlist");
-  // Persist to DB
-  await _wlSAddToDB(ticker);
-}
-
-// Init: sync DB -> cache, then update buttons on auth-ready
-(async () => {
-  const run = async () => {
-    await _wlSSyncCacheFromDB();
-    chartnalistPhase10SyncWatchButtons();
-  };
-  if (window.chartnalistSupabase) {
-    await run();
-  } else {
-    window.addEventListener("chartnalist:auth-ready", run, { once: true });
-    // Fallback: retry a few times
-    let n = 0;
-    const iv = setInterval(async () => {
-      n++;
-      if (window.chartnalistSupabase) { clearInterval(iv); await run(); }
-      if (n > 20) clearInterval(iv);
-    }, 500);
-  }
-})();
-</script>
-<script id="research-detail-js">
-function qbsGate(label,value,pass,detail){
-  return `<div class="research-gate flex items-center justify-between gap-4">
-    <div>
-      <div class="text-[8px] mono uppercase tracking-[.12em] muted-2">${label}</div>
-      <div class="mt-1 text-sm mono">${detail}</div>
-    </div>
-    <div class="text-[9px] mono font-bold ${pass?"positive":"negative"}">${pass?"PASS":"FAIL"}</div>
-  </div>`;
-}
-
-function qbsEvidence(label,value,unit=""){
-  return `<div class="research-gate">
-    <div class="text-[8px] mono uppercase tracking-[.12em] muted-2">${label}</div>
-    <div class="mt-2 text-lg mono font-bold">${value}${unit}</div>
-  </div>`;
-}
-
-function openResearchDetail(encoded){
-  const s=JSON.parse(decodeURIComponent(encoded));
-  const close=number(s.close);
-  const change=number(s.changePct);
-  const vol=number(s.volumeSurge);
-  const freq=number(s.frequencySurge);
-  const bb=number(s.bbWidthPct);
-  const range=number(s.priceRange20Pct);
-  const cp=number(s.closePositionPct);
-  const value=number(s.value);
-
-  const old=document.getElementById("researchDetailOverlay");
-  if(old) old.remove();
-
-  const overlay=document.createElement("div");
-  overlay.id="researchDetailOverlay";
-  overlay.className="research-overlay";
-
-  overlay.innerHTML=`
-  <div class="research-panel">
-    <div class="p-6 border-b border-[#171d21]">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <div class="flex items-center gap-3">
-            <div class="text-2xl font-extrabold">${s.ticker||"—"}</div>
-            <span class="qbs-badge rounded px-2 py-1 text-[8px] mono font-bold">QBS</span>
+      overlay.innerHTML = `
+        <div class="research-panel p-6">
+          <div class="flex items-start justify-between pb-4 border-b border-[#171d21]">
+            <div>
+              <div class="flex items-center gap-3">
+                <span class="text-2xl font-extrabold">${s.code || s.ticker || "—"}</span>
+                <span class="qbs-badge rounded px-2 py-0.5 text-[9px] mono font-bold">${s.logic_setup || "QBS"}</span>
+              </div>
+              <div class="text-xs muted-2 mt-1">${s.name || ""}</div>
+            </div>
+            <button class="research-close" onclick="closeResearchDetail()">Ã—</button>
           </div>
-          <div class="mt-2 text-[9px] mono muted-2">
-            ${formatDate(s.date)} · EXIT T+10
+
+          <div class="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div class="research-gate">
+              <div class="text-[8px] mono muted-2 uppercase">Confirm Close</div>
+              <div class="text-lg font-bold mono text-white mt-1">${formatPrice(s.confirm_close)}</div>
+            </div>
+            <div class="research-gate">
+              <div class="text-[8px] mono muted-2 uppercase">Stop Loss</div>
+              <div class="text-lg font-bold mono positive mt-1">${formatNumber(s.volumeSurge, 2)}×</div>
+            </div>
+            <div class="research-gate">
+              <div class="text-[8px] mono muted-2 uppercase">Target Price (1.5R)</div>
+              <div class="text-lg font-bold mono positive mt-1">${formatNumber(s.frequencySurge, 2)}×</div>
+            </div>
+          </div>
+
+          <div class="mt-4 grid grid-cols-2 gap-3">
+            <div class="research-gate">
+              <div class="text-[8px] mono muted-2 uppercase">Risk Points</div>
+              <div class="text-sm font-bold mono mt-1">${formatNumber(s.bbWidthPct, 2)}%</div>
+            </div>
+            <div class="research-gate">
+              <div class="text-[8px] mono muted-2 uppercase">Close Position</div>
+              <div class="text-sm font-bold mono positive mt-1">${formatNumber(s.closePositionPct, 0)}%</div>
+            </div>
+          </div>
+
+          <div class="mt-6 p-4 rounded-xl border border-[#20272c] bg-[#0b0e10]">
+            <div class="text-[9px] mono positive font-bold uppercase">Transaction Volume / Value</div>
+            <div class="text-sm font-bold mono mt-1">${formatPrice(s.value_idr)} IDR</div>
+          </div>
+
+          <div class="mt-6 flex justify-end">
+            <button onclick="closeResearchDetail()" class="px-4 py-2 bg-[#101416] border border-[#20272c] rounded-lg text-xs mono hover:border-[#00d084]">TUTUP</button>
           </div>
         </div>
-        <button class="research-close" onclick="closeResearchDetail()">×</button>
-      </div>
+      `;
 
-      <div class="mt-6 flex justify-between items-end">
-        <div>
-          <div class="text-[8px] mono uppercase muted-2">Last Price</div>
-          <div class="mt-1 text-3xl mono font-bold">${formatPrice(close)}</div>
-        </div>
-        <div class="text-right">
-          <div class="text-[8px] mono uppercase muted-2">Change</div>
-          <div class="mt-1 text-lg mono font-bold ${changeClass(change)}">${changeText(change)}</div>
-        </div>
-      </div>
-    </div>
+      overlay.onclick = e => { if (e.target === overlay) closeResearchDetail(); };
+      document.body.appendChild(overlay);
+      document.body.style.overflow = "hidden";
+    }
 
-    <div class="p-6">
-      <div class="text-[9px] mono uppercase tracking-[.16em] positive font-bold">WHY DETECTED</div>
-      <div class="mt-1 mb-4 text-xs muted">Evidence yang membuat event memenuhi QBS.</div>
+    function closeResearchDetail() {
+      const el = document.getElementById("researchDetailOverlay");
+      if (el) el.remove();
+      document.body.style.overflow = "";
+    }
+  </script>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        ${qbsEvidence("Volume Surge",formatNumber(vol,2),"×")}
-        ${qbsEvidence("Frequency Surge",formatNumber(freq,2),"×")}
-        ${qbsEvidence("BB Width",formatNumber(bb,2),"%")}
-        ${qbsEvidence("20D Price Range",formatNumber(range,2),"%")}
-        ${qbsEvidence("Close Position",formatNumber(cp,2),"%")}
-        ${qbsEvidence("Change",formatNumber(change,2),"%")}
-      </div>
-
-      <div class="mt-8">
-        <div class="text-[9px] mono uppercase tracking-[.16em] positive font-bold">QBS FILTERS</div>
-        <div class="mt-1 mb-4 text-xs muted">Threshold QBS tidak dimodifikasi oleh UI.</div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          ${qbsGate("Close Price",close,close!==null&&close>=100,close!==null?formatPrice(close)+" ≥ Rp 100":"—")}
-          ${qbsGate("Transaction Value",value,value!==null&&value>=2000000000,value!==null?formatNumber(value/1000000000,2)+"B ≥ 2B":"—")}
-          ${qbsGate("BB Width",bb,bb!==null&&bb<6,bb!==null?formatNumber(bb,2)+"% < 6%":"—")}
-          ${qbsGate("20D Price Range",range,range!==null&&range<15,range!==null?formatNumber(range,2)+"% < 15%":"—")}
-          ${qbsGate("Volume Surge",vol,vol!==null&&vol>=6,vol!==null?formatNumber(vol,2)+"× ≥ 6×":"—")}
-          ${qbsGate("Frequency Surge",freq,freq!==null&&freq>=5,freq!==null?formatNumber(freq,2)+"× ≥ 5×":"—")}
-        </div>
-      </div>
-
-      <div class="mt-8 p-5 rounded-xl border border-[#273229] bg-[#0c1210]">
-        <div class="text-[9px] mono uppercase tracking-[.14em] positive font-bold">RESEARCH STATUS</div>
-        <div class="mt-1 text-sm font-bold">QBS DETECTED</div>
-        <div class="mt-3 text-[10px] leading-5 muted">
-          Ini adalah signal riset berbasis struktur pasar historis, bukan rekomendasi beli/jual.
-        </div>
-      </div>
-    </div>
-
-    <div class="px-6 py-4 border-t border-[#171d21] flex justify-between">
-      <span class="text-[8px] mono muted-2">CHARTNALIST </span>
-      <button onclick="closeResearchDetail()" class="text-[9px] mono positive font-bold">CLOSE</button>
-    </div>
-  </div>`;
-
-  overlay.onclick=e=>{if(e.target===overlay)closeResearchDetail()};
-  document.body.appendChild(overlay);
-  document.body.style.overflow="hidden";
-}
-
-function closeResearchDetail(){
-  const el=document.getElementById("researchDetailOverlay");
-  if(el)el.remove();
-  document.body.style.overflow="";
-}
-</script>
-<script src="/assets/stockfamily-sidebar.js"></script>
-<!-- removed: chartnalist-typography.js (file missing) -->
-<script src="/assets/chartnalist-track.js" defer></script>
+  <script src="/assets/stockfamily-sidebar.js"></script>
+  <script src="/assets/chartnalist-track.js?v=20261015" defer></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
