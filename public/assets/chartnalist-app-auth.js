@@ -435,7 +435,11 @@
           const badge = document.createElement('div');
           badge.id = 'chartnalist-guest-badge';
           badge.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:99999;display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:999px;background:rgba(11,14,20,.92);border:1px solid rgba(0,208,132,.35);color:#00d084;font:650 12px Inter,system-ui,sans-serif;backdrop-filter:blur(12px);box-shadow:0 8px 30px rgba(0,0,0,.35)';
-          badge.innerHTML = '<span style="width:7px;height:7px;border-radius:50%;background:#00d084;box-shadow:0 0 10px rgba(0,208,132,.6)"></span><span>Guest Mode</span><span style="opacity:.35">·</span><a href="/register" style="color:#e2e8f0;text-decoration:none;border-bottom:1px solid rgba(226,232,240,.35)">Create account</a>';
+          badge.innerHTML = '<span style="width:7px;height:7px;border-radius:50%;background:#00d084;box-shadow:0 0 10px rgba(0,208,132,.6)"></span><span>Guest Mode</span><span style="opacity:.35">·</span><a href="/register" data-cn-track="guest_create_account" style="color:#e2e8f0;text-decoration:none;border-bottom:1px solid rgba(226,232,240,.35)">Create account</a>';
+          badge.addEventListener("click", function (e) {
+            var a = e.target.closest("[data-cn-track]");
+            if (a && window.cnTrack) window.cnTrack(a.getAttribute("data-cn-track"));
+          });
           document.body.appendChild(badge);
           return;
         }
@@ -475,14 +479,15 @@
                 <button type="button" data-ob="chart" style="padding:12px 14px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,.08);color:#8b959c;font-weight:600;font-size:13px;cursor:pointer">Tetap di chart</button>
               </div>
             </div>`;
-          const done = () => {
+          const done = (name) => {
             try { localStorage.setItem("chartnalist_onboarded", "1"); } catch (e) {}
+            if (name && window.cnTrack) window.cnTrack("onboard_" + name);
             ov.remove();
           };
           ov.addEventListener("click", (e) => {
             const a = e.target.closest("[data-ob]");
             if (!a) return;
-            done();
+            done(a.getAttribute("data-ob"));
             if (a.getAttribute("data-ob") === "chart") e.preventDefault();
           });
           document.body.appendChild(ov);
@@ -529,3 +534,9 @@
 })();
 
 
+
+// cn-track-delegate
+document.addEventListener("click", function (e) {
+  var a = e.target && e.target.closest && e.target.closest("[data-cn-track]");
+  if (a && window.cnTrack) window.cnTrack(a.getAttribute("data-cn-track"), { from: location.pathname });
+}, true);
