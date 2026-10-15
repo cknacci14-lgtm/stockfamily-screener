@@ -321,9 +321,33 @@ app.get('/api/admin/monitor', async (c) => {
       cnGetOne(env, 'page_views?select=viewed_at&order=viewed_at.desc&limit=1'),
       cnYahooPing()
     ]);
+    // Conversion events (last 7d): path = /event/*
+    let conversion = [];
+    try {
+      const since = new Date(Date.now() - 7 * 864e5).toISOString();
+      const evRes = await fetch(
+        env.SUPABASE_URL + '/rest/v1/page_views?select=path&path=like./event/*&viewed_at=gte.' + since + '&limit=2000',
+        { headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: 'Bearer ' + env.SUPABASE_SERVICE_ROLE_KEY } }
+      );
+      const rows = await evRes.json();
+      const counts = {};
+      if (Array.isArray(rows)) {
+        rows.forEach(function (r) {
+          const k = String(r.path || '');
+          counts[k] = (counts[k] || 0) + 1;
+        });
+      }
+      conversion = Object.keys(counts).sort().map(function (k) {
+        return { path: k, clicks: counts[k] };
+      });
+    } catch (e) {
+      conversion = [];
+    }
+
     return c.json({
       success: true,
       stats: stats.data,
+      conversion: conversion,
       health: {
         db_ms: stats.ms,
         latest_trade_date: eod ? eod.trade_date : null,

@@ -1197,7 +1197,26 @@
           top.map(function (r) { return '<tr style="border-top:1px solid #2a2f3e"><td style="padding:6px 0">' + cnEsc(r.path) + '</td><td>' + cnNum(r.views) + '</td><td>' + cnNum(r.visitors) + '</td></tr>'; }).join('') + '</table>')
           : '<div style="color:#8b93a7">Belum ada data kunjungan.</div>';
 
+        var conv = j.conversion || [];
+        var labels = {
+          '/event/landing_try_demo': 'Try Demo',
+          '/event/landing_get_started': 'Get Started',
+          '/event/landing_sign_in': 'Sign In (landing)',
+          '/event/guest_create_account': 'Guest → Create account',
+          '/event/onboard_screener': 'Onboard → Screener',
+          '/event/onboard_signals': 'Onboard → Signals',
+          '/event/onboard_chart': 'Onboard → Chart'
+        };
+        var convHtml = conv.length
+          ? ('<table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="color:#8b93a7;text-align:left"><th style="padding:6px 0">Event (7 hari)</th><th>Klik</th></tr>' +
+            conv.map(function (r) {
+              var name = labels[r.path] || r.path.replace('/event/', '');
+              return '<tr style="border-top:1px solid #2a2f3e"><td style="padding:6px 0">' + cnEsc(name) + '</td><td>' + cnNum(r.clicks) + '</td></tr>';
+            }).join('') + '</table>')
+          : '<div style="color:#8b93a7">Belum ada event conversion (klik CTA di production).</div>';
+
         body.innerHTML = cnSection('Health sistem', healthHtml) + cnSection('User', userTiles) + cnSection('Traffic', trafficTiles) +
+          cnSection('Conversion (7 hari)', convHtml) +
           cnSection('Page views 14 hari terakhir', chart) + cnSection('Halaman teratas', topHtml);
         upd.textContent = 'diperbarui ' + new Date().toLocaleTimeString('id-ID');
       } catch (err) {
