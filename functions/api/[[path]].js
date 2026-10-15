@@ -326,7 +326,7 @@ app.get('/api/admin/monitor', async (c) => {
     try {
       const since = new Date(Date.now() - 7 * 864e5).toISOString();
       const evRes = await fetch(
-        env.SUPABASE_URL + '/rest/v1/page_views?select=path&path=like./event/*&viewed_at=gte.' + since + '&limit=2000',
+        env.SUPABASE_URL + '/rest/v1/page_views?select=path,viewed_at&viewed_at=gte.' + since + '&order=viewed_at.desc&limit=3000',
         { headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: 'Bearer ' + env.SUPABASE_SERVICE_ROLE_KEY } }
       );
       const rows = await evRes.json();
@@ -334,6 +334,7 @@ app.get('/api/admin/monitor', async (c) => {
       if (Array.isArray(rows)) {
         rows.forEach(function (r) {
           const k = String(r.path || '');
+          if (k.indexOf('/event/') !== 0) return;
           counts[k] = (counts[k] || 0) + 1;
         });
       }
