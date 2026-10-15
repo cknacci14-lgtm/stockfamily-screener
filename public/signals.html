@@ -1194,7 +1194,22 @@ function renderSignalCard(s) {
         if (s.target_3 != null) slTpRow += '<div class="price-item"><span class="price-label">Target 3</span><span class="price-value tp">' + fmtRp(s.target_3) + '</span>' + hitMark(s.tp3_hit_at) + '</div>';
         slTpRow += '</div>';
         
-        return '<div style="margin:16px 0;">' + entryRows + avgDisplay + slTpRow + '</div>';
+        var riskBase = Number(s.actual_entry_avg || s.entry_avg), riskSl = Number(s.stop_loss), riskT1 = Number(s.target_1), riskLine = '';
+        if (riskBase > 0 && riskSl > 0 && riskBase > riskSl) {
+          var rSlPct = (riskSl - riskBase) / riskBase * 100;
+          var rT1Pct = riskT1 > 0 ? (riskT1 - riskBase) / riskBase * 100 : null;
+          var rAlloc = Math.min(100, 100 / Math.abs(rSlPct));
+          var wide = Math.abs(rSlPct) > 25;
+          var fp = function(v) { return v.toFixed(1).replace('.', ','); };
+          riskLine = '<div style="margin-top:8px;padding:8px 12px;background:#0a0e17;border-radius:6px;font-size:11px;color:#9ca3af;line-height:1.7;">' +
+            '<span style="color:#ef4444;font-weight:700;">Jarak SL ' + fp(rSlPct) + '%</span>' +
+            (rT1Pct != null ? ' &middot; <span style="color:#10b981;font-weight:700;">Target 1 +' + fp(rT1Pct) + '%</span>' : '') +
+            ' <span style="color:#6b7280;">(dari ' + (s.actual_entry_avg ? 'entry aktual' : 'entry rata-rata rencana') + ')</span>' +
+            (wide ? '<br><span style="color:#fbbf24;">SL lebar: kerugian bisa besar jika tersentuh.</span>' : '') +
+            '<br>Contoh hitungan: jika siap rugi 1% dari modal di SL, alokasi posisi &asymp; ' + fp(rAlloc) + '% modal. <span style="color:#6b7280;">Bukan rekomendasi.</span>' +
+          '</div>';
+        }
+        return '<div style="margin:16px 0;">' + entryRows + avgDisplay + slTpRow + riskLine + '</div>';
       })() +
 
       (s.image_url ? '<div class="signal-image" onclick="openImageModal(this.querySelector(\'img\').src)"><img src="' + safeText(s.image_url) + '" loading="lazy" alt="Chart ' + ticker + '"></div>' : '') +
