@@ -1,0 +1,105 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Upgrade — CHARTNALIST</title>
+  <meta name="description" content="Upgrade ke Premium atau Pro. Aktivasi manual setelah form dikirim.">
+  <style>
+    :root{--bg:#050607;--panel:#0b0e11;--line:#1b2126;--text:#f4f6f7;--muted:#89939a;--green:#00d084;--gold:#d6bd8a}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;min-height:100vh;display:grid;place-items:center;padding:24px}
+    .card{width:min(440px,100%);background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:28px 24px}
+    h1{margin:0 0 8px;font-size:22px}p{color:var(--muted);font-size:13px;line-height:1.5;margin:0 0 20px}
+    label{display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px}
+    select,textarea,input{width:100%;background:#080a0c;border:1px solid var(--line);border-radius:10px;color:var(--text);padding:12px;font:inherit}
+    textarea{min-height:88px;resize:vertical}
+    button{margin-top:18px;width:100%;padding:12px;border:0;border-radius:10px;background:var(--green);color:#050607;font-weight:800;cursor:pointer}
+    button:disabled{opacity:.5;cursor:not-allowed}
+    .msg{margin-top:14px;font-size:13px;padding:12px;border-radius:10px;display:none}
+    .msg.ok{display:block;background:rgba(0,208,132,.1);border:1px solid rgba(0,208,132,.3);color:var(--green)}
+    .msg.err{display:block;background:rgba(255,93,98,.08);border:1px solid rgba(255,93,98,.3);color:#ff5d62}
+    a{color:var(--green)}
+    .back{display:inline-block;margin-bottom:16px;font-size:13px;color:var(--muted);text-decoration:none}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/chartnalist-track.js?v=20261015" defer></script>
+</head>
+<body>
+  <div class="card">
+    <a class="back" href="/landing#pricing">← Pricing</a>
+    <h1>Form upgrade</h1>
+    <p>Pilih paket. Tim akan aktivasi manual setelah konfirmasi (biasanya 1×24 jam kerja). Pastikan kamu sudah login.</p>
+    <form id="upForm">
+      <label>Paket</label>
+      <select id="plan" name="plan" required>
+        <option value="premium">Premium — Rp 49.000 / bulan</option>
+        <option value="pro">Pro — Rp 149.000 / bulan</option>
+        <option value="pro_3m">Pro — Rp 399.000 / 3 bulan</option>
+      </select>
+      <label>Catatan (opsional)</label>
+      <textarea id="notes" placeholder="Mis. sudah transfer / minta invoice..."></textarea>
+      <button type="submit" id="btn">Kirim permintaan</button>
+    </form>
+    <div class="msg" id="msg"></div>
+  </div>
+  <script>
+  (function () {
+    var params = new URLSearchParams(location.search);
+    var plan = params.get("plan");
+    if (plan === "premium" || plan === "pro") document.getElementById("plan").value = plan === "pro" ? "pro" : "premium";
+    if (plan === "pro_3m") document.getElementById("plan").value = "pro_3m";
+
+    var form = document.getElementById("upForm");
+    var msg = document.getElementById("msg");
+    var btn = document.getElementById("btn");
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      msg.className = "msg";
+      msg.textContent = "";
+      btn.disabled = true;
+      try {
+        var sb = window.chartnalistSupabase;
+        if (!sb) {
+          // soft boot from env on page if auth not loaded
+          msg.className = "msg err";
+          msg.innerHTML = 'Silakan <a href="/login?next=/upgrade">login</a> dulu, lalu buka form ini lagi.';
+          btn.disabled = false;
+          return;
+        }
+        var sess = await sb.auth.getSession();
+        var session = sess && sess.data && sess.data.session;
+        if (!session || !session.user) {
+          msg.className = "msg err";
+          msg.innerHTML = 'Silakan <a href="/login?next=' + encodeURIComponent(location.pathname + location.search) + '">login</a> dulu.';
+          btn.disabled = false;
+          return;
+        }
+        var planVal = document.getElementById("plan").value;
+        var notes = document.getElementById("notes").value.trim();
+        if (window.cnTrack) window.cnTrack("upgrade_request_" + planVal, { from: "/upgrade" });
+        // Persist request client-side for admin follow-up (also tracked as event)
+        try {
+          localStorage.setItem("chartnalist_upgrade_request", JSON.stringify({
+            plan: planVal,
+            notes: notes,
+            email: session.user.email,
+            uid: session.user.id,
+            at: new Date().toISOString()
+          }));
+        } catch (err) {}
+        msg.className = "msg ok";
+        msg.innerHTML = "Permintaan tercatat untuk <b>" + session.user.email + "</b> · paket <b>" + planVal + "</b>. Tim akan follow-up aktivasi. Cek email / dashboard plan badge setelah aktif.";
+        form.reset();
+      } catch (err) {
+        msg.className = "msg err";
+        msg.textContent = err.message || "Gagal mengirim";
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  })();
+  </script>
+  <script src="/assets/chartnalist-app-auth.js"></script>
+</body>
+</html>

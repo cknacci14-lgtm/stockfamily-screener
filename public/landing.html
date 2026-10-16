@@ -491,6 +491,7 @@
         <a href="#intelligence">Intelligence</a>
         <a href="#workflow">How it works</a>
         <a href="#terminal">Terminal</a>
+        <a href="#pricing">Pricing</a>
       </nav>
 
       <div class="nav-actions">
@@ -505,6 +506,7 @@
         <a href="#intelligence" onclick="document.getElementById('mobile-nav').hidden=true">Intelligence</a>
         <a href="#workflow" onclick="document.getElementById('mobile-nav').hidden=true">How it works</a>
         <a href="#terminal" onclick="document.getElementById('mobile-nav').hidden=true">Terminal</a>
+        <a href="#pricing" onclick="document.getElementById('mobile-nav').hidden=true">Pricing</a>
         <a href="/login">Sign In</a>
         <a href="/register" style="color:#00d084">Get Started</a>
       </div>
@@ -750,10 +752,65 @@
       </div>
     </section>
 
+
+    <section class="section" id="pricing">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-kicker">04 / Pricing</div>
+          <h2>Clear plans.<br>No surprise paywalls.</h2>
+          <p class="section-copy">
+            Start free. Upgrade when you need full signals and performance tracking.
+            Activation is manual after you submit the upgrade form.
+          </p>
+        </div>
+        <div class="pricing-grid" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:28px">
+          <div class="price-card" style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px 20px">
+            <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Free</div>
+            <div style="margin-top:10px;font-size:28px;font-weight:800">Rp 0</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px">Selamanya</div>
+            <ul style="margin:18px 0 0;padding:0;list-style:none;font-size:13px;color:var(--text);line-height:1.7">
+              <li>✓ Chart terminal</li>
+              <li>✓ Screener</li>
+              <li>✓ Watchlist terbatas</li>
+              <li style="color:var(--muted)">✗ Full Signals</li>
+              <li style="color:var(--muted)">✗ Signal Performance</li>
+            </ul>
+            <a class="btn btn-ghost" href="/register" data-cn-track="pricing_free" style="margin-top:20px;display:inline-flex">Get Started</a>
+          </div>
+          <div class="price-card" style="background:var(--panel);border:1px solid rgba(0,208,132,.35);border-radius:var(--radius);padding:22px 20px;box-shadow:0 0 0 1px rgba(0,208,132,.08)">
+            <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--green)">Premium</div>
+            <div style="margin-top:10px;font-size:28px;font-weight:800">Rp 49.000</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px">/ bulan</div>
+            <ul style="margin:18px 0 0;padding:0;list-style:none;font-size:13px;color:var(--text);line-height:1.7">
+              <li>✓ Semua di Free</li>
+              <li>✓ Watchlist penuh</li>
+              <li>✓ Signal Center</li>
+              <li style="color:var(--muted)">✗ Full Signals</li>
+              <li style="color:var(--muted)">✗ Signal Performance</li>
+            </ul>
+            <a class="btn btn-primary" href="/upgrade?plan=premium" data-cn-track="pricing_premium" style="margin-top:20px;display:inline-flex">Upgrade Premium</a>
+          </div>
+          <div class="price-card" style="background:linear-gradient(180deg,rgba(214,189,138,.08),var(--panel));border:1px solid rgba(214,189,138,.4);border-radius:var(--radius);padding:22px 20px">
+            <div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)">Pro</div>
+            <div style="margin-top:10px;font-size:28px;font-weight:800">Rp 149.000</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px">/ bulan · atau Rp 399.000 / 3 bln</div>
+            <ul style="margin:18px 0 0;padding:0;list-style:none;font-size:13px;color:var(--text);line-height:1.7">
+              <li>✓ Semua di Premium</li>
+              <li>✓ Full Signals</li>
+              <li>✓ Signal Performance</li>
+              <li>✓ Prioritas aktivasi</li>
+            </ul>
+            <a class="btn btn-primary" href="/upgrade?plan=pro" data-cn-track="pricing_pro" style="margin-top:20px;display:inline-flex;background:linear-gradient(145deg,#e1c98a,#96743c);color:#0b0e14;border:none">Upgrade Pro</a>
+          </div>
+        </div>
+        <p style="margin-top:18px;font-size:12px;color:var(--muted)">Pembayaran & aktivasi manual oleh admin setelah form upgrade dikirim (biasanya 1×24 jam kerja).</p>
+      </div>
+    </section>
+
     <section class="cta">
       <div class="wrap">
         <div class="cta-box">
-          <div class="section-kicker">04 / Start your workspace</div>
+          <div class="section-kicker">05 / Start your workspace</div>
           <h2>Stop watching everything.<br>Focus on what matters.</h2>
           <p>
             Start with the free CHARTNALIST workspace and build your market workflow
