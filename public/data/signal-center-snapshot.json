@@ -1,102 +1,15 @@
 {
   "success": true,
-  "date": "2026-10-15",
-  "count": 2,
+  "date": "2026-10-16",
+  "count": 0,
   "filtered": {
-    "considered": 5,
-    "noTrade": 1,
-    "lateEntry": 1,
-    "wideStop": 1
+    "considered": 2,
+    "noTrade": 2,
+    "lateEntry": 0,
+    "wideStop": 0
   },
-  "signals": [
-    {
-      "stockCode": "SGER",
-      "stockName": "Sumber Global Energy Tbk.",
-      "setup": "PULLBACK",
-      "status": "TRIGGERED",
-      "price": 770,
-      "trigger": 747.75,
-      "invalidation": 655.79,
-      "target1": 885.7,
-      "target2": 977.66,
-      "riskReward": 2.5,
-      "riskLevel": "HIGH",
-      "entryGapPct": 3,
-      "rrFromPrice": 1.01,
-      "planStale": false,
-      "preBreakout": false,
-      "stopDistancePct": 14.8,
-      "stopWide": false,
-      "maxEntry": 770.75,
-      "structure": {
-        "state": "BULLISH",
-        "label": "Bullish structure",
-        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
-      },
-      "participation": {
-        "state": "NEUTRAL",
-        "label": "Normal participation",
-        "explanation": "Trading activity is not showing a decisive expansion or contraction."
-      },
-      "flow": {
-        "state": "NEUTRAL",
-        "label": "Foreign flow neutral",
-        "value": 0.00002592608266806457,
-        "explanation": "Foreign activity does not provide a decisive contextual signal."
-      },
-      "liquidity": {
-        "state": "HEALTHY",
-        "label": "Healthy liquidity",
-        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
-      },
-      "signalDate": null,
-      "updatedAt": "2026-10-15T17:51:48.899Z"
-    },
-    {
-      "stockCode": "MGRO",
-      "stockName": "Mahkota Group Tbk.",
-      "setup": "BREAKOUT",
-      "status": "WATCH",
-      "price": 730,
-      "trigger": 735,
-      "invalidation": 700,
-      "target1": 787.5,
-      "target2": 822.5,
-      "riskReward": 2.5,
-      "riskLevel": "MEDIUM",
-      "entryGapPct": -0.7,
-      "rrFromPrice": 1.92,
-      "planStale": false,
-      "preBreakout": true,
-      "stopDistancePct": 4.1,
-      "stopWide": false,
-      "maxEntry": 743.75,
-      "structure": {
-        "state": "BULLISH",
-        "label": "Bullish structure",
-        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
-      },
-      "participation": {
-        "state": "NEUTRAL",
-        "label": "Normal participation",
-        "explanation": "Trading activity is not showing a decisive expansion or contraction."
-      },
-      "flow": {
-        "state": "NEUTRAL",
-        "label": "Foreign flow neutral",
-        "value": 0.000036852887884073094,
-        "explanation": "Foreign activity does not provide a decisive contextual signal."
-      },
-      "liquidity": {
-        "state": "THIN",
-        "label": "Thin liquidity",
-        "explanation": "Trading activity is materially below the minimum liquidity baseline."
-      },
-      "signalDate": null,
-      "updatedAt": "2026-10-15T17:51:48.899Z"
-    }
-  ],
+  "signals": [],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-10-15T17:51:48.900Z"
+  "generatedAt": "2026-10-16T17:28:57.344Z"
 }

@@ -1,15 +1,15 @@
 {
   "status": "success",
   "engine": "v3",
-  "regime": "Neutral+",
+  "regime": "Neutral-",
   "regimeDetails": {
-    "regime": "Neutral+",
-    "pctUp": 0.15615615615615616,
-    "meanFnet": 3395831.831831832,
-    "universeSize": 333
+    "regime": "Neutral-",
+    "pctUp": 0.008849557522123894,
+    "meanFnet": -251682.59587020648,
+    "universeSize": 339
   },
-  "generatedAt": "2026-10-15T17:48:55.930Z",
-  "lastSync": "16/10/2026, 00.48.55",
+  "generatedAt": "2026-10-16T17:26:05.077Z",
+  "lastSync": "17/10/2026, 00.26.05",
   "total": 0,
   "data": []
 }
