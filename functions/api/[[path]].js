@@ -617,6 +617,16 @@ app.get('/api/public/signals/performance', async (c) => {
     const signals = await sbFetch(env, 'signals?select=*&status=neq.DRAFT&order=created_at.asc');
     const all = signals || [];
 
+    // Harga keluar SL sebenarnya (dicatat monitor, memperhitungkan gap). Bila gagal diambil, pakai level SL seperti sebelumnya.
+    const slEv = {};
+    try {
+      const evs = await sbFetch(env, 'signal_events?select=signal_id,price_at_event&event_type=eq.SL_HIT');
+      (evs || []).forEach(e => {
+        const p = Number(e.price_at_event);
+        if (Number.isFinite(p) && p > 0) slEv[e.signal_id] = p;
+      });
+    } catch (e) {}
+
     const ACTIVE_STATUSES = ['PUBLISHED', 'ACTIVE'];
     const WIN_OUTCOMES = ['TP1', 'TP2', 'TP3'];
 
@@ -641,7 +651,11 @@ app.get('/api/public/signals/performance', async (c) => {
       if (s.outcome === 'TP1') return num(s.target_1);
       if (s.outcome === 'TP2') return num(s.target_2);
       if (s.outcome === 'TP3') return num(s.target_3);
-      if (s.outcome === 'SL') return num(s.stop_loss);
+      if (s.outcome === 'SL') {
+        const slv = num(s.stop_loss);
+        const ev = slEv[s.id];
+        return (Number.isFinite(ev) && slv !== null && ev < slv) ? ev : slv;
+      }
       return null;
     };
 
@@ -660,7 +674,10 @@ app.get('/api/public/signals/performance', async (c) => {
       null;
 
     const getRealizedPct = s => {
-      const entry = num(s.actual_entry_avg || s.entry_avg);
+      let entry = num(s.actual_entry_avg || s.entry_avg);
+      const slLevel = num(s.stop_loss), planned = num(s.entry_avg);
+      // gap menembus SL: fill sudah di bawah SL, pakai entry rencana sebagai acuan
+      if (s.outcome === 'SL' && entry !== null && slLevel !== null && entry <= slLevel && planned) entry = planned;
       const exit = getExitPrice(s);
 
       if (entry === null || entry <= 0 || exit === null) return null;
