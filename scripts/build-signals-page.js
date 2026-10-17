@@ -332,6 +332,17 @@ function renderSignalCard(s) {
   \`;
 }
 
+
+function cnIsProPlan() {
+  try {
+    var a = window.chartnalistAuth || {};
+    if (a.isAdmin) return true;
+    var plan = String(a.plan || "free").toLowerCase();
+    return plan === "pro";
+  } catch (e) { return false; }
+}
+function cnSignalsPreviewLimit() { return 3; }
+
 function renderSignals() {
   const container = document.getElementById('signalsList');
   let signals = allSignals;
@@ -352,7 +363,22 @@ function renderSignals() {
     return;
   }
   
-  container.innerHTML = signals.map(renderSignalCard).join('');
+  var limit = cnSignalsPreviewLimit();
+  var pro = cnIsProPlan();
+  var total = signals.length;
+  var shown = pro ? signals : signals.slice(0, limit);
+  var html = shown.map(renderSignalCard).join('');
+  if (!pro && total > limit) {
+    html += '<div style="margin:20px 0;padding:20px;border:1px solid rgba(225,201,138,.35);border-radius:12px;background:rgba(225,201,138,.06);text-align:center">'
+      + '<div style="font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#c5a866">Pro preview</div>'
+      + '<div style="margin-top:8px;font-size:16px;font-weight:700">Menampilkan ' + limit + ' dari ' + total + ' signals</div>'
+      + '<div style="margin-top:6px;font-size:13px;color:#9aa3aa">Upgrade Pro untuk akses penuh + Signal Performance.</div>'
+      + '<div style="margin-top:14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'
+      + '<a class="cn-premium-cta" href="/upgrade/?plan=pro" data-cn-track="signals_hybrid_upgrade_pro" style="text-decoration:none">Upgrade Pro — Rp 149rb</a>'
+      + '<button type="button" class="cn-premium-close" onclick="openPremiumConversion(\'signals\')">Detail paket</button>'
+      + '</div></div>';
+  }
+  container.innerHTML = html;
 }
 
 function setFilter(f, btn) {
@@ -395,10 +421,11 @@ setInterval(loadSignals, 5 * 60 * 1000);
 </script>
 </body>
 </html>
-\`;
+`;
 
 fs.writeFileSync(FILE, html, 'utf8');
 console.log('✅ File dibuat: public/signals.html');
 console.log('   Size:', fs.statSync(FILE).size, 'bytes');
 console.log('');
 console.log('🎉 Buka: http://localhost:3000/signals.html');
+
