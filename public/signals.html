@@ -842,7 +842,7 @@ tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{
         </div>
 
         <div class="performance-summary-item">
-          <div class="performance-summary-label">Average R:R</div>
+          <div class="performance-summary-label" title="Rata-rata rasio risk:reward yang direncanakan, bukan hasil sebenarnya. Lihat Average R (realized) untuk hasil.">Planned R:R (rata-rata)</div>
           <div id="perfAverageRR" class="performance-summary-value">—</div>
         </div>
 
@@ -1659,6 +1659,16 @@ document.addEventListener('keydown', function(e) {
     var rFmt = function (v) { v = perfNum(v); return (v >= 0 ? "+" : "") + v.toFixed(2) + "R"; };
     setPerfValue("perfTotalR", rFmt(stats.totalR), perfNum(stats.totalR) >= 0 ? "positive" : "negative");
     setPerfValue("perfAvgR", rFmt(stats.avgR), perfNum(stats.avgR) >= 0 ? "positive" : "negative");
+
+    // Belum ada signal selesai: angka nol berarti "belum ada data", bukan hasil nol
+    if (!perfNum(stats.settled)) {
+      ["perfTotalPL", "perfAverageRR", "perfAvgMonth", "perfAvgHolding", "perfAverageTP", "perfAverageSL",
+       "perfConsecutiveProfit", "perfConsecutiveLoss", "perfAvgWeek", "perfGrossProfit", "perfGrossLoss",
+       "perfAvgPL", "perfTotalR", "perfAvgR"].forEach(function (id) {
+        var e = perfEl(id);
+        if (e) { e.textContent = "—"; e.className = "performance-summary-value"; }
+      });
+    }
   }
 
   function renderOpenTP(rows) {

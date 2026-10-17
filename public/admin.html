@@ -1308,6 +1308,19 @@
       }
     }
 
+    // Peringatan bila saham yang sama sudah punya signal yang masih berjalan
+    async function sfDupCheck(ticker, excludeId) {
+      try {
+        const res = await adminFetch('/api/admin/signals');
+        const data = await res.json();
+        if (!data.success || !Array.isArray(data.signals)) return true;
+        const dup = data.signals.filter(s => s.ticker === ticker && s.id !== excludeId && ['ACTIVE', 'PUBLISHED'].includes(s.status));
+        if (!dup.length) return true;
+        const list = dup.map(s => '#' + s.id + ' (' + s.status + ')').join(', ');
+        return confirm('Sudah ada signal ' + ticker + ' yang masih berjalan: ' + list + '.\n\nSignal kedua untuk saham yang sama menggandakan eksposur dan membuat statistik ganda. Tetap lanjut?');
+      } catch (e) { return true; }
+    }
+
     async function createSignal() {
       const btn = document.getElementById('createSignalBtn');
       const payload = {
@@ -1330,6 +1343,7 @@
       if (!payload.entry_1) return addLog('❌ Entry 1 wajib', 'error');
       if (!payload.stop_loss) return addLog('❌ SL wajib', 'error');
       if (!payload.target_1) return addLog('❌ TP1 wajib', 'error');
+      if (!(await sfDupCheck(payload.ticker, null))) return addLog('⏹ Dibatalkan: sudah ada signal ' + payload.ticker + ' yang berjalan', 'info');
       btn.disabled = true;
       btn.textContent = '⏳ Saving...';
       try {
@@ -1397,6 +1411,12 @@
     }
 
     async function publishSignal(id) {
+      try {
+        const r0 = await adminFetch('/api/admin/signals');
+        const d0 = await r0.json();
+        const me = (d0.signals || []).find(s => s.id === id);
+        if (me && !(await sfDupCheck(me.ticker, id))) return;
+      } catch (e) {}
       if (!confirm('Publish signal ini?')) return;
       try {
         const res = await adminFetch('/api/admin/signals/'+id+'/publish', { method: 'POST' });
