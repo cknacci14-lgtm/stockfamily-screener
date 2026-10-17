@@ -1408,7 +1408,7 @@ async function loadSignals() {
         '<div class="empty-state" style="padding: 64px 24px;">' +
           '<i class="fa-solid fa-lock" style="font-size: 42px; color: #00e5ff;"></i>' +
           '<div style="margin-top: 18px; font-size: 20px; font-weight: 700; color: #f5f7f8;">Premium Feature</div>' +
-          '<div style="margin-top: 8px; color: #9aa3aa; max-width: 520px; margin-left: auto; margin-right: auto;">Live Trading Signals tersedia untuk pengguna Premium.</div>' +
+          '<div style="margin-top: 8px; color: #9aa3aa; max-width: 520px; margin-left: auto; margin-right: auto;">Full Signals tersedia di paket Pro (Rp 149.000/bulan). Premium (Rp 49.000) untuk Watchlist & Signal Center.</div>' +
           '<button type="button" class="cn-premium-cta" onclick="openPremiumConversion(&quot;signals&quot;)">' +
             '<i class="fa-solid fa-crown"></i> Lihat Premium' +
           '</button>' +
@@ -1851,7 +1851,7 @@ document.addEventListener('keydown', function(e) {
             '<div class="performance-status" style="padding: 28px; text-align: center;">' +
               '<i class="fa-solid fa-lock" style="font-size: 28px; color: #00e5ff;"></i>' +
               '<div style="margin-top: 12px; font-weight: 700; color: #f5f7f8;">Premium Feature</div>' +
-              '<div style="margin-top: 6px; color: #9aa3aa;">Signal Performance tersedia untuk pengguna Premium.</div>' +
+              '<div style="margin-top: 6px; color: #9aa3aa;">Signal Performance tersedia di paket Pro — Rp 149.000/bulan.</div>' +
               '<button type="button" class="cn-premium-cta" onclick="openPremiumConversion(&quot;performance&quot;)">' +
                 '<i class="fa-solid fa-crown"></i> Lihat Premium' +
               '</button>' +
@@ -1955,7 +1955,7 @@ if (document.readyState === "loading") {
 >
   <div class="cn-premium-modal">
     <div class="cn-premium-modal-head">
-      <div class="cn-premium-kicker">Chartnalist Premium</div>
+      <div class="cn-premium-kicker">Chartnalist Plans</div>
       <div id="cnPremiumTitle" class="cn-premium-title">Trading Intelligence</div>
       <div id="cnPremiumSubtitle" class="cn-premium-subtitle">
         Akses fitur premium Chartnalist untuk membantu monitoring dan evaluasi trading.
@@ -1980,10 +1980,12 @@ if (document.readyState === "loading") {
       </div>
 
       <div class="cn-premium-note">
-        Informasi harga dan pembayaran Premium akan tersedia setelah sistem subscription dan payment Chartnalist siap.
+        Premium Rp 49.000/bulan · Pro Rp 149.000/bulan (atau Rp 399.000 / 3 bulan). Aktivasi manual setelah form upgrade.
       </div>
 
       <div class="cn-premium-actions">
+        <a class="cn-premium-cta" href="/upgrade/?plan=pro" data-cn-track="signals_upgrade_pro" style="text-decoration:none">Upgrade Pro — Rp 149rb</a>
+        <a href="/upgrade/?plan=premium" data-cn-track="signals_upgrade_premium" style="display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border-radius:8px;border:1px solid rgba(255,255,255,.12);color:#e2e8f0;font-size:12px;font-weight:700;text-decoration:none">Premium — Rp 49rb</a>
         <button type="button" class="cn-premium-close" onclick="closePremiumConversion()">
           Tutup
         </button>
@@ -2002,10 +2004,10 @@ if (document.readyState === "loading") {
 
     if (feature === 'performance') {
       subtitle.textContent =
-        'Signal Performance adalah fitur Premium untuk mengevaluasi hasil dan kualitas signal Chartnalist.';
+        'Signal Performance termasuk paket Pro (Rp 149.000/bulan). Kirim form upgrade untuk aktivasi manual.';
     } else {
       subtitle.textContent =
-        'Live Trading Signals adalah fitur Premium untuk monitoring signal trading Chartnalist.';
+        'Full Signals termasuk paket Pro (Rp 149.000/bulan). Premium Rp 49.000 untuk Watchlist & Signal Center.';
     }
 
     modal.classList.add('open');
