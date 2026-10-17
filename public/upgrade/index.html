@@ -28,6 +28,21 @@
     <a class="back" href="/landing#pricing">← Pricing</a>
     <h1>Form upgrade</h1>
     <p>Pilih paket. Tim aktivasi manual setelah konfirmasi (biasanya 1×24 jam kerja). Kamu perlu akun terdaftar.</p>
+    
+    <div style="margin:0 0 20px;padding:14px 14px 12px;border-radius:12px;border:1px solid rgba(0,208,132,.25);background:rgba(0,208,132,.06);font-size:13px;line-height:1.55">
+      <div style="font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#00d084;margin-bottom:8px">Cara bayar</div>
+      <div><b>Bank</b> · BCA</div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px">
+        <b>No. rek</b> · <code id="cnRek" style="font-size:15px;letter-spacing:.04em">6670833851</code>
+        <button type="button" id="cnCopyRek" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:transparent;color:#e2e8f0;font-size:11px;font-weight:700;cursor:pointer">Salin</button>
+      </div>
+      <div style="margin-top:4px"><b>a/n</b> · Alvin Hidayatulloh</div>
+      <div style="margin-top:8px;color:#89939a">
+        Nominal sesuai paket · berita transfer: <b style="color:#f4f6f7">UPGRADE</b> + email akun kamu.<br>
+        Setelah TF, kirim form di bawah. Admin cocokkan mutasi lalu aktivasi (biasanya 1×24 jam kerja).
+      </div>
+    </div>
+
     <form id="upForm">
       <label>Paket</label>
       <select id="plan" name="plan" required>
@@ -43,6 +58,19 @@
   </div>
   <script>
   (function () {
+
+  document.getElementById("cnCopyRek") && document.getElementById("cnCopyRek").addEventListener("click", function () {
+    var n = document.getElementById("cnRek").textContent.trim();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(n).then(function () {
+        document.getElementById("cnCopyRek").textContent = "Tersalin";
+        setTimeout(function () { document.getElementById("cnCopyRek").textContent = "Salin"; }, 1500);
+      });
+    } else {
+      prompt("Salin nomor rekening:", n);
+    }
+  });
+
     var params = new URLSearchParams(location.search);
     var plan = params.get("plan");
     if (plan === "premium") document.getElementById("plan").value = "premium";
@@ -88,7 +116,7 @@
           }));
         } catch (err) {}
         msg.className = "msg ok";
-        msg.innerHTML = "Permintaan tercatat untuk <b>" + session.user.email + "</b> · paket <b>" + planVal + "</b>. Tim akan follow-up aktivasi.";
+        msg.innerHTML = "Permintaan tercatat untuk <b>" + session.user.email + "</b> · paket <b>" + planVal + "</b>. Pastikan sudah transfer ke BCA 6670833851. Tim cocokkan mutasi lalu aktivasi.";
       } catch (err) {
         msg.className = "msg err";
         msg.textContent = err.message || "Gagal mengirim";
