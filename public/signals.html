@@ -1368,7 +1368,7 @@ function renderSignals() {
     html += '<div style="margin:20px 0;padding:20px;border:1px solid rgba(225,201,138,.35);border-radius:12px;background:rgba(225,201,138,.06);text-align:center">'
       + '<div style="font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#c5a866">Pro preview</div>'
       + '<div style="margin-top:8px;font-size:16px;font-weight:700">Menampilkan ' + limit + ' dari ' + total + ' signals</div>'
-      + '<div style="margin-top:6px;font-size:13px;color:#9aa3aa">Upgrade Pro untuk akses penuh + Signal Performance.</div>'
+      + '<div style="margin-top:6px;font-size:13px;color:#9aa3aa">Upgrade Pro untuk akses penuh semua signals.</div>'
       + '<div style="margin-top:14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'
       + '<a class="cn-premium-cta" href="/upgrade/?plan=pro" data-cn-track="signals_hybrid_upgrade_pro" style="text-decoration:none">Upgrade Pro — Rp 149rb</a>'
       + '<button type="button" class="cn-premium-close" onclick="openPremiumConversion(\'signals\')">Detail paket</button>'
@@ -2065,7 +2065,7 @@ if (document.readyState === "loading") {
       </div>
 
       <div class="cn-premium-note">
-        Premium Rp 49.000/bulan · Pro Rp 149.000/bulan (atau Rp 399.000 / 3 bulan). Aktivasi manual setelah form upgrade.
+        Free & Premium: preview 3 signals + Performance. Pro (Rp 149.000/bln): semua signals. Premium (Rp 49.000): terminal unlimited + Signal Center.
       </div>
 
       <div class="cn-premium-actions">
@@ -2089,10 +2089,10 @@ if (document.readyState === "loading") {
 
     if (feature === 'performance') {
       subtitle.textContent =
-        'Signal Performance termasuk paket Pro (Rp 149.000/bulan). Kirim form upgrade untuk aktivasi manual.';
+        'Signal Performance terbuka untuk semua akun. Upgrade Pro untuk akses penuh daftar signals.';
     } else {
       subtitle.textContent =
-        'Full Signals termasuk paket Pro (Rp 149.000/bulan). Premium Rp 49.000 untuk Watchlist & Signal Center.';
+        'Full Signals = Pro (Rp 149.000/bln). Premium (Rp 49.000): terminal unlimited + Smartwatchlist / Signal Center.';
     }
 
     modal.classList.add('open');
