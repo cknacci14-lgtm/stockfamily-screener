@@ -639,8 +639,10 @@ app.get('/api/public/signals/performance', async (c) => {
       ['TP1', 'TP2', 'TP3', 'SL'].includes(s.outcome)
     );
 
-    const wins = closed.filter(s => WIN_OUTCOMES.includes(s.outcome));
-    const losses = closed.filter(s => s.outcome === 'SL');
+    // Pembagian posisi yang dijual di TP1, TP2, TP3 (jumlah 1). Sisa posisi keluar di SL bila signal ditutup SL.
+    const SCALE = [1 / 3, 1 / 3, 1 / 3];
+    let wins = closed.filter(s => WIN_OUTCOMES.includes(s.outcome));
+    let losses = closed.filter(s => s.outcome === 'SL');
 
     const num = v => {
       const n = Number(v);
@@ -660,6 +662,7 @@ app.get('/api/public/signals/performance', async (c) => {
     };
 
     const getSettlementAt = s => {
+      if (s.sl_hit_at) return s.sl_hit_at;
       if (s.outcome === 'TP1') return s.tp1_hit_at || s.closed_at || null;
       if (s.outcome === 'TP2') return s.tp2_hit_at || s.closed_at || null;
       if (s.outcome === 'TP3') return s.tp3_hit_at || s.closed_at || null;
@@ -678,11 +681,33 @@ app.get('/api/public/signals/performance', async (c) => {
       const slLevel = num(s.stop_loss), planned = num(s.entry_avg);
       // gap menembus SL: fill sudah di bawah SL, pakai entry rencana sebagai acuan
       if (s.outcome === 'SL' && entry !== null && slLevel !== null && entry <= slLevel && planned) entry = planned;
-      const exit = getExitPrice(s);
+      if (entry === null || entry <= 0) return null;
 
-      if (entry === null || entry <= 0 || exit === null) return null;
+      const k = s.outcome === 'TP1' ? 1 : s.outcome === 'TP2' ? 2 : s.outcome === 'TP3' ? 3 : 0;
+      if (k === 0) {
+        const ex0 = getExitPrice(s);
+        return ex0 === null ? null : ((ex0 - entry) / entry) * 100;
+      }
 
-      return ((exit - entry) / entry) * 100;
+      const tpv = [num(s.target_1), num(s.target_2), num(s.target_3)];
+      let sum = 0;
+      for (let i = 0; i < k; i++) {
+        if (tpv[i] === null) return null;
+        sum += SCALE[i] * ((tpv[i] - entry) / entry) * 100;
+      }
+      const rest = 1 - SCALE.slice(0, k).reduce((a, b) => a + b, 0);
+      if (rest > 0.0001) {
+        // sisa posisi: SL bila signal ditutup oleh SL, selain itu di target terakhir yang tercapai
+        let ex = tpv[k - 1];
+        if (s.sl_hit_at) {
+          const slv = num(s.stop_loss);
+          const ev = slEv[s.id];
+          ex = (Number.isFinite(ev) && slv !== null && ev < slv) ? ev : slv;
+        }
+        if (ex === null) return null;
+        sum += rest * ((ex - entry) / entry) * 100;
+      }
+      return sum;
     };
 
     const getHoldingDays = s => {
@@ -708,6 +733,22 @@ app.get('/api/public/signals/performance', async (c) => {
       .sort((a, b) =>
         new Date(a.settlementAt) - new Date(b.settlementAt)
       );
+
+    wins = settled.filter(x => x.realizedPct > 0).map(x => x.signal);
+    losses = settled.filter(x => x.realizedPct <= 0).map(x => x.signal);
+
+    // R-multiple: hasil dibagi jarak SL dari entry acuan
+    const rList = settled.map(x => {
+      const s = x.signal;
+      let e = num(s.actual_entry_avg || s.entry_avg);
+      const slv = num(s.stop_loss), pl = num(s.entry_avg);
+      if (s.outcome === 'SL' && e !== null && slv !== null && e <= slv && pl) e = pl;
+      if (e === null || slv === null || e <= slv) return null;
+      const riskPct = ((e - slv) / e) * 100;
+      return x.realizedPct / riskPct;
+    }).filter(v => v !== null && Number.isFinite(v));
+    const totalR = rList.reduce((a, b) => a + b, 0);
+    const avgR = rList.length ? totalR / rList.length : 0;
 
     const settledReturns = settled.map(x => x.realizedPct);
 
@@ -846,6 +887,29 @@ app.get('/api/public/signals/performance', async (c) => {
 
     const frequency = Object.values(monthlyMap);
 
+    // Signal masih ACTIVE tapi sudah kena TP: bagian yang sudah terkunci (belum masuk win rate)
+    const openTP = active
+      .filter(s => ['TP1', 'TP2', 'TP3'].includes(s.outcome))
+      .map(s => {
+        const k = s.outcome === 'TP1' ? 1 : s.outcome === 'TP2' ? 2 : 3;
+        const entry = num(s.actual_entry_avg || s.entry_avg);
+        const tpv = [num(s.target_1), num(s.target_2), num(s.target_3)];
+        let locked = null;
+        if (entry && entry > 0) {
+          locked = 0;
+          for (let i = 0; i < k; i++) {
+            if (tpv[i] === null) { locked = null; break; }
+            locked += SCALE[i] * ((tpv[i] - entry) / entry) * 100;
+          }
+        }
+        return {
+          id: s.id,
+          ticker: s.ticker,
+          outcome: s.outcome,
+          locked_pl_pct: locked === null ? null : Math.round(locked * 100) / 100
+        };
+      });
+
     const byStatus = {
       PUBLISHED: published.length,
       ACTIVE: active.length,
@@ -938,7 +1002,10 @@ app.get('/api/public/signals/performance', async (c) => {
           Math.round(averageSettledPerWeek * 100) / 100,
 
         consecutiveProfit: maxProfitStreak,
-        consecutiveLoss: maxLossStreak
+        consecutiveLoss: maxLossStreak,
+
+        totalR: Math.round(totalR * 100) / 100,
+        avgR: Math.round(avgR * 100) / 100
       },
 
       byStatus,
@@ -950,7 +1017,8 @@ app.get('/api/public/signals/performance', async (c) => {
 
       growth,
       frequency,
-      recentClosed
+      recentClosed,
+      openTP
     });
 
   } catch (err) {

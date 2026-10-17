@@ -837,7 +837,7 @@ tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{
       <div class="performance-summary-grid">
 
         <div class="performance-summary-item">
-          <div class="performance-summary-label">Total P/L</div>
+          <div class="performance-summary-label" title="Jumlah persen tiap signal, bukan return portofolio. Lihat Total R untuk hasil yang tidak bergantung ukuran posisi.">Total P/L (jumlah %)</div>
           <div id="perfTotalPL" class="performance-summary-value">—</div>
         </div>
 
@@ -894,6 +894,21 @@ tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{
         <div class="performance-summary-item">
           <div class="performance-summary-label">Average P/L</div>
           <div id="perfAvgPL" class="performance-summary-value">—</div>
+        </div>
+
+        <div class="performance-summary-item">
+          <div class="performance-summary-label" title="Hasil dibagi jarak SL. 1R = rugi sebesar risiko yang direncanakan.">Total R</div>
+          <div id="perfTotalR" class="performance-summary-value">—</div>
+        </div>
+
+        <div class="performance-summary-item">
+          <div class="performance-summary-label" title="Rata-rata hasil dalam satuan R per signal selesai.">Average R (realized)</div>
+          <div id="perfAvgR" class="performance-summary-value">—</div>
+        </div>
+
+        <div class="performance-summary-item" style="grid-column:1/-1">
+          <div class="performance-summary-label">Terbuka, sudah kena TP (belum masuk win rate)</div>
+          <div id="perfOpenTP" class="performance-summary-value" style="font-size:13px;font-weight:600">—</div>
         </div>
 
       </div>
@@ -1566,6 +1581,22 @@ document.addEventListener('keydown', function(e) {
       perfPct(stats.avgPL),
       stats.avgPL >= 0 ? "positive" : "negative"
     );
+
+    var rFmt = function (v) { v = perfNum(v); return (v >= 0 ? "+" : "") + v.toFixed(2) + "R"; };
+    setPerfValue("perfTotalR", rFmt(stats.totalR), perfNum(stats.totalR) >= 0 ? "positive" : "negative");
+    setPerfValue("perfAvgR", rFmt(stats.avgR), perfNum(stats.avgR) >= 0 ? "positive" : "negative");
+  }
+
+  function renderOpenTP(rows) {
+    var el = perfEl("perfOpenTP");
+    if (!el) return;
+    if (!Array.isArray(rows) || !rows.length) { el.textContent = "Tidak ada"; return; }
+    el.innerHTML = rows.map(function (r) {
+      var t = String(r.ticker || "").replace(/[^A-Za-z0-9]/g, "");
+      var o = String(r.outcome || "").replace(/[^A-Za-z0-9]/g, "");
+      var l = (r.locked_pl_pct == null) ? "" : " · terkunci " + (r.locked_pl_pct >= 0 ? "+" : "") + Number(r.locked_pl_pct).toFixed(2) + "%";
+      return "<div>" + t + " (" + o + ")" + l + "</div>";
+    }).join("") + '<div style="font-weight:400;font-size:11px;opacity:.7;margin-top:4px">Asumsi jual 1/3 posisi di tiap target. Sisa posisi masih berjalan.</div>';
   }
 
   function renderFrequency(rows) {
@@ -1795,6 +1826,7 @@ document.addEventListener('keydown', function(e) {
       performanceData = data;
 
       renderPerformanceStats(data.stats || {});
+      renderOpenTP(data.openTP || []);
       renderFrequency(data.frequency || []);
       renderChart(data.growth || []);
 
