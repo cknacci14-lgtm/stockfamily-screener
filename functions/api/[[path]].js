@@ -1286,6 +1286,18 @@ app.get('/api/admin/signals/:id', async (c) => {
   }
 });
 
+// Signal ACTIVE/PUBLISHED lain untuk saham yang sama (satu saham, satu signal berjalan)
+async function cnActiveDup(env, ticker, excludeId) {
+  const rows = await sbFetch(env, 'signals?select=id,status&ticker=eq.' + encodeURIComponent(ticker) +
+    '&status=in.(ACTIVE,PUBLISHED)' + (excludeId ? '&id=neq.' + excludeId : ''));
+  return Array.isArray(rows) ? rows : [];
+}
+function cnDupMessage(ticker, rows) {
+  return 'Sudah ada signal ' + ticker + ' yang masih berjalan: ' +
+    rows.map(r => '#' + r.id + ' (' + r.status + ')').join(', ') +
+    '. Satu saham hanya boleh punya satu signal berjalan.';
+}
+
 // POST /api/admin/signals - Create
 app.post('/api/admin/signals', async (c) => {
   try {
@@ -1293,6 +1305,10 @@ app.post('/api/admin/signals', async (c) => {
     const env = c.env;
     const errors = validateSignalInput(body);
     if (errors.length) return c.json({ success: false, error: errors.join(', ') }, 400);
+
+    const dupTicker = String(body.ticker).toUpperCase();
+    const dupRows = await cnActiveDup(env, dupTicker, null);
+    if (dupRows.length) return c.json({ success: false, error: cnDupMessage(dupTicker, dupRows) }, 409);
     
     const entryAvg = calcEntryAvg(body);
     const rr = calcRR(body);
@@ -1387,6 +1403,9 @@ app.post('/api/admin/signals/:id/publish', async (c) => {
     const existing = await sbFetch(env, 'signals?select=*&id=eq.' + id);
     if (!existing || !existing.length) return c.json({ success: false, error: 'Not found' }, 404);
     if (existing[0].status !== 'DRAFT') return c.json({ success: false, error: 'Hanya DRAFT yang bisa publish' }, 400);
+
+    const dupPub = await cnActiveDup(env, existing[0].ticker, id);
+    if (dupPub.length) return c.json({ success: false, error: cnDupMessage(existing[0].ticker, dupPub) }, 409);
     
     const updated = await sbFetch(env, 'signals?id=eq.' + id, {
       method: 'PATCH',
