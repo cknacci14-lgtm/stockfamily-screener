@@ -1317,7 +1317,8 @@
         const dup = data.signals.filter(s => s.ticker === ticker && s.id !== excludeId && ['ACTIVE', 'PUBLISHED'].includes(s.status));
         if (!dup.length) return true;
         const list = dup.map(s => '#' + s.id + ' (' + s.status + ')').join(', ');
-        return confirm('Sudah ada signal ' + ticker + ' yang masih berjalan: ' + list + '.\n\nSignal kedua untuk saham yang sama menggandakan eksposur dan membuat statistik ganda. Tetap lanjut?');
+        alert('Tidak bisa dilanjutkan.\n\nSudah ada signal ' + ticker + ' yang masih berjalan: ' + list + '.\n\nSatu saham hanya boleh punya satu signal berjalan. Tunggu signal itu selesai, atau hapus yang lama lebih dulu (arsipkan lewat SQL).');
+        return false;
       } catch (e) { return true; }
     }
 
