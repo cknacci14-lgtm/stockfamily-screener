@@ -1309,16 +1309,25 @@
     }
 
     // Peringatan bila saham yang sama sudah punya signal yang masih berjalan
-    async function sfDupCheck(ticker, excludeId) {
+    // Patch 42: peringatan dengan pilihan lanjut/batal
+    async function sfDupCheck(ticker, excludeId, timeframe) {
       try {
         const res = await adminFetch('/api/admin/signals');
         const data = await res.json();
         if (!data.success || !Array.isArray(data.signals)) return true;
-        const dup = data.signals.filter(s => s.ticker === ticker && s.id !== excludeId && ['ACTIVE', 'PUBLISHED'].includes(s.status));
-        if (!dup.length) return true;
-        const list = dup.map(s => '#' + s.id + ' (' + s.status + ')').join(', ');
-        alert('Tidak bisa dilanjutkan.\n\nSudah ada signal ' + ticker + ' yang masih berjalan: ' + list + '.\n\nSatu saham hanya boleh punya satu signal berjalan. Tunggu signal itu selesai, atau hapus yang lama lebih dulu (arsipkan lewat SQL).');
-        return false;
+        const prev = data.signals.filter(s => s.ticker === ticker && s.id !== excludeId && s.status !== 'DRAFT');
+        if (!prev.length) return true;
+        const live = prev.filter(s => ['ACTIVE', 'PUBLISHED'].includes(s.status));
+        const sameTf = live.filter(s => (s.timeframe || 'D1') === (timeframe || 'D1'));
+        const fmt = v => (v == null || v === '') ? '-' : Number(v).toLocaleString('id-ID');
+        const line = s => '#' + s.id + ' ' + (s.timeframe || 'D1') + ' ' + s.status + (s.outcome ? '/' + s.outcome : '') +
+          ' | entry ' + fmt(s.entry_avg) + ' | SL ' + fmt(s.stop_loss) + ' | TP1 ' + fmt(s.target_1);
+        const rows = prev.slice().sort((a, b) => b.id - a.id).slice(0, 6).map(line).join('\n');
+        let msg = 'Saham ' + ticker + ' sudah pernah punya signal:\n\n' + rows + (prev.length > 6 ? '\n... dan ' + (prev.length - 6) + ' lainnya' : '') + '\n\n';
+        if (sameTf.length) msg += '⚠ Masih ada signal BERJALAN dengan timeframe SAMA (' + (timeframe || 'D1') + '): ' + sameTf.map(s => '#' + s.id).join(', ') + '. Pastikan ini setup yang berbeda, bukan duplikat.\n\n';
+        else if (live.length) msg += 'Ada signal berjalan dengan timeframe berbeda.\n\n';
+        msg += 'OK = tetap lanjut, Cancel = batal.';
+        return confirm(msg);
       } catch (e) { return true; }
     }
 
@@ -1344,7 +1353,7 @@
       if (!payload.entry_1) return addLog('❌ Entry 1 wajib', 'error');
       if (!payload.stop_loss) return addLog('❌ SL wajib', 'error');
       if (!payload.target_1) return addLog('❌ TP1 wajib', 'error');
-      if (!(await sfDupCheck(payload.ticker, null))) return addLog('⏹ Dibatalkan: sudah ada signal ' + payload.ticker + ' yang berjalan', 'info');
+      if (!(await sfDupCheck(payload.ticker, null, payload.timeframe))) return addLog('⏹ Dibatalkan: signal ' + payload.ticker + ' tidak disimpan', 'info');
       btn.disabled = true;
       btn.textContent = '⏳ Saving...';
       try {
@@ -1416,7 +1425,7 @@
         const r0 = await adminFetch('/api/admin/signals');
         const d0 = await r0.json();
         const me = (d0.signals || []).find(s => s.id === id);
-        if (me && !(await sfDupCheck(me.ticker, id))) return;
+        if (me && !(await sfDupCheck(me.ticker, id, me.timeframe))) return;
       } catch (e) {}
       if (!confirm('Publish signal ini?')) return;
       try {
