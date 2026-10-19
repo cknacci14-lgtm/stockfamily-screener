@@ -734,6 +734,17 @@ app.get('/api/public/signals/performance', async (c) => {
         new Date(a.settlementAt) - new Date(b.settlementAt)
       );
 
+    // Patch 43: SL gap = signal SL yang harga keluarnya di bawah level SL (atau fill entry sudah di bawah SL)
+    const MIN_SAMPLE = 20;
+    const isGap = s => {
+      if (s.outcome !== 'SL') return false;
+      const slv = num(s.stop_loss);
+      if (slv === null) return false;
+      const ev = slEv[s.id];
+      const fill = num(s.actual_entry_avg);
+      return (Number.isFinite(ev) && ev < slv) || (fill !== null && fill <= slv);
+    };
+
     wins = settled.filter(x => x.realizedPct > 0).map(x => x.signal);
     losses = settled.filter(x => x.realizedPct <= 0).map(x => x.signal);
 
@@ -749,6 +760,26 @@ app.get('/api/public/signals/performance', async (c) => {
     }).filter(v => v !== null && Number.isFinite(v));
     const totalR = rList.reduce((a, b) => a + b, 0);
     const avgR = rList.length ? totalR / rList.length : 0;
+
+    // Patch 43: SL dipisah menjadi sesuai rencana dan gap
+    const slGroups = { plain: [], gap: [] };
+    settled.filter(x => x.signal.outcome === 'SL').forEach(x => {
+      const s = x.signal;
+      let e = num(s.actual_entry_avg || s.entry_avg);
+      const slv = num(s.stop_loss), pl = num(s.entry_avg);
+      if (e !== null && slv !== null && e <= slv && pl) e = pl;
+      const r = (e !== null && slv !== null && e > slv) ? x.realizedPct / (((e - slv) / e) * 100) : null;
+      (isGap(s) ? slGroups.gap : slGroups.plain).push({ pct: x.realizedPct, r });
+    });
+    const r2 = v => Math.round(v * 100) / 100;
+    const slGroupStat = a => {
+      const rs = a.map(v => v.r).filter(v => v !== null && Number.isFinite(v));
+      return {
+        n: a.length,
+        avgPL: r2(a.length ? a.reduce((t, v) => t + v.pct, 0) / a.length : 0),
+        avgR: r2(rs.length ? rs.reduce((t, v) => t + v, 0) / rs.length : 0)
+      };
+    };
 
     const settledReturns = settled.map(x => x.realizedPct);
 
@@ -921,7 +952,8 @@ app.get('/api/public/signals/performance', async (c) => {
       TP3: closed.filter(s => s.outcome === 'TP3').length,
       TP2: closed.filter(s => s.outcome === 'TP2').length,
       TP1: closed.filter(s => s.outcome === 'TP1').length,
-      SL: closed.filter(s => s.outcome === 'SL').length
+      SL: closed.filter(s => s.outcome === 'SL' && !isGap(s)).length,
+      GAP: closed.filter(s => isGap(s)).length
     };
 
     const byTicker = {};
@@ -957,6 +989,7 @@ app.get('/api/public/signals/performance', async (c) => {
           outcome: s.outcome,
           entry_avg: num(s.entry_avg),
           exit_price: getExitPrice(s),
+          gap: isGap(s),
           return_pct: Math.round(x.realizedPct * 100) / 100,
           days: Math.round((x.holdingDays || 0) * 10) / 10,
           settlement_at: x.settlementAt,
@@ -1005,7 +1038,12 @@ app.get('/api/public/signals/performance', async (c) => {
         consecutiveLoss: maxLossStreak,
 
         totalR: Math.round(totalR * 100) / 100,
-        avgR: Math.round(avgR * 100) / 100
+        avgR: Math.round(avgR * 100) / 100,
+
+        slPlain: slGroupStat(slGroups.plain),
+        slGap: slGroupStat(slGroups.gap),
+        minSample: MIN_SAMPLE,
+        smallSample: settled.length < MIN_SAMPLE
       },
 
       byStatus,

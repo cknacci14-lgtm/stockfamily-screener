@@ -74,11 +74,20 @@ function buildMessage(signal, event, price) {
     lines.push('🎯 <b>' + ticker + ' kena Target ' + k + '</b>');
     lines.push('Signal ' + ticker + ' mencapai Target ' + k + (pct != null ? ' (' + formatPct(pct) + ')' : ''));
   } else if (event === 'SL_HIT') {
-    const base = entryBase(signal);
+    const slLevel = Number(signal.stop_loss);
+    const isGap = priceNum > 0 && slLevel > 0 && priceNum < slLevel;
+    // Gap: fill entry bisa sudah di bawah SL, jadi P/L dihitung dari entry rencana
+    const base = isGap ? (Number(signal.entry_avg) > 0 ? Number(signal.entry_avg) : entryBase(signal)) : entryBase(signal);
     const pct = base && priceNum ? ((priceNum - base) / base) * 100 : null;
-    lines.push('🔴 <b>' + ticker + ' kena Stop</b>');
-    lines.push('Signal ' + ticker + ' tersentuh invalidation/stop level' +
-      (priceNum ? ' (' + formatRp(priceNum) + (pct != null ? ', ' + formatPct(pct) : '') + ')' : ''));
+    if (isGap) {
+      lines.push('🔴 <b>' + ticker + ' kena Stop (gap)</b>');
+      lines.push('⚠️ Gap menembus SL: keluar di ' + formatRp(priceNum) + ' (SL ' + formatRp(slLevel) + ')' +
+        (pct != null ? ', ' + formatPct(pct) + ' dari entry rencana' : ''));
+    } else {
+      lines.push('🔴 <b>' + ticker + ' kena Stop</b>');
+      lines.push('Signal ' + ticker + ' tersentuh invalidation/stop level' +
+        (priceNum ? ' (' + formatRp(priceNum) + (pct != null ? ', ' + formatPct(pct) : '') + ')' : ''));
+    }
   } else {
     lines.push('📊 <b>' + ticker + '</b> ' + esc(event));
   }

@@ -530,6 +530,9 @@ tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{
   margin-bottom: 14px;
 }
 
+.sfSmallBadge { display: inline-block; margin-left: 8px; padding: 1px 7px; border-radius: 999px; border: 1px solid rgba(245,158,11,.5); background: rgba(245,158,11,.12); color: #f59e0b; font-size: 10px; font-weight: 700; letter-spacing: .3px; text-transform: none; vertical-align: middle; }
+.sfSmallBadge:empty { display: none; }
+
 .performance-chart-wrap {
   position: relative;
   height: 250px;
@@ -800,7 +803,7 @@ tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{
     </div>
 
     <div class="performance-panel">
-      <div class="performance-panel-title">Signal Outcome</div>
+      <div class="performance-panel-title">Signal Outcome<span class="sfSmallBadge" data-sf="perf" title="Jumlah signal selesai masih sedikit, jadi persentase mudah berubah. Jangan dijadikan kesimpulan."></span></div>
 
       <div class="performance-mini-grid">
 
@@ -832,7 +835,7 @@ tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{
 
   <div class="performance-summary">
     <div class="performance-panel">
-      <div class="performance-panel-title">Performance Summary</div>
+      <div class="performance-panel-title">Performance Summary<span class="sfSmallBadge" data-sf="perf" title="Jumlah signal selesai masih sedikit, jadi persentase mudah berubah. Jangan dijadikan kesimpulan."></span></div>
 
       <div class="performance-summary-grid">
 
@@ -904,6 +907,11 @@ tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{
         <div class="performance-summary-item">
           <div class="performance-summary-label" title="Rata-rata hasil dalam satuan R per signal selesai.">Average R (realized)</div>
           <div id="perfAvgR" class="performance-summary-value">—</div>
+        </div>
+
+        <div class="performance-summary-item" style="grid-column:1/-1">
+          <div class="performance-summary-label" title="SL gap = harga keluar di bawah level SL (misalnya buka di bawah SL atau ARB), jadi rugi bisa lebih besar dari 1R.">SL sesuai rencana vs SL gap</div>
+          <div id="perfSlSplit" class="performance-summary-value" style="font-size:13px;font-weight:600">—</div>
         </div>
 
         <div class="performance-summary-item" style="grid-column:1/-1">
@@ -1437,7 +1445,8 @@ async function loadSignals() {
     document.getElementById('statWinRate').innerHTML = (closed.length ? Math.round(wins / closed.length * 100) + '%' : '—') +
       '<div style="font-size:10px;font-weight:600;color:#8b93a1;margin-top:4px;font-family:inherit;">' +
       (closed.length ? wins + '/' + closed.length + ' closed' : 'belum ada closed') +
-      (runningTp ? ' · ' + runningTp + ' aktif sudah TP' : '') + '</div>';
+      (runningTp ? ' · ' + runningTp + ' aktif sudah TP' : '') +
+      (closed.length && closed.length < 20 ? '<span class="sfSmallBadge" style="margin-left:6px" title="Jumlah signal selesai masih sedikit.">sampel kecil</span>' : '') + '</div>';
     document.getElementById('statUpdated').textContent = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false }) + ' WIB';
 
     var cnt = {
@@ -1669,6 +1678,25 @@ document.addEventListener('keydown', function(e) {
         if (e) { e.textContent = "—"; e.className = "performance-summary-value"; }
       });
     }
+  }
+
+  function renderSlSplit(stats) {
+    var n = perfNum(stats.settled), min = perfNum(stats.minSample) || 20;
+    var badges = document.querySelectorAll('.sfSmallBadge[data-sf="perf"]');
+    for (var i = 0; i < badges.length; i++) {
+      badges[i].textContent = (n > 0 && n < min) ? ('sampel kecil · n=' + n) : '';
+    }
+    var el = perfEl("perfSlSplit");
+    if (!el) return;
+    var p = stats.slPlain || { n: 0 }, g = stats.slGap || { n: 0 };
+    if (!perfNum(p.n) && !perfNum(g.n)) { el.textContent = "Belum ada SL"; return; }
+    var line = function (label, o) {
+      if (!perfNum(o.n)) return "<div>" + label + ": 0</div>";
+      var rr = perfNum(o.avgR);
+      return "<div>" + label + ": " + perfNum(o.n) + " · rata-rata " + perfPct(o.avgPL) + " · " + (rr >= 0 ? "+" : "") + rr.toFixed(2) + "R</div>";
+    };
+    el.innerHTML = line("SL sesuai rencana", p) + line("SL gap", g) +
+      '<div style="font-weight:400;font-size:11px;opacity:.7;margin-top:4px">Gap = harga keluar di bawah level SL. Rugi bisa melebihi 1R.</div>';
   }
 
   function renderOpenTP(rows) {
@@ -1911,6 +1939,7 @@ document.addEventListener('keydown', function(e) {
 
       renderPerformanceStats(data.stats || {});
       renderOpenTP(data.openTP || []);
+      try { renderSlSplit(data.stats || {}); } catch (e) {}
       try { renderRunningPositions(); } catch (e) {}
       renderFrequency(data.frequency || []);
       renderChart(data.growth || []);
