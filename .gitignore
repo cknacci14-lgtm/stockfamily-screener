@@ -75,3 +75,5 @@ signals-ui-audit.txt
 scripts/zone-forward-log.js
 scripts/backtest-capitulation-*.js
 
+
+public/*.p4-backup
