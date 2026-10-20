@@ -8,6 +8,9 @@ try { zone = require('./zone-forward-log'); } catch (e) { if (e.code !== 'MODULE
 // Modul GEM Score bersifat opsional, sama seperti modul zona.
 let gem = null;
 try { gem = require('./gem-forward-log'); } catch (e) { if (e.code !== 'MODULE_NOT_FOUND') throw e; }
+// Modul LATE MOMENTUM bersifat opsional; kegagalan memuatnya tidak boleh menghentikan pencatat lain.
+let lm = null;
+try { lm = require('./lm-forward-log'); } catch (e) { console.warn('lm-forward-log dilewati: ' + (e && e.message)); }
 const argDate = ((process.argv.find(a => a.startsWith('--date=')) || '').slice(7)) || '';
 
 async function fetchAll(build) {
@@ -118,7 +121,7 @@ async function fillReturns(cal, codeById) {
       await runBatches(list, async r => {
         const ret = closeByCode.get(r.stock_code) / Number(r.ref_close) - 1;
         // GEM_*: sisi naik dilonggarkan (+150%) agar lonjakan nyata tidak dibuang; sisi turun -45% menyaring pemisahan saham
-        const gemRow = /^GEM_/.test(String(r.verdict || ''));
+        const gemRow = /^(GEM|LM)_/.test(String(r.verdict || ''));
         if (!isFinite(ret) || (gemRow ? (ret > 1.5 || ret < -0.45) : Math.abs(ret) > 0.4)) return;
         const upd = {}; upd[col] = ret;
         await sb.from('verdict_forward_log').update(upd).eq('id', r.id);
@@ -156,8 +159,10 @@ async function summary() {
   await logBrokerCatchUp(cal, codeById);
   if (zone) await zone.logRecent(sb, Array.from(new Set(cal.slice(-6).concat([target]))), codeById, fetchAll);
   if (gem) await gem.logRecent(sb, Array.from(new Set(cal.slice(-6).concat([target]))), codeById, fetchAll);
+  if (lm) { try { await lm.logRecent(sb, Array.from(new Set(cal.slice(-6).concat([target]))), codeById, fetchAll); } catch (e) { console.warn('LATE MOMENTUM log gagal: ' + (e && e.message)); } }
   await fillReturns(cal, codeById);
   await summary();
   if (zone) await zone.summary(sb, fetchAll);
   if (gem) await gem.summary(sb, fetchAll);
+  if (lm) { try { await lm.summary(sb, fetchAll); } catch (e) { console.warn('LATE MOMENTUM ringkasan gagal: ' + (e && e.message)); } }
 })().catch(e => { console.error('ERROR:', e.message); process.exit(1); });

@@ -213,6 +213,7 @@ async function logRecent(sb, dates, codeById, fetchAll) {
   let total = 0;
   for (const T of targets) {
     const out = [];
+    const scores = [];   // hanya untuk diagnosis di log, tidak disimpan ke database
     for (const s of series) {
       let idx = -1;
       for (let i = s.rows.length - 1; i >= 0; i--) {
@@ -229,13 +230,16 @@ async function logRecent(sb, dates, codeById, fetchAll) {
       const g = calculateGemScore(s.hist, idx);
       if (g.gem_score == null) continue;
       out.push({ log_date: T, stock_code: s.code, verdict: g.gem_score >= STRONG_MIN ? 'GEM_STRONG' : 'GEM_BASE', ref_close: close, foreign_ratio_20d: null, avg_value_20d: avg });
+      scores.push(g.gem_score);
     }
     for (let i = 0; i < out.length; i += 500) {
       const { error } = await sb.from('verdict_forward_log').upsert(out.slice(i, i + 500), { onConflict: 'log_date,stock_code,verdict', ignoreDuplicates: true });
       if (error) throw new Error(error.message);
     }
     const strong = out.filter(r => r.verdict === 'GEM_STRONG').map(r => r.stock_code);
+    const n60 = scores.filter(x => x >= 60).length, n45 = scores.filter(x => x >= 45).length;
     console.log('Pencatat GEM ' + T + ': ' + out.length + ' saham likuid dinilai, GEM_STRONG ' + strong.length + (strong.length ? ' (' + strong.join(', ') + ')' : ''));
+    console.log('  diagnosis skor: tertinggi ' + (scores.length ? Math.max(...scores) : '-') + ', median ' + (scores.length ? median(scores) : '-') + ', >=60: ' + n60 + ', >=45: ' + n45);
     total += out.length;
   }
   return total;
