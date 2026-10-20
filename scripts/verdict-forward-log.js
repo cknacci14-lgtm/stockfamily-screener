@@ -5,6 +5,9 @@ const SCOPE = 8e9, PRE = 4e9, WARM = 60, HZ = [1, 3, 5, 10];
 // Modul zona demand bersifat opsional: kalau file tidak ada (mis. di-gitignore), skrip tetap jalan seperti biasa.
 let zone = null;
 try { zone = require('./zone-forward-log'); } catch (e) { if (e.code !== 'MODULE_NOT_FOUND') throw e; }
+// Modul GEM Score bersifat opsional, sama seperti modul zona.
+let gem = null;
+try { gem = require('./gem-forward-log'); } catch (e) { if (e.code !== 'MODULE_NOT_FOUND') throw e; }
 const argDate = ((process.argv.find(a => a.startsWith('--date=')) || '').slice(7)) || '';
 
 async function fetchAll(build) {
@@ -100,7 +103,7 @@ async function logBrokerCatchUp(cal, codeById) {
 async function fillReturns(cal, codeById) {
   for (const h of HZ) {
     const col = 'ret_' + h + 'd';
-    const pend = await fetchAll(() => sb.from('verdict_forward_log').select('id,log_date,stock_code,ref_close').is(col, null).order('id'));
+    const pend = await fetchAll(() => sb.from('verdict_forward_log').select('id,log_date,stock_code,ref_close,verdict').is(col, null).order('id'));
     const byDate = new Map();
     for (const r of pend) {
       const i = cal.indexOf(r.log_date);
@@ -114,7 +117,9 @@ async function fillReturns(cal, codeById) {
       const closeByCode = new Map(px.map(p => [codeById.get(String(p.stock_id)), Number(p.close)]));
       await runBatches(list, async r => {
         const ret = closeByCode.get(r.stock_code) / Number(r.ref_close) - 1;
-        if (!isFinite(ret) || Math.abs(ret) > 0.4) return;
+        // GEM_*: sisi naik dilonggarkan (+150%) agar lonjakan nyata tidak dibuang; sisi turun -45% menyaring pemisahan saham
+        const gemRow = /^GEM_/.test(String(r.verdict || ''));
+        if (!isFinite(ret) || (gemRow ? (ret > 1.5 || ret < -0.45) : Math.abs(ret) > 0.4)) return;
         const upd = {}; upd[col] = ret;
         await sb.from('verdict_forward_log').update(upd).eq('id', r.id);
       });
@@ -150,7 +155,9 @@ async function summary() {
   await logSignals(target, codeById);
   await logBrokerCatchUp(cal, codeById);
   if (zone) await zone.logRecent(sb, Array.from(new Set(cal.slice(-6).concat([target]))), codeById, fetchAll);
+  if (gem) await gem.logRecent(sb, Array.from(new Set(cal.slice(-6).concat([target]))), codeById, fetchAll);
   await fillReturns(cal, codeById);
   await summary();
   if (zone) await zone.summary(sb, fetchAll);
+  if (gem) await gem.summary(sb, fetchAll);
 })().catch(e => { console.error('ERROR:', e.message); process.exit(1); });
