@@ -1,15 +1,59 @@
 {
   "success": true,
-  "date": "2026-10-19",
-  "count": 0,
+  "date": "2026-10-20",
+  "count": 1,
   "filtered": {
-    "considered": 2,
-    "noTrade": 1,
+    "considered": 4,
+    "noTrade": 2,
     "lateEntry": 0,
     "wideStop": 1
   },
-  "signals": [],
+  "signals": [
+    {
+      "stockCode": "BSSR",
+      "stockName": "Baramulti Suksessarana Tbk.",
+      "setup": "PULLBACK",
+      "status": "TRIGGERED",
+      "price": 5200,
+      "trigger": 5195.25,
+      "invalidation": 4641.68,
+      "target1": 6025.61,
+      "target2": 6579.18,
+      "riskReward": 2.5,
+      "riskLevel": "HIGH",
+      "entryGapPct": 0.1,
+      "rrFromPrice": 1.48,
+      "planStale": false,
+      "preBreakout": false,
+      "stopDistancePct": 10.7,
+      "stopWide": false,
+      "maxEntry": 5333.65,
+      "structure": {
+        "state": "BULLISH",
+        "label": "Bullish structure",
+        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
+      },
+      "participation": {
+        "state": "CONTRACTING",
+        "label": "Participation contracting",
+        "explanation": "Multiple trading-activity measures are below their recent baseline."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": -8.07028166955166e-7,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HEALTHY",
+        "label": "Healthy liquidity",
+        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-10-20T18:02:58.931Z"
+    }
+  ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-10-19T19:24:13.741Z"
+  "generatedAt": "2026-10-20T18:02:58.931Z"
 }
