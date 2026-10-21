@@ -1822,6 +1822,121 @@ app.delete('/api/admin/cache', (c) => c.json({ success: true, message: 'Cache cl
 // ============================================================
 // FALLBACK
 // ============================================================
+// ============================================================
+// SCREENER BLOCK TRADE (online) - dipakai public/screener-bt.html
+// ============================================================
+async function btPaged(env, basePath, maxPages) {
+  const PAGE = 1000;
+  const rows = [];
+  for (let page = 0; page < maxPages; page++) {
+    const data = await sbFetch(env, basePath + '&limit=' + PAGE + '&offset=' + (page * PAGE));
+    const batch = Array.isArray(data) ? data : [];
+    rows.push(...batch);
+    if (batch.length < PAGE) return { rows, truncated: false };
+  }
+  return { rows, truncated: true };
+}
+
+function btDetectPhase(candles) {
+  if (!candles || candles.length < 3) return { phase: 'NEUTRAL', color: '#64748B', detail: 'Data kurang', weight: 0 };
+  const closes = candles.map(x => Number(x.close));
+  const highs = candles.map(x => Number(x.high));
+  const lows = candles.map(x => Number(x.low));
+  const firstClose = closes[0];
+  const lastClose = closes[closes.length - 1];
+  const priceChange = (lastClose - firstClose) / firstClose;
+  const hi = Math.max(...highs);
+  const lo = Math.min(...lows);
+  const range = hi - lo;
+  const pos = range > 0 ? (lastClose - lo) / range : 0.5;
+  if (priceChange > 0.05) return { phase: 'MARKUP', color: '#00E5FF', detail: 'Harga naik tajam', weight: 80 };
+  if (priceChange < -0.05) return { phase: 'MARKDOWN', color: '#FFB300', detail: 'Harga turun tajam', weight: 10 };
+  if (pos > 0.65 && Math.abs(priceChange) < 0.05) return { phase: 'DISTRIBUSI', color: '#FF5252', detail: 'BT tinggi @ puncak', weight: 60 };
+  if (pos < 0.35 && Math.abs(priceChange) < 0.05) return { phase: 'AKUMULASI', color: '#00E676', detail: 'BT tinggi @ dasar', weight: 100 };
+  return { phase: 'KONSOLIDASI', color: '#64748B', detail: 'Mixed signal', weight: 20 };
+}
+
+function btScore(volume, phaseWeight, count) {
+  const volScore = Math.min(Math.log10(volume + 1) * 12, 100);
+  const countBonus = Math.min(count * 5, 30);
+  return Math.round((volScore * 0.3) + (phaseWeight * 0.5) + (countBonus * 0.2));
+}
+
+app.get('/api/screener/block-trade', async (c) => {
+  try {
+    const env = c.env;
+    const days = Math.min(Math.max(parseInt(c.req.query('days')) || 30, 1), 365);
+    const minVol = Math.max(parseInt(c.req.query('minVol')) || 5000000, 1);
+    const phaseFilter = String(c.req.query('phase') || 'all').toLowerCase();
+    const limit = Math.min(Math.max(parseInt(c.req.query('limit')) || 50, 1), 100);
+
+    const latestDate = String((await getLatestTradeDate(env)) || '').slice(0, 10);
+    if (!latestDate) return c.json({ error: 'No data' }, 404);
+    const startD = new Date(latestDate + 'T00:00:00Z');
+    startD.setUTCDate(startD.getUTCDate() - days);
+    const startStr = startD.toISOString().slice(0, 10);
+
+    const bt = await btPaged(env,
+      'daily_stock_data?select=stock_id,trade_date,close,non_regular_volume,non_regular_value' +
+      '&trade_date=gte.' + startStr + '&trade_date=lte.' + latestDate +
+      '&non_regular_volume=gte.' + minVol + '&order=trade_date.desc,stock_id.asc', 12);
+
+    const byStock = {};
+    for (const r of bt.rows) {
+      const sid = r.stock_id;
+      const btVol = Number(r.non_regular_volume) || 0;
+      if (!(btVol >= minVol)) continue;
+      const o = byStock[sid] || (byStock[sid] = { stock_id: sid, bt_volume: 0, bt_value: 0, bt_count: 0, dates: [], latest_close: Number(r.close), latest_date: r.trade_date });
+      o.bt_volume += btVol;
+      o.bt_value += Number(r.non_regular_value) || 0;
+      o.bt_count++;
+      o.dates.push({ date: r.trade_date, volume: btVol, value: Number(r.non_regular_value) || 0, close: Number(r.close) });
+      if (r.trade_date > o.latest_date) { o.latest_close = Number(r.close); o.latest_date = r.trade_date; }
+    }
+
+    const all = Object.values(byStock).sort((a, b) => b.bt_volume - a.bt_volume);
+    const filterInfo = { days, minVol, phase: phaseFilter };
+    if (!all.length) return c.json({ success: true, filter: filterInfo, totalMatched: 0, returned: 0, stocks: [], truncated: bt.truncated });
+    const cand = all.slice(0, 300);
+
+    const CHUNK = 100;
+    const stockMap = {}; const candlesBy = {};
+    for (let i = 0; i < cand.length; i += CHUNK) {
+      const ids = cand.slice(i, i + CHUNK).map(x => x.stock_id).join(',');
+      const st = await sbFetch(env, 'stocks?select=id,code,name&id=in.(' + ids + ')');
+      (Array.isArray(st) ? st : []).forEach(s => { stockMap[s.id] = s; });
+      const cd = await btPaged(env,
+        'daily_stock_data?select=stock_id,trade_date,close,high,low' +
+        '&stock_id=in.(' + ids + ')&trade_date=gte.' + startStr + '&trade_date=lte.' + latestDate +
+        '&order=trade_date.asc,stock_id.asc', 4);
+      cd.rows.forEach(x => { (candlesBy[x.stock_id] || (candlesBy[x.stock_id] = [])).push(x); });
+    }
+
+    const results = [];
+    for (const sd of cand) {
+      const stock = stockMap[sd.stock_id];
+      if (!stock) continue;
+      const ph = btDetectPhase(candlesBy[sd.stock_id] || []);
+      if (phaseFilter !== 'all' && ph.phase.toLowerCase() !== phaseFilter) continue;
+      results.push({
+        code: stock.code, name: stock.name,
+        phase: ph.phase, phase_color: ph.color, phase_detail: ph.detail,
+        score: btScore(sd.bt_volume, ph.weight, sd.bt_count),
+        bt_volume: sd.bt_volume, bt_value: sd.bt_value, bt_count: sd.bt_count,
+        latest_close: sd.latest_close, latest_date: sd.latest_date,
+        latest_bt: sd.dates[0] || null
+      });
+    }
+    results.sort((a, b) => b.score - a.score);
+    const top = results.slice(0, limit);
+    c.header('Cache-Control', 'public, max-age=300');
+    return c.json({ success: true, filter: filterInfo, totalMatched: results.length, returned: top.length, stocks: top, truncated: bt.truncated });
+  } catch (err) {
+    console.error('[screener-bt]', err);
+    return c.json({ error: err.message }, 500);
+  }
+});
+
 app.all('/api/*', (c) => {
   return c.json({ success: false, error: 'API ' + c.req.method + ' ' + c.req.path + ' not found' }, 404);
 });
