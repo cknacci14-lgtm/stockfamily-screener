@@ -11,7 +11,7 @@
     {
       key: "dashboard",
       label: "Dashboard",
-      href: "/",
+      href: "/app", /* PATCH49_DASHBOARD_APP */
       icon: `
         <svg viewBox="0 0 24 24">
           <path d="M3 11.5 12 4l9 7.5"></path>
@@ -80,7 +80,8 @@
     if (
       path === "/" ||
       path === "" ||
-      path.endsWith("/index.html")
+      path.endsWith("/index.html") ||
+      /\/app(\.html)?\/?$/.test(path)
     ) {
       return "dashboard";
     }
