@@ -35,7 +35,7 @@ tr.row-hover:hover { background:rgba(0,229,255,0.05); cursor:pointer; }
 <header class="border-b border-idx-border bg-idx-card/80 sticky top-0 z-50 backdrop-blur">
   <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
     <div class="flex items-center gap-3">
-      <a href="/" class="text-idx-cyan hover:text-white transition"><i class="fa-solid fa-arrow-left"></i></a>
+      <a href="/app" class="text-idx-cyan hover:text-white transition"><i class="fa-solid fa-arrow-left"></i></a>
       <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-idx-green to-idx-cyan flex items-center justify-center">
         <i class="fa-solid fa-magnifying-glass-chart text-black"></i>
       </div>
@@ -215,7 +215,7 @@ function renderTable(data) {
   }
   document.getElementById('tableCount').textContent = data.length+' hasil';
   tbody.innerHTML = data.map((s,i) => `
-    <tr class="row-hover border-b border-idx-border/30" onclick="window.location.href='/?code=${s.code}'">
+    <tr class="row-hover border-b border-idx-border/30" onclick="window.location.href='/app?code=${s.code}'">
       <td class="px-3 py-2 text-slate-600">${i+1}</td>
       <td class="px-3 py-2 font-bold text-white">${s.code}</td>
       <td class="px-3 py-2 text-slate-400 truncate max-w-[180px]">${s.name || '-'}</td>
