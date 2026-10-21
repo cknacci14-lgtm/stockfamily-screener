@@ -1,15 +1,12 @@
 {
-  "status": "success",
-  "engine": "v3",
-  "regime": "Neutral-",
-  "regimeDetails": {
-    "regime": "Neutral-",
-    "pctUp": 0.8248587570621468,
-    "meanFnet": -1433665.2542372881,
-    "universeSize": 354
-  },
-  "generatedAt": "2026-10-20T18:00:32.006Z",
-  "lastSync": "21/10/2026, 01.00.32",
+  "status": "ok",
+  "engine": "late_momentum_longgar_v1",
+  "formula": "pos3 + closeLoc3>0.70 + vol>1.5 + ret3d 10-35% + foreign<15% + vol>=200k + bidImb>0",
+  "validation": "OOS Jul-Oct 2026 WR1D~68% avg1D~4.5% WR3D~60%",
   "total": 0,
-  "data": []
+  "scan_date": "2026-10-20",
+  "generated_at": "2026-10-21T01:32:44.790Z",
+  "data": [],
+  "results": [],
+  "signals": []
 }
