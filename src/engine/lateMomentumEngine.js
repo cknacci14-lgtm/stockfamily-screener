@@ -1,7 +1,7 @@
 "use strict";
 /**
- * Late Momentum Engine (validated longgar formula)
- * OOS test Jul–Oct 2026: WR~68% next day, ~60% next 3d
+ * Late Momentum Engine (rumus longgar, EKSPERIMENTAL - belum terbukti)
+ * Backtest 20 Okt 2026: naik 58% besok / 52% 3 hari (53% / 43% sejak Jul 2026); edge hilang bila masuk di open T+1. Lihat scripts/backtest-late-momentum.js
  *
  * Rules (all must pass):
  *  pos_3 === 3
@@ -217,7 +217,7 @@ async function runLateMomentumScreener(options = {}) {
     status: "ok",
     engine: "late_momentum_longgar_v1",
     formula: "pos3 + closeLoc3>0.70 + vol>1.5 + ret3d 10-35% + foreign<15% + vol>=200k + bidImb>0",
-    validation: "OOS Jul-Oct 2026 WR1D~68% avg1D~4.5% WR3D~60%",
+    validation: "Eksperimental. Backtest 2025-09 s/d 2026-10: naik 58% besok, edge hilang bila masuk di open T+1. Forward test berjalan.",
     total: signals.length,
     scan_date: scanDate,
     scanDate: scanDate,
