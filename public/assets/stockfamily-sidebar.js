@@ -85,19 +85,19 @@
       return "dashboard";
     }
 
-    if (path.endsWith("/screener.html")) {
+    if (/\/screener(\.html)?\/?$/.test(path)) { /* PATCH48_CLEAN_URL */
       return "screener";
     }
 
-    if (path.endsWith("/signals.html")) {
+    if (/\/signals(\.html)?\/?$/.test(path)) { /* PATCH48_CLEAN_URL */
       return "signals";
     }
 
-    if (path.endsWith("/watchlist.html")) {
+    if (/\/watchlist(\.html)?\/?$/.test(path)) { /* PATCH48_CLEAN_URL */
       return "watchlist";
     }
 
-    if (path.endsWith("/admin.html")) {
+    if (/\/admin(\.html)?\/?$/.test(path)) { /* PATCH48_CLEAN_URL */
       return "admin";
     }
 
