@@ -1063,6 +1063,173 @@
     }
   }
 
+  // CHARTNALIST_SIDEBAR_CANONICAL_V7
+  // Satu tampilan kanonik (logo, Inter, spasi) untuk semua halaman.
+  // Selector diawali "html body #stockfamily-global-sidebar" supaya mengalahkan
+  // override per halaman (#stockfamily-global-sidebar .sf-xxx) tanpa mengubah halaman.
+  function injectCanonicalCSS() {
+
+    if (
+      document.getElementById(
+        "stockfamily-sidebar-canonical-v7"
+      )
+    ) {
+      return;
+    }
+
+    const style =
+      document.createElement("style");
+
+    style.id =
+      "stockfamily-sidebar-canonical-v7";
+
+    style.textContent = `
+      @font-face {
+        font-family:"CN Inter";
+        font-style:normal;
+        font-weight:100 900;
+        font-display:swap;
+        src:url("/assets/fonts/inter-var-latin.woff") format("woff");
+      }
+
+      html body #stockfamily-global-sidebar {
+        --sf-font:"CN Inter",Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+        font-family:var(--sf-font) !important;
+        -webkit-font-smoothing:antialiased;
+        text-rendering:optimizeLegibility;
+      }
+
+      html body #stockfamily-global-sidebar .sf-mark {
+        display:grid !important;
+        place-items:center !important;
+        width:32px !important;
+        height:32px !important;
+        min-width:32px !important;
+        max-width:32px !important;
+        flex:0 0 32px !important;
+        padding:0 !important;
+        border:0 !important;
+        border-radius:0 !important;
+        background:none !important;
+        box-shadow:none !important;
+        color:inherit !important;
+        font-size:0 !important;
+        text-shadow:none !important;
+        overflow:visible !important;
+      }
+
+      html body #stockfamily-global-sidebar .sf-mark img {
+        display:block !important;
+        width:100% !important;
+        height:100% !important;
+        object-fit:contain !important;
+      }
+
+            /* CHARTNALIST_SIDEBAR_COLLAPSE_FIX_V1 */
+      html body #stockfamily-global-sidebar .sf-brand-copy {
+        display:block !important;
+        min-width:0 !important;
+        overflow:hidden !important;
+        white-space:nowrap !important;
+      }
+
+      html:not(.sf-sidebar-collapsed) body #stockfamily-global-sidebar .sf-brand-copy {
+        max-width:160px !important;
+        opacity:1 !important;
+        transform:none !important;
+      }
+
+      @media (min-width: 769px) {
+        html.sf-sidebar-collapsed body #stockfamily-global-sidebar .sf-brand-copy {
+          max-width:0 !important;
+          margin:0 !important;
+          opacity:0 !important;
+          pointer-events:none !important;
+        }
+
+        html.sf-sidebar-collapsed body #stockfamily-global-sidebar .sf-brand {
+          box-sizing:border-box !important;
+          align-self:stretch !important;
+          width:auto !important;
+          max-width:none !important;
+          justify-content:center !important;
+          padding-left:0 !important;
+          padding-right:0 !important;
+          gap:0 !important;
+        }
+      }
+
+      html body #stockfamily-global-sidebar .sf-brand::before,
+      html body #stockfamily-global-sidebar .sf-brand::after {
+        content:none !important;
+        display:none !important;
+      }
+
+      html:not(.sf-sidebar-collapsed) body #stockfamily-global-sidebar .sf-brand {
+        gap:12px !important;
+        overflow:hidden !important;
+      }
+
+      html.sf-sidebar-collapsed body #stockfamily-global-sidebar .sf-brand {
+        gap:0 !important;
+      }
+
+      html body #stockfamily-global-sidebar .sf-brand-name {
+        font:700 15px/1.3 var(--sf-font) !important;
+        letter-spacing:-.01em !important;
+        color:#f3f6f7 !important;
+        white-space:nowrap !important;
+      }
+
+      html body #stockfamily-global-sidebar .sf-brand-name::before,
+      html body #stockfamily-global-sidebar .sf-brand-name::after {
+        content:none !important;
+        display:none !important;
+      }
+
+      html body #stockfamily-global-sidebar .sf-brand-sub {
+        margin-top:3px !important;
+        font:500 11px/1.4 var(--sf-font) !important;
+        letter-spacing:.01em !important;
+        text-transform:none !important;
+        color:#6b777e !important;
+      }
+
+      html body #stockfamily-global-sidebar .sf-section {
+        font:600 11px/1.4 var(--sf-font) !important;
+        letter-spacing:.08em !important;
+        text-transform:uppercase !important;
+        color:#5d6a71 !important;
+      }
+
+      html body #stockfamily-global-sidebar .sf-nav-link {
+        font-family:var(--sf-font) !important;
+        font-size:14px !important;
+        font-weight:500 !important;
+        line-height:1.5 !important;
+        letter-spacing:normal !important;
+        text-transform:none !important;
+      }
+
+      html body #stockfamily-global-sidebar .sf-nav-link.sf-active {
+        font-weight:600 !important;
+      }
+
+      html body #stockfamily-global-sidebar .sf-nav-link .sf-label {
+        font:inherit !important;
+        letter-spacing:inherit !important;
+        text-transform:none !important;
+      }
+
+      html body #stockfamily-global-sidebar .sf-footer {
+        font:500 11px/1.5 var(--sf-font) !important;
+        letter-spacing:normal !important;
+        text-transform:none !important;
+      }
+    `;
+
+    document.head.appendChild(style);
+  }
   function createSidebar() {
 
     const sidebar =
@@ -1084,9 +1251,7 @@
 
         <div class="sf-brand">
 
-          <div class="sf-mark">
-            SF
-          </div>
+          <div class="sf-mark"><img class="sf-mark-img" src="/assets/chartnalist-logo.png" alt="" width="32" height="32" decoding="async"></div>
 
           <div class="sf-brand-copy">
 
@@ -1526,6 +1691,7 @@
   function init() {
 
     injectCSS();
+    injectCanonicalCSS();
 
     document.body.classList.add(
       "sf-shell"

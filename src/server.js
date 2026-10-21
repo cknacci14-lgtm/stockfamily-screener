@@ -10,6 +10,7 @@ const { runQbsProductionSnapshot, clearProductionCache } = require('./services/q
 const { runStockScreenerV3 } = require('./engine/screenerV3');
 const SCREENER_ENGINE = (process.env.SCREENER_ENGINE || 'v3').toLowerCase();
 const gemScoreRoute = require('./routes/gemScoreRoute');
+const slfiRoute = require('./routes/slfiRoute');
 const { buildSmartwatchlist } = require('./services/smartwatchlistService');
 const { buildSignalCenter } = require('./services/signalCenterService');
 
@@ -22,6 +23,7 @@ console.log('Supabase:', process.env.SUPABASE_URL ? 'OK' : 'MISSING');
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.json());
 app.use('/api/gem-score', gemScoreRoute);
+app.use('/api/slfi', slfiRoute);
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } });
 
