@@ -1,33 +1,76 @@
 {
   "success": true,
-  "date": "2026-10-20",
-  "count": 1,
+  "date": "2026-10-21",
+  "count": 2,
   "filtered": {
-    "considered": 4,
+    "considered": 7,
     "noTrade": 2,
-    "lateEntry": 0,
-    "wideStop": 1
+    "lateEntry": 3,
+    "wideStop": 0
   },
   "signals": [
     {
-      "stockCode": "BSSR",
-      "stockName": "Baramulti Suksessarana Tbk.",
-      "setup": "PULLBACK",
+      "stockCode": "AALI",
+      "stockName": "Astra Agro Lestari Tbk.",
+      "setup": "BREAKOUT",
       "status": "TRIGGERED",
-      "price": 5200,
-      "trigger": 5195.25,
-      "invalidation": 4641.68,
-      "target1": 6025.61,
-      "target2": 6579.18,
+      "price": 8800,
+      "trigger": 8675,
+      "invalidation": 8154,
+      "target1": 9456.5,
+      "target2": 9977.5,
       "riskReward": 2.5,
-      "riskLevel": "HIGH",
-      "entryGapPct": 0.1,
-      "rrFromPrice": 1.48,
+      "riskLevel": "MEDIUM",
+      "entryGapPct": 1.4,
+      "rrFromPrice": 1.02,
       "planStale": false,
       "preBreakout": false,
-      "stopDistancePct": 10.7,
+      "stopDistancePct": 7.3,
       "stopWide": false,
-      "maxEntry": 5333.65,
+      "maxEntry": 8805.25,
+      "structure": {
+        "state": "BULLISH",
+        "label": "Bullish structure",
+        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
+      },
+      "participation": {
+        "state": "IMPROVING",
+        "label": "Participation improving",
+        "explanation": "Multiple trading-activity measures are materially above their recent baseline."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": -0.0000017264422075111556,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HEALTHY",
+        "label": "Healthy liquidity",
+        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-10-21T18:07:15.963Z"
+    },
+    {
+      "stockCode": "ULTJ",
+      "stockName": "Ultrajaya Milk Industry & Trading Company Tbk.",
+      "setup": "PULLBACK",
+      "status": "TRIGGERED",
+      "price": 2100,
+      "trigger": 2070.5,
+      "invalidation": 1886.57,
+      "target1": 2346.39,
+      "target2": 2530.32,
+      "riskReward": 2.5,
+      "riskLevel": "HIGH",
+      "entryGapPct": 1.4,
+      "rrFromPrice": 1.15,
+      "planStale": false,
+      "preBreakout": false,
+      "stopDistancePct": 10.2,
+      "stopWide": false,
+      "maxEntry": 2116.48,
       "structure": {
         "state": "BULLISH",
         "label": "Bullish structure",
@@ -41,7 +84,7 @@
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": -8.07028166955166e-7,
+        "value": 0.00004827709349407295,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
@@ -50,10 +93,10 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-21T01:35:38.695Z"
+      "updatedAt": "2026-10-21T18:07:15.963Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-10-21T01:35:38.695Z"
+  "generatedAt": "2026-10-21T18:07:15.963Z"
 }
