@@ -301,6 +301,8 @@ tr:last-child td {
   };
 })();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/chartnalist-app-auth.js"></script>
 </head>
 
 <body>
@@ -495,7 +497,49 @@ tr:last-child td {
     }
   }
 
-  async function load() {
+  
+function cnHasPremiumCenter() {
+  try {
+    var a = window.chartnalistAuth || {};
+    if (a.isAdmin) return true;
+    var plan = String(a.plan || "free").toLowerCase();
+    return plan === "premium" || plan === "pro";
+  } catch (e) { return false; }
+}
+function cnShowPremiumCenterGate(mountId) {
+  var el = document.getElementById(mountId) || document.body;
+  var box = document.createElement("div");
+  box.id = "cnPremiumCenterGate";
+  box.style.cssText = "margin:24px auto;max-width:480px;padding:28px 24px;border-radius:16px;border:1px solid rgba(0,208,132,.3);background:rgba(0,208,132,.06);text-align:center";
+  box.innerHTML = '<div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#00d084">Premium</div>'
+    + '<div style="margin-top:10px;font-size:20px;font-weight:800;color:#f5f7f8">Signal Center</div>'
+    + '<div style="margin-top:8px;font-size:13px;color:#9aa3aa;line-height:1.55">Smartwatchlist lifecycle & Signal Center tersedia di paket Premium (Rp 49.000/bulan) ke atas.</div>'
+    + '<div style="margin-top:18px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'
+    + '<a href="/upgrade/?plan=premium" data-cn-track="signal_center_upgrade" style="padding:10px 16px;border-radius:8px;background:#00d084;color:#050607;font-weight:800;font-size:13px;text-decoration:none">Upgrade Premium</a>'
+    + '<a href="/landing#pricing" style="padding:10px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.15);color:#e2e8f0;font-weight:600;font-size:13px;text-decoration:none">Lihat paket</a>'
+    + '</div>';
+  // Prefer replace main content area
+  var main = document.querySelector("main") || document.getElementById("app") || el;
+  if (main && main !== document.body) {
+    main.innerHTML = "";
+    main.appendChild(box);
+  } else {
+    document.body.appendChild(box);
+  }
+}
+function cnRunAfterAuth(cb) {
+  if (window.chartnalistAuth) { cb(); return; }
+  window.addEventListener("chartnalist:auth-ready", function () { cb(); }, { once: true });
+  // fallback if auth script missing
+  setTimeout(function () { if (!window.chartnalistAuth) cb(); }, 2500);
+}
+
+async function load() {
+    if (!cnHasPremiumCenter()) {
+      cnShowPremiumCenterGate('empty');
+      return;
+    }
+
     try {
       const response = await fetch('/api/public/signal-center', {
         cache: 'no-store'
