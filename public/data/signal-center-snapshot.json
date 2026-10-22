@@ -50,7 +50,7 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-21T18:07:15.963Z"
+      "updatedAt": "2026-10-22T18:05:38.826Z"
     },
     {
       "stockCode": "ULTJ",
@@ -93,10 +93,10 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-21T18:07:15.963Z"
+      "updatedAt": "2026-10-22T18:05:38.826Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-10-21T18:07:15.963Z"
+  "generatedAt": "2026-10-22T18:05:38.826Z"
 }
