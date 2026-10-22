@@ -1046,9 +1046,12 @@ function cnHasPremiumCenter() {
   try {
     var a = window.chartnalistAuth || {};
     if (a.isAdmin) return true;
+    var role = String(a.role || "").toLowerCase();
+    if (role === "admin") return true;
     var plan = String(a.plan || "free").toLowerCase();
     return plan === "premium" || plan === "pro";
   } catch (e) { return false; }
+} catch (e) { return false; }
 }
 function cnShowPremiumCenterGate(mountId) {
   var el = document.getElementById(mountId) || document.body;
