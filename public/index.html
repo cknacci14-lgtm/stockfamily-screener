@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id" class="dark">
 <head>
 <meta charset="UTF-8">
@@ -1970,29 +1970,35 @@
   });
 
   chart.priceScale('volume_scale').applyOptions({
-    scaleMargins: { top: 0.68, bottom: 0.18 }
+    scaleMargins: { top: 0.82, bottom: 0.18 }
   });
 
   const vwapSeries = chart.addLineSeries({ color: '#FFB300', lineWidth: 2, priceLineVisible: false, lastValueVisible: true });
   const gemSeries = chart.addLineSeries({
-    color: '#A855F7',
+    color: '#58a6ff',
     lineWidth: 2,
     priceScaleId: 'gem_scale',
     priceLineVisible: false,
     lastValueVisible: true,
-    title: 'GEM'
+    title: 'FF'
   });
-  // Level seperti RSI
-  gemSeries.createPriceLine({ price: 75, color: '#00E676', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'GEM 75' });
-  gemSeries.createPriceLine({ price: 60, color: '#00E5FF', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'GEM 60' });
-  gemSeries.createPriceLine({ price: 45, color: '#FFB300', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'GEM 45' });
-  gemSeries.createPriceLine({ price: 30, color: '#FF5252', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'GEM 30' });
+  const slfiHist = chart.addHistogramSeries({
+    priceScaleId: 'gem_scale',
+    priceFormat: { type: 'price', precision: 2, minMove: 0.01 },
+    lastValueVisible: false,
+    priceLineVisible: false
+  });
+  // Level Foreign Flow
+  gemSeries.createPriceLine({ price: 15, color: '#3fb950', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'FF +15' });
+  gemSeries.createPriceLine({ price: 0, color: '#8b949e', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: '0' });
+  gemSeries.createPriceLine({ price: -15, color: '#f85149', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'FF -15' });
+  
   chart.priceScale('gem_scale').applyOptions({
-    scaleMargins: { top: 0.90, bottom: 0 },
+    scaleMargins: { top: 0.72, bottom: 0 },
     borderVisible: false,
   });
   chart.priceScale('volume_scale').applyOptions({
-    scaleMargins: { top: 0.68, bottom: 0.18 }
+    scaleMargins: { top: 0.82, bottom: 0.18 }
   });
 
   let resizeTimeout = null;
@@ -2210,23 +2216,23 @@
   
   async function loadGemHistory(code) {
     try {
-      const res = await fetch('/api/gem-score/history/' + encodeURIComponent(code));
+      const res = await fetch('/api/slfi/history/' + encodeURIComponent(code));
       const json = await res.json();
       if (!json.success || !json.data || !json.data.length) {
-        gemSeries.setData([]);
+        gemSeries.setData([]); 
         return;
       }
-      const gemData = json.data
-        .filter(d => d.gem_score != null && d.trade_date)
-        .map(d => {
-          const t = Math.floor(new Date(d.trade_date + 'T00:00:00+07:00').getTime() / 1000);
-          return { time: t, value: d.gem_score };
-        })
-        .filter(d => !isNaN(d.time));
+      const rows = json.data.filter(d => d.far_smooth != null && d.trade_date);
+      const gemData = rows.map(d => {
+        const t = Math.floor(new Date(d.trade_date + 'T00:00:00+07:00').getTime() / 1000);
+        return { time: t, value: d.far_smooth };
+      }).filter(d => !isNaN(d.time));
+      
       gemSeries.setData(gemData);
+      
     } catch (err) {
       console.error('[loadGemHistory]', err);
-      gemSeries.setData([]);
+      gemSeries.setData([]); 
     }
   }
   function showChartLoading(show) {
@@ -2771,7 +2777,7 @@
         candleSeries.setData([]);
         volumeSeries.setData([]);
         vwapSeries.setData([]);
-        gemSeries.setData([]);
+        gemSeries.setData([]); 
         setDataStatus('DATA KOSONG DARI YAHOO', 'error');
         document.getElementById('lastUpdateLabel').innerText = `Tidak ada data candle untuk ${code}`;
         showChartLoading(false);
@@ -2830,7 +2836,7 @@
       candleSeries.setData([]);
       volumeSeries.setData([]);
       vwapSeries.setData([]);
-        gemSeries.setData([]);
+        gemSeries.setData([]); 
       setDataStatus(`GAGAL: ${err.message}`, 'error');
       showChartLoading(false);
     }
@@ -3724,7 +3730,64 @@ function renderSummaryBase() {
       }
     });
   }
-  function selectTicker(code) {
+  
+function cnTickerLimit() { return 3; }
+function cnIsPremiumTerminal() {
+  try {
+    var a = window.chartnalistAuth || {};
+    if (a.isAdmin) return true;
+    var plan = String(a.plan || "free").toLowerCase();
+    return plan === "premium" || plan === "pro";
+  } catch (e) { return false; }
+}
+function cnGetOpenedTickers() {
+  try { return JSON.parse(localStorage.getItem("cn_opened_tickers") || "[]"); }
+  catch (e) { return []; }
+}
+function cnCanOpenTicker(code) {
+  if (cnIsPremiumTerminal()) return true;
+  code = String(code || "").toUpperCase().trim();
+  if (!code) return false;
+  var list = cnGetOpenedTickers();
+  if (list.indexOf(code) >= 0) return true;
+  return list.length < cnTickerLimit();
+}
+function cnRecordTicker(code) {
+  if (cnIsPremiumTerminal()) return;
+  code = String(code || "").toUpperCase().trim();
+  if (!code) return;
+  var list = cnGetOpenedTickers();
+  if (list.indexOf(code) < 0) {
+    list.push(code);
+    try { localStorage.setItem("cn_opened_tickers", JSON.stringify(list)); } catch (e) {}
+  }
+}
+function cnShowTickerLimitModal() {
+  var existing = document.getElementById("cnTickerLimitModal");
+  if (existing) { existing.style.display = "flex"; return; }
+  var el = document.createElement("div");
+  el.id = "cnTickerLimitModal";
+  el.style.cssText = "position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(3,5,8,.78);backdrop-filter:blur(8px)";
+  el.innerHTML = '<div style="width:min(400px,100%);background:#101315;border:1px solid rgba(0,208,132,.3);border-radius:16px;padding:24px;text-align:center">'
+    + '<div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#00d084">Free plan</div>'
+    + '<div style="margin-top:8px;font-size:20px;font-weight:800;color:#f5f7f8">Maksimal 3 ticker</div>'
+    + '<div style="margin-top:8px;font-size:13px;color:#9aa3aa;line-height:1.5">Kuota API terminal Free terbatas. Upgrade Premium untuk pencarian ticker unlimited.</div>'
+    + '<div style="margin-top:18px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'
+    + '<a href="/upgrade/?plan=premium" data-cn-track="terminal_limit_upgrade" style="padding:10px 16px;border-radius:8px;background:#00d084;color:#050607;font-weight:800;font-size:13px;text-decoration:none">Upgrade Premium</a>'
+    + '<button type="button" onclick="document.getElementById(\'cnTickerLimitModal\').style.display=\'none\'" style="padding:10px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:#e2e8f0;font-weight:600;font-size:13px;cursor:pointer">Tutup</button>'
+    + '</div></div>';
+  el.onclick = function(e) { if (e.target === el) el.style.display = "none"; };
+  document.body.appendChild(el);
+}
+
+function selectTicker(code) {
+  code = String(code || '').toUpperCase().trim();
+  if (!cnCanOpenTicker(code)) {
+    cnShowTickerLimitModal();
+    return;
+  }
+  cnRecordTicker(code);
+
     activeCode = code.toUpperCase();
     window._chartFitted = false; // reset supaya fitContent jalan lagi
     loadHistory(activeCode);
