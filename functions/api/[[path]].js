@@ -1937,6 +1937,137 @@ app.get('/api/screener/block-trade', async (c) => {
   }
 });
 
+
+// ============================================================
+// ADMIN: upgrade requests (manual billing)
+// ============================================================
+app.get('/api/admin/upgrade-requests', async (c) => {
+  try {
+    const env = c.env;
+    const key = env.SUPABASE_SERVICE_ROLE_KEY;
+    const url = env.SUPABASE_URL;
+    const status = c.req.query('status') || 'pending';
+    let q = 'upgrade_requests?select=*&order=created_at.desc&limit=100';
+    if (status !== 'all') q += '&status=eq.' + encodeURIComponent(status);
+    const res = await fetch(url + '/rest/v1/' + q, {
+      headers: { apikey: key, Authorization: 'Bearer ' + key }
+    });
+    if (!res.ok) throw new Error('query HTTP ' + res.status + ' ' + (await res.text()).slice(0, 200));
+    const rows = await res.json();
+    for (const r of (rows || [])) {
+      if (!r.proof_path) { r.proof_url = null; continue; }
+      try {
+        const sRes = await fetch(url + '/storage/v1/object/sign/upgrade-proofs/' + r.proof_path, {
+          method: 'POST',
+          headers: { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ expiresIn: 3600 })
+        });
+        if (sRes.ok) {
+          const s = await sRes.json();
+          r.proof_url = s.signedURL || s.signedUrl || (s.path ? (url + '/storage/v1/object/sign/upgrade-proofs/' + s.path) : null);
+          if (r.proof_url && r.proof_url.indexOf('http') !== 0) {
+            r.proof_url = url + '/storage/v1' + (r.proof_url.charAt(0) === '/' ? '' : '/') + r.proof_url;
+          }
+        } else {
+          r.proof_url = null;
+        }
+      } catch (_) { r.proof_url = null; }
+    }
+    return c.json({ success: true, requests: rows || [] });
+  } catch (err) {
+    console.error('[admin-upgrade-list]', err);
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
+
+app.post('/api/admin/upgrade-requests/:id/approve', async (c) => {
+  try {
+    const env = c.env;
+    const key = env.SUPABASE_SERVICE_ROLE_KEY;
+    const url = env.SUPABASE_URL;
+    const id = c.req.param('id');
+    const getRes = await fetch(url + '/rest/v1/upgrade_requests?id=eq.' + encodeURIComponent(id) + '&select=*&limit=1', {
+      headers: { apikey: key, Authorization: 'Bearer ' + key }
+    });
+    if (!getRes.ok) throw new Error('load HTTP ' + getRes.status);
+    const rows = await getRes.json();
+    const row = rows && rows[0];
+    if (!row) return c.json({ success: false, error: 'Not found' }, 404);
+    if (row.status !== 'pending') return c.json({ success: false, error: 'Already ' + row.status }, 400);
+
+    const plan = row.plan === 'pro_3m' ? 'pro' : row.plan;
+    const days = row.plan === 'pro_3m' ? 90 : 30;
+    const ends = new Date(Date.now() + days * 864e5).toISOString();
+
+    if (row.user_id) {
+      // profiles: plan only (safe). Optional plan_ends_at if column exists.
+      let patch = { plan: plan };
+      let pRes = await fetch(url + '/rest/v1/profiles?id=eq.' + row.user_id, {
+        method: 'PATCH',
+        headers: {
+          apikey: key, Authorization: 'Bearer ' + key,
+          'Content-Type': 'application/json', Prefer: 'return=minimal'
+        },
+        body: JSON.stringify(patch)
+      });
+      if (!pRes.ok) {
+        const t = await pRes.text();
+        throw new Error('profile update failed: ' + pRes.status + ' ' + t.slice(0, 200));
+      }
+      // best-effort ends_at columns
+      for (const col of ['plan_ends_at', 'subscription_ends_at', 'plan_expires_at']) {
+        const r2 = await fetch(url + '/rest/v1/profiles?id=eq.' + row.user_id, {
+          method: 'PATCH',
+          headers: {
+            apikey: key, Authorization: 'Bearer ' + key,
+            'Content-Type': 'application/json', Prefer: 'return=minimal'
+          },
+          body: JSON.stringify({ [col]: ends })
+        });
+        if (r2.ok) break;
+      }
+    }
+
+    const uRes = await fetch(url + '/rest/v1/upgrade_requests?id=eq.' + encodeURIComponent(id), {
+      method: 'PATCH',
+      headers: {
+        apikey: key, Authorization: 'Bearer ' + key,
+        'Content-Type': 'application/json', Prefer: 'return=minimal'
+      },
+      body: JSON.stringify({ status: 'approved', reviewed_at: new Date().toISOString() })
+    });
+    if (!uRes.ok) throw new Error('approve HTTP ' + uRes.status + ' ' + (await uRes.text()).slice(0, 200));
+
+    return c.json({ success: true, plan: plan, days: days, ends_at: ends });
+  } catch (err) {
+    console.error('[admin-upgrade-approve]', err);
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
+
+app.post('/api/admin/upgrade-requests/:id/reject', async (c) => {
+  try {
+    const env = c.env;
+    const key = env.SUPABASE_SERVICE_ROLE_KEY;
+    const url = env.SUPABASE_URL;
+    const id = c.req.param('id');
+    const uRes = await fetch(url + '/rest/v1/upgrade_requests?id=eq.' + encodeURIComponent(id), {
+      method: 'PATCH',
+      headers: {
+        apikey: key, Authorization: 'Bearer ' + key,
+        'Content-Type': 'application/json', Prefer: 'return=minimal'
+      },
+      body: JSON.stringify({ status: 'rejected', reviewed_at: new Date().toISOString() })
+    });
+    if (!uRes.ok) throw new Error('reject HTTP ' + uRes.status + ' ' + (await uRes.text()).slice(0, 200));
+    return c.json({ success: true });
+  } catch (err) {
+    console.error('[admin-upgrade-reject]', err);
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
+
+
 app.all('/api/*', (c) => {
   return c.json({ success: false, error: 'API ' + c.req.method + ' ' + c.req.path + ' not found' }, 404);
 });

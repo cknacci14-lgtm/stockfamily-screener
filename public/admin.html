@@ -447,7 +447,28 @@
       <button class="admin-tab active" data-tab="dashboard" onclick="switchAdminTab('dashboard')">📊 Dashboard</button>
       <button class="admin-tab" data-tab="forward" onclick="switchAdminTab('forward')">Forward Test</button>
       <button class="admin-tab" data-tab="monitor" onclick="switchAdminTab('monitor')">Monitoring</button>
+      <button class="admin-tab" data-tab="upgrade" onclick="switchAdminTab('upgrade')">💳 Upgrade</button>
       <button class="admin-tab" data-tab="signals" onclick="switchAdminTab('signals')">🎯 Signals</button>
+    </div>
+
+    <!-- Tab: Upgrade requests -->
+    <div id="tab-upgrade" class="tab-panel">
+      <div class="admin-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+          <h2 style="margin:0">Upgrade requests</h2>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="upg-filter" onchange="loadUpgradeTab()" style="background:#0a0e17;border:1px solid #2a2f3e;color:#e0e0e0;padding:6px 10px;border-radius:6px">
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="all">All</option>
+            </select>
+            <button class="btn btn-secondary" type="button" onclick="loadUpgradeTab()">Refresh</button>
+          </div>
+        </div>
+        <div id="upg-body"><div class="signal-empty">Buka tab untuk memuat...</div></div>
+        <div id="upg-updated" style="margin-top:8px;font-size:11px;color:#6b7280"></div>
+      </div>
     </div>
 
     <!-- Tab: Dashboard -->
@@ -1265,6 +1286,79 @@
       }
     }
 
+    
+    async function loadUpgradeTab() {
+      var body = document.getElementById('upg-body');
+      var upd = document.getElementById('upg-updated');
+      var filter = (document.getElementById('upg-filter') || {}).value || 'pending';
+      if (!body) return;
+      body.innerHTML = '<div class="signal-empty">Memuat...</div>';
+      try {
+        var res = await adminFetch('/api/admin/upgrade-requests?status=' + encodeURIComponent(filter));
+        var j = await res.json();
+        if (!res.ok || !j.success) throw new Error(j.error || ('HTTP ' + res.status));
+        var rows = j.requests || [];
+        if (!rows.length) {
+          body.innerHTML = '<div class="signal-empty">Tidak ada request (' + filter + ').</div>';
+        } else {
+          var html = '<div class="preview-table"><table><thead><tr>'
+            + '<th>Waktu</th><th>Email</th><th>Paket</th><th>Nominal</th><th>Bukti</th><th>Status</th><th>Aksi</th>'
+            + '</tr></thead><tbody>';
+          rows.forEach(function (r) {
+            var when = r.created_at ? new Date(r.created_at).toLocaleString('id-ID') : '—';
+            var amt = r.amount != null ? ('Rp ' + Number(r.amount).toLocaleString('id-ID')) : '—';
+            var proof = r.proof_url
+              ? ('<a href="' + r.proof_url + '" target="_blank" rel="noopener" style="color:#60a5fa">Lihat</a>')
+              : (r.proof_path ? '<span style="color:#6b7280;font-size:11px">' + r.proof_path + '</span>' : '—');
+            var st = r.status || 'pending';
+            var badge = st === 'approved' ? 'green' : (st === 'rejected' ? 'red' : 'yellow');
+            var actions = '';
+            if (st === 'pending') {
+              actions = '<button class="btn btn-success" style="padding:4px 10px;font-size:11px;margin-right:4px" onclick="approveUpgrade('' + r.id + '')">Approve</button>'
+                + '<button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="rejectUpgrade('' + r.id + '')">Reject</button>';
+            } else {
+              actions = '—';
+            }
+            html += '<tr>'
+              + '<td>' + when + '</td>'
+              + '<td>' + (r.email || '—') + (r.notes ? '<div style="font-size:10px;color:#6b7280;max-width:180px;white-space:normal">' + String(r.notes).replace(/</g,'&lt;') + '</div>' : '') + '</td>'
+              + '<td><strong>' + (r.plan || '—') + '</strong></td>'
+              + '<td>' + amt + '</td>'
+              + '<td>' + proof + '</td>'
+              + '<td><span class="status-badge ' + badge + '">' + st + '</span></td>'
+              + '<td>' + actions + '</td>'
+              + '</tr>';
+          });
+          html += '</tbody></table></div>';
+          body.innerHTML = html;
+        }
+        if (upd) upd.textContent = 'diperbarui ' + new Date().toLocaleTimeString('id-ID');
+      } catch (err) {
+        body.innerHTML = '<div class="signal-empty" style="color:#ea4335">Gagal: ' + (err.message || err) + '</div>';
+      }
+    }
+    async function approveUpgrade(id) {
+      if (!confirm('Approve request ini? Plan user akan diaktifkan (30/90 hari).')) return;
+      try {
+        var res = await adminFetch('/api/admin/upgrade-requests/' + id + '/approve', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+        var j = await res.json();
+        if (!res.ok || !j.success) throw new Error(j.error || 'Gagal approve');
+        addLog('✅ Upgrade approved → plan ' + (j.plan || '') + ' (' + (j.days || '') + ' hari)', 'success');
+        loadUpgradeTab();
+      } catch (e) { addLog('❌ ' + e.message, 'error'); alert(e.message); }
+    }
+    async function rejectUpgrade(id) {
+      if (!confirm('Reject request ini?')) return;
+      try {
+        var res = await adminFetch('/api/admin/upgrade-requests/' + id + '/reject', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+        var j = await res.json();
+        if (!res.ok || !j.success) throw new Error(j.error || 'Gagal reject');
+        addLog('🗑️ Upgrade rejected', 'info');
+        loadUpgradeTab();
+      } catch (e) { addLog('❌ ' + e.message, 'error'); alert(e.message); }
+    }
+
+
     function switchAdminTab(tabName) {
       document.querySelectorAll('.admin-tab').forEach(t => {
         t.classList.toggle('active', t.dataset.tab === tabName);
@@ -1275,6 +1369,7 @@
       if (tabName === 'signals') loadSignalsList();
       if (tabName === 'forward') loadForwardTab();
       if (tabName === 'monitor') loadMonitorTab();
+      if (tabName === 'upgrade') loadUpgradeTab();
     }
 
     // ============================================================
