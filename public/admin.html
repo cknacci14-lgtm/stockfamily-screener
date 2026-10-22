@@ -1314,8 +1314,8 @@
             var badge = st === 'approved' ? 'green' : (st === 'rejected' ? 'red' : 'yellow');
             var actions = '';
             if (st === 'pending') {
-              actions = '<button class="btn btn-success" style="padding:4px 10px;font-size:11px;margin-right:4px" onclick="approveUpgrade('' + r.id + '')">Approve</button>'
-                + '<button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="rejectUpgrade('' + r.id + '')">Reject</button>';
+              actions = '<button class="btn btn-success" style="padding:4px 10px;font-size:11px;margin-right:4px" onclick="approveUpgrade(\'' + r.id + '\')">Approve</button>'
+                + '<button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="rejectUpgrade(\'' + r.id + '\')">Reject</button>';
             } else {
               actions = '—';
             }
