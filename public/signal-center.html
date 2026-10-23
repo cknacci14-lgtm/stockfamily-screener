@@ -537,6 +537,7 @@ function cnRunAfterAuth(cb) {
 }
 
 async function load() {
+    if (!window.chartnalistAuth && !window.__cnAuthWaited) { window.__cnAuthWaited = true; cnRunAfterAuth(load); return; }
     if (!cnHasPremiumCenter()) {
       cnShowPremiumCenterGate('empty');
       return;
