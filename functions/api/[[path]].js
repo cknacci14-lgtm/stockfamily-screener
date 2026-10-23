@@ -2069,22 +2069,23 @@ app.post('/api/admin/upgrade-requests/:id/reject', async (c) => {
 
 
 
+
+
+
 // ============================================================
-// CRON: expire plans past plan_ends_at (call with X-Cron-Secret)
+// OPS: expire plans past plan_ends_at (X-Cron-Secret)
 // ============================================================
-app.post('/api/cron/expire-plans', async (c) => {
+app.post('/api/ops/expire-plans', async (c) => {
   try {
     const env = c.env;
-    const secret = (env.CRON_SECRET || env.ADMIN_CRON_SECRET || '').trim();
-    const hdr = (c.req.header('X-Cron-Secret') || c.req.header('Authorization') || '').replace(/^Bearer\s+/i, '').trim();
+    const secret = String(env.CRON_SECRET || env.ADMIN_CRON_SECRET || '').trim();
+    const hdr = String(c.req.header('X-Cron-Secret') || '').trim();
     if (!secret || hdr !== secret) {
       return c.json({ success: false, error: 'Unauthorized' }, 401);
     }
     const key = env.SUPABASE_SERVICE_ROLE_KEY;
     const url = env.SUPABASE_URL;
     const now = new Date().toISOString();
-
-    // Find expired paid plans
     const q = 'profiles?select=id,email,plan,plan_ends_at&plan=in.(premium,pro)&plan_ends_at=lt.' + now + '&limit=500';
     const res = await fetch(url + '/rest/v1/' + q, {
       headers: { apikey: key, Authorization: 'Bearer ' + key }
@@ -2095,14 +2096,17 @@ app.post('/api/cron/expire-plans', async (c) => {
     for (const r of (rows || [])) {
       const patch = await fetch(url + '/rest/v1/profiles?id=eq.' + r.id, {
         method: 'PATCH',
-        headers: { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        headers: {
+          apikey: key, Authorization: 'Bearer ' + key,
+          'Content-Type': 'application/json', Prefer: 'return=minimal'
+        },
         body: JSON.stringify({ plan: 'free', plan_ends_at: null, expiry_notice_sent_at: null })
       });
       if (patch.ok) expired++;
     }
     return c.json({ success: true, checked: (rows || []).length, expired: expired, at: now });
   } catch (err) {
-    console.error('[cron-expire-plans]', err);
+    console.error('[ops-expire-plans]', err);
     return c.json({ success: false, error: err.message }, 500);
   }
 });
