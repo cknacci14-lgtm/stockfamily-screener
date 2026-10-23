@@ -27,6 +27,21 @@ app.use('*', cors({
 // ============================================================
 // HEALTH CHECK
 // ============================================================
+
+async function cnSendEmail(env, { to, subject, html }) {
+  const key = String(env.RESEND_API_KEY || '').trim();
+  const from = String(env.EMAIL_FROM || 'Chartnalist <onboarding@resend.dev>').trim();
+  if (!key || !to) return { ok: false, skipped: true, reason: 'no_key_or_to' };
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ from, to: [to], subject, html })
+  });
+  const body = await res.text();
+  if (!res.ok) return { ok: false, status: res.status, body: body.slice(0, 300) };
+  return { ok: true, body: body.slice(0, 200) };
+}
+
 app.get('/api/test', (c) => {
   return c.json({ ok: true, batch: 'A+B', timestamp: new Date().toISOString() });
 });
@@ -39,9 +54,13 @@ app.post('/api/ops/expire-plans', async (c) => {
     if (!secret || hdr !== secret) return c.json({ success: false, error: 'Unauthorized' }, 401);
     const key = env.SUPABASE_SERVICE_ROLE_KEY;
     const url = env.SUPABASE_URL;
-    const now = new Date().toISOString();
+    const now = new Date();
+    const nowIso = now.toISOString();
+    const in3 = new Date(now.getTime() + 3 * 864e5).toISOString();
+
+    // 1) Expire past due
     const res = await fetch(
-      url + '/rest/v1/profiles?select=id,plan,plan_ends_at&plan=in.(premium,pro)&plan_ends_at=lt.' + now + '&limit=500',
+      url + '/rest/v1/profiles?select=id,email,plan,plan_ends_at&plan=in.(premium,pro)&plan_ends_at=lt.' + nowIso + '&limit=500',
       { headers: { apikey: key, Authorization: 'Bearer ' + key } }
     );
     if (!res.ok) throw new Error('list HTTP ' + res.status);
@@ -53,9 +72,51 @@ app.post('/api/ops/expire-plans', async (c) => {
         headers: { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
         body: JSON.stringify({ plan: 'free', plan_ends_at: null, expiry_notice_sent_at: null })
       });
-      if (patch.ok) expired++;
+      if (patch.ok) {
+        expired++;
+        try {
+          if (r.email) {
+            await cnSendEmail(env, {
+              to: r.email,
+              subject: 'Chartnalist — paket berakhir',
+              html: '<p>Halo,</p><p>Paket <b>' + (r.plan || '') + '</b> kamu sudah berakhir. Akun kembali ke Free.</p><p><a href="https://chartnalis.web.id/upgrade">Perpanjang paket</a></p><p>— Chartnalist</p>'
+            });
+          }
+        } catch (e) { console.error('[email-expired]', e); }
+      }
     }
-    return c.json({ success: true, checked: (rows || []).length, expired, at: now });
+
+    // 2) H-3 reminder: ends within 3 days, not yet notified
+    const res2 = await fetch(
+      url + '/rest/v1/profiles?select=id,email,plan,plan_ends_at,expiry_notice_sent_at&plan=in.(premium,pro)&plan_ends_at=gte.' + nowIso + '&plan_ends_at=lte.' + in3 + '&limit=500',
+      { headers: { apikey: key, Authorization: 'Bearer ' + key } }
+    );
+    let reminded = 0;
+    if (res2.ok) {
+      const soon = await res2.json();
+      for (const r of (soon || [])) {
+        if (r.expiry_notice_sent_at) continue;
+        if (!r.email) continue;
+        const endsId = r.plan_ends_at
+          ? new Date(r.plan_ends_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+          : '-';
+        const mail = await cnSendEmail(env, {
+          to: r.email,
+          subject: 'Chartnalist — paket segera berakhir',
+          html: '<p>Halo,</p><p>Paket <b>' + (r.plan || '') + '</b> kamu berakhir pada <b>' + endsId + '</b> (kurang dari 3 hari).</p><p><a href="https://chartnalis.web.id/upgrade">Perpanjang sekarang</a></p><p>— Chartnalist</p>'
+        });
+        if (mail.ok || mail.skipped) {
+          await fetch(url + '/rest/v1/profiles?id=eq.' + r.id, {
+            method: 'PATCH',
+            headers: { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+            body: JSON.stringify({ expiry_notice_sent_at: nowIso })
+          });
+          if (mail.ok) reminded++;
+        }
+      }
+    }
+
+    return c.json({ success: true, checked: (rows || []).length, expired, reminded, at: nowIso });
   } catch (err) {
     console.error('[ops-expire-plans]', err);
     return c.json({ success: false, error: err.message }, 500);
@@ -2069,6 +2130,19 @@ app.post('/api/admin/upgrade-requests/:id/approve', async (c) => {
       body: JSON.stringify({ status: 'approved', reviewed_at: new Date().toISOString() })
     });
     if (!uRes.ok) throw new Error('approve HTTP ' + uRes.status + ' ' + (await uRes.text()).slice(0, 200));
+
+    // email aktivasi (best-effort)
+    try {
+      const endsId = new Date(ends).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+      const to = row.email || null;
+      if (to) {
+        await cnSendEmail(env, {
+          to,
+          subject: 'Chartnalist — paket ' + plan + ' aktif',
+          html: '<p>Halo,</p><p>Paket <b>' + plan + '</b> kamu sudah aktif.</p><p>Berlaku hingga <b>' + endsId + '</b> (' + days + ' hari).</p><p><a href="https://chartnalis.web.id/app">Buka terminal</a></p><p>— Chartnalist</p>'
+        });
+      }
+    } catch (e) { console.error('[email-activate]', e); }
 
     return c.json({ success: true, plan: plan, days: days, ends_at: ends });
   } catch (err) {
