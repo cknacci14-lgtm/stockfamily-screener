@@ -31,6 +31,38 @@ app.get('/api/test', (c) => {
   return c.json({ ok: true, batch: 'A+B', timestamp: new Date().toISOString() });
 });
 
+app.post('/api/ops/expire-plans', async (c) => {
+  try {
+    const env = c.env;
+    const secret = String(env.CRON_SECRET || '').trim();
+    const hdr = String(c.req.header('X-Cron-Secret') || '').trim();
+    if (!secret || hdr !== secret) return c.json({ success: false, error: 'Unauthorized' }, 401);
+    const key = env.SUPABASE_SERVICE_ROLE_KEY;
+    const url = env.SUPABASE_URL;
+    const now = new Date().toISOString();
+    const res = await fetch(
+      url + '/rest/v1/profiles?select=id,plan,plan_ends_at&plan=in.(premium,pro)&plan_ends_at=lt.' + now + '&limit=500',
+      { headers: { apikey: key, Authorization: 'Bearer ' + key } }
+    );
+    if (!res.ok) throw new Error('list HTTP ' + res.status);
+    const rows = await res.json();
+    let expired = 0;
+    for (const r of (rows || [])) {
+      const patch = await fetch(url + '/rest/v1/profiles?id=eq.' + r.id, {
+        method: 'PATCH',
+        headers: { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify({ plan: 'free', plan_ends_at: null, expiry_notice_sent_at: null })
+      });
+      if (patch.ok) expired++;
+    }
+    return c.json({ success: true, checked: (rows || []).length, expired, at: now });
+  } catch (err) {
+    console.error('[ops-expire-plans]', err);
+    return c.json({ success: false, error: err.message }, 500);
+  }
+});
+
+
 // ============================================================
 // ============================================================
 // AUTH (CHARTNALIST) - Edge-compatible
@@ -2072,44 +2104,6 @@ app.post('/api/admin/upgrade-requests/:id/reject', async (c) => {
 
 
 
-// ============================================================
-// OPS: expire plans past plan_ends_at (X-Cron-Secret)
-// ============================================================
-app.post('/api/ops/expire-plans', async (c) => {
-  try {
-    const env = c.env;
-    const secret = String(env.CRON_SECRET || env.ADMIN_CRON_SECRET || '').trim();
-    const hdr = String(c.req.header('X-Cron-Secret') || '').trim();
-    if (!secret || hdr !== secret) {
-      return c.json({ success: false, error: 'Unauthorized' }, 401);
-    }
-    const key = env.SUPABASE_SERVICE_ROLE_KEY;
-    const url = env.SUPABASE_URL;
-    const now = new Date().toISOString();
-    const q = 'profiles?select=id,email,plan,plan_ends_at&plan=in.(premium,pro)&plan_ends_at=lt.' + now + '&limit=500';
-    const res = await fetch(url + '/rest/v1/' + q, {
-      headers: { apikey: key, Authorization: 'Bearer ' + key }
-    });
-    if (!res.ok) throw new Error('list HTTP ' + res.status + ' ' + (await res.text()).slice(0, 200));
-    const rows = await res.json();
-    let expired = 0;
-    for (const r of (rows || [])) {
-      const patch = await fetch(url + '/rest/v1/profiles?id=eq.' + r.id, {
-        method: 'PATCH',
-        headers: {
-          apikey: key, Authorization: 'Bearer ' + key,
-          'Content-Type': 'application/json', Prefer: 'return=minimal'
-        },
-        body: JSON.stringify({ plan: 'free', plan_ends_at: null, expiry_notice_sent_at: null })
-      });
-      if (patch.ok) expired++;
-    }
-    return c.json({ success: true, checked: (rows || []).length, expired: expired, at: now });
-  } catch (err) {
-    console.error('[ops-expire-plans]', err);
-    return c.json({ success: false, error: err.message }, 500);
-  }
-});
 
 
 app.all('/api/*', (c) => {
