@@ -58,7 +58,6 @@ app.post('/api/ops/expire-plans', async (c) => {
     const nowIso = now.toISOString();
     const in3 = new Date(now.getTime() + 3 * 864e5).toISOString();
 
-    // 1) Expire past due
     const res = await fetch(
       url + '/rest/v1/profiles?select=id,email,plan,plan_ends_at&plan=in.(premium,pro)&plan_ends_at=lt.' + nowIso + '&limit=500',
       { headers: { apikey: key, Authorization: 'Bearer ' + key } }
@@ -79,40 +78,36 @@ app.post('/api/ops/expire-plans', async (c) => {
             await cnSendEmail(env, {
               to: r.email,
               subject: 'Chartnalist — paket berakhir',
-              html: '<p>Halo,</p><p>Paket <b>' + (r.plan || '') + '</b> kamu sudah berakhir. Akun kembali ke Free.</p><p><a href="https://chartnalis.web.id/upgrade">Perpanjang paket</a></p><p>— Chartnalist</p>'
+              html: '<p>Paket <b>' + (r.plan || '') + '</b> berakhir. Akun kembali Free.</p><p><a href="https://chartnalis.web.id/upgrade">Perpanjang</a></p>'
             });
           }
         } catch (e) { console.error('[email-expired]', e); }
       }
     }
 
-    // 2) H-3 reminder: ends within 3 days, not yet notified
+    let reminded = 0;
     const res2 = await fetch(
       url + '/rest/v1/profiles?select=id,email,plan,plan_ends_at,expiry_notice_sent_at&plan=in.(premium,pro)&plan_ends_at=gte.' + nowIso + '&plan_ends_at=lte.' + in3 + '&limit=500',
       { headers: { apikey: key, Authorization: 'Bearer ' + key } }
     );
-    let reminded = 0;
     if (res2.ok) {
       const soon = await res2.json();
       for (const r of (soon || [])) {
-        if (r.expiry_notice_sent_at) continue;
-        if (!r.email) continue;
+        if (r.expiry_notice_sent_at || !r.email) continue;
         const endsId = r.plan_ends_at
           ? new Date(r.plan_ends_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
           : '-';
         const mail = await cnSendEmail(env, {
           to: r.email,
           subject: 'Chartnalist — paket segera berakhir',
-          html: '<p>Halo,</p><p>Paket <b>' + (r.plan || '') + '</b> kamu berakhir pada <b>' + endsId + '</b> (kurang dari 3 hari).</p><p><a href="https://chartnalis.web.id/upgrade">Perpanjang sekarang</a></p><p>— Chartnalist</p>'
+          html: '<p>Paket <b>' + (r.plan || '') + '</b> berakhir <b>' + endsId + '</b> (&lt; 3 hari).</p><p><a href="https://chartnalis.web.id/upgrade">Perpanjang</a></p>'
         });
-        if (mail.ok || mail.skipped) {
-          await fetch(url + '/rest/v1/profiles?id=eq.' + r.id, {
-            method: 'PATCH',
-            headers: { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-            body: JSON.stringify({ expiry_notice_sent_at: nowIso })
-          });
-          if (mail.ok) reminded++;
-        }
+        await fetch(url + '/rest/v1/profiles?id=eq.' + r.id, {
+          method: 'PATCH',
+          headers: { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+          body: JSON.stringify({ expiry_notice_sent_at: nowIso })
+        });
+        if (mail.ok) reminded++;
       }
     }
 
