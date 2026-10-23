@@ -507,7 +507,6 @@ function cnHasPremiumCenter() {
     var plan = String(a.plan || "free").toLowerCase();
     return plan === "premium" || plan === "pro";
   } catch (e) { return false; }
-} catch (e) { return false; }
 }
 function cnShowPremiumCenterGate(mountId) {
   var el = document.getElementById(mountId) || document.body;
