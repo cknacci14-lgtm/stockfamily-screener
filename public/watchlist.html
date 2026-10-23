@@ -1051,7 +1051,6 @@ function cnHasPremiumCenter() {
     var plan = String(a.plan || "free").toLowerCase();
     return plan === "premium" || plan === "pro";
   } catch (e) { return false; }
-} catch (e) { return false; }
 }
 function cnShowPremiumCenterGate(mountId) {
   var el = document.getElementById(mountId) || document.body;
@@ -1082,6 +1081,7 @@ function cnRunAfterAuth(cb) {
 }
 
 async function load() {
+  if (!window.chartnalistAuth && !window.__cnAuthWaited) { window.__cnAuthWaited = true; cnRunAfterAuth(load); return; }
     if (!cnHasPremiumCenter()) {
       cnShowPremiumCenterGate();
       return;
