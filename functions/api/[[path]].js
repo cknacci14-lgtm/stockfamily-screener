@@ -49,9 +49,13 @@ app.get('/api/test', (c) => {
 app.post('/api/ops/expire-plans', async (c) => {
   try {
     const env = c.env;
-    const secret = String(env.CRON_SECRET || '').trim();
-    const hdr = String(c.req.header('X-Cron-Secret') || '').trim();
-    if (!secret || hdr !== secret) return c.json({ success: false, error: 'Unauthorized' }, 401);
+    const secret = String(env.CRON_SECRET || env.ADMIN_CRON_SECRET || '').trim();
+
+    const hdr = String(c.req.header('X-Cron-Secret') || c.req.header('x-cron-secret') || '').trim();
+
+    if (!secret) return c.json({ success: false, error: 'CRON_SECRET not configured on server' }, 503);
+
+    if (!hdr || hdr !== secret) return c.json({ success: false, error: 'Unauthorized', hint: 'header mismatch', hdrLen: hdr.length, secretLen: secret.length }, 401);
     const key = env.SUPABASE_SERVICE_ROLE_KEY;
     const url = env.SUPABASE_URL;
     const now = new Date();
