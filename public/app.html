@@ -599,6 +599,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/assets/chartnalist-bt.js"></script>
 <script src="/assets/chartnalist-app-auth.js"></script>
+<style id="sf-readability">
+#sf-right-sidebar .text-\[9px\], #sf-right-sidebar [style*="font-size:9px"], #sf-right-sidebar [style*="font-size: 9px"] { font-size: 10.5px !important; }
+#sf-right-sidebar .text-\[10px\], #sf-right-sidebar [style*="font-size:10px"], #sf-right-sidebar [style*="font-size: 10px"] { font-size: 11px !important; }
+#sf-right-sidebar .text-slate-500 { color: #8b93a7 !important; }
+</style>
 </head>
 <body class="bg-idx-bg text-slate-200 font-sans antialiased h-screen flex flex-col select-none">
 
@@ -1531,6 +1536,8 @@
           </button>
           <div class="w-px h-4 bg-idx-border mx-1"></div>
           <input type="text" id="watermarkInput" class="watermark-input" placeholder="Watermark..." value="CHARTNALIST" onchange="updateWatermark(this.value)" onkeyup="if(event.key==='Enter')updateWatermark(this.value)">
+          <button class="draw-btn" id="btnLevel" title="Tampilkan garis Swing High/Low dan Pivot di chart" onclick="sfToggleLevels()" style="font-size:10px;width:auto;padding:0 7px">Level</button>
+          <button class="draw-btn" id="btnBT" title="Buka/tutup Historical Block Trade (di bawah chart)" onclick="toggleBTHistory()" style="font-size:10px;width:auto;padding:0 7px">Block trade</button>
           <button class="draw-btn" id="btnShare" title="Bagikan / Download Chart" onclick="shareChart()">
             <i class="fa-solid fa-share-nodes"></i>
           </button>
@@ -1569,9 +1576,10 @@
       <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mb-2 flex items-center gap-1.5"><i class="fa-solid fa-bullseye"></i> Ringkasan <span id="sumCode" class="text-slate-500 font-normal normal-case"></span><span class="ml-auto flex gap-1"><button id="modeSwing" onclick="setSumMode('swing')">Swing</button><button id="modeDay" onclick="setSumMode('day')">Day</button></span></h2>
       <div class="space-y-1.5 text-[11px]">
         <div id="sumVerdict" class="p-2 rounded bg-idx-panel/60 border border-idx-border font-bold text-center">--</div>
-        <div class="p-2 rounded bg-idx-panel/60 border border-idx-border"><div class="text-slate-500 text-[10px]">HARGA</div><div id="sumPrice" class="font-bold text-slate-300">--</div></div>
-        <div class="p-2 rounded bg-idx-panel/60 border border-idx-border"><div class="text-slate-500 text-[10px]">FLOW ASING</div><div id="sumFlow" class="font-bold text-slate-300">--</div></div>
-        <div class="p-2 rounded bg-idx-panel/60 border border-idx-border"><div class="text-slate-500 text-[10px]">VOLATILITAS</div><div id="sumRisk" class="font-bold text-slate-300">--</div></div>
+        <div id="sumHorizon" class="text-[10px] text-slate-400 px-1" style="display:none;line-height:1.5"></div>
+        <div class="p-2 rounded bg-idx-panel/60 border border-idx-border"><div class="text-slate-500 text-[10px]" title="Struktur harga harian: HH/HL = tren naik, LH/LL = tren turun. VWAP = harga rata-rata tertimbang volume 20 hari. RSI(14) = kekuatan harga 0-100 (70 ke atas jenuh beli, 30 ke bawah jenuh jual)." style="cursor:help;border-bottom:1px dotted #64748B;display:inline-block">HARGA</div><div id="sumPrice" class="font-bold text-slate-300">--</div></div>
+        <div class="p-2 rounded bg-idx-panel/60 border border-idx-border"><div class="text-slate-500 text-[10px]" title="Selisih beli dan jual investor asing selama 20 hari, dikonversi ke rupiah dengan harga penutupan. Data akhir hari (EOD), bukan real-time." style="cursor:help;border-bottom:1px dotted #64748B;display:inline-block">FLOW ASING</div><div id="sumFlow" class="font-bold text-slate-300">--</div></div>
+        <div class="p-2 rounded bg-idx-panel/60 border border-idx-border"><div class="text-slate-500 text-[10px]" title="ATR(14) = rata-rata rentang harga harian 14 hari terakhir. Dipakai sebagai ukuran jarak stop yang wajar." style="cursor:help;border-bottom:1px dotted #64748B;display:inline-block">VOLATILITAS</div><div id="sumRisk" class="font-bold text-slate-300">--</div></div>
       </div>
       <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mt-3 mb-2 flex items-center gap-1.5"><i class="fa-solid fa-crosshairs"></i> Trade Plan</h2>
       <div class="space-y-1.5 text-[11px]">
@@ -1581,7 +1589,7 @@
         <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border"><span class="text-slate-400">Target 1</span><span id="tpT1" class="font-bold text-idx-green">--</span></div>
         <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border"><span class="text-slate-400">Target 2</span><span id="tpT2" class="font-bold text-idx-green">--</span></div>
         <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border"><span class="text-slate-400">Risk / Reward</span><span id="tpRR" class="font-bold text-slate-300">--</span></div>
-        <div class="text-[9px] text-slate-500 italic">Heuristik swing + ATR(14), bukan rekomendasi. Uji riwayat 5 tahun (150 saham likuid, tahan maks 10 hari): target 1 tercapai sebelum stop di sekitar 38% kasus, stop tersentuh lebih dulu di sekitar 39%, hasil rata-rata sekitar -0,45% per transaksi setelah biaya (mendekati 0 sebelum biaya). Berfungsi sebagai pembatas rugi, belum terbukti sebagai penghasil untung.</div>
+        <details class="text-[10px]" style="color:#8b93a7"><summary style="cursor:pointer;outline:none">Dasar uji &amp; batasan <span style="opacity:.7">(heuristik, bukan rekomendasi)</span></summary><div style="margin-top:4px;line-height:1.5;font-style:italic">Heuristik swing + ATR(14). Uji riwayat 5 tahun (150 saham likuid, tahan maks 10 hari): target 1 tercapai sebelum stop di sekitar 38% kasus, stop tersentuh lebih dulu di sekitar 39%, hasil rata-rata sekitar -0,45% per transaksi setelah biaya (mendekati 0 sebelum biaya). Berfungsi sebagai pembatas rugi, belum terbukti sebagai penghasil untung.</div></details>
       </div>
     </div>
 
@@ -1681,7 +1689,7 @@
           <span id="gemForeignNet" class="font-bold">--</span>
         </div>
       </div>
-      <p class="text-[10px] text-slate-500 mt-1.5 italic">Quiet Accumulation Indicator</p>
+      <p class="text-[10px] text-slate-500 mt-1.5 italic">Quiet Accumulation Indicator (skor 0-100). Warna skor: hijau 75 ke atas, cyan 60 ke atas, kuning 45 ke atas, abu di bawah 45. Garis bantu di sub-chart pada 75, 60, 45, dan 30. Memakai antara lain rasio volume dan net asing 20 hari. Informasi, bukan sinyal beli atau jual.</p>
     </div>        
     
 
@@ -1966,23 +1974,6 @@
   });
 
   const vwapSeries = chart.addLineSeries({ color: '#FFB300', lineWidth: 2, priceLineVisible: false, lastValueVisible: true });
-  const gemSeries = chart.addLineSeries({
-    color: '#A855F7',
-    lineWidth: 2,
-    priceScaleId: 'gem_scale',
-    priceLineVisible: false,
-    lastValueVisible: true,
-    title: 'GEM'
-  });
-  // Level seperti RSI
-  gemSeries.createPriceLine({ price: 2, color: '#00E676', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'SLFI +2' });
-  gemSeries.createPriceLine({ price: 0, color: '#64748B', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: '0' });
-  gemSeries.createPriceLine({ price: -2, color: '#FF5252', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'SLFI -2' });
-  
-  chart.priceScale('gem_scale').applyOptions({
-    scaleMargins: { top: 0.90, bottom: 0 },
-    borderVisible: false,
-  });
   chart.priceScale('volume_scale').applyOptions({
     scaleMargins: { top: 0.68, bottom: 0.18 }
   });
@@ -2200,27 +2191,6 @@
   // LOAD HISTORY
   // ============================================================
   
-  async function loadGemHistory(code) {
-    try {
-      const res = await fetch('/api/slfi/history/' + encodeURIComponent(code));
-      const json = await res.json();
-      if (!json.success || !json.data || !json.data.length) {
-        gemSeries.setData([]);
-        return;
-      }
-      const gemData = json.data
-        .filter(d => d.slfi_smooth != null && d.trade_date)
-        .map(d => {
-          const t = Math.floor(new Date(d.trade_date + 'T00:00:00+07:00').getTime() / 1000);
-          return { time: t, value: d.slfi_smooth };
-        })
-        .filter(d => !isNaN(d.time));
-      gemSeries.setData(gemData);
-    } catch (err) {
-      console.error('[loadGemHistory]', err);
-      gemSeries.setData([]);
-    }
-  }
   function showChartLoading(show) {
     const el = document.getElementById('chartLoading');
     if (el) el.classList.toggle('show', !!show);
@@ -2763,7 +2733,6 @@
         candleSeries.setData([]);
         volumeSeries.setData([]);
         vwapSeries.setData([]);
-        gemSeries.setData([]);
         setDataStatus('DATA KOSONG DARI YAHOO', 'error');
         document.getElementById('lastUpdateLabel').innerText = `Tidak ada data candle untuk ${code}`;
         showChartLoading(false);
@@ -2779,7 +2748,6 @@
       const volumeByTime = new Map(cleanVolumes.map(v => [v.time, v.value]));
       const vwapData = calcRollingVWAP(latestCandles, volumeByTime, 20);
       vwapSeries.setData(vwapData);
-      loadGemHistory(code);
       loadBlockTradeMarkers(code);
       loadHistoricalBT(code);
       loadBidOfferFromSupabase(code);
@@ -2822,7 +2790,6 @@
       candleSeries.setData([]);
       volumeSeries.setData([]);
       vwapSeries.setData([]);
-        gemSeries.setData([]);
       setDataStatus(`GAGAL: ${err.message}`, 'error');
       showChartLoading(false);
     }
@@ -3027,7 +2994,7 @@ function sfCalcSync() {
       '<label style="' + lab + '">Risiko per transaksi (%)<input id="calcRisk" type="number" min="0" step="0.1" oninput="sfCalcSave();sfCalcRecalc()" style="' + inp + '"></label>' +
       '<label style="' + lab + '">Entry (Rp)<input id="calcEntry" type="number" min="0" oninput="sfCalcDirty()" style="' + inp + '"></label>' +
       '<label style="' + lab + '">Stop (Rp)<input id="calcStop" type="number" min="0" oninput="sfCalcDirty()" style="' + inp + '"></label>' +
-      '</div><div id="calcOut" style="font-size:11px;margin-top:6px;color:#CBD5E1"></div>' +
+      '</div><div id="calcChips" style="margin-top:5px;font-size:10px;color:#8b93a7"></div><div id="calcOut" style="font-size:11px;margin-top:6px;color:#CBD5E1"></div>' +
       '<div style="font-size:9px;color:#8b93a7;margin-top:4px;font-style:italic">Gap pembukaan bisa membuat rugi melebihi stop. Bukan rekomendasi.</div>';
     anchor.parentNode.insertBefore(box, anchor.nextSibling);
   }
@@ -3042,7 +3009,67 @@ function sfCalcSync() {
   var eEl = document.getElementById('calcEntry'), sEl = document.getElementById('calcStop');
   if (s && s.code !== sfCalcState.code) { sfCalcState.code = s.code; sfCalcState.dirty = false; }
   if (!sfCalcState.dirty) { eEl.value = p ? p.entry : ''; sEl.value = p ? p.stop : ''; }
+  sfCalcChips();
   sfCalcRecalc();
+}
+function sfDayLevels(s) {
+  var cs = s && s.candles;
+  if (!cs || cs.length < 2) return null;
+  var last = cs[cs.length - 1], prev = cs[cs.length - 2];
+  var w = new Date(Date.now() + 7 * 3600 * 1000);
+  var todayWib = w.toISOString().slice(0, 10);
+  var lastDay = new Date((Number(last.time) + 7 * 3600) * 1000).toISOString().slice(0, 10);
+  var mins = w.getUTCHours() * 60 + w.getUTCMinutes(), wd = w.getUTCDay();
+  var live = lastDay === todayWib && wd >= 1 && wd <= 5 && mins >= 540 && mins < 975;
+  var ref = live ? prev : last;
+  var H = Number(ref.high), L = Number(ref.low), C = Number(ref.close);
+  if (!isFinite(H) || !isFinite(L) || !isFinite(C)) return null;
+  var P = (H + L + C) / 3;
+  return { P: P, R1: 2 * P - L, R2: P + (H - L), S1: 2 * P - H, S2: P - (H - L) };
+}
+function sfHorizon() {
+  var el = document.getElementById('sumHorizon'), s = window._sf;
+  if (!el || !s) return;
+  var tr = (s.structure && s.structure.trend) || '';
+  var up = /BULL|BREAKOUT/.test(tr), dn = /BEAR|BREAKDOWN/.test(tr);
+  var sw = up ? ['tren naik', '#00E676'] : dn ? ['tren turun', '#FF5252'] : ['sideways', '#FFB300'];
+  var lv = sfDayLevels(s), px = Number(s.close), d = null;
+  if (lv && isFinite(px)) {
+    var f = function (v) { return fmtRp(sfRound(v)); };
+    if (px > lv.R1) d = ['kuat, di atas R1 ' + f(lv.R1), '#00E676'];
+    else if (px > lv.P) d = ['condong naik, di atas pivot ' + f(lv.P), '#00E676'];
+    else if (px > lv.S1) d = ['condong turun, di bawah pivot ' + f(lv.P), '#FFB300'];
+    else d = ['lemah, di bawah S1 ' + f(lv.S1), '#FF5252'];
+  }
+  var differ = !!(d && ((up && d[1] !== '#00E676') || (dn && d[1] === '#00E676')));
+  el.innerHTML = '<span style="color:#8b93a7">Swing:</span> <b style="color:' + sw[1] + '">' + sw[0] + '</b>' +
+    (d ? ' &middot; <span style="color:#8b93a7">Day:</span> <b style="color:' + d[1] + '">' + d[0] + '</b>' : '') +
+    (differ ? '<div style="opacity:.75">Dua horizon berbeda arah. Pakai yang sesuai gaya trading Anda.</div>' : '');
+  el.style.display = '';
+  try { sfLevelLines(); } catch (e) {}
+}
+function sfCalcSet(id, v) { var el = document.getElementById(id); if (!el) return; el.value = v; sfCalcDirty(); }
+function sfCalcAtrStop(k) {
+  var s = window._sf, eEl = document.getElementById('calcEntry');
+  var e = (eEl && parseFloat(eEl.value)) || (s && s.close);
+  if (!s || !s.atr || !e) return;
+  sfCalcSet('calcStop', sfRound(e - k * s.atr, 'down'));
+}
+function sfCalcChips() {
+  var el = document.getElementById('calcChips'), s = window._sf;
+  if (!el) return;
+  if (!s) { el.innerHTML = ''; return; }
+  var lv = sfDayLevels(s);
+  var chip = function (label, js) { return '<button type="button" onclick="' + js + '" style="margin:2px 3px 0 0;padding:1px 6px;border-radius:3px;border:1px solid rgba(0,229,255,.35);background:transparent;color:#00E5FF;font-size:10px;cursor:pointer">' + label + '</button>'; };
+  var setE = function (v) { return 'sfCalcSet(\'calcEntry\',' + v + ')'; };
+  var setS = function (v) { return 'sfCalcSet(\'calcStop\',' + v + ')'; };
+  var h = '<div>Isi entry: ' + chip('Harga terakhir', setE(sfRound(s.close, 'up')));
+  if (lv) h += chip('Pivot', setE(sfRound(lv.P))) + chip('R1', setE(sfRound(lv.R1)));
+  h += '</div><div>Isi stop: ';
+  if (lv) h += chip('S1', setS(sfRound(lv.S1))) + chip('S2', setS(sfRound(lv.S2)));
+  if (s.atr) h += chip('1,5&times;ATR', 'sfCalcAtrStop(1.5)') + chip('1&times;ATR', 'sfCalcAtrStop(1)');
+  h += '</div><div style="opacity:.7;margin-top:2px">Pilihan cepat dari level di panel, bukan rekomendasi.</div>';
+  el.innerHTML = h;
 }
 function renderMode() {
   const tp = document.getElementById('tpStatus');
@@ -3066,6 +3093,7 @@ function renderMode() {
     b.style.cssText = 'font-size:9px;padding:1px 6px;border-radius:3px;cursor:pointer;border:1px solid rgba(0,229,255,.4);' + (on ? 'background:rgba(0,229,255,.2);color:#00E5FF;' : 'background:transparent;color:#64748B;');
   });
   if (isDay) renderDay(day);
+  sfHorizon();
   sfCalcSync();
 }
 function renderDay(box) {
@@ -3164,6 +3192,7 @@ function renderSummaryBase() {
   // Trade plan
   const dash = '--'; window._sfPlan = null;
   ['tpEntry', 'tpStop', 'tpT1', 'tpT2', 'tpRR'].forEach(function (id) { set(id, dash); });
+  sfPlanRows(false);
   const lastLow = Number(st.lastLow), lastHigh = Number(st.lastHigh), prevHigh = Number(st.prevHigh);
   if (!isFinite(close) || !atr) { set('tpStatus', 'Data belum cukup untuk trade plan.'); return; }
   if (dn) {
@@ -3181,6 +3210,7 @@ function renderSummaryBase() {
     const rr = risk > 0 ? (t1 - entry) / risk : 0;
     const pc = function (a) { return ((a - entry) / entry * 100).toFixed(1) + '%'; };
     window._sfPlan = { entry: entry, stop: stop };
+    sfPlanRows(true);
     set('tpEntry', fmtRp(entry) + ' <span style="opacity:.6;font-size:9px">harga terakhir</span>');
     set('tpStop', fmtRp(stop) + ' <span style="opacity:.7;font-size:9px">' + pc(stop) + '</span>');
     set('tpT1', fmtRp(t1) + ' <span style="opacity:.7;font-size:9px">+' + pc(t1) + '</span>');
@@ -5421,6 +5451,64 @@ function togglePanel(panelId, headerEl) {
     }
 </style>
 <script src="/assets/chartnalist-track.js?v=20261015" defer></script>
+<style id="sf-polish34">
+#btnLevel, #btnBT { width: auto !important; min-width: 0 !important; padding: 0 8px !important; white-space: nowrap !important; font-size: 10px !important; line-height: 1 !important; border: 1px solid #2A2E39 !important; flex-shrink: 0; }
+#btnLevel:hover, #btnBT:hover { border-color: #00E5FF !important; color: #fff; }
+</style>
+<script id="sf-polish33">
+function sfPlanRows(show) {
+  ['tpEntry', 'tpStop', 'tpT1', 'tpT2', 'tpRR'].forEach(function (id) {
+    var e = document.getElementById(id), p = e && e.parentElement;
+    if (p) p.style.display = show ? '' : 'none';
+  });
+}
+function sfLevelsOn() { try { return localStorage.getItem('sfLevels') !== '0'; } catch (e) { return true; } }
+function sfLevelLines() {
+  var cs = (typeof candleSeries !== 'undefined') ? candleSeries : null, s = window._sf;
+  if (!cs || !cs.createPriceLine) return;
+  (window._sfLvLines || []).forEach(function (l) { try { cs.removePriceLine(l); } catch (e) {} });
+  window._sfLvLines = [];
+  var b = document.getElementById('btnLevel');
+  var on = sfLevelsOn();
+  if (b) { b.style.opacity = on ? '1' : '.55'; b.style.borderColor = on ? '#00E5FF' : ''; }
+  if (!on || !s) return;
+  var add = function (price, color, title) {
+    price = Number(price);
+    if (!isFinite(price) || price <= 0) return;
+    window._sfLvLines.push(cs.createPriceLine({ price: price, color: color, lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: title }));
+  };
+  var st = s.structure || {};
+  add(isFinite(Number(st.lastHigh)) ? sfRound(Number(st.lastHigh)) : NaN, '#00E676', 'Swing H');
+  add(isFinite(Number(st.lastLow)) ? sfRound(Number(st.lastLow)) : NaN, '#FF5252', 'Swing L');
+  var lv = sfDayLevels(s);
+  if (lv && typeof sfMode !== 'undefined' && sfMode === 'day') {
+    add(sfRound(lv.R1), '#80CBC4', 'R1');
+    add(sfRound(lv.P), '#FFB300', 'Pivot');
+    add(sfRound(lv.S1), '#EF9A9A', 'S1');
+  }
+}
+function sfToggleLevels() {
+  try { localStorage.setItem('sfLevels', sfLevelsOn() ? '0' : '1'); } catch (e) {}
+  sfLevelLines();
+}
+</script>
+<script id="sf-bt-collapse-default">
+(function () {
+  var KEY = 'sfBtCollapsed';
+  function want() { try { var v = localStorage.getItem(KEY); return v === null ? true : v === '1'; } catch (e) { return true; } }
+  var orig = window.toggleBTHistory;
+  if (typeof orig === 'function') {
+    window.toggleBTHistory = function () {
+      orig.apply(this, arguments);
+      try { localStorage.setItem(KEY, document.getElementById('btHistoryPanel').classList.contains('collapsed') ? '1' : '0'); } catch (e) {}
+    };
+  }
+  window.addEventListener('load', function () {
+    var p = document.getElementById('btHistoryPanel');
+    if (p && typeof window.toggleBTHistory === 'function' && want() && !p.classList.contains('collapsed')) window.toggleBTHistory();
+  });
+})();
+</script>
 </body>
 </html>
 

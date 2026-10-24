@@ -1970,35 +1970,12 @@
   });
 
   chart.priceScale('volume_scale').applyOptions({
-    scaleMargins: { top: 0.82, bottom: 0.18 }
+    scaleMargins: { top: 0.68, bottom: 0.18 }
   });
 
   const vwapSeries = chart.addLineSeries({ color: '#FFB300', lineWidth: 2, priceLineVisible: false, lastValueVisible: true });
-  const gemSeries = chart.addLineSeries({
-    color: '#58a6ff',
-    lineWidth: 2,
-    priceScaleId: 'gem_scale',
-    priceLineVisible: false,
-    lastValueVisible: true,
-    title: 'FF'
-  });
-  const slfiHist = chart.addHistogramSeries({
-    priceScaleId: 'gem_scale',
-    priceFormat: { type: 'price', precision: 2, minMove: 0.01 },
-    lastValueVisible: false,
-    priceLineVisible: false
-  });
-  // Level Foreign Flow
-  gemSeries.createPriceLine({ price: 15, color: '#3fb950', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'FF +15' });
-  gemSeries.createPriceLine({ price: 0, color: '#8b949e', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: '0' });
-  gemSeries.createPriceLine({ price: -15, color: '#f85149', lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'FF -15' });
-  
-  chart.priceScale('gem_scale').applyOptions({
-    scaleMargins: { top: 0.72, bottom: 0 },
-    borderVisible: false,
-  });
   chart.priceScale('volume_scale').applyOptions({
-    scaleMargins: { top: 0.82, bottom: 0.18 }
+    scaleMargins: { top: 0.68, bottom: 0.18 }
   });
 
   let resizeTimeout = null;
@@ -2214,27 +2191,6 @@
   // LOAD HISTORY
   // ============================================================
   
-  async function loadGemHistory(code) {
-    try {
-      const res = await fetch('/api/slfi/history/' + encodeURIComponent(code));
-      const json = await res.json();
-      if (!json.success || !json.data || !json.data.length) {
-        gemSeries.setData([]); 
-        return;
-      }
-      const rows = json.data.filter(d => d.far_smooth != null && d.trade_date);
-      const gemData = rows.map(d => {
-        const t = Math.floor(new Date(d.trade_date + 'T00:00:00+07:00').getTime() / 1000);
-        return { time: t, value: d.far_smooth };
-      }).filter(d => !isNaN(d.time));
-      
-      gemSeries.setData(gemData);
-      
-    } catch (err) {
-      console.error('[loadGemHistory]', err);
-      gemSeries.setData([]); 
-    }
-  }
   function showChartLoading(show) {
     const el = document.getElementById('chartLoading');
     if (el) el.classList.toggle('show', !!show);
@@ -2777,7 +2733,6 @@
         candleSeries.setData([]);
         volumeSeries.setData([]);
         vwapSeries.setData([]);
-        gemSeries.setData([]); 
         setDataStatus('DATA KOSONG DARI YAHOO', 'error');
         document.getElementById('lastUpdateLabel').innerText = `Tidak ada data candle untuk ${code}`;
         showChartLoading(false);
@@ -2793,7 +2748,6 @@
       const volumeByTime = new Map(cleanVolumes.map(v => [v.time, v.value]));
       const vwapData = calcRollingVWAP(latestCandles, volumeByTime, 20);
       vwapSeries.setData(vwapData);
-      loadGemHistory(code);
       loadBlockTradeMarkers(code);
       loadHistoricalBT(code);
       loadBidOfferFromSupabase(code);
@@ -2836,7 +2790,6 @@
       candleSeries.setData([]);
       volumeSeries.setData([]);
       vwapSeries.setData([]);
-        gemSeries.setData([]); 
       setDataStatus(`GAGAL: ${err.message}`, 'error');
       showChartLoading(false);
     }
