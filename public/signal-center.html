@@ -559,9 +559,9 @@ async function load() {
         : [];
 
       $('generated').textContent =
-        payload.generatedAt
-          ? `Updated ${new Date(payload.generatedAt).toLocaleString()}`
-          : 'Updated —';
+        (payload.date || payload.as_of)
+          ? `EOD ${payload.date || payload.as_of}` + (payload.generatedAt ? ` · snapshot ${new Date(payload.generatedAt).toLocaleString()}` : '')
+          : (payload.generatedAt ? `Updated ${new Date(payload.generatedAt).toLocaleString()}` : 'Updated —');
 
       $('loading').hidden = true;
 

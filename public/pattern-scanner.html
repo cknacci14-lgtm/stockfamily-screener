@@ -97,17 +97,51 @@ tbody tr.link { cursor: pointer; } tbody tr.link:hover { background: #0f1417; }
 .empty { padding: 34px 16px; text-align: center; color: var(--muted); font-size: 13px; }
 .more { display: flex; justify-content: center; padding: 12px; border-top: 1px solid var(--line); }
 
-.bubbles { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding: 22px 14px; }
+.bubbles { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; padding: 22px 14px; }
 .bubble {
-  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
-  border-radius: 50%; border: 2px solid var(--bc, var(--line)); background: var(--surface-2); color: var(--text); text-decoration: none;
-  transition: transform .15s ease;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border-radius: 50%; text-decoration: none; color: var(--text, #e5e7eb);
+  border: 2px solid var(--bc, rgba(148,163,184,.3));
+  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.07), rgba(11,15,20,.95));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--bc, #334155) 40%, transparent),
+              0 6px 18px rgba(0,0,0,.35);
+  transition: transform .2s ease, box-shadow .25s ease;
+  animation: bubble-in .45s ease backwards;
 }
-.bubble:hover { transform: scale(1.06); }
-.bubble.none { opacity: .72; }
+.bubble:hover {
+  transform: scale(1.1);
+  z-index: 2;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--bc, #64748b) 55%, transparent),
+              0 10px 28px rgba(0,0,0,.45);
+}
+.bubble.none { opacity: .5; filter: saturate(.35); }
+.bubble.has-pat, .bubble[class*="pat-"] {
+  opacity: 1;
+}
+.bubble.pat-w_bottom {
+  animation: bubble-in .45s ease backwards, pulse-bc 2.4s ease-in-out infinite;
+}
 .bubble .c { font-size: 12px; font-weight: 800; letter-spacing: .02em; }
 .bubble .p { font-size: 10px; font-weight: 700; margin-top: 2px; }
-.bubble .t { font-size: 8px; font-weight: 800; letter-spacing: .08em; margin-top: 2px; color: var(--bc); }
+.bubble .p.up, .bubble .p.pos { color: #4ade80 !important; }
+.bubble .p.down, .bubble .p.neg { color: #f87171 !important; }
+.bubble .t { font-size: 8px; font-weight: 800; letter-spacing: .06em; margin-top: 2px; color: var(--bc, #94a3b8); }
+@keyframes bubble-in {
+  from { opacity: 0; transform: scale(.82); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes pulse-bc {
+  0%, 100% { box-shadow: 0 0 0 2px var(--bc), 0 6px 18px rgba(0,0,0,.35); }
+  50% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--bc) 25%, transparent), 0 8px 22px rgba(0,0,0,.4); }
+}
+@keyframes bubble-in {
+  from { opacity: 0; transform: scale(.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes pulse-w {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(56,189,248,.45), 0 8px 24px rgba(56,189,248,.12); }
+  50% { box-shadow: 0 0 0 7px rgba(56,189,248,.12), 0 8px 28px rgba(56,189,248,.18); }
+}
 .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }
 .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
 
@@ -148,7 +182,7 @@ tbody tr.link { cursor: pointer; } tbody tr.link:hover { background: #0f1417; }
 
     <section class="section">
       <div class="section-head">
-        <h2>Terdeteksi Hari Ini</h2><div class="rule"></div>
+        <h2>Terdeteksi pada EOD <span id="matchAsOf">—</span></h2><div class="rule"></div>
         <div class="pills" id="matchPills"></div>
       </div>
       <div class="panel">
@@ -239,7 +273,7 @@ tbody tr.link { cursor: pointer; } tbody tr.link:hover { background: #0f1417; }
   }
   var STATUS = {
     forming: ["FORMING", false], breakout: ["BREAKOUT", true],
-    breakout_today: ["BREAKOUT HARI INI", true], breakout_recent: ["BREAKOUT BARU", true]
+    breakout_today: ["BREAKOUT DI EOD", true], breakout_recent: ["BREAKOUT BARU", true]
   };
 
   var S = { scan: null, bt: null, matchFilter: "ALL", btFilter: "ALL", btShown: PAGE };
@@ -288,7 +322,12 @@ tbody tr.link { cursor: pointer; } tbody tr.link:hover { background: #0f1417; }
   // ---------- render
   function renderMeta() {
     var sc = S.scan;
-    $("meta").innerHTML = "DATA <b>" + esc(sc.data_date) + "</b> &middot; " + num(sc.stocks_scanned) + " dari " + num(sc.stocks_total)
+    $("meta").innerHTML = "EOD <b>" + esc(sc.data_date) + "</b> &middot; scan "
+      + esc(String(sc.generated_at || "").replace("T", " ").slice(0, 16)) + " UTC &middot; "
+      + num(sc.stocks_scanned) + " dari " + num(sc.stocks_total)
+      + " saham discan (rata-rata nilai transaksi 20 hari &ge; Rp " + num((sc.min_avg_value_idr || 0) / 1e9, 1) + " M, tidak suspend)"
+      + "<br><span class=\"dim\">Label breakout mengacu ke tanggal EOD di atas, bukan hari kalender saat Anda membuka halaman.</span>";
+    if ($("matchAsOf")) $("matchAsOf").textContent = sc.data_date || "—";
       + " saham discan (rata-rata nilai transaksi 20 hari &ge; Rp " + num(sc.min_avg_value_idr / 1e9, 1) + " miliar, tidak suspend) &middot; dibuat " + esc(String(sc.generated_at).slice(0, 16).replace("T", " ")) + " UTC";
   }
 
@@ -343,7 +382,7 @@ tbody tr.link { cursor: pointer; } tbody tr.link:hover { background: #0f1417; }
     var rows = S.matchFilter === "ALL" ? all : all.filter(function (m) { return m.pattern === S.matchFilter; });
     $("matchNote").innerHTML = "<span>" + rows.length + " saham</span><span>R:R dihitung dari trigger ke target dan invalidation</span><span>Klik baris untuk buka Stock Detail</span>";
     if (!rows.length) {
-      $("matchBody").innerHTML = '<tr><td colspan="10"><div class="empty">Tidak ada saham yang memenuhi pattern ini pada ' + esc(S.scan.data_date) + ".</div></td></tr>";
+      $("matchBody").innerHTML = '<tr><td colspan="10"><div class="empty">Tidak ada match pada tanggal EOD ini yang memenuhi pattern ini pada ' + esc(S.scan.data_date) + ".</div></td></tr>";
       return;
     }
     $("matchBody").innerHTML = rows.map(function (m) {
@@ -373,11 +412,11 @@ tbody tr.link { cursor: pointer; } tbody tr.link:hover { background: #0f1417; }
     var withP = list.filter(function (b) { return b.pattern; }).length;
     $("bubbleNote").innerHTML = "<span>" + list.length + " saham paling likuid</span><span>" + withP + " dengan pattern hari ini</span><span>Ukuran = volatilitas (ATR 14 hari / harga)</span>";
     var maxAtr = Math.max.apply(null, list.map(function (b) { return b.atr_pct || 0; }).concat([1]));
-    $("bubbles").innerHTML = list.map(function (b) {
+    $("bubbles").innerHTML = list.map(function (b, idx) {
       var d = Math.round(56 + ((b.atr_pct || 0) / maxAtr) * 44);
       var m = b.pattern ? PATTERNS[b.pattern] : null;
       var tip = b.code + " · " + (m ? m.label : "Tanpa pattern") + " · " + pct(b.change_pct) + " · ATR " + num(b.atr_pct, 1) + "%";
-      return '<a class="bubble' + (m ? "" : " none") + '" href="' + stockUrl(b.code) + '" title="' + esc(tip) + '" style="width:' + d + "px;height:" + d + "px;--bc:" + (m ? m.color : "#2a3237") + '">'
+      return '<a class="bubble' + (m ? (' pat-' + b.pattern) : ' none') + '" href="' + stockUrl(b.code) + '" title="' + esc(tip) + '" style="width:' + d + "px;height:" + d + "px;animation-delay:" + (idx * 0.02) + "s;--bc:" + (m ? m.color : "#2a3237") + '">'
         + '<span class="c">' + esc(b.code) + '</span><span class="p mono ' + cls(b.change_pct) + '">' + pct(b.change_pct, 1) + "</span>"
         + (m ? '<span class="t mono">' + m.short + "</span>" : "") + "</a>";
     }).join("");
