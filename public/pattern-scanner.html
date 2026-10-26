@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CHARTNALIST | Pattern Scanner</title>
+<script src="/assets/stockfamily-sidebar.js"></script>
+
+<style>
+:root {
+  --bg: #050607;
+  --surface: #0d1012;
+  --surface-2: #111518;
+  --line: #20262a;
+  --text: #f5f7f8;
+  --muted: #8b959c;
+  --cyan: #00d9ff;
+  --green: #00d084;
+  --red: #ff4d4d;
+  --yellow: #f5b700;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+.terminal { min-height: 100vh; padding: 28px 30px 42px; }
+.mono { font-family: ui-monospace, "JetBrains Mono", SFMono-Regular, Menlo, Consolas, monospace; }
+
+.topbar {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  padding-bottom: 18px; border-bottom: 1px solid var(--line);
+}
+.kicker { font-size: 10px; font-weight: 800; letter-spacing: .16em; color: var(--green); }
+h1 { margin: 6px 0 4px; font-size: 30px; letter-spacing: -.02em; line-height: 1.1; }
+.sub { color: var(--muted); font-size: 13px; line-height: 1.5; max-width: 760px; }
+.meta { margin-top: 8px; font-size: 11px; color: var(--muted); }
+.meta b { color: var(--text); font-weight: 600; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 34px; padding: 0 13px;
+  border: 1px solid #263238; border-radius: 7px; background: #101315; color: var(--text);
+  font: 800 11px/1 inherit; letter-spacing: .045em; text-decoration: none; white-space: nowrap; cursor: pointer;
+  transition: border-color .15s ease, background .15s ease, color .15s ease;
+}
+.btn:hover { border-color: var(--cyan); background: #12181B; color: var(--cyan); }
+
+.section { margin-top: 28px; }
+.section-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.section-head h2 { margin: 0; font-size: 15px; letter-spacing: .01em; }
+.section-head .rule { flex: 1; height: 1px; background: var(--line); min-width: 24px; }
+.section-head .tag { font-size: 10px; color: var(--muted); letter-spacing: .08em; }
+
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.card { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; overflow: hidden; }
+.card::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 3px; background: var(--pc, var(--green)); }
+.card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.card-title { font-size: 15px; font-weight: 800; }
+.card-tag { font-size: 10px; color: var(--muted); letter-spacing: .1em; margin-top: 4px; }
+.today-pill { padding: 4px 9px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: .08em; border: 1px solid var(--pc); color: var(--pc); background: rgba(255,255,255,.02); }
+.today-pill.zero { border-color: var(--line); color: var(--muted); }
+.illu { margin: 14px 0; height: 78px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 6px; }
+.illu svg { width: 100%; height: 100%; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.stat { background: var(--surface-2); border: 1px solid var(--line); border-radius: 9px; padding: 9px 8px; }
+.stat .l { font-size: 9px; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; }
+.stat .v { margin-top: 5px; font-size: 15px; font-weight: 800; }
+.base { margin-top: 10px; font-size: 11px; color: var(--muted); line-height: 1.5; }
+.warn { margin-top: 10px; padding: 7px 9px; font-size: 11px; line-height: 1.45; color: var(--yellow); border: 1px solid rgba(245,183,0,.35); background: rgba(245,183,0,.07); border-radius: 8px; }
+.pos { color: var(--green); } .neg { color: var(--red); } .dim { color: var(--muted); }
+
+.pills { display: flex; gap: 8px; flex-wrap: wrap; }
+.pill { height: 30px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface-2); color: var(--muted); font: 600 12px/1 inherit; cursor: pointer; }
+.pill:hover { color: var(--text); }
+.pill.active { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 800; }
+.pill .n { margin-left: 6px; opacity: .65; font-weight: 700; }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.panel-note { padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 11px; color: var(--muted); display: flex; gap: 14px; flex-wrap: wrap; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 760px; }
+th { text-align: left; padding: 10px 12px; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--line); white-space: nowrap; }
+th.r, td.r { text-align: right; }
+td { padding: 11px 12px; border-bottom: 1px solid #14191c; white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+tbody tr.link { cursor: pointer; } tbody tr.link:hover { background: #0f1417; }
+.code { font-weight: 800; letter-spacing: .02em; }
+.name { color: var(--muted); font-size: 11px; max-width: 170px; overflow: hidden; text-overflow: ellipsis; display: inline-block; vertical-align: bottom; margin-left: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: .06em; border: 1px solid; }
+.chip i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; display: inline-block; }
+.status { font-size: 10px; font-weight: 800; letter-spacing: .08em; color: var(--muted); }
+.status.hot { color: var(--green); }
+.win { color: var(--green); border-color: rgba(0,208,132,.35); background: rgba(0,208,132,.1); }
+.loss { color: var(--red); border-color: rgba(255,77,77,.35); background: rgba(255,77,77,.1); }
+.empty { padding: 34px 16px; text-align: center; color: var(--muted); font-size: 13px; }
+.more { display: flex; justify-content: center; padding: 12px; border-top: 1px solid var(--line); }
+
+.bubbles { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding: 22px 14px; }
+.bubble {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  border-radius: 50%; border: 2px solid var(--bc, var(--line)); background: var(--surface-2); color: var(--text); text-decoration: none;
+  transition: transform .15s ease;
+}
+.bubble:hover { transform: scale(1.06); }
+.bubble.none { opacity: .72; }
+.bubble .c { font-size: 12px; font-weight: 800; letter-spacing: .02em; }
+.bubble .p { font-size: 10px; font-weight: 700; margin-top: 2px; }
+.bubble .t { font-size: 8px; font-weight: 800; letter-spacing: .08em; margin-top: 2px; color: var(--bc); }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }
+.legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
+
+.method { margin-top: 28px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); font-size: 12px; line-height: 1.65; color: var(--muted); }
+.method b { color: var(--text); }
+
+#gate { display: none; }
+#app { display: none; }
+#loadError { display: none; margin-top: 24px; padding: 18px; border: 1px solid rgba(255,77,77,.35); background: rgba(255,77,77,.07); border-radius: 12px; font-size: 13px; line-height: 1.6; }
+
+@media (max-width: 980px) { .cards { grid-template-columns: 1fr; } .terminal { padding: 18px 14px 36px; } h1 { font-size: 24px; } }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/chartnalist-app-auth.js"></script>
+</head>
+<body>
+<main class="terminal" id="main">
+  <header class="topbar">
+    <div>
+      <div class="kicker">TRADING INTELLIGENCE</div>
+      <h1>Pattern Scanner</h1>
+      <div class="sub">Ascending Triangle, W-Bottom, dan Bull Flag dideteksi dengan aturan tetap dari data harian di database, lalu diuji ke belakang selama 1 tahun. Semua angka dihitung ulang setiap hari, tanpa data contoh.</div>
+      <div class="meta mono" id="meta">Loading snapshot...</div>
+    </div>
+    <a class="btn" href="/watchlist.html">&larr; SMARTWATCHLIST</a>
+  </header>
+
+  <div id="loadError"></div>
+
+  <div id="app">
+    <section class="section">
+      <div class="section-head">
+        <h2>3 Pattern &middot; Hasil Uji 1 Tahun</h2><div class="rule"></div>
+        <span class="tag mono" id="cardsTag"></span>
+      </div>
+      <div class="cards" id="cards"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>Terdeteksi Hari Ini</h2><div class="rule"></div>
+        <div class="pills" id="matchPills"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-note mono" id="matchNote"></div>
+        <div class="scroll"><table>
+          <thead><tr>
+            <th>Ticker</th><th>Pattern</th><th>Status</th><th class="r">Conf</th><th class="r">Close</th><th class="r">Chg</th>
+            <th class="r">Trigger</th><th class="r">Invalidation</th><th class="r">Target</th><th class="r">R:R</th>
+          </tr></thead>
+          <tbody id="matchBody"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>Bubble Map</h2><div class="rule"></div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="panel"><div class="panel-note mono" id="bubbleNote"></div><div class="bubbles" id="bubbles"></div></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>Riwayat Sinyal (Backtest)</h2><div class="rule"></div>
+        <div class="pills" id="btPills"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-note mono" id="btNote"></div>
+        <div class="scroll"><table>
+          <thead><tr>
+            <th>Ticker</th><th>Pattern</th><th>Tanggal Sinyal</th><th class="r">Entry</th><th>Tanggal Exit</th><th class="r">Exit (10D)</th><th class="r">Hasil</th><th>Status</th>
+          </tr></thead>
+          <tbody id="btBody"></tbody>
+        </table></div>
+        <div class="more" id="btMore" style="display:none"><button class="btn" id="btMoreBtn">TAMPILKAN LEBIH BANYAK</button></div>
+      </div>
+    </section>
+
+    <section class="method" id="method"></section>
+  </div>
+
+  <div id="gate"></div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  // Same rule as Signal Center: Premium/Pro (and admins). Set to false to open the page to everyone.
+  var REQUIRE_PREMIUM = true;
+
+  var PATTERNS = {
+    asc_triangle: { label: "Ascending Triangle", short: "ASC TRI", color: "#f5b700", tag: "ACCUMULATION" },
+    w_bottom:     { label: "W-Bottom",           short: "W-BOT",   color: "#00d9ff", tag: "REVERSAL" },
+    bull_flag:    { label: "Bull Flag",          short: "FLAG",    color: "#00d084", tag: "CONTINUATION" }
+  };
+  var ORDER = ["asc_triangle", "w_bottom", "bull_flag"];
+  var SMALL_SAMPLE = 30;
+  var PAGE = 60;
+
+  var ILLU = {
+    asc_triangle: '<svg viewBox="0 0 200 64"><path d="M10 12 L190 12" stroke="#f5b700" stroke-width="1.4"/><path d="M10 54 L170 14" stroke="#8b959c" stroke-width="1" stroke-dasharray="4 4"/><path d="M14 50 L40 22 L58 40 L88 17 L104 34 L134 13 L150 24 L176 12" fill="none" stroke="#00d084" stroke-width="1.6"/></svg>',
+    w_bottom:     '<svg viewBox="0 0 200 64"><path d="M10 10 L50 54 L90 24 L130 54 L170 12 L192 8" fill="none" stroke="#00d9ff" stroke-width="1.6"/><path d="M90 24 L192 24" stroke="#8b959c" stroke-width="1" stroke-dasharray="4 4"/><circle cx="170" cy="12" r="3" fill="#00d084"/></svg>',
+    bull_flag:    '<svg viewBox="0 0 200 64"><path d="M10 58 L56 10" stroke="#00d084" stroke-width="2" fill="none"/><path d="M56 10 L100 16 L96 32 L52 26 Z" fill="rgba(0,208,132,.12)" stroke="#f5b700" stroke-width="1"/><path d="M98 24 L160 6" stroke="#00d084" stroke-width="1.6" fill="none" stroke-dasharray="4 3"/></svg>'
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function num(n, d) {
+    if (n == null || !isFinite(n)) return "-";
+    return Number(n).toLocaleString("id-ID", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 });
+  }
+  function pct(n, d) {
+    if (n == null || !isFinite(n)) return "-";
+    return (n > 0 ? "+" : "") + num(n, d == null ? 2 : d) + "%";
+  }
+  function cls(n) { return n > 0 ? "pos" : n < 0 ? "neg" : "dim"; }
+  function stockUrl(code) { return "/stock.html?code=" + encodeURIComponent(code); }
+  function chip(p) {
+    var m = PATTERNS[p];
+    if (!m) return "";
+    return '<span class="chip" style="color:' + m.color + ';border-color:' + m.color + '66"><i></i>' + esc(m.label) + "</span>";
+  }
+  var STATUS = {
+    forming: ["FORMING", false], breakout: ["BREAKOUT", true],
+    breakout_today: ["BREAKOUT HARI INI", true], breakout_recent: ["BREAKOUT BARU", true]
+  };
+
+  var S = { scan: null, bt: null, matchFilter: "ALL", btFilter: "ALL", btShown: PAGE };
+
+  // ---------- gate (same approach as Signal Center)
+  function isAdmin(a) {
+    try { return typeof a.isAdmin === "function" ? !!a.isAdmin() : !!a.isAdmin; } catch (e) { return false; }
+  }
+  function allowed() {
+    if (!REQUIRE_PREMIUM) return true;
+    try {
+      var a = window.chartnalistAuth || {};
+      var plan = String(a.plan || "free").toLowerCase();
+      return isAdmin(a) || plan === "premium" || plan === "pro";
+    } catch (e) { return false; }
+  }
+  function showGate() {
+    $("app").style.display = "none";
+    var g = $("gate");
+    g.style.display = "block";
+    g.innerHTML = '<div style="margin:24px auto;max-width:480px;padding:28px 24px;border-radius:16px;border:1px solid rgba(0,208,132,.3);background:rgba(0,208,132,.06);text-align:center">'
+      + '<div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#00d084">Premium</div>'
+      + '<div style="margin-top:10px;font-size:20px;font-weight:800;color:#f5f7f8">Pattern Scanner</div>'
+      + '<div style="margin-top:8px;font-size:13px;color:#9aa3aa;line-height:1.55">Pattern Scanner tersedia di paket Premium (Rp 49.000/bulan) ke atas.</div>'
+      + '<div style="margin-top:18px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'
+      + '<a href="/upgrade/?plan=premium" style="padding:10px 16px;border-radius:8px;background:#00d084;color:#050607;font-weight:800;font-size:13px;text-decoration:none">Upgrade Premium</a>'
+      + '<a href="/landing#pricing" style="padding:10px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.15);color:#e2e8f0;font-weight:600;font-size:13px;text-decoration:none">Lihat paket</a>'
+      + "</div></div>";
+  }
+  function runAfterAuth(cb) {
+    if (window.chartnalistAuth) { cb(); return; }
+    var done = false;
+    function once() { if (!done) { done = true; cb(); } }
+    window.addEventListener("chartnalist:auth-ready", once, { once: true });
+    setTimeout(once, 2500);
+  }
+
+  // ---------- data
+  function getJson(url) {
+    return fetch(url, { cache: "no-cache" }).then(function (r) {
+      if (!r.ok) throw new Error(url + " -> HTTP " + r.status);
+      return r.json();
+    });
+  }
+
+  // ---------- render
+  function renderMeta() {
+    var sc = S.scan;
+    $("meta").innerHTML = "DATA <b>" + esc(sc.data_date) + "</b> &middot; " + num(sc.stocks_scanned) + " dari " + num(sc.stocks_total)
+      + " saham discan (rata-rata nilai transaksi 20 hari &ge; Rp " + num(sc.min_avg_value_idr / 1e9, 1) + " miliar, tidak suspend) &middot; dibuat " + esc(String(sc.generated_at).slice(0, 16).replace("T", " ")) + " UTC";
+  }
+
+  function renderCards() {
+    var base = S.bt.baseline || {};
+    $("cardsTag").textContent = "UNIVERSE: TOP " + S.bt.universe.length + " LIKUID · EXIT " + S.bt.horizon + " HARI BURSA";
+    $("cards").innerHTML = ORDER.map(function (p) {
+      var m = PATTERNS[p], b = S.bt.patterns[p] || { summary: {} }, s = b.summary || {};
+      var today = (S.scan.patterns[p] || []).length;
+      var n = s.signals || 0;
+      var dWin = n && base.win_rate_pct != null ? s.win_rate_pct - base.win_rate_pct : null;
+      var dAvg = n && base.avg_return_pct != null ? s.avg_return_pct - base.avg_return_pct : null;
+      var warn = "";
+      if (n === 0) warn = '<div class="warn">Tidak ada sinyal dalam 1 tahun terakhir dengan aturan saat ini. Tidak ada statistik yang bisa dihitung.</div>';
+      else if (n < SMALL_SAMPLE) warn = '<div class="warn">Sampel kecil (n=' + n + '). Win rate dan rata-rata dari sampel sekecil ini belum bisa dipakai sebagai bukti.</div>';
+      return '<div class="card" style="--pc:' + m.color + '">'
+        + '<div class="card-top"><div><div class="card-title">' + esc(m.label) + '</div><div class="card-tag mono">' + m.tag + '</div></div>'
+        + '<span class="today-pill mono' + (today ? "" : " zero") + '">' + today + ' HARI INI</span></div>'
+        + '<div class="illu">' + ILLU[p] + "</div>"
+        + '<div class="stats">'
+        + '<div class="stat"><div class="l">Sinyal 1Y</div><div class="v mono">' + num(n) + "</div></div>"
+        + '<div class="stat"><div class="l">Win Rate</div><div class="v mono">' + (n ? num(s.win_rate_pct, 1) + "%" : "-") + "</div></div>"
+        + '<div class="stat"><div class="l">Avg 10D</div><div class="v mono ' + cls(s.avg_return_pct) + '">' + (n ? pct(s.avg_return_pct) : "-") + "</div></div>"
+        + '<div class="stat"><div class="l">PF</div><div class="v mono">' + (s.profit_factor == null ? "-" : num(s.profit_factor, 2)) + "</div></div>"
+        + "</div>"
+        + '<div class="base mono">Pembanding (semua hari, saham yang sama): win ' + num(base.win_rate_pct, 1) + "% &middot; avg " + pct(base.avg_return_pct)
+        + (dWin == null ? "" : '<br>Selisih: win <span class="' + cls(dWin) + '">' + (dWin > 0 ? "+" : "") + num(dWin, 1) + " pt</span> &middot; avg <span class=\"" + cls(dAvg) + '">' + (dAvg > 0 ? "+" : "") + num(dAvg, 2) + " pt</span>")
+        + "</div>"
+        + ((b.best || []).length ? '<div class="base mono">Terbaik (n&ge;3): ' + b.best.map(esc).join(" &middot; ") + "</div>" : "")
+        + warn + "</div>";
+    }).join("");
+  }
+
+  function pillsHtml(counts, active) {
+    var items = [["ALL", "All"]].concat(ORDER.map(function (p) { return [p, PATTERNS[p].label]; }));
+    return items.map(function (it) {
+      return '<button class="pill' + (active === it[0] ? " active" : "") + '" data-k="' + it[0] + '">' + esc(it[1]) + '<span class="n">' + (counts[it[0]] || 0) + "</span></button>";
+    }).join("");
+  }
+
+  function allMatches() {
+    var out = [];
+    ORDER.forEach(function (p) { (S.scan.patterns[p] || []).forEach(function (m) { out.push(m); }); });
+    return out.sort(function (a, b) { return b.confidence - a.confidence; });
+  }
+
+  function renderMatches() {
+    var all = allMatches();
+    var counts = { ALL: all.length };
+    ORDER.forEach(function (p) { counts[p] = (S.scan.patterns[p] || []).length; });
+    $("matchPills").innerHTML = pillsHtml(counts, S.matchFilter);
+    var rows = S.matchFilter === "ALL" ? all : all.filter(function (m) { return m.pattern === S.matchFilter; });
+    $("matchNote").innerHTML = "<span>" + rows.length + " saham</span><span>R:R dihitung dari trigger ke target dan invalidation</span><span>Klik baris untuk buka Stock Detail</span>";
+    if (!rows.length) {
+      $("matchBody").innerHTML = '<tr><td colspan="10"><div class="empty">Tidak ada saham yang memenuhi pattern ini pada ' + esc(S.scan.data_date) + ".</div></td></tr>";
+      return;
+    }
+    $("matchBody").innerHTML = rows.map(function (m) {
+      var lv = m.levels || {};
+      var risk = lv.trigger - lv.invalidation, reward = lv.target - lv.trigger;
+      var rr = risk > 0 ? reward / risk : null;
+      var st = STATUS[m.status] || [String(m.status || "").toUpperCase(), false];
+      return '<tr class="link" data-code="' + esc(m.code) + '">'
+        + '<td><span class="code">' + esc(m.code) + '</span><span class="name">' + esc(m.name) + "</span></td>"
+        + "<td>" + chip(m.pattern) + "</td>"
+        + '<td><span class="status mono' + (st[1] ? " hot" : "") + '">' + esc(st[0]) + "</span></td>"
+        + '<td class="r mono">' + num(m.confidence * 100, 0) + "</td>"
+        + '<td class="r mono">' + num(m.last_close) + "</td>"
+        + '<td class="r mono ' + cls(m.change_pct) + '">' + pct(m.change_pct) + "</td>"
+        + '<td class="r mono">' + num(lv.trigger) + "</td>"
+        + '<td class="r mono">' + num(lv.invalidation) + "</td>"
+        + '<td class="r mono">' + num(lv.target) + "</td>"
+        + '<td class="r mono">' + (rr == null ? "-" : "1:" + num(rr, 1)) + "</td></tr>";
+    }).join("");
+  }
+
+  function renderBubbles() {
+    var list = S.scan.bubbles || [];
+    $("legend").innerHTML = ORDER.map(function (p) {
+      return '<span><i style="background:' + PATTERNS[p].color + '"></i>' + esc(PATTERNS[p].label) + "</span>";
+    }).join("") + '<span><i style="background:#3a444b"></i>Tanpa pattern</span>';
+    var withP = list.filter(function (b) { return b.pattern; }).length;
+    $("bubbleNote").innerHTML = "<span>" + list.length + " saham paling likuid</span><span>" + withP + " dengan pattern hari ini</span><span>Ukuran = volatilitas (ATR 14 hari / harga)</span>";
+    var maxAtr = Math.max.apply(null, list.map(function (b) { return b.atr_pct || 0; }).concat([1]));
+    $("bubbles").innerHTML = list.map(function (b) {
+      var d = Math.round(56 + ((b.atr_pct || 0) / maxAtr) * 44);
+      var m = b.pattern ? PATTERNS[b.pattern] : null;
+      var tip = b.code + " · " + (m ? m.label : "Tanpa pattern") + " · " + pct(b.change_pct) + " · ATR " + num(b.atr_pct, 1) + "%";
+      return '<a class="bubble' + (m ? "" : " none") + '" href="' + stockUrl(b.code) + '" title="' + esc(tip) + '" style="width:' + d + "px;height:" + d + "px;--bc:" + (m ? m.color : "#2a3237") + '">'
+        + '<span class="c">' + esc(b.code) + '</span><span class="p mono ' + cls(b.change_pct) + '">' + pct(b.change_pct, 1) + "</span>"
+        + (m ? '<span class="t mono">' + m.short + "</span>" : "") + "</a>";
+    }).join("");
+  }
+
+  function allTrades() {
+    var out = [];
+    ORDER.forEach(function (p) { ((S.bt.patterns[p] || {}).trades || []).forEach(function (t) { out.push(Object.assign({ pattern: p }, t)); }); });
+    return out.sort(function (a, b) { return a.signal_date < b.signal_date ? 1 : a.signal_date > b.signal_date ? -1 : 0; });
+  }
+
+  function renderBacktest() {
+    var all = allTrades();
+    var counts = { ALL: all.length };
+    ORDER.forEach(function (p) { counts[p] = ((S.bt.patterns[p] || {}).trades || []).length; });
+    $("btPills").innerHTML = pillsHtml(counts, S.btFilter);
+    var rows = S.btFilter === "ALL" ? all : all.filter(function (t) { return t.pattern === S.btFilter; });
+    var wins = rows.filter(function (t) { return t.return_pct > 0; }).length;
+    var avg = rows.length ? rows.reduce(function (s, t) { return s + t.return_pct; }, 0) / rows.length : null;
+    var base = S.bt.baseline || {};
+    $("btNote").innerHTML = "<span>" + rows.length + " sinyal</span>"
+      + (rows.length ? "<span>Win rate <b class=\"" + (wins / rows.length * 100 > base.win_rate_pct ? "pos" : "neg") + '">' + num(wins / rows.length * 100, 1) + "%</b> (pembanding " + num(base.win_rate_pct, 1) + "%)</span>"
+        + "<span>Rata-rata <b class=\"" + cls(avg) + '">' + pct(avg) + "</b> (pembanding " + pct(base.avg_return_pct) + ")</span>" : "")
+      + "<span>Entry = close hari sinyal &middot; exit = close " + S.bt.horizon + " hari bursa kemudian</span>";
+    if (!rows.length) {
+      $("btBody").innerHTML = '<tr><td colspan="8"><div class="empty">Belum ada sinyal untuk filter ini.</div></td></tr>';
+      $("btMore").style.display = "none";
+      return;
+    }
+    var shown = rows.slice(0, S.btShown);
+    $("btBody").innerHTML = shown.map(function (t) {
+      var w = t.return_pct > 0;
+      return '<tr class="link" data-code="' + esc(t.code) + '"><td><span class="code">' + esc(t.code) + "</span></td><td>" + chip(t.pattern) + "</td>"
+        + '<td class="mono">' + esc(t.signal_date) + '</td><td class="r mono">' + num(t.entry) + '</td><td class="mono">' + esc(t.exit_date) + '</td><td class="r mono">' + num(t.exit) + "</td>"
+        + '<td class="r mono ' + cls(t.return_pct) + '"><b>' + pct(t.return_pct) + "</b></td>"
+        + '<td><span class="chip ' + (w ? "win" : "loss") + '">' + (w ? "WIN" : "LOSS") + "</span></td></tr>";
+    }).join("");
+    $("btMore").style.display = rows.length > shown.length ? "flex" : "none";
+  }
+
+  function renderMethod() {
+    var bt = S.bt;
+    var ov = bt.detector_overrides && Object.keys(bt.detector_overrides).length ? " Aturan yang diubah dari standar: " + esc(JSON.stringify(bt.detector_overrides)) + "." : "";
+    $("method").innerHTML = "<b>Cara membaca.</b> Backtest memakai " + bt.universe.length + " saham: " + esc(bt.universe_rule) + ". " + esc(bt.entry_rule) + "." + ov
+      + " <b>Keterbatasan:</b> " + esc(bt.caveat) + " Selisih terhadap pembanding baru berarti jika jumlah sinyal cukup besar; sinyal yang muncul bersamaan di banyak saham pada hari pasar yang sama tidak independen. Scanner ini alat bantu edukasi, <b>bukan ajakan jual beli</b>. Keputusan dan risiko tetap tanggung jawab pribadi.";
+  }
+
+  function bind() {
+    $("matchPills").addEventListener("click", function (e) {
+      var b = e.target.closest(".pill"); if (!b) return;
+      S.matchFilter = b.getAttribute("data-k"); renderMatches();
+    });
+    $("btPills").addEventListener("click", function (e) {
+      var b = e.target.closest(".pill"); if (!b) return;
+      S.btFilter = b.getAttribute("data-k"); S.btShown = PAGE; renderBacktest();
+    });
+    $("btMoreBtn").addEventListener("click", function () { S.btShown += PAGE; renderBacktest(); });
+    function go(e) {
+      var tr = e.target.closest("tr.link"); if (!tr) return;
+      location.href = stockUrl(tr.getAttribute("data-code"));
+    }
+    $("matchBody").addEventListener("click", go);
+    $("btBody").addEventListener("click", go);
+  }
+
+  function load() {
+    if (!allowed()) { showGate(); return; }
+    Promise.all([getJson("/data/pattern-scan.json"), getJson("/data/pattern-backtest.json")]).then(function (res) {
+      S.scan = res[0]; S.bt = res[1];
+      $("app").style.display = "block";
+      renderMeta(); renderCards(); renderMatches(); renderBubbles(); renderBacktest(); renderMethod(); bind();
+    }).catch(function (err) {
+      var el = $("loadError");
+      el.style.display = "block";
+      el.innerHTML = "<b>Snapshot belum tersedia.</b><br>" + esc(err.message) + "<br><span class=\"dim\">Jalankan <code>node scripts/pattern-scan.js</code> untuk membuat <code>public/data/pattern-scan.json</code> dan <code>pattern-backtest.json</code> dari database.</span>";
+      $("meta").textContent = "Snapshot tidak ditemukan";
+    });
+  }
+
+  runAfterAuth(load);
+})();
+</script>
+<script src="/assets/chartnalist-track.js?v=20261015" defer></script>
+</body>
+</html>

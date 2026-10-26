@@ -60,6 +60,14 @@ jobs:
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: node scripts/signal-performance.js report
 
+
+      - name: Pattern scan + backtest snapshot
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: node scripts/pattern-scan.js
+
       - name: Commit updated screener + paper trade log
         run: |
           git config user.name "github-actions[bot]"
@@ -68,10 +76,11 @@ jobs:
           git add public/results/paper-trade-log.json
           git add public/data/signal-center-snapshot.json
           git add public/data/signal-log.json public/data/signal-performance.json 2>/dev/null || true
+          git add public/data/pattern-scan.json public/data/pattern-backtest.json 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "chore(qbs): daily screener + paper trade refresh $(date -u +%Y-%m-%d)"
+            git commit -m "chore(qbs): daily screener + paper trade + pattern scan $(date -u +%Y-%m-%d)"
             for i in 1 2 3; do
               if git pull --rebase origin main && git push; then exit 0; fi
               echo "push attempt $i failed, retrying..."
