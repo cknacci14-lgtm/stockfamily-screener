@@ -121,6 +121,37 @@ async function fetchYahoo(code) {
   };
 }
 
+// Candle 5 menit (5 hari terakhir) -> [{ ts(ms), open, low, high }]
+async function fetchYahooIntraday(code) {
+  const d = await fetchJson(
+    'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(code) + '.JK?range=5d&interval=5m',
+    { 'User-Agent': 'Mozilla/5.0' }
+  );
+  const r = d && d.chart && d.chart.result && d.chart.result[0];
+  const q = r && r.indicators && r.indicators.quote && r.indicators.quote[0];
+  if (!r || !Array.isArray(r.timestamp) || !q) return [];
+  const out = [];
+  for (let i = 0; i < r.timestamp.length; i++) {
+    const lo = q.low[i], hi = q.high[i], op = q.open[i];
+    if (lo == null || hi == null) continue;
+    out.push({ ts: r.timestamp[i] * 1000, open: op != null ? Number(op) : null, low: Number(lo), high: Number(hi) });
+  }
+  return out;
+}
+
+// Open/low/high dari candle yang mulai pada atau setelah sinceIso. null bila tidak ada.
+function rangeSince(md, sinceIso) {
+  if (!md.candles || !md.candles.length || !sinceIso) return null;
+  const since = new Date(sinceIso).getTime();
+  const c = md.candles.filter(x => x.ts >= since);
+  if (!c.length) return null;
+  return {
+    open: c[0].open,
+    low: Math.min(...c.map(x => x.low)),
+    high: Math.max(...c.map(x => x.high))
+  };
+}
+
 // Mengembalikan { ok, price, open, low, high, date, source } atau { ok:false, reason }
 async function fetchMarketData(code) {
   const y = await fetchYahoo(code);
@@ -143,7 +174,8 @@ async function fetchMarketData(code) {
     price: base.price,
     open: yOk ? y.open : null,
     low: yOk && y.low != null ? Math.min(y.low, base.price) : null,
-    high: yOk && y.high != null ? Math.max(y.high, base.price) : null
+    high: yOk && y.high != null ? Math.max(y.high, base.price) : null,
+    candles: yOk ? await fetchYahooIntraday(code) : []
   };
 }
 
@@ -175,8 +207,11 @@ function checkSignalStatus(signal, md, nowIso) {
   // terbit sebelum bursa buka (< 09:00 WIB) = seluruh range hari ini terjadi setelah signal ada
   const pubMins = signal.published_at ? (() => { const w = new Date(new Date(signal.published_at).getTime() + 7 * 3600 * 1000); return w.getUTCHours() * 60 + w.getUTCMinutes(); })() : null;
   const publishedPreOpen = published === today && pubMins != null && pubMins < 9 * 60;
-  const entryRangeOk = (published < today || publishedPreOpen) && md.low != null;
-  const lowEntry = entryRangeOk ? md.low : md.price;
+  const rngE = rangeSince(md, signal.published_at);
+  const legacyOk = (published < today || publishedPreOpen) && md.low != null;
+  const entryRangeOk = !!rngE || legacyOk;
+  const lowEntry = rngE ? Math.min(rngE.low, md.price) : (legacyOk ? md.low : md.price);
+  const entryMd = rngE ? { ...md, open: rngE.open } : md;
 
   const entries = [1, 2, 3].map(i => ({
     i,
@@ -191,7 +226,7 @@ function checkSignalStatus(signal, md, nowIso) {
   for (const e of entries) {
     if (!e.hitAt && lowEntry <= e.price) {
       e.hitAt = nowIso;
-      e.fill = entryFill(e.price, md, entryRangeOk);
+      e.fill = entryFill(e.price, entryMd, entryRangeOk);
       lastFill = e.fill;
       update['entry_' + e.i + '_hit_at'] = nowIso;
       update['entry_' + e.i + '_fill_price'] = e.fill;
@@ -215,10 +250,13 @@ function checkSignalStatus(signal, md, nowIso) {
 
   // ---- EXIT (TP / SL) ----
   // low/high harian hanya dipakai bila posisi sudah aktif sejak sebelum hari ini
-  const exitRangeOk = wasActive && md.low != null && md.high != null &&
+  const rngX = wasActive && signal.entry_hit_at ? rangeSince(md, signal.entry_hit_at) : null;
+  const legacyExit = wasActive && md.low != null && md.high != null &&
     signal.entry_hit_at && wibDate(signal.entry_hit_at) < today;
-  const lowExit = exitRangeOk ? md.low : md.price;
-  const highExit = exitRangeOk ? md.high : md.price;
+  const exitRangeOk = !!rngX || legacyExit;
+  const lowExit = rngX ? Math.min(rngX.low, md.price) : (legacyExit ? md.low : md.price);
+  const highExit = rngX ? Math.max(rngX.high, md.price) : (legacyExit ? md.high : md.price);
+  const openX = rngX ? rngX.open : md.open;
 
   const prevTp = signal.tp3_hit_at ? 3 : signal.tp2_hit_at ? 2 : signal.tp1_hit_at ? 1 : 0;
   let reached = 0;
@@ -228,7 +266,7 @@ function checkSignalStatus(signal, md, nowIso) {
   if (slHit) {
     // Jika SL dan TP sama-sama mungkin dalam satu range, SL didahulukan (konservatif)
     const slPrice = exitRangeOk
-      ? ((md.open != null && md.open < sl) ? md.open : sl)
+      ? ((openX != null && openX < sl) ? openX : sl)
       : Math.min(sl, md.price);
     update.sl_hit_at = nowIso;
     update.outcome = prevTp > 0 ? 'TP' + prevTp : 'SL';
