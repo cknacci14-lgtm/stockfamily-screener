@@ -1,6 +1,6 @@
 {
- "generatedAt": "2026-10-23T17:57:28.953Z",
- "marketDate": "2026-10-23",
+ "generatedAt": "2026-10-27T04:31:50.630Z",
+ "marketDate": "2026-10-26",
  "params": {
   "outcomeWindow": 20,
   "triggerWindow": 10,
@@ -17,10 +17,10 @@
  ],
  "sources": {
   "live": {
-   "entries": 55,
+   "entries": 58,
    "shown": 16,
    "from": "2026-10-08",
-   "to": "2026-10-23"
+   "to": "2026-10-26"
   },
   "backfill": {
    "entries": 832,
@@ -45,10 +45,10 @@
      "beat": 82
     },
     "h10": {
-     "n": 4,
-     "medRet": -1.41,
-     "medExcess": 12.55,
-     "beat": 100
+     "n": 6,
+     "medRet": -4.73,
+     "medExcess": 9.22,
+     "beat": 83
     },
     "h20": {
      "n": 0
@@ -82,10 +82,10 @@
      "beat": 83
     },
     "h10": {
-     "n": 3,
-     "medRet": -2.33,
-     "medExcess": 11.63,
-     "beat": 100
+     "n": 5,
+     "medRet": -7.14,
+     "medExcess": 6.82,
+     "beat": 80
     },
     "h20": {
      "n": 0
@@ -179,9 +179,9 @@
    "source": "live",
    "shown": false,
    "group": "SEMUA",
-   "n": 15,
-   "stocks": 15,
-   "dates": 8,
+   "n": 16,
+   "stocks": 16,
+   "dates": 9,
    "fwd": {
     "h5": {
      "n": 10,
@@ -190,9 +190,46 @@
      "beat": 80
     },
     "h10": {
-     "n": 1,
-     "medRet": 9.74,
-     "medExcess": 23.7,
+     "n": 2,
+     "medRet": 2.26,
+     "medExcess": 14.64,
+     "beat": 100
+    },
+    "h20": {
+     "n": 0
+    }
+   },
+   "trade": {
+    "n": 8,
+    "t1Pct": 75,
+    "stopPct": 25,
+    "expPct": 0,
+    "avgR1": 0.2,
+    "avgR2": 0.6,
+    "trigPct": null,
+    "pending": 7,
+    "t1Late": 1
+   },
+   "verdict": "BELUM CUKUP DATA"
+  },
+  {
+   "source": "live",
+   "shown": false,
+   "group": "BREAKOUT",
+   "n": 14,
+   "stocks": 14,
+   "dates": 9,
+   "fwd": {
+    "h5": {
+     "n": 9,
+     "medRet": 2.06,
+     "medExcess": 16.12,
+     "beat": 78
+    },
+    "h10": {
+     "n": 2,
+     "medRet": 2.26,
+     "medExcess": 14.64,
      "beat": 100
     },
     "h20": {
@@ -206,43 +243,6 @@
     "expPct": 0,
     "avgR1": 0.38,
     "avgR2": 0.86,
-    "trigPct": null,
-    "pending": 7,
-    "t1Late": 1
-   },
-   "verdict": "BELUM CUKUP DATA"
-  },
-  {
-   "source": "live",
-   "shown": false,
-   "group": "BREAKOUT",
-   "n": 13,
-   "stocks": 13,
-   "dates": 8,
-   "fwd": {
-    "h5": {
-     "n": 9,
-     "medRet": 2.06,
-     "medExcess": 16.12,
-     "beat": 78
-    },
-    "h10": {
-     "n": 1,
-     "medRet": 9.74,
-     "medExcess": 23.7,
-     "beat": 100
-    },
-    "h20": {
-     "n": 0
-    }
-   },
-   "trade": {
-    "n": 6,
-    "t1Pct": 100,
-    "stopPct": 0,
-    "expPct": 0,
-    "avgR1": 0.61,
-    "avgR2": 1.24,
     "trigPct": null,
     "pending": 6,
     "t1Late": 1
@@ -426,7 +426,7 @@
     "h20": {
      "n": 29,
      "medRet": -8.16,
-     "medExcess": -1.8,
+     "medExcess": -1.74,
      "beat": 45
     }
    },
@@ -504,10 +504,10 @@
      "beat": 50
     },
     "h20": {
-     "n": 269,
-     "medRet": -3.48,
-     "medExcess": 0.52,
-     "beat": 51
+     "n": 276,
+     "medRet": -3.46,
+     "medExcess": 0.66,
+     "beat": 52
     }
    },
    "trade": {
@@ -544,10 +544,10 @@
      "beat": 48
     },
     "h20": {
-     "n": 203,
-     "medRet": -4.2,
-     "medExcess": 0.39,
-     "beat": 50
+     "n": 210,
+     "medRet": -4.03,
+     "medExcess": 0.44,
+     "beat": 51
     }
    },
    "trade": {
@@ -608,9 +608,9 @@
    "shown": false,
    "group": "SEMUA",
    "reason": "TELAT ENTRY",
-   "n": 12,
-   "stocks": 12,
-   "dates": 6,
+   "n": 13,
+   "stocks": 13,
+   "dates": 7,
    "fwd": {
     "h5": {
      "n": 8,
@@ -619,9 +619,9 @@
      "beat": 88
     },
     "h10": {
-     "n": 1,
-     "medRet": 9.74,
-     "medExcess": 23.7,
+     "n": 2,
+     "medRet": 2.26,
+     "medExcess": 14.64,
      "beat": 100
     },
     "h20": {
@@ -629,12 +629,12 @@
     }
    },
    "trade": {
-    "n": 6,
-    "t1Pct": 83,
-    "stopPct": 17,
+    "n": 7,
+    "t1Pct": 71,
+    "stopPct": 29,
     "expPct": 0,
-    "avgR1": 0.26,
-    "avgR2": 0.66,
+    "avgR1": 0.08,
+    "avgR2": 0.38,
     "trigPct": null,
     "pending": 5,
     "t1Late": 1
@@ -698,10 +698,10 @@
      "beat": 50
     },
     "h20": {
-     "n": 261,
-     "medRet": -3.33,
-     "medExcess": 0.81,
-     "beat": 52
+     "n": 268,
+     "medRet": -3.34,
+     "medExcess": 0.89,
+     "beat": 53
     }
    },
    "trade": {
@@ -918,7 +918,7 @@
    "outcome": "GAGAL_SEBELUM_TRIGGER",
    "R1": null,
    "ret5": -6.7,
-   "ret10": null
+   "ret10": -7.3
   },
   {
    "date": "2026-10-12",
@@ -934,7 +934,7 @@
    "outcome": "GAGAL_SEBELUM_TRIGGER",
    "R1": null,
    "ret5": -19.4,
-   "ret10": null
+   "ret10": -13.7
   },
   {
    "date": "2026-10-12",
@@ -950,7 +950,7 @@
    "outcome": "GAGAL_SEBELUM_TRIGGER",
    "R1": null,
    "ret5": -6.1,
-   "ret10": null
+   "ret10": -1.9
   },
   {
    "date": "2026-10-08",
