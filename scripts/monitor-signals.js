@@ -139,11 +139,18 @@ async function fetchYahooIntraday(code) {
   return out;
 }
 
-// Open/low/high dari candle yang mulai pada atau setelah sinceIso. null bila tidak ada.
-function rangeSince(md, sinceIso) {
+// Candle pertama sejak sinceIso yang low-nya menyentuh level. null bila tidak ada.
+function firstTouchLow(md, level, sinceIso) {
   if (!md.candles || !md.candles.length || !sinceIso) return null;
   const since = new Date(sinceIso).getTime();
-  const c = md.candles.filter(x => x.ts >= since);
+  return md.candles.find(x => x.ts >= since && x.low <= level) || null;
+}
+
+// Open/low/high dari candle sejak sinceIso (strict=true: hanya candle setelahnya). null bila tidak ada.
+function rangeSince(md, sinceIso, strict) {
+  if (!md.candles || !md.candles.length || !sinceIso) return null;
+  const since = new Date(sinceIso).getTime();
+  const c = md.candles.filter(x => strict ? x.ts > since : x.ts >= since);
   if (!c.length) return null;
   return {
     open: c[0].open,
@@ -223,12 +230,16 @@ function checkSignalStatus(signal, md, nowIso) {
 
   let newHits = 0;
   let lastFill = null;
+  let firstHitIso = null;
   for (const e of entries) {
     if (!e.hitAt && lowEntry <= e.price) {
-      e.hitAt = nowIso;
-      e.fill = entryFill(e.price, entryMd, entryRangeOk);
+      const tc = rngE ? firstTouchLow(md, e.price, signal.published_at) : null;
+      const hitIso = tc ? new Date(tc.ts).toISOString() : nowIso;
+      if (!firstHitIso || hitIso < firstHitIso) firstHitIso = hitIso;
+      e.hitAt = hitIso;
+      e.fill = entryFill(e.price, tc && tc.open != null ? { ...md, open: tc.open } : entryMd, entryRangeOk);
       lastFill = e.fill;
-      update['entry_' + e.i + '_hit_at'] = nowIso;
+      update['entry_' + e.i + '_hit_at'] = hitIso;
       update['entry_' + e.i + '_fill_price'] = e.fill;
       newHits++;
     }
@@ -243,14 +254,14 @@ function checkSignalStatus(signal, md, nowIso) {
     update.actual_entry_avg = w > 0 ? Math.round((sum / w) * 100) / 100 : null;
     if (!wasActive) {
       update.status = 'ACTIVE';
-      update.entry_hit_at = nowIso;
+      update.entry_hit_at = firstHitIso || nowIso;
     }
     events.push({ event: 'ENTRY_HIT', price: lastFill, notify: true });
   }
 
   // ---- EXIT (TP / SL) ----
   // low/high harian hanya dipakai bila posisi sudah aktif sejak sebelum hari ini
-  const rngX = wasActive && signal.entry_hit_at ? rangeSince(md, signal.entry_hit_at) : null;
+  const rngX = wasActive && signal.entry_hit_at ? rangeSince(md, signal.entry_hit_at, true) : null;
   const legacyExit = wasActive && md.low != null && md.high != null &&
     signal.entry_hit_at && wibDate(signal.entry_hit_at) < today;
   const exitRangeOk = !!rngX || legacyExit;
