@@ -1,4 +1,4 @@
-﻿name: Cron expire plans
+name: Cron expire plans
 on:
   schedule:
     - cron: "0 17 * * *"   # 00:00 WIB (17:00 UTC)
@@ -12,7 +12,7 @@ jobs:
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          curl -fsS -X POST "https://chartnalis.web.id/api/cron/expire-plans" \
+          curl -fsS -X POST "https://chartnalis.web.id/api/ops/expire-plans" \
             -H "X-Cron-Secret: $CRON_SECRET" \
             -H "Content-Type: application/json" \
             -d "{}"
