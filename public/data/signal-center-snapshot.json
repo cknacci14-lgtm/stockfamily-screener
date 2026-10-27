@@ -1,15 +1,59 @@
 {
   "success": true,
-  "date": "2026-10-26",
-  "count": 0,
+  "date": "2026-10-27",
+  "count": 1,
   "filtered": {
-    "considered": 3,
+    "considered": 5,
     "noTrade": 2,
-    "lateEntry": 1,
+    "lateEntry": 2,
     "wideStop": 0
   },
-  "signals": [],
+  "signals": [
+    {
+      "stockCode": "JSMR",
+      "stockName": "Jasa Marga (Persero) Tbk.",
+      "setup": "BREAKOUT",
+      "status": "TRIGGERED",
+      "price": 2850,
+      "trigger": null,
+      "invalidation": null,
+      "target1": null,
+      "target2": null,
+      "riskReward": null,
+      "riskLevel": "HIGH",
+      "entryGapPct": 0,
+      "rrFromPrice": 0,
+      "planStale": false,
+      "preBreakout": false,
+      "stopDistancePct": 0,
+      "stopWide": false,
+      "maxEntry": 0,
+      "structure": {
+        "state": "BULLISH",
+        "label": "Bullish structure",
+        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
+      },
+      "participation": {
+        "state": "IMPROVING",
+        "label": "Participation improving",
+        "explanation": "Multiple trading-activity measures are materially above their recent baseline."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": -0.00003126388320937897,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HEALTHY",
+        "label": "Healthy liquidity",
+        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-10-27T18:47:40.860Z"
+    }
+  ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-10-27T04:31:08.611Z"
+  "generatedAt": "2026-10-27T18:47:40.860Z"
 }

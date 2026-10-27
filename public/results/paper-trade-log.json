@@ -2040,10 +2040,10 @@
       "signal_close": 3710,
       "entry_price": 3720,
       "entry_date": "2026-10-14",
-      "exit_price": null,
-      "exit_date": null,
-      "return_pct": null,
-      "status": "PENDING",
+      "exit_price": 2320,
+      "exit_date": "2026-10-27",
+      "return_pct": -37.634408602150536,
+      "status": "COMPLETE",
       "created_at": "2026-10-13T19:55:38.991Z"
     },
     "SIMP_2026-10-13": {
@@ -2054,10 +2054,10 @@
       "signal_close": 565,
       "entry_price": 565,
       "entry_date": "2026-10-14",
-      "exit_price": null,
-      "exit_date": null,
-      "return_pct": null,
-      "status": "PENDING",
+      "exit_price": 520,
+      "exit_date": "2026-10-27",
+      "return_pct": -7.964601769911504,
+      "status": "COMPLETE",
       "created_at": "2026-10-13T19:55:38.991Z"
     },
     "SSIA_2026-10-13": {
@@ -2068,10 +2068,10 @@
       "signal_close": 1650,
       "entry_price": 1655,
       "entry_date": "2026-10-14",
-      "exit_price": null,
-      "exit_date": null,
-      "return_pct": null,
-      "status": "PENDING",
+      "exit_price": 1205,
+      "exit_date": "2026-10-27",
+      "return_pct": -27.19033232628399,
+      "status": "COMPLETE",
       "created_at": "2026-10-13T19:55:38.991Z"
     },
     "ARCI_2026-10-13": {
@@ -2082,10 +2082,10 @@
       "signal_close": 1245,
       "entry_price": 1230,
       "entry_date": "2026-10-14",
-      "exit_price": null,
-      "exit_date": null,
-      "return_pct": null,
-      "status": "PENDING",
+      "exit_price": 975,
+      "exit_date": "2026-10-27",
+      "return_pct": -20.73170731707317,
+      "status": "COMPLETE",
       "created_at": "2026-10-13T19:55:38.991Z"
     },
     "HUMI_2026-10-13": {
@@ -2096,10 +2096,10 @@
       "signal_close": 116,
       "entry_price": 117,
       "entry_date": "2026-10-14",
-      "exit_price": null,
-      "exit_date": null,
-      "return_pct": null,
-      "status": "PENDING",
+      "exit_price": 91,
+      "exit_date": "2026-10-27",
+      "return_pct": -22.22222222222222,
+      "status": "COMPLETE",
       "created_at": "2026-10-13T19:55:38.991Z"
     },
     "FORE_2026-10-13": {
@@ -2110,10 +2110,10 @@
       "signal_close": 745,
       "entry_price": 745,
       "entry_date": "2026-10-14",
-      "exit_price": null,
-      "exit_date": null,
-      "return_pct": null,
-      "status": "PENDING",
+      "exit_price": 580,
+      "exit_date": "2026-10-27",
+      "return_pct": -22.14765100671141,
+      "status": "COMPLETE",
       "created_at": "2026-10-13T19:55:38.991Z"
     },
     "MAPI_2026-10-13": {
@@ -2124,10 +2124,10 @@
       "signal_close": 1440,
       "entry_price": 1440,
       "entry_date": "2026-10-14",
-      "exit_price": null,
-      "exit_date": null,
-      "return_pct": null,
-      "status": "PENDING",
+      "exit_price": 1320,
+      "exit_date": "2026-10-27",
+      "return_pct": -8.333333333333332,
+      "status": "COMPLETE",
       "created_at": "2026-10-13T19:55:38.991Z"
     },
     "DGWG_2026-10-13": {
@@ -2138,10 +2138,10 @@
       "signal_close": 322,
       "entry_price": 324,
       "entry_date": "2026-10-14",
-      "exit_price": null,
-      "exit_date": null,
-      "return_pct": null,
-      "status": "PENDING",
+      "exit_price": 260,
+      "exit_date": "2026-10-27",
+      "return_pct": -19.753086419753085,
+      "status": "COMPLETE",
       "created_at": "2026-10-13T19:55:38.991Z"
     },
     "ESSA_2026-10-13": {
@@ -2152,10 +2152,10 @@
       "signal_close": 580,
       "entry_price": 580,
       "entry_date": "2026-10-14",
-      "exit_price": null,
-      "exit_date": null,
-      "return_pct": null,
-      "status": "PENDING",
+      "exit_price": 535,
+      "exit_date": "2026-10-27",
+      "return_pct": -7.758620689655173,
+      "status": "COMPLETE",
       "created_at": "2026-10-13T19:55:38.991Z"
     },
     "GPSO_2026-10-13": {
@@ -2166,10 +2166,10 @@
       "signal_close": 230,
       "entry_price": 234,
       "entry_date": "2026-10-14",
-      "exit_price": null,
-      "exit_date": null,
-      "return_pct": null,
-      "status": "PENDING",
+      "exit_price": 216,
+      "exit_date": "2026-10-27",
+      "return_pct": -7.6923076923076925,
+      "status": "COMPLETE",
       "created_at": "2026-10-13T19:55:38.991Z"
     },
     "INDO_2026-10-13": {
@@ -2178,12 +2178,12 @@
       "regime": "Supportive",
       "signal_date": "2026-10-13",
       "signal_close": 171,
-      "entry_price": null,
-      "entry_date": null,
-      "exit_price": null,
-      "exit_date": null,
-      "return_pct": null,
-      "status": "PENDING",
+      "entry_price": 172,
+      "entry_date": "2026-10-14",
+      "exit_price": 135,
+      "exit_date": "2026-10-27",
+      "return_pct": -21.511627906976745,
+      "status": "COMPLETE",
       "created_at": "2026-10-13T19:55:38.991Z"
     },
     "HEAL_2026-10-13": {
@@ -2194,10 +2194,10 @@
       "signal_close": 600,
       "entry_price": 600,
       "entry_date": "2026-10-14",
-      "exit_price": null,
-      "exit_date": null,
-      "return_pct": null,
-      "status": "PENDING",
+      "exit_price": 488,
+      "exit_date": "2026-10-27",
+      "return_pct": -18.666666666666668,
+      "status": "COMPLETE",
       "created_at": "2026-10-13T19:55:38.991Z"
     },
     "ISSP_2026-10-23": {
@@ -2339,7 +2339,13 @@
       "new_signals": 0,
       "completed": 0,
       "total_entries": 158
+    },
+    {
+      "timestamp": "2026-10-27T18:45:24.001Z",
+      "new_signals": 0,
+      "completed": 12,
+      "total_entries": 158
     }
   ],
-  "last_run": "2026-10-27T04:28:16.710Z"
+  "last_run": "2026-10-27T18:45:24.000Z"
 }

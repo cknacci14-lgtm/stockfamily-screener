@@ -4,8 +4,8 @@
   "formula": "pos3 + closeLoc3>0.70 + vol>1.5 + ret3d 10-35% + foreign<15% + vol>=200k + bidImb>0",
   "validation": "Eksperimental. Backtest 2025-09 s/d 2026-10: naik 58% besok, edge hilang bila masuk di open T+1. Forward test berjalan.",
   "total": 0,
-  "scan_date": "2026-10-26",
-  "generated_at": "2026-10-27T04:28:07.834Z",
+  "scan_date": "2026-10-27",
+  "generated_at": "2026-10-27T18:45:12.970Z",
   "data": [],
   "results": [],
   "signals": []
