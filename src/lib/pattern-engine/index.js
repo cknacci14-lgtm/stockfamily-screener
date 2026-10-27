@@ -11,8 +11,7 @@ const { cleanCandles } = require("./utils");
 const DETECTORS = {
   asc_triangle: detectAscendingTriangle,
   w_bottom: detectWBottom,
-  bull_flag: detectBullFlag,
-  flag_pennant: detectFlagPennant,
+  flag_pennant: detectFlagPennant,   // replaces bull_flag (kept below only for reference)
 };
 
 function getDetector(type) {
