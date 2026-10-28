@@ -64,11 +64,19 @@ function detectWBottom(candles, opts = {}) {
       const higherBottom = Math.max(low1, low2);
       if ((neckline - higherBottom) / higherBottom < o.minDepth) continue;
 
-      // breakout after bottom 2, fresh
+      // breakout after bottom 2: must be the FIRST close above the break level
+      // since bottom 2, and that first close must be within the fresh window
+      const level = neckline * (1 + o.breakPct);
+      let firstCross = -1;
+      for (let t = j + 1; t < n; t++) {
+        if (c[t].close > level) { firstCross = t; break; }
+      }
+      if (firstCross < 0 || firstCross < n - 1 - o.freshBars) continue;
+
       let breakIdx = -1;
-      for (let t = Math.max(j + 1, n - 1 - o.freshBars); t < n; t++) {
+      for (let t = firstCross; t < n; t++) {
         const prevVol = avg(c.slice(Math.max(0, t - 20), t).map((x) => x.volume));
-        if (c[t].close > neckline * (1 + o.breakPct) && c[t].volume > prevVol) {
+        if (c[t].close > level && c[t].volume > prevVol) {
           breakIdx = t;
           break;
         }
