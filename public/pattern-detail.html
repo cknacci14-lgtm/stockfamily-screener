@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Detail Pola | Chartnalist</title>
+<script src="/assets/stockfamily-sidebar.js"></script>
+<style>
+:root { --bg:#050607; --surface:#0d1012; --surface-2:#111518; --line:#20262a; --text:#f5f7f8; --muted:#8b959c; --cyan:#00d9ff; --green:#00d084; --red:#ff4d4d; --yellow:#f5b700; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); }
+body { font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.terminal { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+.topbar { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+.kicker { font-size: 10px; font-weight: 800; letter-spacing: .14em; color: var(--green); }
+h1 { margin: 4px 0 0; font-size: 28px; line-height: 1.15; }
+h1 small { font-size: 14px; font-weight: 500; color: var(--muted); margin-left: 8px; }
+.meta { margin-top: 8px; font-size: 11px; color: var(--muted); }
+.btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { display: inline-block; padding: 8px 12px; border: 1px solid #263238; border-radius: 7px; background: #101315; color: var(--text); text-decoration: none; font-size: 11px; font-weight: 700; letter-spacing: .06em; }
+.btn:hover { border-color: var(--cyan); color: var(--cyan); }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: .06em; border: 1px solid; }
+.chip i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; display: inline-block; }
+.heads { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 18px; }
+.grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 16px; margin-top: 16px; }
+.col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; min-width: 0; }
+.card h2 { margin: 0 0 12px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+#chart { width: 100%; height: 440px; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; font-size: 11px; color: var(--muted); }
+.legend i { display: inline-block; width: 14px; height: 3px; margin-right: 6px; vertical-align: middle; }
+.kv { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; font-size: 13px; }
+.kv span:nth-child(odd) { color: var(--muted); }
+.kv span:nth-child(even) { text-align: right; font-weight: 700; }
+.pos { color: var(--green); } .neg { color: var(--red); } .dim { color: var(--muted); }
+.txt p { margin: 0 0 8px; font-size: 13px; line-height: 1.6; }
+.txt p:last-child { margin-bottom: 0; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.stat { background: var(--surface-2); border: 1px solid var(--line); border-radius: 9px; padding: 9px 10px; }
+.stat small { font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.stat b { display: block; font-size: 20px; margin-top: 2px; }
+.warn { margin-top: 10px; padding: 7px 9px; font-size: 11px; line-height: 1.45; color: var(--yellow); border: 1px solid rgba(245,183,0,.35); background: rgba(245,183,0,.07); border-radius: 8px; }
+.note { margin-top: 10px; font-size: 12px; color: var(--muted); line-height: 1.6; }
+.tablewrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 520px; }
+th { text-align: left; padding: 8px 10px; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 9px 10px; border-bottom: 1px solid #14191c; white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+.empty { padding: 18px; text-align: center; color: var(--muted); font-size: 13px; }
+#loadError { margin-top: 24px; padding: 18px; border: 1px solid rgba(255,77,77,.35); background: rgba(255,77,77,.07); border-radius: 12px; font-size: 13px; line-height: 1.6; }
+@media (max-width: 980px) { .grid { grid-template-columns: 1fr; } .stats { grid-template-columns: repeat(2, 1fr); } #chart { height: 340px; } h1 { font-size: 22px; } .terminal { padding: 18px 14px 36px; } }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/chartnalist-app-auth.js"></script>
+</head>
+<body>
+<main class="terminal" id="main">
+  <header class="topbar">
+    <div>
+      <div class="kicker">DETAIL POLA</div>
+      <h1 id="hdr">Memuat...</h1>
+      <div class="meta mono" id="meta">Memuat data...</div>
+    </div>
+    <div class="btns">
+      <a class="btn" href="/pattern-scanner.html">&larr; PATTERN SCANNER</a>
+      <a class="btn" id="stockLink" href="/stock.html">STOCK DETAIL</a>
+    </div>
+  </header>
+  <div id="loadError" style="display:none"></div>
+  <div id="gate" style="display:none"></div>
+  <div id="app" style="display:none"></div>
+</main>
+
+<script src="https://unpkg.com/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // Aturan akses sama dengan Pattern Scanner: Premium/Pro (dan admin).
+  var REQUIRE_PREMIUM = true;
+  var SMALL_SAMPLE = 30;
+
+  var PATTERNS = {
+    asc_triangle: { label: "Ascending Triangle", color: "#f5b700" },
+    w_bottom:     { label: "W-Bottom",           color: "#00d9ff" },
+    flag_pennant: { label: "Flag & Pennant",     color: "#00d084" }
+  };
+  var ORDER = ["asc_triangle", "w_bottom", "flag_pennant"];
+  var STATUS = {
+    forming: "TERBENTUK (BELUM BREAKOUT)", breakout: "BREAKOUT",
+    breakout_today: "BREAKOUT DI EOD", breakout_recent: "BREAKOUT BARU"
+  };
+  // Catatan per pola di bagian uji historis. Hapus entri ini kalau definisi pola/backtest berubah.
+  var PATTERN_NOTES = {
+    flag_pennant: "Uji historis memasuki pola saat konsolidasi masih berjalan (close hari terakhir konsolidasi), bukan saat harga menembus trigger. Jadi statistik ini tidak menguji breakout di atas trigger."
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function num(n, d) {
+    if (n == null || n === "" || !isFinite(n)) return "-";
+    return Number(n).toLocaleString("id-ID", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 });
+  }
+  function pct(n, d) {
+    if (n == null || n === "" || !isFinite(n)) return "-";
+    return (n > 0 ? "+" : "") + num(n, d == null ? 2 : d) + "%";
+  }
+  function cls(n) { return n > 0 ? "pos" : n < 0 ? "neg" : "dim"; }
+
+  var qs = new URLSearchParams(location.search);
+  var CODE = String(qs.get("code") || "").toUpperCase().trim();
+  var WANT = String(qs.get("pattern") || "").trim();
+  if (!/^[A-Z0-9]{2,8}$/.test(CODE)) CODE = "";
+  if (!PATTERNS[WANT]) WANT = "";
+
+  // ---------- gerbang (sama dengan Pattern Scanner)
+  function isAdmin(a) {
+    try { return typeof a.isAdmin === "function" ? !!a.isAdmin() : !!a.isAdmin; } catch (e) { return false; }
+  }
+  function allowed() {
+    if (!REQUIRE_PREMIUM) return true;
+    try {
+      var a = window.chartnalistAuth || {};
+      var plan = String(a.plan || "free").toLowerCase();
+      return isAdmin(a) || plan === "premium" || plan === "pro";
+    } catch (e) { return false; }
+  }
+  function showGate() {
+    $("app").style.display = "none";
+    var g = $("gate");
+    g.style.display = "block";
+    g.innerHTML = '<div style="margin:24px auto;max-width:480px;padding:28px 24px;border-radius:16px;border:1px solid rgba(0,208,132,.3);background:rgba(0,208,132,.06);text-align:center">'
+      + '<div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#00d084">Premium</div>'
+      + '<div style="margin-top:10px;font-size:20px;font-weight:800;color:#f5f7f8">Detail Pola</div>'
+      + '<div style="margin-top:8px;font-size:13px;color:#9aa3aa;line-height:1.55">Detail pola tersedia di paket Premium ke atas.</div>'
+      + '<div style="margin-top:18px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'
+      + '<a href="/upgrade/?plan=premium" style="padding:10px 16px;border-radius:8px;background:#00d084;color:#050607;font-weight:800;font-size:13px;text-decoration:none">Upgrade Premium</a>'
+      + '<a href="/landing#pricing" style="padding:10px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.15);color:#e2e8f0;font-weight:600;font-size:13px;text-decoration:none">Lihat paket</a>'
+      + "</div></div>";
+  }
+  function runAfterAuth(cb) {
+    if (window.chartnalistAuth) { cb(); return; }
+    var done = false;
+    function once() { if (!done) { done = true; cb(); } }
+    window.addEventListener("chartnalist:auth-ready", once, { once: true });
+    setTimeout(once, 2500);
+  }
+
+  function fail(msg) {
+    var e = $("loadError");
+    e.style.display = "block";
+    e.textContent = msg;
+  }
+  function getJson(url) {
+    return fetch(url, { cache: "no-cache" }).then(function (r) {
+      if (!r.ok) throw new Error(url + " -> HTTP " + r.status);
+      return r.json();
+    });
+  }
+
+  // ---------- data
+  function findMatch(scan) {
+    var best = null;
+    var pats = (scan && scan.patterns) || {};
+    ORDER.forEach(function (p) {
+      if (WANT && p !== WANT) return;
+      (pats[p] || []).forEach(function (m) {
+        if (m && m.code === CODE && (!best || (m.confidence || 0) > (best.confidence || 0))) {
+          best = Object.assign({}, m, { pattern: m.pattern || p });
+        }
+      });
+    });
+    return best;
+  }
+  function cleanCandles(hist) {
+    var byTime = {};
+    (hist.candles || []).forEach(function (c) {
+      var o = Number(c.open), h = Number(c.high), l = Number(c.low), cl = Number(c.close);
+      if (!c.time || !(cl > 0) || !(h > 0) || !(l > 0)) return;
+      var t = String(c.time).slice(0, 10);
+      byTime[t] = { time: t, open: o > 0 ? o : cl, high: h, low: l, close: cl };
+    });
+    return Object.keys(byTime).sort().map(function (t) { return byTime[t]; });
+  }
+
+  // ---------- teks
+  function conditionParagraphs(m) {
+    var L = m.levels || {}, d = m.details || {};
+    var trig = L.trigger, inv = L.invalidation, close = m.last_close;
+    var out = [];
+    if (m.status === "forming") {
+      if (close > 0 && trig > 0 && close <= trig) {
+        out.push("Belum ada candle yang close di atas " + num(trig) + ". Close terakhir " + num(close) + " masih " + num((trig / close - 1) * 100, 1) + "% di bawah trigger.");
+      } else {
+        out.push("Close terakhir " + num(close) + " berada di atas trigger " + num(trig) + ", tetapi detektor belum menyatakan pola ini breakout.");
+      }
+    } else if (m.status === "breakout" || m.status === "breakout_today" || m.status === "breakout_recent") {
+      if (d.break_date) {
+        out.push("Close pertama di atas trigger tercatat pada " + esc(d.break_date) + (d.break_close ? " di " + num(d.break_close) : "") + ".");
+      }
+      if (close > 0 && trig > 0) out.push("Close terakhir " + num(close) + ", " + pct((close / trig - 1) * 100, 1) + " dari trigger.");
+    }
+    if (inv > 0) out.push("Pola dianggap gagal bila harga menembus " + num(inv) + " (invalidation).");
+    out.push("Trigger, stop, dan target adalah level hasil rumus detektor, bukan prediksi harga.");
+    return out;
+  }
+  function detailParagraphs(m) {
+    var d = m.details || {}, out = [];
+    if (m.pattern === "flag_pennant") {
+      if (d.pole_gain_pct != null) {
+        out.push("Tiang: naik " + pct(d.pole_gain_pct, 1) + " dalam 3 candle" + (d.pole_start_date ? " (" + esc(d.pole_start_date) + " s/d " + esc(d.pole_end_date) + ")" : "") + ", volume " + num(d.pole_vol_vs_base, 1) + "x rata-rata sebelumnya.");
+      }
+      if (d.consolidation_candles != null) {
+        out.push("Konsolidasi " + esc(d.variant || "") + ": " + num(d.consolidation_candles) + " candle, rentang " + num(d.range_vs_pole * 100, 0) + "% dari tinggi tiang, retrace " + num(d.retrace_pct, 1) + "%, volume " + num(d.cons_vol_vs_pole * 100, 0) + "% dari volume tiang.");
+      }
+    } else if (m.pattern === "w_bottom") {
+      if (d.bottom1 && d.bottom2) {
+        out.push("Dasar 1: " + esc(d.bottom1.date) + " (low " + num(d.bottom1.low) + "). Dasar 2: " + esc(d.bottom2.date) + " (low " + num(d.bottom2.low) + "). Selisih " + num(d.bottoms_diff_pct, 2) + "%, jarak " + num(d.bottoms_gap_candles) + " candle, volume dasar 2 = " + num(d.bottom2_vs_bottom1_volume, 2) + "x dasar 1.");
+      }
+    }
+    return out;
+  }
+  function paras(list) {
+    return list.map(function (t) { return "<p>" + t + "</p>"; }).join("");
+  }
+
+  // ---------- chart
+  function drawChart(m, data) {
+    var el = $("chart");
+    if (typeof LightweightCharts === "undefined") { el.innerHTML = '<div class="empty">Library chart gagal dimuat.</div>'; return; }
+    if (!data.length) { el.innerHTML = '<div class="empty">Data harga tidak tersedia.</div>'; return; }
+
+    var chart = LightweightCharts.createChart(el, {
+      width: el.clientWidth, height: el.clientHeight || 440,
+      layout: { background: { type: (LightweightCharts.ColorType ? LightweightCharts.ColorType.Solid : "solid"), color: "#0d1012" }, textColor: "#8b959c" },
+      grid: { vertLines: { color: "#14191c" }, horzLines: { color: "#14191c" } },
+      rightPriceScale: { borderColor: "#20262a" },
+      timeScale: { borderColor: "#20262a" },
+      crosshair: { mode: LightweightCharts.CrosshairMode.Normal }
+    });
+    var Lv = m.levels || {};
+    var cs = chart.addCandlestickSeries({
+      autoscaleInfoProvider: function (orig) {
+        var r = orig();
+        if (!r || !r.priceRange) return r;
+        [Lv.trigger, Lv.invalidation, Lv.target].forEach(function (v) {
+          if (v > 0) {
+            r.priceRange.minValue = Math.min(r.priceRange.minValue, v);
+            r.priceRange.maxValue = Math.max(r.priceRange.maxValue, v);
+          }
+        });
+        return r;
+      },
+      upColor: "#00d084", downColor: "#ff4d4d", borderUpColor: "#00d084", borderDownColor: "#ff4d4d",
+      wickUpColor: "#00d084", wickDownColor: "#ff4d4d"
+    });
+    cs.setData(data);
+
+    var timeSet = {};
+    data.forEach(function (c) { timeSet[c.time] = true; });
+    var lastT = data[data.length - 1].time;
+    function has(t) { return !!(t && timeSet[t]); }
+
+    var L = m.levels || {}, d = m.details || {};
+    var dashed = LightweightCharts.LineStyle.Dashed;
+    if (L.trigger > 0) cs.createPriceLine({ price: L.trigger, color: "#00d9ff", lineWidth: 1, lineStyle: dashed, axisLabelVisible: true, title: "Trigger" });
+    if (L.invalidation > 0) cs.createPriceLine({ price: L.invalidation, color: "#ff4d4d", lineWidth: 1, lineStyle: dashed, axisLabelVisible: true, title: "Stop" });
+    if (L.target > 0) cs.createPriceLine({ price: L.target, color: "#00d084", lineWidth: 1, lineStyle: dashed, axisLabelVisible: true, title: "Target" });
+
+    var lineOpts = function (color, w) { return { color: color, lineWidth: w, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false }; };
+
+    if (m.pattern === "flag_pennant" && has(d.pole_start_date) && has(d.pole_end_date) && has(d.cons_start_date) &&
+        d.pole_low > 0 && d.pole_high > 0 && d.cons_high > 0 && d.cons_low > 0 &&
+        d.pole_start_date < d.pole_end_date && d.cons_start_date < lastT) {
+      var pole = chart.addLineSeries(lineOpts("#00d084", 2));
+      pole.setData([{ time: d.pole_start_date, value: d.pole_low }, { time: d.pole_end_date, value: d.pole_high }]);
+      var up = chart.addLineSeries(lineOpts("#f5b700", 1));
+      up.setData([{ time: d.cons_start_date, value: d.cons_high }, { time: lastT, value: d.cons_high }]);
+      var lo = chart.addLineSeries(lineOpts("#f5b700", 1));
+      lo.setData([{ time: d.cons_start_date, value: d.cons_low }, { time: lastT, value: d.cons_low }]);
+    }
+
+    var mk = [];
+    function addMk(date, text, pos, color, shape) {
+      if (has(date)) mk.push({ time: date, position: pos, color: color, shape: shape, text: text });
+    }
+    if (m.pattern === "w_bottom") {
+      addMk(d.bottom1 && d.bottom1.date, "B1", "belowBar", "#00d9ff", "arrowUp");
+      addMk(d.bottom2 && d.bottom2.date, "B2", "belowBar", "#00d9ff", "arrowUp");
+      addMk(d.break_date, "Break", "aboveBar", "#00d084", "circle");
+    }
+    mk.sort(function (a, b) { return a.time < b.time ? -1 : a.time > b.time ? 1 : 0; });
+    if (mk.length) cs.setMarkers(mk);
+
+    try {
+      var n = data.length;
+      chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - 110), to: n + 4 });
+    } catch (e) { chart.timeScale().fitContent(); }
+
+    window.addEventListener("resize", function () { chart.applyOptions({ width: el.clientWidth }); });
+  }
+
+  // ---------- backtest
+  function backtestHtml(bt, m) {
+    var p = bt && bt.patterns && bt.patterns[m.pattern];
+    if (!p || !p.summary) return '<div class="empty">Statistik uji historis tidak tersedia.</div>';
+    var s = p.summary;
+    var h = (bt && bt.horizon) || 10;
+    var html = '<div class="stats">'
+      + '<div class="stat"><small>Sinyal 1Y</small><b>' + num(s.signals) + '</b></div>'
+      + '<div class="stat"><small>Win rate</small><b>' + (s.win_rate_pct == null ? "-" : num(s.win_rate_pct, 1) + "%") + '</b></div>'
+      + '<div class="stat"><small>Avg ' + esc(h) + 'D</small><b class="' + cls(s.avg_return_pct) + '">' + pct(s.avg_return_pct, 2) + '</b></div>'
+      + '<div class="stat"><small>PF</small><b>' + num(s.profit_factor, 2) + '</b></div>'
+      + '</div>';
+    html += '<div class="note">Median ' + pct(s.median_return_pct, 2) + " &middot; rata-rata menang " + pct(s.avg_win_pct, 2) + " &middot; rata-rata kalah " + pct(s.avg_loss_pct, 2) + " &middot; terbaik " + pct(s.best_pct, 2) + " &middot; terburuk " + pct(s.worst_pct, 2) + "</div>";
+    if (s.signals != null && s.signals < SMALL_SAMPLE) {
+      html += '<div class="warn">Sampel kecil (n=' + num(s.signals) + '). Win rate dan rata-rata dari sampel sekecil ini belum bisa dipakai sebagai bukti.</div>';
+    }
+    if (bt.entry_rule) html += '<div class="note"><b>Aturan uji:</b> ' + esc(bt.entry_rule) + "</div>";
+    if (PATTERN_NOTES[m.pattern]) html += '<div class="note">' + esc(PATTERN_NOTES[m.pattern]) + "</div>";
+    if (bt.caveat) html += '<div class="note">' + esc(bt.caveat) + "</div>";
+    return html;
+  }
+  function historyHtml(bt, m) {
+    var p = bt && bt.patterns && bt.patterns[m.pattern];
+    var trades = ((p && p.trades) || []).filter(function (t) { return t.code === CODE; });
+    if (!trades.length) return '<div class="empty">Belum ada sinyal historis ' + esc(CODE) + " untuk pola ini dalam periode uji.</div>";
+    trades.sort(function (a, b) { return a.signal_date < b.signal_date ? 1 : -1; });
+    var rows = trades.slice(0, 20).map(function (t) {
+      return "<tr><td>" + esc(t.signal_date) + "</td><td>" + num(t.entry) + "</td><td>" + esc(t.exit_date) + "</td><td>" + num(t.exit) + '</td><td class="' + cls(t.return_pct) + '">' + pct(t.return_pct, 2) + '</td><td class="' + cls(t.max_drawdown_pct) + '">' + pct(t.max_drawdown_pct, 1) + "</td></tr>";
+    }).join("");
+    return '<div class="tablewrap"><table><thead><tr><th>Tanggal sinyal</th><th>Entry</th><th>Tanggal exit</th><th>Exit</th><th>Return</th><th>Max drawdown</th></tr></thead><tbody>' + rows + "</tbody></table></div>";
+  }
+
+  // ---------- render
+  function render(res) {
+    var scan = res[0], bt = res[1], hist = res[2];
+    if (!scan || !scan.patterns) throw new Error("Snapshot pattern-scan tidak valid");
+    if (!hist || hist.success === false) throw new Error((hist && hist.error) || "Data harga tidak tersedia");
+
+    var m = findMatch(scan);
+    var data = cleanCandles(hist);
+    $("meta").innerHTML = "EOD " + esc(scan.data_date || "-") + " &middot; scan " + esc(String(scan.generated_at || "").replace("T", " ").slice(0, 16)) + " UTC";
+    $("hdr").innerHTML = esc(CODE) + "<small>" + esc((m && m.name) || hist.name || "") + "</small>";
+    $("stockLink").href = "/stock.html?code=" + encodeURIComponent(CODE);
+    var app = $("app");
+    app.style.display = "block";
+
+    if (!m) {
+      app.innerHTML = '<div class="card empty" style="margin-top:20px">Tidak ada pola terdeteksi untuk ' + esc(CODE) + " pada EOD " + esc(scan.data_date || "-") + '. <a class="btn" style="margin-left:8px" href="/pattern-scanner.html">Kembali ke Pattern Scanner</a></div>';
+      return;
+    }
+
+    var P = PATTERNS[m.pattern] || { label: m.pattern, color: "#8b959c" };
+    var L = m.levels || {};
+    var close = m.last_close;
+    var rr = (L.trigger > L.invalidation && L.invalidation > 0) ? (L.target - L.trigger) / (L.trigger - L.invalidation) : null;
+    var risk = (L.trigger > 0 && L.invalidation > 0) ? (L.invalidation / L.trigger - 1) * 100 : null;
+    var reward = (L.trigger > 0 && L.target > 0) ? (L.target / L.trigger - 1) * 100 : null;
+    var toTrig = (close > 0 && L.trigger > 0) ? (L.trigger / close - 1) * 100 : null;
+
+    var html = '<div class="heads">'
+      + '<span class="chip" style="color:' + P.color + ';border-color:' + P.color + '66"><i></i>' + esc(P.label) + "</span>"
+      + '<span class="mono" style="font-size:11px;letter-spacing:.08em;color:var(--muted)">' + esc(STATUS[m.status] || String(m.status || "").toUpperCase()) + "</span>"
+      + '<span class="mono" style="font-size:11px;color:var(--muted)">CONF ' + num((m.confidence || 0) * 100, 0) + "</span>"
+      + "</div>";
+
+    html += '<div class="grid">'
+      + '<div class="card"><h2>Chart 1 tahun terakhir</h2><div id="chart"></div>'
+      + '<div class="legend"><span><i style="background:#00d9ff"></i>Trigger</span><span><i style="background:#ff4d4d"></i>Stop (invalidation)</span><span><i style="background:#00d084"></i>Target</span>'
+      + (m.pattern === "flag_pennant" ? '<span><i style="background:#00d084"></i>Tiang</span><span><i style="background:#f5b700"></i>Rentang konsolidasi</span>' : "")
+      + (m.pattern === "w_bottom" ? "<span>B1 dan B2 = dasar, Break = close pertama di atas neckline</span>" : "")
+      + "</div></div>"
+      + '<div class="col">'
+      + '<div class="card"><h2>Level</h2><div class="kv">'
+      + "<span>Close terakhir</span><span>" + num(close) + ' <span class="' + cls(m.change_pct) + '">' + pct(m.change_pct, 2) + "</span></span>"
+      + "<span>Trigger</span><span>" + num(L.trigger) + "</span>"
+      + "<span>Stop (invalidation)</span><span>" + num(L.invalidation) + (risk != null ? ' <span class="neg">' + pct(risk, 1) + "</span>" : "") + "</span>"
+      + "<span>Target</span><span>" + num(L.target) + (reward != null ? ' <span class="pos">' + pct(reward, 1) + "</span>" : "") + "</span>"
+      + "<span>R:R dari trigger</span><span>" + (rr != null ? "1:" + num(rr, 1) : "-") + "</span>"
+      + "<span>Kenaikan close ke trigger</span><span>" + (toTrig != null && toTrig > 0 ? pct(toTrig, 1) : "-") + "</span>"
+      + "</div></div>"
+      + '<div class="card txt"><h2>Kondisi saat ini</h2>' + paras(conditionParagraphs(m)) + paras(detailParagraphs(m)) + "</div>"
+      + "</div></div>";
+
+    html += '<div class="card" style="margin-top:16px"><h2>Uji historis: ' + esc(P.label) + "</h2>" + backtestHtml(bt, m) + "</div>";
+    html += '<div class="card" style="margin-top:16px"><h2>Sinyal sebelumnya: ' + esc(CODE) + "</h2>" + historyHtml(bt, m) + "</div>";
+
+    app.innerHTML = html;
+    drawChart(m, data);
+  }
+
+  function start() {
+    if (!allowed()) { showGate(); return; }
+    if (!CODE) { fail("Kode saham tidak valid. Contoh: /pattern-detail.html?code=DMAS"); return; }
+    Promise.all([
+      getJson("/data/pattern-scan.json"),
+      getJson("/data/pattern-backtest.json").catch(function () { return null; }),
+      getJson("/api/public/history/" + encodeURIComponent(CODE) + "?range=1y")
+    ]).then(render).catch(function (e) {
+      fail("Gagal memuat data: " + e.message);
+    });
+  }
+
+  runAfterAuth(start);
+})();
+</script>
+<script src="/assets/chartnalist-track.js?v=20261015" defer></script>
+</body>
+</html>

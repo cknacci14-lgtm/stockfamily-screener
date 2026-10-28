@@ -265,7 +265,13 @@ tbody tr.link { cursor: pointer; } tbody tr.link:hover { background: #0f1417; }
     return (n > 0 ? "+" : "") + num(n, d == null ? 2 : d) + "%";
   }
   function cls(n) { return n > 0 ? "pos" : n < 0 ? "neg" : "dim"; }
-  function stockUrl(code) { return "/stock.html?code=" + encodeURIComponent(code); }
+  function stockUrl(code) {
+    var has = false;
+    try {
+      ORDER.forEach(function (p) { ((S.scan.patterns || {})[p] || []).forEach(function (m) { if (m.code === code) has = true; }); });
+    } catch (e) {}
+    return (has ? "/pattern-detail.html?code=" : "/stock.html?code=") + encodeURIComponent(code);
+  }
   function chip(p) {
     var m = PATTERNS[p];
     if (!m) return "";
