@@ -128,6 +128,14 @@ function detectFlagPennant(candles, opts = {}) {
           range_vs_pole: round(range / poleHeight, 2),
           cons_vol_vs_pole: round(consVol / poleVol, 2),
           retrace_pct: round(retrace * 100, 1),
+          pole_start_date: pole[0].date,
+          pole_end_date: pole[2].date,
+          cons_start_date: cons[0].date,
+          prev_close: round(prevClose, 2),
+          pole_low: round(poleLow, 2),
+          pole_high: round(poleHigh, 2),
+          cons_high: round(consHigh, 2),
+          cons_low: round(consLow, 2),
         },
       };
     }
