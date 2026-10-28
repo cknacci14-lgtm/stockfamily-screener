@@ -163,7 +163,7 @@ tbody tr.link { cursor: pointer; } tbody tr.link:hover { background: #0f1417; }
     <div>
       <div class="kicker">TRADING INTELLIGENCE</div>
       <h1>Pattern Scanner</h1>
-      <div class="sub">Ascending Triangle, W-Bottom, dan Bull Flag dideteksi dengan aturan tetap dari data harian di database, lalu diuji ke belakang selama 1 tahun. Semua angka dihitung ulang setiap hari, tanpa data contoh.</div>
+      <div class="sub">Ascending Triangle, W-Bottom, serta Flag &amp; Pennant dideteksi dengan aturan tetap dari data harian di database, lalu diuji ke belakang selama 1 tahun. Semua angka dihitung ulang setiap hari, tanpa data contoh.</div>
       <div class="meta mono" id="meta">Loading snapshot...</div>
     </div>
     <a class="btn" href="/watchlist.html">&larr; SMARTWATCHLIST</a>
@@ -238,16 +238,16 @@ tbody tr.link { cursor: pointer; } tbody tr.link:hover { background: #0f1417; }
   var PATTERNS = {
     asc_triangle: { label: "Ascending Triangle", short: "ASC TRI", color: "#f5b700", tag: "ACCUMULATION" },
     w_bottom:     { label: "W-Bottom",           short: "W-BOT",   color: "#00d9ff", tag: "REVERSAL" },
-    bull_flag:    { label: "Bull Flag",          short: "FLAG",    color: "#00d084", tag: "CONTINUATION" }
+    flag_pennant:    { label: "Flag & Pennant",          short: "FLAG",    color: "#00d084", tag: "CONTINUATION" }
   };
-  var ORDER = ["asc_triangle", "w_bottom", "bull_flag"];
+  var ORDER = ["asc_triangle", "w_bottom", "flag_pennant"];
   var SMALL_SAMPLE = 30;
   var PAGE = 60;
 
   var ILLU = {
     asc_triangle: '<svg viewBox="0 0 200 64"><path d="M10 12 L190 12" stroke="#f5b700" stroke-width="1.4"/><path d="M10 54 L170 14" stroke="#8b959c" stroke-width="1" stroke-dasharray="4 4"/><path d="M14 50 L40 22 L58 40 L88 17 L104 34 L134 13 L150 24 L176 12" fill="none" stroke="#00d084" stroke-width="1.6"/></svg>',
     w_bottom:     '<svg viewBox="0 0 200 64"><path d="M10 10 L50 54 L90 24 L130 54 L170 12 L192 8" fill="none" stroke="#00d9ff" stroke-width="1.6"/><path d="M90 24 L192 24" stroke="#8b959c" stroke-width="1" stroke-dasharray="4 4"/><circle cx="170" cy="12" r="3" fill="#00d084"/></svg>',
-    bull_flag:    '<svg viewBox="0 0 200 64"><path d="M10 58 L56 10" stroke="#00d084" stroke-width="2" fill="none"/><path d="M56 10 L100 16 L96 32 L52 26 Z" fill="rgba(0,208,132,.12)" stroke="#f5b700" stroke-width="1"/><path d="M98 24 L160 6" stroke="#00d084" stroke-width="1.6" fill="none" stroke-dasharray="4 3"/></svg>'
+    flag_pennant:    '<svg viewBox="0 0 200 64"><path d="M10 58 L56 10" stroke="#00d084" stroke-width="2" fill="none"/><path d="M56 10 L100 16 L96 32 L52 26 Z" fill="rgba(0,208,132,.12)" stroke="#f5b700" stroke-width="1"/><path d="M98 24 L160 6" stroke="#00d084" stroke-width="1.6" fill="none" stroke-dasharray="4 3"/></svg>'
   };
 
   var $ = function (id) { return document.getElementById(id); };
