@@ -50,10 +50,10 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-28T03:24:47.992Z"
+      "updatedAt": "2026-10-28T07:19:07.959Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-10-28T03:24:47.993Z"
+  "generatedAt": "2026-10-28T07:19:07.959Z"
 }
