@@ -364,7 +364,7 @@ tr:last-child td { border-bottom: 0; }
     var risk = (L.trigger > 0 && L.invalidation > 0) ? (L.invalidation / L.trigger - 1) * 100 : null;
     var reward = (L.trigger > 0 && L.target > 0) ? (L.target / L.trigger - 1) * 100 : null;
     var toTrig = (close > 0 && L.trigger > 0) ? (L.trigger / close - 1) * 100 : null;
-    var rrNow = (L.invalidation > 0 && close > L.invalidation && L.target > close) ? (L.target - close) / (close - L.invalidation) : null;
+    var rrNow = (L.trigger > 0 && close > L.trigger && L.invalidation > 0 && L.target > close) ? (L.target - close) / (close - L.invalidation) : null;
     var prog = (close > L.trigger && L.target > L.trigger) ? (close - L.trigger) / (L.target - L.trigger) * 100 : null;
 
     var html = '<div class="heads">'
