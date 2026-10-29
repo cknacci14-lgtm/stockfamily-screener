@@ -1,162 +1,33 @@
 {
   "success": true,
-  "date": "2026-10-28",
-  "count": 4,
+  "date": "2026-10-29",
+  "count": 1,
   "filtered": {
-    "considered": 6,
+    "considered": 3,
     "noTrade": 2,
     "lateEntry": 0,
     "wideStop": 0
   },
   "signals": [
     {
-      "stockCode": "ULTJ",
-      "stockName": "Ultrajaya Milk Industry & Trading Company Tbk.",
-      "setup": "PULLBACK",
-      "status": "TRIGGERED",
-      "price": 2120,
-      "trigger": 2084,
-      "invalidation": 1894.71,
-      "target1": 2367.93,
-      "target2": 2557.21,
-      "riskReward": 2.5,
-      "riskLevel": "HIGH",
-      "entryGapPct": 1.7,
-      "rrFromPrice": 1.1,
-      "planStale": false,
-      "preBreakout": false,
-      "stopDistancePct": 10.6,
-      "stopWide": false,
-      "maxEntry": 2131.32,
-      "structure": {
-        "state": "BULLISH",
-        "label": "Bullish structure",
-        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
-      },
-      "participation": {
-        "state": "CONTRACTING",
-        "label": "Participation contracting",
-        "explanation": "Multiple trading-activity measures are below their recent baseline."
-      },
-      "flow": {
-        "state": "NEUTRAL",
-        "label": "Foreign flow neutral",
-        "value": 0.000040154864329014504,
-        "explanation": "Foreign activity does not provide a decisive contextual signal."
-      },
-      "liquidity": {
-        "state": "HEALTHY",
-        "label": "Healthy liquidity",
-        "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
-      },
-      "signalDate": null,
-      "updatedAt": "2026-10-28T18:57:08.423Z"
-    },
-    {
-      "stockCode": "BDMN",
-      "stockName": "Bank Danamon Indonesia Tbk.",
-      "setup": "BREAKOUT",
-      "status": "WATCH",
-      "price": 4920,
-      "trigger": 5075,
-      "invalidation": 4558.93,
-      "target1": 5849.11,
-      "target2": 6365.18,
-      "riskReward": 2.5,
-      "riskLevel": "HIGH",
-      "entryGapPct": -3.1,
-      "rrFromPrice": 2.57,
-      "planStale": false,
-      "preBreakout": true,
-      "stopDistancePct": 7.3,
-      "stopWide": false,
-      "maxEntry": 5204.02,
-      "structure": {
-        "state": "NEUTRAL",
-        "label": "Neutral structure",
-        "explanation": "Price structure does not currently show a decisive directional condition."
-      },
-      "participation": {
-        "state": "CONTRACTING",
-        "label": "Participation contracting",
-        "explanation": "Multiple trading-activity measures are below their recent baseline."
-      },
-      "flow": {
-        "state": "NEUTRAL",
-        "label": "Foreign flow neutral",
-        "value": -0.00001892676448797927,
-        "explanation": "Foreign activity does not provide a decisive contextual signal."
-      },
-      "liquidity": {
-        "state": "HIGH_RISK",
-        "label": "Elevated liquidity risk",
-        "explanation": "One or more execution-quality measures are below the preferred baseline."
-      },
-      "signalDate": null,
-      "updatedAt": "2026-10-28T18:57:08.422Z"
-    },
-    {
-      "stockCode": "BSSR",
-      "stockName": "Baramulti Suksessarana Tbk.",
-      "setup": "BREAKOUT",
-      "status": "WATCH",
-      "price": 5150,
-      "trigger": 5275,
-      "invalidation": 4804.46,
-      "target1": 5980.8,
-      "target2": 6451.34,
-      "riskReward": 2.5,
-      "riskLevel": "HIGH",
-      "entryGapPct": -2.4,
-      "rrFromPrice": 2.4,
-      "planStale": false,
-      "preBreakout": true,
-      "stopDistancePct": 6.7,
-      "stopWide": false,
-      "maxEntry": 5392.63,
-      "structure": {
-        "state": "NEUTRAL",
-        "label": "Neutral structure",
-        "explanation": "Price structure does not currently show a decisive directional condition."
-      },
-      "participation": {
-        "state": "CONTRACTING",
-        "label": "Participation contracting",
-        "explanation": "Multiple trading-activity measures are below their recent baseline."
-      },
-      "flow": {
-        "state": "NEUTRAL",
-        "label": "Foreign flow neutral",
-        "value": 0.000030211807875212866,
-        "explanation": "Foreign activity does not provide a decisive contextual signal."
-      },
-      "liquidity": {
-        "state": "HIGH_RISK",
-        "label": "Elevated liquidity risk",
-        "explanation": "One or more execution-quality measures are below the preferred baseline."
-      },
-      "signalDate": null,
-      "updatedAt": "2026-10-28T18:57:08.423Z"
-    },
-    {
       "stockCode": "PWON",
       "stockName": "Pakuwon Jati Tbk.",
       "setup": "BREAKOUT",
       "status": "WATCH",
-      "price": 290,
-      "trigger": 294,
-      "invalidation": 259.71,
-      "target1": 345.43,
-      "target2": 379.71,
+      "price": 286,
+      "trigger": 296,
+      "invalidation": 261,
+      "target1": 348.5,
+      "target2": 383.5,
       "riskReward": 2.5,
       "riskLevel": "HIGH",
-      "entryGapPct": -1.4,
-      "rrFromPrice": 1.83,
+      "entryGapPct": -3.4,
+      "rrFromPrice": 2.5,
       "planStale": false,
       "preBreakout": true,
-      "stopDistancePct": 10.4,
+      "stopDistancePct": 8.7,
       "stopWide": false,
-      "maxEntry": 302.57,
+      "maxEntry": 304.75,
       "structure": {
         "state": "NEUTRAL",
         "label": "Neutral structure",
@@ -170,7 +41,7 @@
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": 0.0011929298120385914,
+        "value": 0.0012298966794800214,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
@@ -179,10 +50,10 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-10-28T18:57:08.423Z"
+      "updatedAt": "2026-10-29T19:03:03.278Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-10-28T18:57:08.423Z"
+  "generatedAt": "2026-10-29T19:03:03.278Z"
 }

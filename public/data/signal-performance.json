@@ -1,6 +1,6 @@
 {
- "generatedAt": "2026-10-28T18:57:50.031Z",
- "marketDate": "2026-10-28",
+ "generatedAt": "2026-10-29T19:03:45.347Z",
+ "marketDate": "2026-10-29",
  "params": {
   "outcomeWindow": 20,
   "triggerWindow": 10,
@@ -17,10 +17,10 @@
  ],
  "sources": {
   "live": {
-   "entries": 69,
-   "shown": 21,
+   "entries": 72,
+   "shown": 22,
    "from": "2026-10-08",
-   "to": "2026-10-28"
+   "to": "2026-10-29"
   },
   "backfill": {
    "entries": 832,
@@ -41,14 +41,14 @@
     "h5": {
      "n": 14,
      "medRet": -2.26,
-     "medExcess": 3.22,
+     "medExcess": 3.24,
      "beat": 86
     },
     "h10": {
-     "n": 9,
-     "medRet": -7.14,
-     "medExcess": 6.82,
-     "beat": 78
+     "n": 11,
+     "medRet": -3.42,
+     "medExcess": 11.63,
+     "beat": 82
     },
     "h20": {
      "n": 0
@@ -61,7 +61,7 @@
     "expPct": 0,
     "avgR1": -0.71,
     "avgR2": -1,
-    "trigPct": 33,
+    "trigPct": 43,
     "pending": 6,
     "t1Late": 0
    },
@@ -82,10 +82,10 @@
      "beat": 83
     },
     "h10": {
-     "n": 5,
-     "medRet": -7.14,
-     "medExcess": 6.82,
-     "beat": 80
+     "n": 6,
+     "medRet": -5.28,
+     "medExcess": 9.22,
+     "beat": 83
     },
     "h20": {
      "n": 0
@@ -98,7 +98,7 @@
     "expPct": 0,
     "avgR1": -1,
     "avgR2": -1,
-    "trigPct": 33,
+    "trigPct": 43,
     "pending": 3,
     "t1Late": 0
    },
@@ -156,10 +156,10 @@
      "beat": 80
     },
     "h10": {
-     "n": 2,
-     "medRet": -16.77,
-     "medExcess": -2.12,
-     "beat": 50
+     "n": 3,
+     "medRet": -10.85,
+     "medExcess": 3.8,
+     "beat": 67
     },
     "h20": {
      "n": 0
@@ -193,10 +193,10 @@
      "beat": 69
     },
     "h10": {
-     "n": 6,
+     "n": 8,
      "medRet": -2.77,
      "medExcess": 11.88,
-     "beat": 83
+     "beat": 88
     },
     "h20": {
      "n": 0
@@ -226,14 +226,14 @@
     "h5": {
      "n": 11,
      "medRet": 2.06,
-     "medExcess": 8.13,
+     "medExcess": 8.17,
      "beat": 73
     },
     "h10": {
-     "n": 5,
+     "n": 7,
      "medRet": -2.78,
      "medExcess": 11.87,
-     "beat": 80
+     "beat": 86
     },
     "h20": {
      "n": 0
@@ -263,7 +263,7 @@
     "h5": {
      "n": 2,
      "medRet": -10.63,
-     "medExcess": -2.68,
+     "medExcess": -2.66,
      "beat": 50
     },
     "h10": {
@@ -310,10 +310,10 @@
      "beat": 58
     },
     "h20": {
-     "n": 211,
-     "medRet": 0.91,
-     "medExcess": 1.49,
-     "beat": 56
+     "n": 212,
+     "medRet": 1.08,
+     "medExcess": 1.52,
+     "beat": 57
     }
    },
    "trade": {
@@ -350,9 +350,9 @@
      "beat": 67
     },
     "h20": {
-     "n": 111,
-     "medRet": 1.92,
-     "medExcess": 2.08,
+     "n": 112,
+     "medRet": 1.95,
+     "medExcess": 2.15,
      "beat": 64
     }
    },
@@ -466,7 +466,7 @@
     "h10": {
      "n": 2,
      "medRet": 0.02,
-     "medExcess": 8.29,
+     "medExcess": 8.32,
      "beat": 50
     },
     "h20": {
@@ -510,9 +510,9 @@
      "beat": 50
     },
     "h20": {
-     "n": 276,
-     "medRet": -3.46,
-     "medExcess": 0.66,
+     "n": 277,
+     "medRet": -3.48,
+     "medExcess": 0.71,
      "beat": 52
     }
    },
@@ -550,9 +550,9 @@
      "beat": 48
     },
     "h20": {
-     "n": 210,
-     "medRet": -4.03,
-     "medExcess": 0.44,
+     "n": 211,
+     "medRet": -4.2,
+     "medExcess": 0.47,
      "beat": 51
     }
    },
@@ -621,14 +621,14 @@
     "h5": {
      "n": 10,
      "medRet": -1.97,
-     "medExcess": 7.87,
+     "medExcess": 7.9,
      "beat": 80
     },
     "h10": {
-     "n": 6,
-     "medRet": -2.77,
-     "medExcess": 11.88,
-     "beat": 83
+     "n": 7,
+     "medRet": -2.78,
+     "medExcess": 11.87,
+     "beat": 86
     },
     "h20": {
      "n": 0
@@ -663,7 +663,10 @@
      "beat": 33
     },
     "h10": {
-     "n": 0
+     "n": 1,
+     "medRet": 5.61,
+     "medExcess": 20.8,
+     "beat": 100
     },
     "h20": {
      "n": 0
@@ -704,9 +707,9 @@
      "beat": 50
     },
     "h20": {
-     "n": 268,
-     "medRet": -3.34,
-     "medExcess": 0.89,
+     "n": 269,
+     "medRet": -3.35,
+     "medExcess": 0.94,
      "beat": 53
     }
    },
@@ -766,6 +769,22 @@
   }
  ],
  "recent": [
+  {
+   "date": "2026-10-29",
+   "code": "PWON",
+   "group": "PRA-BREAKOUT",
+   "status": "WATCH",
+   "source": "live",
+   "repeat": true,
+   "price": 286,
+   "trigger": 296,
+   "stop": 261,
+   "target1": 348.5,
+   "outcome": "MENUNGGU",
+   "R1": null,
+   "ret5": null,
+   "ret10": null
+  },
   {
    "date": "2026-10-28",
    "code": "BDMN",
@@ -924,7 +943,7 @@
    "outcome": "GAGAL_SEBELUM_TRIGGER",
    "R1": null,
    "ret5": -2.7,
-   "ret10": null
+   "ret10": -3.4
   },
   {
    "date": "2026-10-15",
@@ -940,7 +959,7 @@
    "outcome": "STOP",
    "R1": -1,
    "ret5": 3.9,
-   "ret10": null
+   "ret10": 1.3
   },
   {
    "date": "2026-10-14",
@@ -1389,22 +1408,6 @@
    "R1": null,
    "ret5": 25.6,
    "ret10": 59.2
-  },
-  {
-   "date": "2026-09-25",
-   "code": "PTBA",
-   "group": "PRA-BREAKOUT",
-   "status": "WATCH",
-   "source": "backfill",
-   "repeat": false,
-   "price": 3090,
-   "trigger": 3200,
-   "stop": 2950,
-   "target1": 3575,
-   "outcome": "STOP",
-   "R1": -1,
-   "ret5": 2.9,
-   "ret10": 6.8
   }
  ]
 }
