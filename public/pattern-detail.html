@@ -204,6 +204,7 @@ tr:last-child td { border-bottom: 0; }
         out.push("Close pertama di atas trigger tercatat pada " + esc(d.break_date) + (d.break_close ? " di " + num(d.break_close) : "") + ".");
       }
       if (close > 0 && trig > 0) out.push("Close terakhir " + num(close) + ", " + pct((close / trig - 1) * 100, 1) + " dari trigger.");
+      if (close > trig && L.target > trig) out.push("Harga sudah menempuh " + num((close - trig) / (L.target - trig) * 100, 0) + "% jarak dari trigger ke target.");
     }
     if (inv > 0) out.push("Pola dianggap gagal bila harga menembus " + num(inv) + " (invalidation).");
     out.push("Trigger, stop, dan target adalah level hasil rumus detektor, bukan prediksi harga.");
@@ -363,6 +364,8 @@ tr:last-child td { border-bottom: 0; }
     var risk = (L.trigger > 0 && L.invalidation > 0) ? (L.invalidation / L.trigger - 1) * 100 : null;
     var reward = (L.trigger > 0 && L.target > 0) ? (L.target / L.trigger - 1) * 100 : null;
     var toTrig = (close > 0 && L.trigger > 0) ? (L.trigger / close - 1) * 100 : null;
+    var rrNow = (L.invalidation > 0 && close > L.invalidation && L.target > close) ? (L.target - close) / (close - L.invalidation) : null;
+    var prog = (close > L.trigger && L.target > L.trigger) ? (close - L.trigger) / (L.target - L.trigger) * 100 : null;
 
     var html = '<div class="heads">'
       + '<span class="chip" style="color:' + P.color + ';border-color:' + P.color + '66"><i></i>' + esc(P.label) + "</span>"
@@ -384,6 +387,8 @@ tr:last-child td { border-bottom: 0; }
       + "<span>Target</span><span>" + num(L.target) + (reward != null ? ' <span class="pos">' + pct(reward, 1) + "</span>" : "") + "</span>"
       + "<span>R:R dari trigger</span><span>" + (rr != null ? "1:" + num(rr, 1) : "-") + "</span>"
       + "<span>Kenaikan close ke trigger</span><span>" + (toTrig != null && toTrig > 0 ? pct(toTrig, 1) : "-") + "</span>"
+      + "<span>R:R dari close terakhir</span><span>" + (rrNow != null ? "1:" + num(rrNow, 1) : "-") + "</span>"
+      + "<span>Progres trigger ke target</span><span>" + (prog != null ? num(prog, 0) + "%" : "-") + "</span>"
       + "</div></div>"
       + '<div class="card txt"><h2>Kondisi saat ini</h2>' + paras(conditionParagraphs(m)) + paras(detailParagraphs(m)) + "</div>"
       + "</div></div>";
