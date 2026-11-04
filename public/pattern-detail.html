@@ -297,6 +297,7 @@ tr:last-child td { border-bottom: 0; }
       addMk(d.break_date, "Break", "aboveBar", "#00d084", "circle");
     }
     mk.sort(function (a, b) { return a.time < b.time ? -1 : a.time > b.time ? 1 : 0; });
+    cs.applyOptions({ lastValueVisible: false, priceLineVisible: false });
     if (mk.length) cs.setMarkers(mk);
 
     try {
