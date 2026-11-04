@@ -1,15 +1,59 @@
 {
   "success": true,
-  "date": "2026-11-02",
-  "count": 0,
+  "date": "2026-11-03",
+  "count": 1,
   "filtered": {
     "considered": 3,
     "noTrade": 2,
-    "lateEntry": 1,
+    "lateEntry": 0,
     "wideStop": 0
   },
-  "signals": [],
+  "signals": [
+    {
+      "stockCode": "PRDA",
+      "stockName": "Prodia Widyahusada Tbk.",
+      "setup": "BREAKOUT",
+      "status": "WATCH",
+      "price": 3680,
+      "trigger": 3760,
+      "invalidation": 3217.14,
+      "target1": 4574.29,
+      "target2": 5117.14,
+      "riskReward": 2.5,
+      "riskLevel": "HIGH",
+      "entryGapPct": -2.1,
+      "rrFromPrice": 1.93,
+      "planStale": false,
+      "preBreakout": true,
+      "stopDistancePct": 12.6,
+      "stopWide": false,
+      "maxEntry": 3895.72,
+      "structure": {
+        "state": "BULLISH",
+        "label": "Bullish structure",
+        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
+      },
+      "participation": {
+        "state": "NEUTRAL",
+        "label": "Normal participation",
+        "explanation": "Trading activity is not showing a decisive expansion or contraction."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": -0.000024469722109128548,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HIGH_RISK",
+        "label": "Elevated liquidity risk",
+        "explanation": "One or more execution-quality measures are below the preferred baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-11-04T20:30:43.067Z"
+    }
+  ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-11-03T20:14:05.044Z"
+  "generatedAt": "2026-11-04T20:30:43.067Z"
 }
