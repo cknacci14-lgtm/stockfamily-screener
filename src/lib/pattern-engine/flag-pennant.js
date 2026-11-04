@@ -50,12 +50,12 @@ function detectFlagPennant(candles, opts = {}) {
   let best = null;
   const hit = (stage) => { if (o.trace) o.trace[stage] = (o.trace[stage] || 0) + 1; };
 
-  for (let k = o.minCons; k <= o.maxCons; k++) {
-    const impStart = n - k - 3;
+  for (const e of [0, 1, 2, 3]) for (let k = o.minCons; k <= o.maxCons; k++) {
+    const impStart = n - k - 3 - e;
     if (impStart - 1 < 0) continue;
 
     const pole = c.slice(impStart, impStart + 3);
-    const cons = c.slice(n - k);
+    const cons = c.slice(n - k - e, n - e);
     const prevClose = c[impStart - 1].close;
 
     hit("tried");
@@ -74,6 +74,7 @@ function detectFlagPennant(candles, opts = {}) {
     const consHigh = Math.max(...cons.map((x) => x.high));
     const consLow = Math.min(...cons.map((x) => x.low));
     const range = consHigh - consLow;
+    if (e > 0 && !(c[n - e].close > consHigh && c[n - 1].close > consHigh)) continue;
     if (!(range <= o.rangeVsPole * poleHeight)) continue;
     hit("tight");
 
@@ -114,7 +115,7 @@ function detectFlagPennant(candles, opts = {}) {
         matched: true,
         pattern: PATTERN,
         confidence: round(confidence),
-        status: c[n - 1].close > consHigh ? "breakout" : "forming",
+        status: e > 0 ? "breakout" : "forming",
         levels: {
           trigger: round(consHigh, 2),
           invalidation: round(consLow, 2),
@@ -136,6 +137,7 @@ function detectFlagPennant(candles, opts = {}) {
           pole_high: round(poleHigh, 2),
           cons_high: round(consHigh, 2),
           cons_low: round(consLow, 2),
+          ...(e > 0 ? { break_date: c[n - e].date, break_close: round(c[n - e].close, 2), bars_since_break: e - 1 } : {}),
         },
       };
     }

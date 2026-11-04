@@ -93,7 +93,7 @@ tr:last-child td { border-bottom: 0; }
   };
   // Catatan per pola di bagian uji historis. Hapus entri ini kalau definisi pola/backtest berubah.
   var PATTERN_NOTES = {
-    flag_pennant: "Uji historis memasuki pola saat konsolidasi masih berjalan (close hari terakhir konsolidasi), bukan saat harga menembus trigger. Jadi statistik ini tidak menguji breakout di atas trigger."
+    flag_pennant: "Uji historis memasuki pola pada sinyal pertama, yaitu saat konsolidasi masih berjalan atau saat breakout bila itu lebih dulu terjadi, lalu keluar 10 hari bursa kemudian. Statistik tidak memisahkan kedua kondisi itu."
   };
 
   var $ = function (id) { return document.getElementById(id); };
@@ -203,6 +203,7 @@ tr:last-child td { border-bottom: 0; }
       if (d.break_date) {
         out.push("Close pertama di atas trigger tercatat pada " + esc(d.break_date) + (d.break_close ? " di " + num(d.break_close) : "") + ".");
       }
+      if (typeof d.bars_since_break === "number") out.push(d.bars_since_break === 0 ? "Breakout terjadi pada candle terakhir." : "Breakout " + d.bars_since_break + " hari bursa lalu.");
       if (close > 0 && trig > 0) out.push("Close terakhir " + num(close) + ", " + pct((close / trig - 1) * 100, 1) + " dari trigger.");
       if (close > trig && L.target > trig) out.push("Harga sudah menempuh " + num((close - trig) / (L.target - trig) * 100, 0) + "% jarak dari trigger ke target.");
     }

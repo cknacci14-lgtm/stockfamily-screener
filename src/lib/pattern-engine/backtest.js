@@ -12,7 +12,7 @@ const { avg, round } = require("./utils");
  * `pending` and excluded from statistics.
  */
 function scanHistory(candles, detector, o = {}) {
-  const { window = 60, horizon = 10, cooldown = horizon, detectorOpts = {}, accept = null } = o;
+  const { window = 60, horizon = 10, cooldown = horizon, detectorOpts = {}, accept = null, status = null } = o;
   const trades = [];
   const pending = [];
   let last = -Infinity;
@@ -24,6 +24,7 @@ function scanHistory(candles, detector, o = {}) {
     if (accept && !accept(win)) continue;
     const res = detector(win, detectorOpts);
     if (!res.matched) continue;
+    if (status && !status.includes(res.status)) continue;
     last = t;
 
     if (t + horizon < candles.length) {

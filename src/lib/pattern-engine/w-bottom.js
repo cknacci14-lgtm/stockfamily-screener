@@ -108,7 +108,7 @@ function detectWBottom(candles, opts = {}) {
             bottoms_diff_pct: round(diff * 100, 2),
             bottom2_vs_bottom1_volume: round(v2 / v1, 2),
             break_date: c[breakIdx].date,
-            break_close: round(c[breakIdx].close, 2),
+            break_close: round(c[breakIdx].close, 2), bars_since_break: n - 1 - breakIdx,
           },
         };
       }
