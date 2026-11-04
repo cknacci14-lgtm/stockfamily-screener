@@ -203,6 +203,12 @@
     .signal-action-btn.delete { background: #7f1d1d22; border-color: #dc2626; color: #ef4444; }
     .signal-action-btn.delete:hover { background: #dc2626; color: #fff; }
     .signal-empty { text-align: center; padding: 30px; color: #6b7280; font-style: italic; }
+    .sig-search-wrap { position: relative; max-width: 280px; margin: 0 0 12px; }
+    .sig-search-wrap input { width: 100%; box-sizing: border-box; padding: 8px 30px 8px 12px; background: #131722; border: 1px solid #2a2f3e; border-radius: 8px; color: #e5e7eb; font-size: 13px; text-transform: uppercase; outline: none; }
+    .sig-search-wrap input::placeholder { text-transform: none; color: #6b7280; }
+    .sig-search-wrap input:focus { border-color: #10b981; }
+    .sig-search-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: 0; color: #6b7280; font-size: 16px; line-height: 1; cursor: pointer; display: none; padding: 2px 4px; }
+    .sig-search-clear:hover { color: #e5e7eb; }
 
   
     /* === Ticker Autocomplete === */
@@ -713,6 +719,10 @@
 
       <div class="admin-card">
         <h2>📋 Signals List</h2>
+        <div class="sig-search-wrap">
+          <input type="text" id="sigListSearch" placeholder="Cari ticker..." autocomplete="off" oninput="filterSignalsList()">
+          <button type="button" class="sig-search-clear" id="sigListSearchClear" onclick="clearSignalsSearch()" aria-label="Hapus pencarian">&times;</button>
+        </div>
         <div id="signalsListContainer">
           <div class="signal-empty">Loading...</div>
         </div>
@@ -1493,7 +1503,7 @@
           const statusClass = (s.status || 'draft').toLowerCase();
           const outcomeClass = (s.outcome || '').toLowerCase();
           const dateStr = s.created_at ? new Date(s.created_at).toLocaleDateString('id-ID',{day:'2-digit',month:'short'}) : '—';
-          return '<tr>' +
+          return '<tr data-ticker="' + String(s.ticker || '').toUpperCase() + '">' +
             '<td><strong>' + s.ticker + '</strong></td>' +
             '<td>' + (s.timeframe||'—') + '</td>' +
             '<td>' + (s.entry_avg ? 'Rp '+Number(s.entry_avg).toLocaleString('id-ID') : '—') + '</td>' +
@@ -1509,10 +1519,42 @@
             '</td>' +
           '</tr>';
         }).join('');
-        container.innerHTML = '<table class="signal-list-table"><thead><tr><th>Ticker</th><th>TF</th><th>Entry Avg</th><th>SL</th><th>TP1</th><th>RR</th><th>Status</th><th>Outcome</th><th>Created</th><th>Actions</th></tr></thead><tbody>' + rows + '</tbody></table>';
+        container.innerHTML = '<table class="signal-list-table"><thead><tr><th>Ticker</th><th>TF</th><th>Entry Avg</th><th>SL</th><th>TP1</th><th>RR</th><th>Status</th><th>Outcome</th><th>Created</th><th>Actions</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+          '<div class="signal-empty" id="sigListNoMatch" style="display:none"></div>';
+        filterSignalsList();
       } catch (err) {
         container.innerHTML = '<div class="signal-empty">Error: ' + err.message + '</div>';
       }
+    }
+
+    function filterSignalsList() {
+      const input = document.getElementById('sigListSearch');
+      if (!input) return;
+      const q = input.value.trim().toUpperCase();
+      const clearBtn = document.getElementById('sigListSearchClear');
+      if (clearBtn) clearBtn.style.display = input.value ? 'block' : 'none';
+      const rows = document.querySelectorAll('#signalsListContainer .signal-list-table tbody tr');
+      let shown = 0;
+      rows.forEach(tr => {
+        const match = !q || (tr.dataset.ticker || '').indexOf(q) !== -1;
+        tr.style.display = match ? '' : 'none';
+        if (match) shown++;
+      });
+      const noMatch = document.getElementById('sigListNoMatch');
+      if (noMatch) {
+        if (q && rows.length && !shown) {
+          noMatch.textContent = 'Tidak ada signal dengan ticker "' + q + '".';
+          noMatch.style.display = '';
+        } else {
+          noMatch.style.display = 'none';
+        }
+      }
+    }
+
+    function clearSignalsSearch() {
+      const input = document.getElementById('sigListSearch');
+      if (input) { input.value = ''; input.focus(); }
+      filterSignalsList();
     }
 
     async function publishSignal(id) {
