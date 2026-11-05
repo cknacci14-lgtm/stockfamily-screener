@@ -203,6 +203,11 @@
     .signal-action-btn.delete { background: #7f1d1d22; border-color: #dc2626; color: #ef4444; }
     .signal-action-btn.delete:hover { background: #dc2626; color: #fff; }
     .signal-empty { text-align: center; padding: 30px; color: #6b7280; font-style: italic; }
+    #sfToastBox { position: fixed; top: 16px; right: 16px; z-index: 10000; display: flex; flex-direction: column; gap: 8px; max-width: min(380px, calc(100vw - 32px)); pointer-events: none; }
+    .sf-toast { pointer-events: auto; padding: 10px 14px; border-radius: 8px; font-size: 13px; line-height: 1.4; background: #131722; border: 1px solid #2a2f3e; border-left-width: 4px; color: #e5e7eb; box-shadow: 0 6px 20px rgba(0,0,0,.45); cursor: pointer; }
+    .sf-toast.error { border-left-color: #ef4444; }
+    .sf-toast.success { border-left-color: #10b981; }
+    .sf-toast.info { border-left-color: #f59e0b; }
     .sig-search-wrap { position: relative; max-width: 280px; margin: 0 0 12px; }
     .sig-search-wrap input { width: 100%; box-sizing: border-box; padding: 8px 30px 8px 12px; background: #131722; border: 1px solid #2a2f3e; border-radius: 8px; color: #e5e7eb; font-size: 13px; text-transform: uppercase; outline: none; }
     .sig-search-wrap input::placeholder { text-transform: none; color: #6b7280; }
@@ -1100,6 +1105,25 @@
       var time = new Date().toLocaleTimeString('id-ID');
       var cls = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
       area.innerHTML = '<div><span class="time">[' + time + ']</span> <span class="' + cls + '">' + msg + '</span></div>' + area.innerHTML;
+      // Notifikasi juga tampil bila sedang di tab Signals (log ada di tab Dashboard)
+      var sp = document.getElementById('tab-signals');
+      if (sp && sp.classList.contains('active')) sfToast(msg, cls);
+    }
+
+    function sfToast(msg, type) {
+      var box = document.getElementById('sfToastBox');
+      if (!box) {
+        box = document.createElement('div');
+        box.id = 'sfToastBox';
+        document.body.appendChild(box);
+      }
+      var t = document.createElement('div');
+      t.className = 'sf-toast ' + (type || 'info');
+      t.textContent = msg;
+      var remove = function () { if (t.parentNode) t.parentNode.removeChild(t); };
+      t.onclick = remove;
+      box.appendChild(t);
+      setTimeout(remove, type === 'error' ? 8000 : 4000);
     }
 
     // ============================================================
@@ -1438,6 +1462,9 @@
 
     async function createSignal() {
       const btn = document.getElementById('createSignalBtn');
+      // Nilai yang diisi otomatis (tanpa event change) ikut dibulatkan sebelum dikirim
+      const snapped = SF_PRICE_FIELDS.filter(sfSnapField);
+      if (snapped.length) { updateSignalPreview(); sfToast('Harga dibulatkan ke fraksi IDX: ' + snapped.map(id => id.replace('sig-', '')).join(', '), 'info'); }
       const payload = {
         ticker: document.getElementById('sig-ticker').value.trim().toUpperCase(),
         timeframe: document.getElementById('sig-timeframe').value,
@@ -1588,6 +1615,42 @@
     ['sig-entry1','sig-entry2','sig-entry3','sig-weight1','sig-weight2','sig-weight3','sig-sl','sig-tp1'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.addEventListener('input', updateSignalPreview);
+    });
+
+    // Fraksi harga IDX: <200:1, 200-<500:2, 500-<2000:5, 2000-<5000:10, >=5000:25
+    function sfTick(p) {
+      if (p < 200) return 1;
+      if (p < 500) return 2;
+      if (p < 2000) return 5;
+      if (p < 5000) return 10;
+      return 25;
+    }
+    function sfSnapPrice(p) {
+      var t = sfTick(p);
+      return Math.round(p / t) * t;
+    }
+    var SF_PRICE_FIELDS = ['sig-entry1','sig-entry2','sig-entry3','sig-sl','sig-tp1','sig-tp2','sig-tp3'];
+    // Bulatkan satu kolom ke fraksi terdekat; kembalikan true bila nilainya berubah
+    function sfSnapField(id) {
+      var el = document.getElementById(id);
+      if (!el || el.value === '') return false;
+      var v = parseFloat(el.value);
+      if (!isFinite(v) || v <= 0) return false;
+      var s = sfSnapPrice(v);
+      if (s === v) return false;
+      el.value = s;
+      return true;
+    }
+    SF_PRICE_FIELDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('change', function () {
+        var before = el.value;
+        if (sfSnapField(id)) {
+          sfToast('Harga ' + before + ' dibulatkan ke ' + el.value + ' (fraksi IDX)', 'info');
+          updateSignalPreview();
+        }
+      });
     });
 
 
