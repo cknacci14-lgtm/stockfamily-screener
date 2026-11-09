@@ -1,0 +1,36 @@
+name: CN Top20 Forward Log
+
+on:
+  schedule:
+    # 21:30 WIB (14:30 UTC), Senin-Jumat: data harian biasanya sudah masuk (17:30-19:30 WIB)
+    - cron: '30 14 * * 1-5'
+    # 08:15 WIB (01:15 UTC), Selasa-Sabtu: menangkap data yang terlambat dan mengevaluasi hari sebelumnya
+    - cron: '15 1 * * 2-6'
+  workflow_dispatch:
+
+concurrency:
+  group: cn-forward-log
+  cancel-in-progress: false
+
+jobs:
+  log:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Tanpa npm install: skrip memakai fetch bawaan Node.
+
+      - name: Catat sinyal dan evaluasi hasil
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/cn-forward-log.js
