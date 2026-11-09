@@ -97,6 +97,24 @@
     .research-note { border-left: 2px solid rgba(245, 183, 0, 0.65); }
 
     .positive { color: var(--green); }
+
+    .tab-btn {
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(11, 13, 15, 0.92);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 150ms ease;
+    }
+    .tab-btn:hover { color: var(--text); border-color: #303940; }
+    .tab-btn.tab-active {
+      color: var(--green);
+      border-color: rgba(0, 208, 132, 0.35);
+      background: rgba(0, 208, 132, 0.07);
+    }
     .negative { color: var(--red); }
     .muted { color: var(--muted); }
     .muted-2 { color: var(--muted-2); }
@@ -133,7 +151,7 @@
 
       <div class="flex items-center gap-2">
         <a href="/app" class="hidden sm:block text-[11px] muted hover:text-white transition px-2 py-2">Dashboard</a>
-        <button id="refreshButton" onclick="fetchData()" class="refresh-btn rounded-lg px-3 py-2 text-[10px] mono font-bold flex items-center gap-1.5 transition">
+        <button id="refreshButton" onclick="refreshActive()" class="refresh-btn rounded-lg px-3 py-2 text-[10px] mono font-bold flex items-center gap-1.5 transition">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
           REFRESH
         </button>
@@ -152,8 +170,8 @@
             <span class="status-dot"></span>
             <span class="text-[9px] mono uppercase tracking-[0.18em] muted-2">EKSPERIMENTAL &middot; FORWARD TEST BERJALAN</span>
           </div>
-          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Top 20 Gainer Screener</h1>
-          <p class="mt-2 text-sm muted max-w-2xl leading-relaxed">
+          <h1 id="heroTitle" class="text-3xl sm:text-4xl font-extrabold tracking-tight">Top 20 Gainer Screener</h1>
+          <p id="heroDesc" class="mt-2 text-sm muted max-w-2xl leading-relaxed">
             Saham yang punya peluang lebih tinggi dari acak untuk masuk 20 besar gainer likuid di hari bursa berikutnya.
             Hanya saham yang lolos aturan yang tampil, jadi banyak hari daftarnya kosong.
           </p>
@@ -166,6 +184,14 @@
       </div>
       <div class="scan-line mt-7"></div>
     </section>
+
+    <!-- TABS -->
+    <div class="flex gap-2 mb-8" role="tablist">
+      <button id="tabBtn-top20" type="button" class="tab-btn tab-active" onclick="showTab('top20')">Top 20 Gainer</button>
+      <button id="tabBtn-watch" type="button" class="tab-btn" onclick="showTab('watch')">Watchlist Harian</button>
+    </div>
+
+    <div id="tab-top20">
 
     <!-- SUMMARY STATS -->
     <section class="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
@@ -282,6 +308,82 @@
       </ul>
     </section>
 
+    </div>
+
+    <!-- TAB: WATCHLIST HARIAN -->
+    <div id="tab-watch" class="hidden">
+
+      <section class="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
+        <div class="panel rounded-xl p-4">
+          <div class="text-[9px] mono uppercase tracking-[0.16em] muted-2">Daftar Pantau</div>
+          <div id="countW" class="mt-2 text-2xl font-bold mono">—</div>
+          <div class="mt-1 text-[10px] muted-2">Aturan R1, R2, dan R8</div>
+        </div>
+        <div class="panel rounded-xl p-4">
+          <div class="text-[9px] mono uppercase tracking-[0.16em] muted-2">Filter Hindari</div>
+          <div id="countAvoid" class="mt-2 text-2xl font-bold mono">—</div>
+          <div class="mt-1 text-[10px] muted-2">Aturan R3</div>
+        </div>
+        <div class="panel rounded-xl p-4 col-span-2 lg:col-span-1">
+          <div class="text-[9px] mono uppercase tracking-[0.16em] muted-2">Status</div>
+          <div id="watchStatus" class="mt-2 text-sm font-bold mono muted">IDLE</div>
+          <div class="mt-1 text-[10px] muted-2">Khusus pengguna yang login</div>
+        </div>
+      </section>
+
+      <section id="watchStale" class="hidden panel research-note rounded-xl p-4 mb-8">
+        <div class="text-xs font-bold">Data watchlist tertinggal</div>
+        <p class="mt-1 text-[11px] muted leading-relaxed">
+          Watchlist dihitung dari data hingga tanggal di atas, sedangkan data harga sudah lebih baru.
+          Daftar akan diperbarui setelah proses refresh berikutnya.
+        </p>
+      </section>
+
+      <section class="mb-10">
+        <div class="mb-3">
+          <h2 class="text-sm font-bold">Daftar Pantau</h2>
+          <p class="text-[10px] muted-2 mt-1">
+            Alat pantau, bukan sinyal beli. Peluang di kartu adalah statistik historis aturan, bukan prediksi untuk saham ini secara khusus.
+          </p>
+        </div>
+        <div id="gridW" class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+          <div class="panel rounded-xl p-10 text-center col-span-full">
+            <div class="text-xs muted">Membuka tab ini memuat watchlist...</div>
+          </div>
+        </div>
+        <div id="emptyW" class="empty-state hidden rounded-xl p-8 text-center">
+          <div class="text-sm font-semibold">Tidak ada saham pantau pada tanggal data terbaru</div>
+          <div class="mt-2 text-[11px] muted-2">Tidak ada saham yang memenuhi aturan R1, R2, atau R8 hari itu.</div>
+        </div>
+      </section>
+
+      <section class="mb-10">
+        <div class="mb-3">
+          <h2 class="text-sm font-bold">Filter Hindari (R3)</h2>
+          <p class="text-[10px] muted-2 mt-1">Saham yang sudah naik tinggi tetapi statistiknya cenderung berbalik. Gunakan untuk menghindari, bukan untuk membeli.</p>
+        </div>
+        <div id="avoidBox" class="panel rounded-xl p-5">
+          <div class="text-[11px] muted-2">—</div>
+        </div>
+      </section>
+
+      <section id="watchError" class="empty-state hidden rounded-xl p-10 text-center mb-10">
+        <div id="watchErrorTitle" class="text-sm font-semibold">Gagal Memuat Watchlist</div>
+        <div id="watchErrorMessage" class="mt-2 text-[11px] muted-2">Coba refresh beberapa saat lagi.</div>
+      </section>
+
+      <section class="panel research-note rounded-xl p-5">
+        <div class="text-xs font-bold">Catatan Penting (Eksperimental)</div>
+        <ul class="mt-2 text-[11px] muted leading-relaxed max-w-4xl list-disc pl-4 space-y-1">
+          <li>Bukan rekomendasi investasi. Uji historis tidak menemukan keuntungan bersih bila dibeli di harga open atau close berikutnya.</li>
+          <li>Tingkat keyakinan: R1 dan R2 sedang, R8 rendah (cenderung melemah pada data terbaru), R3 tinggi sebagai filter hindari.</li>
+          <li>Peluang ARA besok menurun pada periode uji terbaru karena kondisi pasar bergeser. Gunakan peluang masuk top 20, bukan peluang ARA.</li>
+          <li>Statistik dihitung dari seluruh data berlabel dan bertambah otomatis seiring data baru.</li>
+        </ul>
+      </section>
+
+    </div>
+
     <footer class="mt-8 pb-8 text-[9px] mono muted-2">
       CHARTNALIST | TOP 20 GAINER SCREENER (EKSPERIMENTAL)
     </footer>
@@ -304,6 +406,7 @@
     }
 
     function num(val, decimals) {
+      if (val === null || val === undefined || val === "") return "—";
       const n = Number(val);
       if (!Number.isFinite(n)) return "—";
       return n.toLocaleString("id-ID", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
@@ -333,7 +436,7 @@
       const naik = Number(r.naik_pct);
       const naikTxt = Number.isFinite(naik) ? (naik >= 0 ? "+" : "") + num(naik, 1) + "%" : "—";
 
-      return '<article class="signal-card rounded-xl overflow-hidden p-5" onclick="window.location.href=\'/stock?code=' + code + '\'">' +
+      return '<article class="signal-card rounded-xl overflow-hidden p-5" data-code="' + code + '">' +
         '<div class="flex items-start justify-between pb-4 border-b border-[#171d21]">' +
           '<div class="flex items-center gap-3 min-w-0">' +
             '<div class="w-8 h-8 shrink-0 rounded-lg bg-[#101416] border border-[#20272c] flex items-center justify-center text-[9px] mono muted-2">' + String(i + 1).padStart(2, "0") + "</div>" +
@@ -390,7 +493,10 @@
         const a = rows.filter(function (r) { return r.lane === "A"; });
         const b = rows.filter(function (r) { return r.lane === "B"; });
 
-        document.getElementById("lastUpdated").textContent = formatDate(data.scan_date);
+        dates.top20 = data.scan_date;
+        laneA = a;
+        if (currentTab === "top20") setDate();
+        else if (watchRows !== null) renderWatch();
         document.getElementById("countA").textContent = a.length;
         document.getElementById("countB").textContent = b.length;
 
@@ -421,7 +527,248 @@
       }
     }
 
+    // ---------------------------------------------------------------
+    // TAB WATCHLIST HARIAN + PENGATUR TAB
+    // ---------------------------------------------------------------
+    const TABS = {
+      top20: {
+        title: "Top 20 Gainer Screener",
+        desc: "Saham yang punya peluang lebih tinggi dari acak untuk masuk 20 besar gainer likuid di hari bursa berikutnya. Hanya saham yang lolos aturan yang tampil, jadi banyak hari daftarnya kosong."
+      },
+      watch: {
+        title: "Watchlist Harian",
+        desc: "Daftar pantau dari aturan R1, R2, dan R8, ditambah filter hindari R3. Probabilitas dihitung dari seluruh data berlabel dan bertambah seiring data baru. Khusus pengguna yang login."
+      }
+    };
+    let currentTab = "top20";
+    const dates = { top20: null, watch: null };
+    let laneA = [];
+    let watchRows = null;
+    let watchLoading = false;
+
+    function setDate() {
+      document.getElementById("lastUpdated").textContent = formatDate(dates[currentTab]);
+    }
+
+    function showTab(name) {
+      currentTab = name;
+      document.getElementById("tab-top20").classList.toggle("hidden", name !== "top20");
+      document.getElementById("tab-watch").classList.toggle("hidden", name !== "watch");
+      document.getElementById("tabBtn-top20").classList.toggle("tab-active", name === "top20");
+      document.getElementById("tabBtn-watch").classList.toggle("tab-active", name === "watch");
+      document.getElementById("heroTitle").textContent = TABS[name].title;
+      document.getElementById("heroDesc").textContent = TABS[name].desc;
+      try {
+        history.replaceState(null, "", name === "watch" ? "#watchlist" : location.pathname + location.search);
+      } catch (e) {}
+      setDate();
+      if (name === "watch" && watchRows === null && !watchLoading) loadWatch();
+    }
+
+    function refreshActive() {
+      if (currentTab === "watch") {
+        watchRows = null;
+        loadWatch();
+      } else {
+        fetchData();
+      }
+    }
+
+    function sameDay(a, b) {
+      return !!(a && b) && String(a).slice(0, 10) === String(b).slice(0, 10);
+    }
+
+    function waitAuth(ms) {
+      return new Promise(function (resolve) {
+        if (window.chartnalistAuth) return resolve(window.chartnalistAuth);
+        let done = false;
+        function fin() {
+          if (done) return;
+          done = true;
+          resolve(window.chartnalistAuth || null);
+        }
+        window.addEventListener("chartnalist:auth-ready", fin, { once: true });
+        setTimeout(fin, ms);
+      });
+    }
+
+    function setWatchStatus(text, cls) {
+      const el = document.getElementById("watchStatus");
+      el.textContent = text;
+      el.className = "mt-2 text-sm font-bold mono " + (cls || "muted");
+    }
+
+    function showWatchError(title, message) {
+      document.getElementById("gridW").innerHTML = "";
+      document.getElementById("emptyW").classList.add("hidden");
+      document.getElementById("avoidBox").innerHTML = '<div class="text-[11px] muted-2">—</div>';
+      document.getElementById("countW").textContent = "—";
+      document.getElementById("countAvoid").textContent = "—";
+      document.getElementById("watchStale").classList.add("hidden");
+      document.getElementById("watchErrorTitle").textContent = title;
+      document.getElementById("watchErrorMessage").textContent = message;
+      document.getElementById("watchError").classList.remove("hidden");
+    }
+
+    async function loadWatch() {
+      const refresh = document.getElementById("refreshButton");
+      watchLoading = true;
+      refresh.disabled = true;
+      setWatchStatus("MEMUAT", "muted");
+      document.getElementById("watchError").classList.add("hidden");
+
+      try {
+        const auth = await waitAuth(10000);
+        if (!auth) {
+          showWatchError("Sesi Belum Siap", "Muat ulang halaman, lalu buka tab ini lagi.");
+          setWatchStatus("ERROR", "negative");
+          return;
+        }
+        if (auth.isGuest || !window.chartnalistSupabase) {
+          showWatchError("Khusus Pengguna Login", "Watchlist Harian hanya tersedia untuk pengguna yang sudah masuk. Buat akun atau masuk untuk melihatnya.");
+          setWatchStatus("LOGIN DIPERLUKAN", "muted");
+          return;
+        }
+
+        const q = await window.chartnalistSupabase
+          .from("v_watchlist_harian")
+          .select("*")
+          .order("prioritas", { ascending: true })
+          .order("gainer_rank", { ascending: true });
+
+        if (q.error) {
+          const denied = q.error.code === "42501" || /permission denied/i.test(q.error.message || "");
+          if (denied) {
+            showWatchError("Akses Ditolak", "Akunmu belum punya izin membaca watchlist. Coba masuk ulang.");
+            setWatchStatus("DITOLAK", "negative");
+          } else {
+            showWatchError("Gagal Memuat Watchlist", "Pesan: " + (q.error.message || "tidak diketahui"));
+            setWatchStatus("ERROR", "negative");
+          }
+          return;
+        }
+
+        watchRows = q.data || [];
+        renderWatch();
+      } catch (err) {
+        console.error("Watchlist error:", err);
+        showWatchError("Gagal Memuat Watchlist", "Pesan: " + (err && err.message ? err.message : err));
+        setWatchStatus("ERROR", "negative");
+      } finally {
+        watchLoading = false;
+        refresh.disabled = false;
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+
+    function renderWatchCard(r, i) {
+      const code = esc(r.ticker);
+      const ret = Number(r.ret_hari_ini);
+      const retTxt = Number.isFinite(ret) ? (ret >= 0 ? "+" : "") + num(ret, 1) + "%" : "—";
+      const retCls = Number.isFinite(ret) && ret < 0 ? "negative" : "positive";
+      const valueTxt = Number.isFinite(Number(r.value_hari_ini)) ? "Rp " + num(Number(r.value_hari_ini) / 1e9, 1) + " M" : "—";
+
+      let both = "";
+      if (sameDay(r.trade_date, dates.top20)) {
+        const hit = laneA.find(function (x) { return x.code === r.ticker; });
+        if (hit) {
+          both = '<span class="badge-a rounded px-2 py-0.5 text-[8px] mono font-bold">JUGA LOLOS TOP 20: ' + esc(hit.rule) + "</span>";
+        }
+      }
+
+      const gate = r.aturan === "R8" ? metric("Gate Ratio", num(r.gate_ratio, 2)) : metric("Hari sejak top", num(r.days_since_top, 0));
+
+      return '<article class="signal-card rounded-xl overflow-hidden p-5" data-code="' + code + '">' +
+        '<div class="flex items-start justify-between pb-4 border-b border-[#171d21]">' +
+          '<div class="flex items-center gap-3 min-w-0">' +
+            '<div class="w-8 h-8 shrink-0 rounded-lg bg-[#101416] border border-[#20272c] flex items-center justify-center text-[9px] mono muted-2">' + String(i + 1).padStart(2, "0") + "</div>" +
+            '<div class="min-w-0">' +
+              '<div class="flex flex-wrap items-center gap-2">' +
+                '<span class="text-xl font-extrabold tracking-tight">' + code + "</span>" +
+                '<span class="badge-a rounded px-2 py-0.5 text-[8px] mono font-bold">' + esc(r.aturan) + "</span>" + both +
+              "</div>" +
+              '<div class="text-[10px] muted-2 truncate max-w-[260px]">' + esc(r.nama || "") + "</div>" +
+              '<div class="text-[10px] muted-2">' + esc(r.label || "") + " &middot; keyakinan " + esc(r.keyakinan || "—") + "</div>" +
+            "</div>" +
+          "</div>" +
+          '<div class="text-right shrink-0">' +
+            '<div class="text-lg font-bold mono ' + retCls + '">' + retTxt + "</div>" +
+            '<div class="text-[9px] mono muted-2">naik hari ini</div>' +
+          "</div>" +
+        "</div>" +
+        '<div class="grid grid-cols-2 sm:grid-cols-4 gap-2 my-4">' +
+          metric("Rank Gainer", r.gainer_rank == null ? "—" : "#" + esc(r.gainer_rank)) +
+          metric("Streak Top", num(r.streak_top, 0)) +
+          metric("Nilai", valueTxt) +
+          gate +
+        "</div>" +
+        '<div class="text-[8px] mono uppercase tracking-[0.14em] muted-2 mb-2">Statistik historis aturan ini</div>' +
+        '<div class="grid grid-cols-2 sm:grid-cols-4 gap-2">' +
+          metric("Top 20 besok", num(r.p_top20_besok, 1) + "%", "positive") +
+          metric("ARA besok", num(r.p_ara_besok, 1) + "%") +
+          metric("Median ret besok", num(r.ret_cc_med, 2) + "%") +
+          metric("Ret positif", num(r.p_ret_positif, 1) + "%") +
+        "</div>" +
+        '<div class="pt-3 mt-4 border-t border-[#171d21] flex items-center justify-between gap-4">' +
+          '<div class="text-[9px] mono muted-2">Sampel ' + esc(r.n_dasar) + " &middot; hingga " + formatDate(r.statistik_hingga) + "</div>" +
+          '<button type="button" class="chartnalist-watch-btn text-[9px] mono px-2 py-1 rounded border border-[#20272c] hover:border-[#00d084]" data-watch-ticker="' + code + '" onclick="event.stopPropagation(); if (window.chartnalistPhase10ToggleWatch) chartnalistPhase10ToggleWatch(this)">+ WATCH</button>' +
+        "</div>" +
+      "</article>";
+    }
+
+    function renderAvoid(list) {
+      if (!list.length) {
+        return '<div class="text-[11px] muted-2">Tidak ada saham R3 pada tanggal data terbaru.</div>';
+      }
+      const s = list[0];
+      const chips = list.map(function (r) {
+        const ret = Number(r.ret_hari_ini);
+        const t = Number.isFinite(ret) ? " " + (ret >= 0 ? "+" : "") + num(ret, 1) + "%" : "";
+        return '<span class="badge-warn rounded px-2 py-1 text-[10px] mono font-bold cursor-pointer" data-code="' + esc(r.ticker) + '">' + esc(r.ticker) + t + "</span>";
+      }).join(" ");
+      return '<div class="flex flex-wrap gap-2 mb-3">' + chips + "</div>" +
+        '<p class="text-[11px] muted leading-relaxed">Saham di rank 5 teratas tanpa ARA cenderung tidak berulang: peluang masuk top 20 besok hanya ' +
+        num(s.p_top20_besok, 1) + "% dan median return besok " + num(s.ret_cc_med, 2) + "% (hanya " + num(s.p_ret_positif, 1) +
+        "% yang positif, sampel " + esc(s.n_dasar) + ").</p>";
+    }
+
+    function renderWatch() {
+      const rows = watchRows || [];
+      const pantau = rows.filter(function (r) { return r.status === "PANTAU"; });
+      const hindari = rows.filter(function (r) { return r.status === "HINDARI"; });
+      const d = rows.length ? rows[0].trade_date : null;
+
+      dates.watch = d;
+      if (currentTab === "watch") setDate();
+
+      document.getElementById("watchError").classList.add("hidden");
+      document.getElementById("countW").textContent = pantau.length;
+      document.getElementById("countAvoid").textContent = hindari.length;
+      document.getElementById("gridW").innerHTML = pantau.map(renderWatchCard).join("");
+      document.getElementById("emptyW").classList.toggle("hidden", pantau.length > 0);
+      document.getElementById("avoidBox").innerHTML = renderAvoid(hindari);
+
+      const stale = !!(d && dates.top20) && String(d).slice(0, 10) < String(dates.top20).slice(0, 10);
+      document.getElementById("watchStale").classList.toggle("hidden", !stale);
+
+      setWatchStatus(pantau.length + " PANTAU", "positive");
+
+      if (window.chartnalistPhase10SyncWatchButtons) {
+        chartnalistPhase10SyncWatchButtons();
+      }
+    }
+
+    // Klik kartu atau chip kode saham membuka halaman saham (tanpa onclick inline).
+    document.addEventListener("click", function (e) {
+      if (e.target.closest("button")) return;
+      const el = e.target.closest("[data-code]");
+      if (el && el.getAttribute("data-code")) {
+        window.location.href = "/stock?code=" + encodeURIComponent(el.getAttribute("data-code"));
+      }
+    });
+
     fetchData();
+    if (location.hash === "#watchlist") showTab("watch");
   </script>
 
   <script src="/assets/stockfamily-sidebar.js"></script>
