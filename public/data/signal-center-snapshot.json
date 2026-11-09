@@ -1,11 +1,11 @@
 {
   "success": true,
-  "date": "2026-11-05",
+  "date": "2026-11-06",
   "count": 2,
   "filtered": {
-    "considered": 6,
-    "noTrade": 3,
-    "lateEntry": 1,
+    "considered": 4,
+    "noTrade": 2,
+    "lateEntry": 0,
     "wideStop": 0
   },
   "signals": [
@@ -34,49 +34,6 @@
         "explanation": "Price structure does not currently show a decisive directional condition."
       },
       "participation": {
-        "state": "CONTRACTING",
-        "label": "Participation contracting",
-        "explanation": "Multiple trading-activity measures are below their recent baseline."
-      },
-      "flow": {
-        "state": "NEUTRAL",
-        "label": "Foreign flow neutral",
-        "value": 0.00004212968848608964,
-        "explanation": "Foreign activity does not provide a decisive contextual signal."
-      },
-      "liquidity": {
-        "state": "HIGH_RISK",
-        "label": "Elevated liquidity risk",
-        "explanation": "One or more execution-quality measures are below the preferred baseline."
-      },
-      "signalDate": null,
-      "updatedAt": "2026-11-06T20:02:24.325Z"
-    },
-    {
-      "stockCode": "PRDA",
-      "stockName": "Prodia Widyahusada Tbk.",
-      "setup": "BREAKOUT",
-      "status": "WATCH",
-      "price": 3650,
-      "trigger": 3760,
-      "invalidation": 3390,
-      "target1": 4315,
-      "target2": 4685,
-      "riskReward": 2.5,
-      "riskLevel": "HIGH",
-      "entryGapPct": -2.9,
-      "rrFromPrice": 2.56,
-      "planStale": false,
-      "preBreakout": true,
-      "stopDistancePct": 7.1,
-      "stopWide": false,
-      "maxEntry": 3852.5,
-      "structure": {
-        "state": "NEUTRAL",
-        "label": "Neutral structure",
-        "explanation": "Price structure does not currently show a decisive directional condition."
-      },
-      "participation": {
         "state": "NEUTRAL",
         "label": "Normal participation",
         "explanation": "Trading activity is not showing a decisive expansion or contraction."
@@ -84,7 +41,7 @@
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": -0.00002851924245673502,
+        "value": 0.000041528846402653226,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
@@ -93,10 +50,53 @@
         "explanation": "One or more execution-quality measures are below the preferred baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-06T20:02:24.325Z"
+      "updatedAt": "2026-11-09T23:04:10.211Z"
+    },
+    {
+      "stockCode": "PRDA",
+      "stockName": "Prodia Widyahusada Tbk.",
+      "setup": "BREAKOUT",
+      "status": "WATCH",
+      "price": 3690,
+      "trigger": 3760,
+      "invalidation": 3390,
+      "target1": 4315,
+      "target2": 4685,
+      "riskReward": 2.5,
+      "riskLevel": "HIGH",
+      "entryGapPct": -1.9,
+      "rrFromPrice": 2.08,
+      "planStale": false,
+      "preBreakout": true,
+      "stopDistancePct": 8.1,
+      "stopWide": false,
+      "maxEntry": 3852.5,
+      "structure": {
+        "state": "BULLISH",
+        "label": "Bullish structure",
+        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
+      },
+      "participation": {
+        "state": "CONTRACTING",
+        "label": "Participation contracting",
+        "explanation": "Multiple trading-activity measures are below their recent baseline."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": -0.00002863130667990049,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "THIN",
+        "label": "Thin liquidity",
+        "explanation": "Trading activity is materially below the minimum liquidity baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-11-09T23:04:10.211Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-11-06T20:02:24.326Z"
+  "generatedAt": "2026-11-09T23:04:10.211Z"
 }

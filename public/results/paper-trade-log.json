@@ -2206,10 +2206,10 @@
       "signal_close": 450,
       "entry_price": 456,
       "entry_date": "2026-10-26",
-      "exit_price": null,
-      "exit_date": null,
-      "return_pct": null,
-      "status": "PENDING",
+      "exit_price": 380,
+      "exit_date": "2026-11-06",
+      "return_pct": -16.666666666666664,
+      "status": "COMPLETE",
       "created_at": "2026-10-23T17:54:43.012Z"
     }
   },
@@ -2405,7 +2405,13 @@
       "new_signals": 0,
       "completed": 0,
       "total_entries": 158
+    },
+    {
+      "timestamp": "2026-11-09T23:01:30.264Z",
+      "new_signals": 0,
+      "completed": 1,
+      "total_entries": 158
     }
   ],
-  "last_run": "2026-11-06T19:59:44.058Z"
+  "last_run": "2026-11-09T23:01:30.264Z"
 }
