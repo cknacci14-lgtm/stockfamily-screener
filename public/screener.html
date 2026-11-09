@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>CHARTNALIST | Late Momentum Screener</title>
+  <title>CHARTNALIST | Top 20 Gainer Screener</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -15,7 +15,6 @@
     :root {
       --bg: #050607;
       --surface: #0b0d0f;
-      --surface-2: #101315;
       --border: #1c2227;
       --text: #f5f7f8;
       --muted: #8c969e;
@@ -25,27 +24,19 @@
       --yellow: #f5b700;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
       min-height: 100vh;
       background:
-        radial-gradient(
-          circle at 50% -20%,
-          rgba(0, 208, 132, 0.07),
-          transparent 38%
-        ),
+        radial-gradient(circle at 50% -20%, rgba(0, 208, 132, 0.07), transparent 38%),
         var(--bg);
       color: var(--text);
       font-family: "Plus Jakarta Sans", sans-serif;
     }
 
-    .mono {
-      font-family: "JetBrains Mono", monospace;
-    }
+    .mono { font-family: "JetBrains Mono", monospace; }
 
     .topbar {
       background: rgba(5, 6, 7, 0.88);
@@ -59,116 +50,66 @@
     }
 
     .signal-card {
-      background:
-        linear-gradient(
-          145deg,
-          rgba(16, 19, 21, 0.98),
-          rgba(9, 11, 13, 0.98)
-        );
+      background: linear-gradient(145deg, rgba(16, 19, 21, 0.98), rgba(9, 11, 13, 0.98));
       border: 1px solid var(--border);
-      transition:
-        transform 160ms ease,
-        border-color 160ms ease,
-        box-shadow 160ms ease;
+      transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+      cursor: pointer;
     }
-
     .signal-card:hover {
       transform: translateY(-2px);
       border-color: #303940;
       box-shadow: 0 14px 40px rgba(0, 0, 0, 0.25);
     }
 
-    .qbs-badge {
+    .badge-a {
       color: var(--green);
       background: rgba(0, 208, 132, 0.07);
       border: 1px solid rgba(0, 208, 132, 0.2);
     }
-
-    .metric {
-      background: #0b0e10;
-      border: 1px solid #171d21;
+    .badge-b {
+      color: var(--yellow);
+      background: rgba(245, 183, 0, 0.07);
+      border: 1px solid rgba(245, 183, 0, 0.25);
     }
+    .badge-warn {
+      color: var(--red);
+      background: rgba(255, 77, 77, 0.07);
+      border: 1px solid rgba(255, 77, 77, 0.28);
+    }
+
+    .metric { background: #0b0e10; border: 1px solid #171d21; }
 
     .refresh-btn {
       border: 1px solid rgba(0, 208, 132, 0.24);
       color: var(--green);
       background: rgba(0, 208, 132, 0.055);
     }
-
-    .refresh-btn:hover {
-      background: rgba(0, 208, 132, 0.11);
-      border-color: rgba(0, 208, 132, 0.42);
-    }
-
-    .refresh-btn:disabled {
-      opacity: 0.55;
-      cursor: wait;
-    }
+    .refresh-btn:hover { background: rgba(0, 208, 132, 0.11); border-color: rgba(0, 208, 132, 0.42); }
+    .refresh-btn:disabled { opacity: 0.55; cursor: wait; }
 
     .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
+      width: 7px; height: 7px; border-radius: 999px;
       background: var(--green);
       box-shadow: 0 0 10px rgba(0, 208, 132, 0.55);
     }
 
-    .empty-state {
-      border: 1px dashed #252c31;
-      background: rgba(11, 13, 15, 0.72);
-    }
+    .empty-state { border: 1px dashed #252c31; background: rgba(11, 13, 15, 0.72); }
+    .research-note { border-left: 2px solid rgba(245, 183, 0, 0.65); }
 
-    .research-note {
-      border-left: 2px solid rgba(245, 183, 0, 0.65);
-    }
-
-    .positive {
-      color: var(--green);
-    }
-
-    .negative {
-      color: var(--red);
-    }
-
-    .muted {
-      color: var(--muted);
-    }
-
-    .muted-2 {
-      color: var(--muted-2);
-    }
+    .positive { color: var(--green); }
+    .negative { color: var(--red); }
+    .muted { color: var(--muted); }
+    .muted-2 { color: var(--muted-2); }
 
     .scan-line {
       height: 1px;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(0, 208, 132, 0.28),
-        transparent
-      );
+      background: linear-gradient(90deg, transparent, rgba(0, 208, 132, 0.28), transparent);
       animation: scan 2.2s ease-in-out infinite;
     }
-
     @keyframes scan {
-      0%, 100% {
-        opacity: 0.2;
-        transform: scaleX(0.55);
-      }
-      50% {
-        opacity: 1;
-        transform: scaleX(1);
-      }
+      0%, 100% { opacity: 0.2; transform: scaleX(0.55); }
+      50% { opacity: 1; transform: scaleX(1); }
     }
-  </style>
-
-  <style id="research-detail-css">
-    .research-overlay { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(0,0,0,.78); backdrop-filter: blur(14px); }
-    .research-panel { width: min(850px, 100%); max-height: 88vh; overflow-y: auto; background: #090b0d; border: 1px solid #20272c; border-radius: 18px; box-shadow: 0 30px 100px rgba(0,0,0,.65); }
-    .research-close { width: 34px; height: 34px; border-radius: 9px; border: 1px solid #20272c; background: #101416; color: #8c969e; cursor: pointer; }
-    .research-close:hover { color: #f5f7f8; border-color: #00d084; }
-    .research-gate { border: 1px solid #1b2227; background: #0d1012; border-radius: 12px; padding: 14px; }
-    .research-card-clickable { cursor: pointer; transition: .15s; }
-    .research-card-clickable:hover { border-color: #273238; transform: translateY(-1px); }
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -186,20 +127,19 @@
         </div>
         <div class="hidden sm:block w-px h-4 bg-[#1c2227]"></div>
         <div class="hidden sm:block text-[10px] mono uppercase tracking-[0.14em] muted-2">
-          Late Momentum Screener Engine
+          Top 20 Gainer Screener
         </div>
       </div>
 
       <div class="flex items-center gap-2">
         <a href="/app" class="hidden sm:block text-[11px] muted hover:text-white transition px-2 py-2">Dashboard</a>
-        <button id="refreshButton" onclick="fetchLiveData(true)" class="refresh-btn rounded-lg px-3 py-2 text-[10px] mono font-bold flex items-center gap-1.5 transition">
+        <button id="refreshButton" onclick="fetchData()" class="refresh-btn rounded-lg px-3 py-2 text-[10px] mono font-bold flex items-center gap-1.5 transition">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
           REFRESH
         </button>
       </div>
     </div>
   </header>
-
 
   <!-- MAIN -->
   <main class="max-w-7xl mx-auto px-5 py-8">
@@ -210,448 +150,281 @@
         <div>
           <div class="flex items-center gap-2 mb-3">
             <span class="status-dot"></span>
-            <span class="text-[9px] mono uppercase tracking-[0.18em] muted-2">LATE MOMENTUM ENGINE</span>
+            <span class="text-[9px] mono uppercase tracking-[0.18em] muted-2">EKSPERIMENTAL &middot; FORWARD TEST BERJALAN</span>
           </div>
-          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Late Momentum</h1>
+          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Top 20 Gainer Screener</h1>
           <p class="mt-2 text-sm muted max-w-2xl leading-relaxed">
-            Deteksi momentum lanjutan eksperimental (belum terbukti): 3 hari positif, close kuat, volume ekspansi, foreign terbatas, dan bid dominan.
+            Saham yang punya peluang lebih tinggi dari acak untuk masuk 20 besar gainer likuid di hari bursa berikutnya.
+            Hanya saham yang lolos aturan yang tampil, jadi banyak hari daftarnya kosong.
           </p>
         </div>
 
         <div class="lg:text-right">
-          <div class="text-[9px] mono uppercase tracking-[0.18em] muted-2">Last Scan Date</div>
+          <div class="text-[9px] mono uppercase tracking-[0.18em] muted-2">Tanggal Data</div>
           <div id="lastUpdated" class="mt-1 text-xs mono text-[#c7cdd1]">—</div>
         </div>
       </div>
       <div class="scan-line mt-7"></div>
     </section>
 
-
     <!-- SUMMARY STATS -->
-    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+    <section class="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
       <div class="panel rounded-xl p-4">
-        <div class="text-[9px] mono uppercase tracking-[0.16em] muted-2">Signals Detected</div>
-        <div id="signalCount" class="mt-2 text-2xl font-bold mono">—</div>
-        <div class="mt-1 text-[10px] muted-2">Qualifying setups</div>
+        <div class="text-[9px] mono uppercase tracking-[0.16em] muted-2">Daftar Pantau (Lane A)</div>
+        <div id="countA" class="mt-2 text-2xl font-bold mono">—</div>
+        <div class="mt-1 text-[10px] muted-2">Sudah di top 20 hari ini</div>
       </div>
-
       <div class="panel rounded-xl p-4">
-        <div class="text-[9px] mono uppercase tracking-[0.16em] muted-2">Universe</div>
-        <div id="totalUniverse" class="mt-2 text-2xl font-bold mono">965</div>
-        <div class="mt-1 text-[10px] muted-2">IDX stocks evaluated</div>
+        <div class="text-[9px] mono uppercase tracking-[0.16em] muted-2">Radar (Lane B)</div>
+        <div id="countB" class="mt-2 text-2xl font-bold mono">—</div>
+        <div class="mt-1 text-[10px] muted-2">Belum di top 20 hari ini</div>
       </div>
-
-      <div class="panel rounded-xl p-4">
-        <div class="text-[9px] mono uppercase tracking-[0.16em] muted-2">Engine Status</div>
-        <div class="mt-2 text-sm font-bold positive mono">ACTIVE</div>
-        <div class="mt-1 text-[10px] muted-2">Late Momentum Locked</div>
-      </div>
-    </section>
-
-
-    <!-- SIGNAL HEADER -->
-    <section class="flex items-end justify-between mb-3">
-      <div>
-        <h2 class="text-sm font-bold">Detected Late Momentum Signals</h2>
-        <p class="text-[10px] muted-2 mt-1">Sinyal hasil scan engine berdasarkan data transaksi harian</p>
-      </div>
-      <div id="dataStatus" class="text-[9px] mono uppercase tracking-wider muted-2">IDLE</div>
-    </section>
-
-
-    <!-- SIGNAL GRID -->
-    <section id="signalGrid" class="grid grid-cols-1 xl:grid-cols-2 gap-4">
-      <div class="panel rounded-xl p-10 text-center col-span-full">
-        <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto positive mb-3"></i>
-        <div class="text-xs muted">Memuat hasil scan engine...</div>
+      <div class="panel rounded-xl p-4 col-span-2 lg:col-span-1">
+        <div class="text-[9px] mono uppercase tracking-[0.16em] muted-2">Status</div>
+        <div id="dataStatus" class="mt-2 text-sm font-bold mono positive">IDLE</div>
+        <div class="mt-1 text-[10px] muted-2">Dihitung dari data penutupan harian</div>
       </div>
     </section>
 
-
-    <!-- EMPTY STATE -->
-    <section id="emptyState" class="empty-state hidden rounded-xl p-10 text-center mt-4">
-      <i data-lucide="scan-search" class="w-7 h-7 mx-auto muted-2 mb-3"></i>
-      <div id="emptyTitle" class="text-sm font-semibold">Tidak Ada Signal Late Momentum</div>
-      <div id="emptyMessage" class="mt-2 text-[11px] muted-2">Tidak ada saham yang memenuhi kriteria Late Momentum (eksperimental) pada sesi ini.</div>
-    </section>
-
-
-    <!-- DISCLAIMER -->
-    <section class="panel research-note rounded-xl mt-7 p-5">
-      <div class="flex items-start gap-3">
-        <div class="text-[#f5b700] mt-0.5"></div>
-        <div>
-          <div class="text-xs font-bold">Research Signal Engine Disclaimer</div>
-          <p class="mt-2 text-[11px] muted leading-relaxed max-w-4xl">
-            Sinyal ini dihasilkan otomatis oleh Late Momentum (eksperimental) Engine. Output ini adalah analisis algoritmik berbasis historical market structure dan bukan merupakan ajakan beli atau jual.
-          </p>
+    <!-- LANE A -->
+    <section class="mb-10">
+      <div class="mb-3">
+        <h2 class="text-sm font-bold">Daftar Pantau: peluang tinggi masuk top 20 lagi besok</h2>
+        <p class="text-[10px] muted-2 mt-1">
+          Saham ini sudah masuk top 20 hari ini. Hampir selalu tutup di batas ARA, jadi sulit dibeli di harga penutupan.
+          Gunakan sebagai daftar pantau untuk besok pagi, bukan sinyal beli.
+        </p>
+      </div>
+      <div id="gridA" class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <div class="panel rounded-xl p-10 text-center col-span-full">
+          <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto positive mb-3"></i>
+          <div class="text-xs muted">Memuat hasil scan...</div>
         </div>
       </div>
+      <div id="emptyA" class="empty-state hidden rounded-xl p-8 text-center">
+        <div class="text-sm font-semibold">Tidak ada saham yang lolos Lane A</div>
+        <div class="mt-2 text-[11px] muted-2">Ini normal. Pada pengujian, rata-rata hanya sekitar 0,3 saham per hari yang lolos.</div>
+      </div>
+    </section>
+
+    <!-- LANE B -->
+    <section class="mb-10">
+      <div class="mb-3">
+        <h2 class="text-sm font-bold">Radar &asymp; 14%: belum naik besar, peluang masuk top 20 besok</h2>
+        <p class="text-[10px] muted-2 mt-1">
+          Peluangnya sekitar 5 kali acak, tetapi sekitar 6 dari 7 saham di daftar ini tetap tidak masuk top 20.
+          Ini radar, bukan sinyal probabilitas tinggi.
+        </p>
+      </div>
+      <div id="gridB" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
+      <div id="emptyB" class="empty-state hidden rounded-xl p-8 text-center">
+        <div class="text-sm font-semibold">Tidak ada saham yang lolos Radar</div>
+        <div class="mt-2 text-[11px] muted-2">Pada pengujian, rata-rata sekitar 0,6 saham per hari.</div>
+      </div>
+    </section>
+
+    <!-- ERROR -->
+    <section id="errorState" class="empty-state hidden rounded-xl p-10 text-center mb-10">
+      <div id="errorTitle" class="text-sm font-semibold">Gagal Memuat Data</div>
+      <div id="errorMessage" class="mt-2 text-[11px] muted-2">Coba refresh beberapa saat lagi.</div>
+    </section>
+
+    <!-- CARA MEMBACA -->
+    <section class="panel rounded-xl p-5 mb-7">
+      <h3 class="text-xs font-bold mb-3">Aturan dan hasil uji historis</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-[11px] mono">
+          <thead>
+            <tr class="muted-2 text-left">
+              <th class="py-2 pr-4 font-normal">Aturan</th>
+              <th class="py-2 pr-4 font-normal">Syarat</th>
+              <th class="py-2 pr-4 font-normal">Peluang masuk top 20 besok</th>
+              <th class="py-2 font-normal">Sampel</th>
+            </tr>
+          </thead>
+          <tbody class="muted">
+            <tr class="border-t border-[#171d21]">
+              <td class="py-2 pr-4 positive font-bold">A_L1</td>
+              <td class="py-2 pr-4">Likuid (&ge; Rp 5 M), naik &ge; 5%, close di high 20 hari, rentang harian sempit</td>
+              <td class="py-2 pr-4">&asymp; 63%</td>
+              <td class="py-2">35</td>
+            </tr>
+            <tr class="border-t border-[#171d21]">
+              <td class="py-2 pr-4 positive font-bold">A_S2R</td>
+              <td class="py-2 pr-4">Rp 0,5-5 M, naik &ge; 5%, close di high 20 hari, rank &le; 5, pernah top 20 dalam 5 hari terakhir</td>
+              <td class="py-2 pr-4">&asymp; 47%</td>
+              <td class="py-2">38</td>
+            </tr>
+            <tr class="border-t border-[#171d21]">
+              <td class="py-2 pr-4 font-bold" style="color:var(--yellow)">B_L</td>
+              <td class="py-2 pr-4">Likuid, belum top 20, naik &ge; 3%, volume &ge; 2,5x, close dekat high, volatilitas tinggi</td>
+              <td class="py-2 pr-4">&asymp; 14%</td>
+              <td class="py-2">157</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="mt-3 text-[10px] muted-2 leading-relaxed">
+        Pembanding: peluang acak sebuah saham likuid masuk top 20 adalah sekitar 4,4% per hari.
+        Saham yang disuspensi besok dihitung sebagai gagal.
+      </p>
+    </section>
+
+    <!-- DISCLAIMER -->
+    <section class="panel research-note rounded-xl p-5">
+      <div class="text-xs font-bold">Catatan Penting (Eksperimental)</div>
+      <ul class="mt-2 text-[11px] muted leading-relaxed max-w-4xl list-disc pl-4 space-y-1">
+        <li>Angka di atas berasal dari uji historis 1 Okt 2025 - 6 Nov 2026 dan dipilih dari ratusan kombinasi aturan, sehingga cenderung lebih bagus dari hasil nyata. Sampel aturan Lane A masih kecil.</li>
+        <li>"Masuk top 20" tidak sama dengan "untung". Pada Lane A, sebagian besar kenaikan terjadi saat pembukaan besok, bukan setelahnya.</li>
+        <li>Saham yang naik beruntun hingga ARA berisiko disuspensi bursa dan tidak bisa dijual. Tanda peringatan muncul bila saham sudah naik &ge; 15% dan berulang di top 20.</li>
+        <li>Hasil forward test (pencatatan nyata ke depan) akan menggantikan angka uji historis ini.</li>
+        <li>Bukan ajakan beli atau jual.</li>
+      </ul>
     </section>
 
     <footer class="mt-8 pb-8 text-[9px] mono muted-2">
-      CHARTNALIST | LATE MOMENTUM ENGINE
+      CHARTNALIST | TOP 20 GAINER SCREENER (EKSPERIMENTAL)
     </footer>
 
   </main>
 
-
-  <!-- SCRIPTS & ENGINE DATA ADAPTER -->
   <script>
     lucide.createIcons();
 
-    function formatNumber(val, decimals = 2) {
+    const RULES = {
+      A_L1:  { badge: "badge-a", title: "A_L1",  note: "Peluang masuk top 20 besok ≈ 63% (sampel 35)" },
+      A_S2R: { badge: "badge-a", title: "A_S2R", note: "Peluang masuk top 20 besok ≈ 47% (sampel 38)" },
+      B_L:   { badge: "badge-b", title: "RADAR", note: "Peluang masuk top 20 besok ≈ 14% (sampel 157)" }
+    };
+
+    function esc(s) {
+      return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+
+    function num(val, decimals) {
       const n = Number(val);
       if (!Number.isFinite(n)) return "—";
       return n.toLocaleString("id-ID", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
     }
 
-    function formatPrice(val) {
-      const n = Number(val);
-      if (!Number.isFinite(n)) return "Rp —";
-      return "Rp " + n.toLocaleString("id-ID", { maximumFractionDigits: 0 });
-    }
-
     function formatDate(val) {
       if (!val) return "—";
-      const match = String(val).match(/^(\d{4})-(\d{2})-(\d{2})/);
-      if (match) {
-        const [, year, month, day] = match;
-        const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
-        return `${day} ${months[Number(month) - 1]} ${year}`;
-      }
-      return val;
+      const m = String(val).match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (!m) return esc(val);
+      const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+      return m[3] + " " + months[Number(m[2]) - 1] + " " + m[1];
     }
 
-    function metric(label, value, colorClass = "") {
-      return `
-        <div class="metric rounded-lg p-3">
-          <div class="text-[8px] mono uppercase tracking-[0.14em] muted-2">${label}</div>
-          <div class="mt-1.5 text-sm font-bold mono ${colorClass}">${value}</div>
-        </div>
-      `;
+    function metric(label, value, cls) {
+      return '<div class="metric rounded-lg p-3">' +
+        '<div class="text-[8px] mono uppercase tracking-[0.14em] muted-2">' + label + "</div>" +
+        '<div class="mt-1.5 text-sm font-bold mono ' + (cls || "") + '">' + value + "</div>" +
+        "</div>";
     }
 
-    function renderSignalCard(stock, index) {
+    function renderCard(r, i) {
+      const info = RULES[r.rule] || { badge: "badge-a", title: esc(r.rule), note: "" };
+      const code = esc(r.code);
+      const warn = r.risiko_suspensi
+        ? '<span class="badge-warn rounded px-2 py-0.5 text-[8px] mono font-bold">RISIKO SUSPENSI TINGGI</span>'
+        : "";
+      const naik = Number(r.naik_pct);
+      const naikTxt = Number.isFinite(naik) ? (naik >= 0 ? "+" : "") + num(naik, 1) + "%" : "—";
 
-      const code =
-        stock.code ||
-        stock.ticker ||
-        stock.symbol ||
-        "—";
-
-      const name = stock.name || "";
-
-      const close =
-        stock.confirm_close ??
-        stock.close ??
-        null;
-
-      const changePct = Number(stock.changePct);
-      const volumeSurge = Number(stock.volumeSurge);
-      const frequencySurge = Number(stock.frequencySurge);
-      const bbWidthPct = Number(stock.bbWidthPct);
-      const priceRange20Pct = Number(stock.priceRange20Pct);
-      const closePositionPct = Number(stock.closePositionPct);
-
-      const changeText = Number.isFinite(changePct)
-        ? `${changePct >= 0 ? "+" : ""}${formatNumber(changePct, 2)}%`
-        : "—";
-
-      const changeClass =
-        Number.isFinite(changePct) && changePct >= 0
-          ? "positive"
-          : "negative";
-
-      const metricValue = (value, suffix = "") => {
-        return value === "—" || value == null
-          ? "—"
-          : `${value}${suffix}`;
-      };
-
-      return `
-        <article
-          class="signal-card rounded-xl overflow-hidden research-card-clickable p-5"
-          onclick="openResearchDetail(encodeURIComponent(JSON.stringify(${JSON.stringify(stock)})))"
-        >
-
-          <div class="flex items-start justify-between pb-4 border-b border-[#171d21]">
-
-            <div class="flex items-center gap-3 min-w-0">
-
-              <div class="w-8 h-8 shrink-0 rounded-lg bg-[#101416] border border-[#20272c] flex items-center justify-center text-[9px] mono muted-2">
-                ${String(index + 1).padStart(2, "0")}
-              </div>
-
-              <div class="min-w-0">
-
-                <div class="flex items-center gap-2">
-                  <span class="text-xl font-extrabold tracking-tight">
-                    ${code}
-                  </span>
-
-                  <span class="qbs-badge rounded px-2 py-0.5 text-[8px] mono font-bold">
-                    LATE MOMENTUM
-                  </span>
-                </div>
-
-                <div class="text-[10px] muted-2 truncate max-w-[240px]">
-                  ${name || "Canonical QBS V4.9.1"}
-                </div>
-
-              </div>
-
-            </div>
-
-            <div class="text-right shrink-0">
-
-              <div class="text-lg font-bold mono">
-                ${formatPrice(close)}
-              </div>
-
-              <div class="text-[9px] mono ${changeClass} font-semibold">
-                ${changeText}
-              </div>
-
-            </div>
-
-          </div>
-
-
-          <!-- QBS CORE METRICS -->
-
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 my-4">
-
-            ${metric(
-              "Volume Surge",
-              Number.isFinite(volumeSurge)
-                ? metricValue(formatNumber(volumeSurge, 2), "×")
-                : "—",
-              "positive"
-            )}
-
-            ${metric(
-              "Frequency Surge",
-              Number.isFinite(frequencySurge)
-                ? metricValue(formatNumber(frequencySurge, 2), "×")
-                : "—",
-              "positive"
-            )}
-
-            ${metric(
-              "BB Width",
-              Number.isFinite(bbWidthPct)
-                ? metricValue(formatNumber(bbWidthPct, 2), "%")
-                : "—"
-            )}
-
-            ${metric(
-              "Range 20D",
-              Number.isFinite(priceRange20Pct)
-                ? metricValue(formatNumber(priceRange20Pct, 2), "%")
-                : "—"
-            )}
-
-          </div>
-
-
-          <!-- MARKET STRUCTURE -->
-
-          <div class="grid grid-cols-2 gap-2">
-
-            ${metric(
-              "Close Position",
-              Number.isFinite(closePositionPct)
-                ? metricValue(formatNumber(closePositionPct, 0), "%")
-                : "—",
-              Number.isFinite(closePositionPct) && closePositionPct >= 80
-                ? "positive"
-                : ""
-            )}
-
-            ${metric(
-              "Change",
-              Number.isFinite(changePct)
-                ? metricValue(formatNumber(changePct, 2), "%")
-                : "—",
-              changeClass
-            )}
-
-          </div>
-
-
-          <!-- FOOTER -->
-
-          <div class="pt-3 mt-4 border-t border-[#171d21] flex items-center justify-between gap-4">
-
-            <div class="text-[9px] mono muted-2">
-              <span class="text-white font-bold">
-                QBS DETECTED
-              </span>
-
-              <span class="mx-1">•</span>
-
-              ${stock.date ? formatDate(stock.date) : "Latest Session"}
-            </div>
-
-            <button
-              type="button"
-              class="chartnalist-watch-btn text-[9px] mono px-2 py-1 rounded border border-[#20272c] hover:border-[#00d084]"
-              data-watch-ticker="${code}"
-              onclick="event.stopPropagation(); chartnalistPhase10ToggleWatch(this)"
-            >
-              + WATCH
-            </button>
-
-          </div>
-
-        </article>
-      `;
+      return '<article class="signal-card rounded-xl overflow-hidden p-5" onclick="window.location.href=\'/stock?code=' + code + '\'">' +
+        '<div class="flex items-start justify-between pb-4 border-b border-[#171d21]">' +
+          '<div class="flex items-center gap-3 min-w-0">' +
+            '<div class="w-8 h-8 shrink-0 rounded-lg bg-[#101416] border border-[#20272c] flex items-center justify-center text-[9px] mono muted-2">' + String(i + 1).padStart(2, "0") + "</div>" +
+            '<div class="min-w-0">' +
+              '<div class="flex flex-wrap items-center gap-2">' +
+                '<span class="text-xl font-extrabold tracking-tight">' + code + "</span>" +
+                '<span class="' + info.badge + ' rounded px-2 py-0.5 text-[8px] mono font-bold">' + info.title + "</span>" +
+                warn +
+              "</div>" +
+              '<div class="text-[10px] muted-2">' + esc(info.note) + "</div>" +
+            "</div>" +
+          "</div>" +
+          '<div class="text-right shrink-0">' +
+            '<div class="text-lg font-bold mono ' + (naik >= 0 ? "positive" : "negative") + '">' + naikTxt + "</div>" +
+            '<div class="text-[9px] mono muted-2">naik hari ini</div>' +
+          "</div>" +
+        "</div>" +
+        '<div class="grid grid-cols-2 sm:grid-cols-4 gap-2 my-4">' +
+          metric("Nilai", "Rp " + num(r.nilai_miliar, 1) + " M") +
+          metric("Volume vs 20D", num(r.rvol, 1) + "×", Number(r.rvol) >= 2.5 ? "positive" : "") +
+          metric("Close Position", num(Number(r.clv) * 100, 0) + "%", Number(r.clv) >= 0.85 ? "positive" : "") +
+          metric("Rank Hari Ini", r.rank_hari_ini == null ? "—" : "#" + esc(r.rank_hari_ini)) +
+        "</div>" +
+        '<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">' +
+          metric("Top 20 (5 hari)", num(r.top20_5hari, 0) + "×") +
+          metric("Frekuensi", num(r.freq, 0)) +
+          metric("Rentang 20D", num(r.atr20_pct, 1) + "%") +
+        "</div>" +
+        '<div class="pt-3 mt-4 border-t border-[#171d21] flex items-center justify-between gap-4">' +
+          '<div class="text-[9px] mono muted-2">' + formatDate(r.signal_date) + "</div>" +
+          '<button type="button" class="chartnalist-watch-btn text-[9px] mono px-2 py-1 rounded border border-[#20272c] hover:border-[#00d084]" data-watch-ticker="' + code + '" onclick="event.stopPropagation(); if (window.chartnalistPhase10ToggleWatch) chartnalistPhase10ToggleWatch(this)">+ WATCH</button>' +
+        "</div>" +
+      "</article>";
     }
-    async function fetchLiveData(force = false) {
-      const grid = document.getElementById("signalGrid");
+
+    async function fetchData() {
       const status = document.getElementById("dataStatus");
       const refresh = document.getElementById("refreshButton");
+      const gridA = document.getElementById("gridA");
+      const gridB = document.getElementById("gridB");
 
       refresh.disabled = true;
       status.textContent = "SCANNING";
+      document.getElementById("errorState").classList.add("hidden");
 
       try {
-        // Membaca file output hasil scan engine
-        const res = await fetch("/screener_results.json?v=" + Date.now(), { cache: "no-store" });
-
-        if (!res || !res.ok) {
-          throw new Error("File hasil scan engine tidak ditemukan.");
+        const res = await fetch("/api/screener-top20?v=" + Date.now(), { cache: "no-store" });
+        const data = await res.json().catch(function () { return null; });
+        if (!res.ok || !data || !data.success) {
+          throw new Error((data && data.error) || ("HTTP " + res.status));
         }
 
-        const data = await res.json();
-        const results = data.results || data.signals || data.data || (Array.isArray(data) ? data : []);
-        const detectedScanDate =
-          (results[0] && results[0].date) ||
-          data.scan_date ||
-          data.scanDate ||
-          null;
+        const rows = Array.isArray(data.results) ? data.results : [];
+        const a = rows.filter(function (r) { return r.lane === "A"; });
+        const b = rows.filter(function (r) { return r.lane === "B"; });
 
-        document.getElementById("lastUpdated").textContent =
-          detectedScanDate
-            ? formatDate(detectedScanDate)
-            : "—";
+        document.getElementById("lastUpdated").textContent = formatDate(data.scan_date);
+        document.getElementById("countA").textContent = a.length;
+        document.getElementById("countB").textContent = b.length;
 
-        document.getElementById("signalCount").textContent = results.length;
-        if (data.total_universe) document.getElementById("totalUniverse").textContent = data.total_universe;
+        gridA.innerHTML = a.map(renderCard).join("");
+        gridB.innerHTML = b.map(renderCard).join("");
+        document.getElementById("emptyA").classList.toggle("hidden", a.length > 0);
+        document.getElementById("emptyB").classList.toggle("hidden", b.length > 0);
 
-        if (results.length === 0) {
-          grid.innerHTML = "";
-          document.getElementById("emptyState").classList.remove("hidden");
-          status.textContent = "0 SIGNALS";
-          return;
-        }
-
-        document.getElementById("emptyState").classList.add("hidden");
-        grid.innerHTML = results.map(renderSignalCard).join("");
-        status.textContent = `${results.length} SIGNALS DETECTED`;
+        status.textContent = rows.length + " PICKS";
+        status.className = "mt-2 text-sm font-bold mono positive";
 
         if (window.chartnalistPhase10SyncWatchButtons) {
           chartnalistPhase10SyncWatchButtons();
         }
-
       } catch (err) {
-        console.error("QBS Screener Error:", err);
-        grid.innerHTML = "";
-        document.getElementById("emptyState").classList.remove("hidden");
-        document.getElementById("emptyTitle").textContent = "Gagal Memuat Data Engine";
-        document.getElementById("emptyMessage").textContent = "Pastikan `/screener_results.json` tersedia dan dihasilkan oleh Canonical QBS V4.9.1.";
-        status.textContent = "ENGINE ERROR";
+        console.error("Screener error:", err);
+        gridA.innerHTML = "";
+        gridB.innerHTML = "";
+        document.getElementById("emptyA").classList.add("hidden");
+        document.getElementById("emptyB").classList.add("hidden");
+        document.getElementById("errorState").classList.remove("hidden");
+        document.getElementById("errorMessage").textContent = "Pesan: " + (err && err.message ? err.message : err);
+        status.textContent = "ERROR";
+        status.className = "mt-2 text-sm font-bold mono negative";
       } finally {
         refresh.disabled = false;
         lucide.createIcons();
       }
     }
 
-    fetchLiveData();
-  </script>
-
-  <!-- RESEARCH DETAIL MODAL -->
-  <script id="research-detail-js">
-    function openResearchDetail(encoded) {
-      const s = JSON.parse(decodeURIComponent(encoded));
-
-      const old = document.getElementById("researchDetailOverlay");
-      if (old) old.remove();
-
-      const overlay = document.createElement("div");
-      overlay.id = "researchDetailOverlay";
-      overlay.className = "research-overlay";
-
-      overlay.innerHTML = `
-        <div class="research-panel p-6">
-          <div class="flex items-start justify-between pb-4 border-b border-[#171d21]">
-            <div>
-              <div class="flex items-center gap-3">
-                <span class="text-2xl font-extrabold">${s.code || s.ticker || "—"}</span>
-                <span class="qbs-badge rounded px-2 py-0.5 text-[9px] mono font-bold">${s.logic_setup || "QBS"}</span>
-              </div>
-              <div class="text-xs muted-2 mt-1">${s.name || ""}</div>
-            </div>
-            <button class="research-close" onclick="closeResearchDetail()">Ã—</button>
-          </div>
-
-          <div class="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <div class="research-gate">
-              <div class="text-[8px] mono muted-2 uppercase">Confirm Close</div>
-              <div class="text-lg font-bold mono text-white mt-1">${formatPrice(s.confirm_close)}</div>
-            </div>
-            <div class="research-gate">
-              <div class="text-[8px] mono muted-2 uppercase">Stop Loss</div>
-              <div class="text-lg font-bold mono positive mt-1">${formatNumber(s.volumeSurge, 2)}×</div>
-            </div>
-            <div class="research-gate">
-              <div class="text-[8px] mono muted-2 uppercase">Target Price (1.5R)</div>
-              <div class="text-lg font-bold mono positive mt-1">${formatNumber(s.frequencySurge, 2)}×</div>
-            </div>
-          </div>
-
-          <div class="mt-4 grid grid-cols-2 gap-3">
-            <div class="research-gate">
-              <div class="text-[8px] mono muted-2 uppercase">Risk Points</div>
-              <div class="text-sm font-bold mono mt-1">${formatNumber(s.bbWidthPct, 2)}%</div>
-            </div>
-            <div class="research-gate">
-              <div class="text-[8px] mono muted-2 uppercase">Close Position</div>
-              <div class="text-sm font-bold mono positive mt-1">${formatNumber(s.closePositionPct, 0)}%</div>
-            </div>
-          </div>
-
-          <div class="mt-6 p-4 rounded-xl border border-[#20272c] bg-[#0b0e10]">
-            <div class="text-[9px] mono positive font-bold uppercase">Transaction Volume / Value</div>
-            <div class="text-sm font-bold mono mt-1">${formatPrice(s.value_idr)} IDR</div>
-          </div>
-
-          <div class="mt-6 flex justify-end">
-            <button onclick="closeResearchDetail()" class="px-4 py-2 bg-[#101416] border border-[#20272c] rounded-lg text-xs mono hover:border-[#00d084]">TUTUP</button>
-          </div>
-        </div>
-      `;
-
-      overlay.onclick = e => { if (e.target === overlay) closeResearchDetail(); };
-      document.body.appendChild(overlay);
-      document.body.style.overflow = "hidden";
-    }
-
-    function closeResearchDetail() {
-      const el = document.getElementById("researchDetailOverlay");
-      if (el) el.remove();
-      document.body.style.overflow = "";
-    }
+    fetchData();
   </script>
 
   <script src="/assets/stockfamily-sidebar.js"></script>
   <script src="/assets/chartnalist-track.js?v=20261015" defer></script>
 </body>
 </html>
-
-
-
-
-
-
