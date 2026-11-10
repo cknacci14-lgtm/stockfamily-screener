@@ -45,12 +45,66 @@ async function requireAdmin(request, env) {
   return { user };
 }
 
+// Ringkasan forward test Watchlist Harian (tabel cn_watch_forward_log).
+async function watchSummary(url, key) {
+  const r = await fetch(
+    url + '/rest/v1/cn_watch_forward_log' +
+      '?select=signal_date,ticker,aturan,status,ret_hari_ini,p_top20_besok,target_date,masuk_top20_besok,suspensi_besok,ret_besok_pct,evaluated_at' +
+      '&order=signal_date.desc&limit=5000',
+    { headers: { apikey: key, Authorization: 'Bearer ' + key } }
+  );
+  if (!r.ok) return json({ success: false, error: 'Gagal membaca log watchlist (' + r.status + ')' }, 502);
+  const rows = await r.json();
+  const list = Array.isArray(rows) ? rows : [];
+
+  const by = {};
+  const days = new Set();
+  for (const x of list) {
+    days.add(x.signal_date);
+    const b = (by[x.aturan] = by[x.aturan] || { aturan: x.aturan, dicatat: 0, n: 0, hit: 0, suspensi: 0, ret_sum: 0, ret_n: 0, p_sum: 0, p_n: 0 });
+    b.dicatat++;
+    if (x.p_top20_besok != null) { b.p_sum += Number(x.p_top20_besok); b.p_n++; }
+    if (x.evaluated_at) {
+      b.n++;
+      if (x.masuk_top20_besok) b.hit++;
+      if (x.suspensi_besok) b.suspensi++;
+      if (x.ret_besok_pct != null) { b.ret_sum += Number(x.ret_besok_pct); b.ret_n++; }
+    }
+  }
+  const summary = Object.keys(by).sort().map(k => {
+    const b = by[k];
+    const ci = wilson(b.hit, b.n);
+    return {
+      aturan: b.aturan,
+      dicatat: b.dicatat,
+      n: b.n,
+      menunggu: b.dicatat - b.n,
+      hit: b.hit,
+      precision_pct: b.n ? +(100 * b.hit / b.n).toFixed(1) : null,
+      ci_low: ci ? +ci[0].toFixed(1) : null,
+      ci_high: ci ? +ci[1].toFixed(1) : null,
+      klaim_pct: b.p_n ? +(b.p_sum / b.p_n).toFixed(1) : null,
+      suspensi: b.suspensi,
+      avg_ret_pct: b.ret_n ? +(b.ret_sum / b.ret_n).toFixed(2) : null
+    };
+  });
+  const dates = Array.from(days).sort();
+  const lastDate = dates.length ? dates[dates.length - 1] : null;
+  const latest = list.filter(x => x.signal_date === lastDate).map(x => ({
+    ticker: x.ticker, aturan: x.aturan, status: x.status, ret_hari_ini: x.ret_hari_ini
+  }));
+  return json({ success: true, data: { days: dates.length, first_date: dates[0] || null, last_log_date: lastDate, summary, latest } });
+}
+
 export async function onRequestGet({ request, env }) {
   try {
     const auth = await requireAdmin(request, env);
     if (auth.error) return auth.error;
 
     const url = env.SUPABASE_URL, key = env.SUPABASE_SERVICE_ROLE_KEY;
+    if (new URL(request.url).searchParams.get('set') === 'watch') {
+      return await watchSummary(url, key);
+    }
     const r = await fetch(
       url + '/rest/v1/cn_screener_forward_log' +
         '?select=signal_date,code,rule,lane,naik_pct,risiko_suspensi,target_date,masuk_top20_besok,suspensi_besok,ret_besok_pct,evaluated_at' +
