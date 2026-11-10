@@ -21,6 +21,21 @@ export async function onRequestGet({ env }) {
   }
   try {
     const h = { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' };
+    // Jalur cepat: tabel yang diisi workflow tiap malam (cn_riwayat_refresh).
+    const rh = { apikey: key, Authorization: 'Bearer ' + key };
+    const [cr, cd] = await Promise.all([
+      fetch(url + '/rest/v1/cn_screener_riwayat?select=signal_date,code,rule,lane,naik_pct,nilai_miliar,risiko_suspensi,target_date,masuk_top20_besok,suspensi_besok,ret_besok_pct&order=signal_date.desc,lane.asc,code.asc&limit=1000', { headers: rh }),
+      fetch(url + '/rest/v1/cn_screener_riwayat_hari?select=d&order=d.desc&limit=30', { headers: rh })
+    ]);
+    if (cr.ok && cd.ok) {
+      const days = await cd.json();
+      if (Array.isArray(days) && days.length) {
+        const picks = await cr.json();
+        return json({ success: true, source: 'cache', dates: days.map(x => x.d), results: Array.isArray(picks) ? picks : [] });
+      }
+    }
+
+    // Cadangan: hitung langsung (lebih lambat). Dipakai bila tabel belum terisi.
     const body = JSON.stringify({ p_hari: 15 });
     const [res, dts] = await Promise.all([
       fetch(url + '/rest/v1/rpc/cn_screener_history', { method: 'POST', headers: h, body }),
@@ -37,6 +52,7 @@ export async function onRequestGet({ env }) {
     const dates = await dts.json();
     return json({
       success: true,
+      source: 'live',
       dates: Array.isArray(dates) ? dates : [],
       results: Array.isArray(rows) ? rows : []
     });

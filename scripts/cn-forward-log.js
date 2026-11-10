@@ -90,6 +90,12 @@ async function main() {
     await summarize('Ringkasan Watchlist', 'cn_watch_forward_log', 'aturan', 'ret_besok_pct');
   }, ok);
 
+  // Dijalankan terakhir: setelah pencatatan, supaya hasil hari bursa terbaru ikut terhitung.
+  await section('riwayat', async () => {
+    const row = await rpc('cn_riwayat_refresh');
+    console.log('Riwayat 15 hari | Pick:', row && row.pick, '| Hari:', row && row.hari);
+  }, ok);
+
   if (!ok.value) process.exit(1);
 }
 
