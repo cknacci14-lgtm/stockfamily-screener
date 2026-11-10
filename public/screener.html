@@ -676,6 +676,12 @@
         }
       }
 
+      // Aturan yang sama dengan Top 20: streak >= 2 hari dan naik >= 15% berisiko disuspensi.
+      let susp = "";
+      if (Number(r.streak_top) >= 2 && Number.isFinite(ret) && ret >= 15) {
+        susp = '<span class="badge-warn rounded px-2 py-0.5 text-[8px] mono font-bold">RISIKO SUSPENSI</span>';
+      }
+
       const gate = r.aturan === "R8" ? metric("Gate Ratio", num(r.gate_ratio, 2)) : metric("Hari sejak top", num(r.days_since_top, 0));
 
       return '<article class="signal-card rounded-xl overflow-hidden p-5" data-code="' + code + '">' +
@@ -685,7 +691,7 @@
             '<div class="min-w-0">' +
               '<div class="flex flex-wrap items-center gap-2">' +
                 '<span class="text-xl font-extrabold tracking-tight">' + code + "</span>" +
-                '<span class="badge-a rounded px-2 py-0.5 text-[8px] mono font-bold">' + esc(r.aturan) + "</span>" + both +
+                '<span class="badge-a rounded px-2 py-0.5 text-[8px] mono font-bold">' + esc(r.aturan) + "</span>" + both + susp +
               "</div>" +
               '<div class="text-[10px] muted-2 truncate max-w-[260px]">' + esc(r.nama || "") + "</div>" +
               '<div class="text-[10px] muted-2">' + esc(r.label || "") + " &middot; keyakinan " + esc(r.keyakinan || "—") + "</div>" +
