@@ -596,6 +596,7 @@
       </div>
       <div id="fw-body"><div class="admin-card">Klik tab ini untuk memuat data.</div></div>
       <div id="fw-cn"></div>
+      <div id="fw-cnw"></div>
     </div>
 
     <div id="tab-monitor" class="tab-panel">
@@ -1279,7 +1280,41 @@
         body.innerHTML = '<div class="admin-card" style="color:#FF5252">Gagal memuat: ' + cnEsc(err.message) + '</div>';
       }
     }
+    async function loadCnWatchForward() {
+      var box = document.getElementById('fw-cnw');
+      if (!box) return;
+      box.innerHTML = '<div class="admin-card">Memuat forward test Watchlist Harian...</div>';
+      try {
+        var res = await adminFetch('/api/admin/cn-forward-test?set=watch');
+        var j = await res.json();
+        if (!res.ok || !j.success) throw new Error(j.error || ('HTTP ' + res.status));
+        var d = j.data || {};
+        var f = function (v) { return v == null ? '-' : Number(v).toLocaleString('id-ID'); };
+        var names = { R1: 'R1 ARA top', R2: 'R2 ARA streak 2+', R3: 'R3 HINDARI (presisi rendah = filter bekerja)', R8: 'R8 dekat gerbang likuid' };
+        var tiles = cnGrid([
+          cnTile('Hari tercatat', cnNum(d.days)),
+          cnTile('Catatan terakhir', cnEsc(d.last_log_date || '-')),
+          cnTile('Catatan pertama', cnEsc(d.first_date || '-'))
+        ]);
+        var sum = d.summary || [];
+        var sumHtml = sum.length ? ('<table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="color:#8b93a7;text-align:left"><th style="padding:6px 0">Aturan</th><th>Dicatat</th><th>Selesai (n)</th><th>Masuk top 20</th><th>Presisi %</th><th>Selang 95%</th><th>Klaim halaman %</th><th>Suspensi</th><th>Rata-rata ret besok %</th><th></th></tr>' +
+          sum.map(function (r) {
+            var note = Number(r.n) === 0 ? 'menunggu hasil' : (Number(r.n) < 30 ? 'sampel kecil' : '');
+            var ci = r.ci_low == null ? '-' : f(r.ci_low) + ' - ' + f(r.ci_high);
+            return '<tr style="border-top:1px solid #2a2f3e"><td style="padding:6px 0">' + cnEsc(names[r.aturan] || r.aturan) + '</td><td>' + cnNum(r.dicatat) + '</td><td>' + cnNum(r.n) + '</td><td>' + cnNum(r.hit) + '</td><td>' + f(r.precision_pct) + '</td><td>' + ci + '</td><td>' + f(r.klaim_pct) + '</td><td>' + cnNum(r.suspensi) + '</td><td>' + f(r.avg_ret_pct) + '</td><td style="color:#FFB300">' + note + '</td></tr>';
+          }).join('') + '</table>') : '<div style="color:#8b93a7">Belum ada sinyal tercatat.</div>';
+        var latest = d.latest || [];
+        var latestHtml = latest.length ? ('<div style="display:flex;flex-wrap:wrap;gap:6px">' + latest.map(function (r) {
+          return '<span style="background:#1a1f2e;border:1px solid #2a2f3e;border-radius:4px;padding:2px 6px;font-size:12px">' + cnEsc(r.ticker) + ' <span style="color:#8b93a7">' + cnEsc(r.aturan) + '</span></span>';
+        }).join('') + '</div>') : '<div style="color:#8b93a7">Tidak ada pick pada catatan terakhir.</div>';
+        box.innerHTML = '<div class="admin-card"><h2>Watchlist Harian</h2><p style="color:#8b93a7;font-size:12px">Isi halaman Watchlist Harian dicatat apa adanya setiap hari, lalu dinilai di hari bursa berikutnya. Kolom "Klaim halaman" adalah rata-rata peluang yang ditampilkan saat itu, bandingkan dengan presisi nyata. Untuk R3 (hindari), presisi yang rendah berarti filter bekerja. Suspensi dihitung gagal.</p></div>' +
+          cnSection('Status pencatat', tiles) + cnSection('Presisi forward test per aturan', sumHtml) + cnSection('Pick pada catatan terakhir', latestHtml);
+      } catch (err) {
+        box.innerHTML = '<div class="admin-card" style="color:#FF5252">Gagal memuat forward test Watchlist: ' + cnEsc(err.message) + '</div>';
+      }
+    }
     async function loadCnForward() {
+      loadCnWatchForward();
       var box = document.getElementById('fw-cn');
       if (!box) return;
       box.innerHTML = '<div class="admin-card">Memuat forward test Top 20 Gainer...</div>';
