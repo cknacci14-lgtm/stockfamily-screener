@@ -591,14 +591,31 @@
       return '<table class="w-full text-[11px] mono"><thead><tr>' + head + "</tr></thead><tbody>" + rows + "</tbody></table>";
     }
 
+    // Server kadang menjawab halaman HTML (502) saat sibuk: coba lagi beberapa kali.
+    async function fetchJsonRetry(url, tries) {
+      let lastErr = "tidak diketahui";
+      for (let i = 0; i < tries; i++) {
+        try {
+          const res = await fetch(url);
+          const text = await res.text();
+          let data = null;
+          try { data = JSON.parse(text); } catch (e) { data = null; }
+          if (data && data.success) return data;
+          lastErr = data && data.error ? data.error : "server sibuk (HTTP " + res.status + ")";
+        } catch (e) {
+          lastErr = e && e.message ? e.message : String(e);
+        }
+        if (i < tries - 1) await new Promise(function (r) { setTimeout(r, 1500 * (i + 1)); });
+      }
+      throw new Error(lastErr);
+    }
+
     async function loadHistory() {
       const box = document.getElementById("histTop");
       const sumBox = document.getElementById("histTopSummary");
       if (!box) return;
       try {
-        const res = await fetch("/api/screener-history");
-        const data = await res.json();
-        if (!res.ok || !data.success) throw new Error(data.error || "HTTP " + res.status);
+        const data = await fetchJsonRetry("/api/screener-history", 3);
 
         const picks = data.results || [];
         const days = (data.dates || []).slice().sort().reverse();
