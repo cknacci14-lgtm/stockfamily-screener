@@ -595,6 +595,7 @@
         <p style="color:#8b93a7;font-size:12px;margin-top:8px">Hasil sinyal yang dicatat setiap hari (jalankan scripts/verdict-forward-log.js setelah upload data). Jangan menyimpulkan sebelum sampel (n) sekitar 100 dan datanya minimal sebulan hari berbeda.</p>
       </div>
       <div id="fw-body"><div class="admin-card">Klik tab ini untuk memuat data.</div></div>
+      <div id="fw-cn"></div>
     </div>
 
     <div id="tab-monitor" class="tab-panel">
@@ -1278,11 +1279,45 @@
         body.innerHTML = '<div class="admin-card" style="color:#FF5252">Gagal memuat: ' + cnEsc(err.message) + '</div>';
       }
     }
+    async function loadCnForward() {
+      var box = document.getElementById('fw-cn');
+      if (!box) return;
+      box.innerHTML = '<div class="admin-card">Memuat forward test Top 20 Gainer...</div>';
+      try {
+        var res = await adminFetch('/api/admin/cn-forward-test');
+        var j = await res.json();
+        if (!res.ok || !j.success) throw new Error(j.error || ('HTTP ' + res.status));
+        var d = j.data || {};
+        var f = function (v, suf) { return v == null ? '-' : Number(v).toLocaleString('id-ID') + (suf || ''); };
+        var names = { A_L1: 'A_L1 (top 20 hari ini, tier L)', A_S2R: 'A_S2R (top 20 hari ini, tier S)', B_L: 'B_L Radar (belum top 20)' };
+        var tiles = cnGrid([
+          cnTile('Hari tercatat', cnNum(d.days)),
+          cnTile('Catatan terakhir', cnEsc(d.last_log_date || '-')),
+          cnTile('Catatan pertama', cnEsc(d.first_date || '-'))
+        ]);
+        var sum = d.summary || [];
+        var sumHtml = sum.length ? ('<table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="color:#8b93a7;text-align:left"><th style="padding:6px 0">Aturan</th><th>Dicatat</th><th>Selesai (n)</th><th>Masuk top 20</th><th>Presisi %</th><th>Selang 95%</th><th>Backtest %</th><th>Suspensi</th><th>Rata-rata ret besok %</th><th></th></tr>' +
+          sum.map(function (r) {
+            var note = Number(r.n) === 0 ? 'menunggu hasil' : (Number(r.n) < 30 ? 'sampel kecil' : '');
+            var ci = r.ci_low == null ? '-' : f(r.ci_low) + ' - ' + f(r.ci_high);
+            return '<tr style="border-top:1px solid #2a2f3e"><td style="padding:6px 0">' + cnEsc(names[r.rule] || r.rule) + '</td><td>' + cnNum(r.dicatat) + '</td><td>' + cnNum(r.n) + '</td><td>' + cnNum(r.hit) + '</td><td>' + f(r.precision_pct) + '</td><td>' + ci + '</td><td>' + f(r.backtest_pct) + '</td><td>' + cnNum(r.suspensi) + '</td><td>' + f(r.avg_ret_pct) + '</td><td style="color:#FFB300">' + note + '</td></tr>';
+          }).join('') + '</table>') : '<div style="color:#8b93a7">Belum ada sinyal tercatat.</div>';
+        var latest = d.latest || [];
+        var latestHtml = latest.length ? ('<div style="display:flex;flex-wrap:wrap;gap:6px">' + latest.map(function (r) {
+          return '<span style="background:#1a1f2e;border:1px solid #2a2f3e;border-radius:4px;padding:2px 6px;font-size:12px">' + cnEsc(r.code) + ' <span style="color:#8b93a7">' + cnEsc(r.rule) + '</span></span>';
+        }).join('') + '</div>') : '<div style="color:#8b93a7">Tidak ada pick pada catatan terakhir.</div>';
+        box.innerHTML = '<div class="admin-card"><h2>Top 20 Gainer Screener</h2><p style="color:#8b93a7;font-size:12px">Dicatat otomatis oleh workflow CN Top20 Forward Log. Suspensi dihitung gagal. Backtest bersifat in-sample, jadi jangan menyimpulkan sebelum n per aturan sekitar 30 atau lebih dan datanya minimal sebulan.</p></div>' +
+          cnSection('Status pencatat', tiles) + cnSection('Presisi forward test per aturan', sumHtml) + cnSection('Pick pada catatan terakhir', latestHtml);
+      } catch (err) {
+        box.innerHTML = '<div class="admin-card" style="color:#FF5252">Gagal memuat forward test Top 20 Gainer: ' + cnEsc(err.message) + '</div>';
+      }
+    }
     async function loadForwardTab() {
       var body = document.getElementById('fw-body');
       var upd = document.getElementById('fw-updated');
       body.innerHTML = '<div class="admin-card">Memuat...</div>';
       try {
+        loadCnForward();
         var res = await adminFetch('/api/admin/forward-test');
         var j = await res.json();
         if (!res.ok || !j.success) throw new Error(j.error || ('HTTP ' + res.status));
