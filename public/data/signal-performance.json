@@ -1,6 +1,6 @@
 {
- "generatedAt": "2026-11-09T23:04:51.603Z",
- "marketDate": "2026-11-06",
+ "generatedAt": "2026-11-10T01:23:19.477Z",
+ "marketDate": "2026-11-09",
  "params": {
   "outcomeWindow": 20,
   "triggerWindow": 10,
@@ -17,10 +17,10 @@
  ],
  "sources": {
   "live": {
-   "entries": 88,
-   "shown": 27,
+   "entries": 92,
+   "shown": 29,
    "from": "2026-10-08",
-   "to": "2026-11-06"
+   "to": "2026-11-09"
   },
   "backfill": {
    "entries": 832,
@@ -51,10 +51,10 @@
      "beat": 87
     },
     "h20": {
-     "n": 4,
-     "medRet": -8.63,
-     "medExcess": 14.9,
-     "beat": 75
+     "n": 6,
+     "medRet": -14.81,
+     "medExcess": 8.49,
+     "beat": 83
     }
    },
    "trade": {
@@ -91,10 +91,10 @@
      "beat": 83
     },
     "h20": {
-     "n": 3,
-     "medRet": -14.47,
-     "medExcess": 9.06,
-     "beat": 67
+     "n": 5,
+     "medRet": -15.15,
+     "medExcess": 7.93,
+     "beat": 80
     }
    },
    "trade": {
@@ -167,7 +167,7 @@
     "h10": {
      "n": 6,
      "medRet": -6.42,
-     "medExcess": 6.62,
+     "medExcess": 6.66,
      "beat": 83
     },
     "h20": {
@@ -196,21 +196,21 @@
    "dates": 11,
    "fwd": {
     "h5": {
-     "n": 18,
-     "medRet": -6.49,
-     "medExcess": 5.32,
-     "beat": 67
+     "n": 19,
+     "medRet": -6.44,
+     "medExcess": 5.92,
+     "beat": 68
     },
     "h10": {
-     "n": 14,
-     "medRet": -8.9,
-     "medExcess": 4.64,
-     "beat": 57
+     "n": 15,
+     "medRet": -12.57,
+     "medExcess": 3.69,
+     "beat": 53
     },
     "h20": {
-     "n": 1,
-     "medRet": 1.54,
-     "medExcess": 25.07,
+     "n": 2,
+     "medRet": -9.52,
+     "medExcess": 13.78,
      "beat": 100
     }
    },
@@ -236,21 +236,21 @@
    "dates": 11,
    "fwd": {
     "h5": {
-     "n": 16,
-     "medRet": -6.28,
-     "medExcess": 5.32,
-     "beat": 69
+     "n": 17,
+     "medRet": -6.01,
+     "medExcess": 5.92,
+     "beat": 71
     },
     "h10": {
-     "n": 12,
-     "medRet": -8.9,
-     "medExcess": 4.64,
-     "beat": 58
+     "n": 13,
+     "medRet": -12.57,
+     "medExcess": 3.69,
+     "beat": 54
     },
     "h20": {
-     "n": 1,
-     "medRet": 1.54,
-     "medExcess": 25.07,
+     "n": 2,
+     "medRet": -9.52,
+     "medExcess": 13.78,
      "beat": 100
     }
    },
@@ -513,9 +513,9 @@
    "dates": 58,
    "fwd": {
     "h5": {
-     "n": 297,
-     "medRet": -0.88,
-     "medExcess": -0.05,
+     "n": 298,
+     "medRet": -0.87,
+     "medExcess": -0.04,
      "beat": 49
     },
     "h10": {
@@ -553,9 +553,9 @@
    "dates": 57,
    "fwd": {
     "h5": {
-     "n": 227,
-     "medRet": -1.44,
-     "medExcess": -0.24,
+     "n": 228,
+     "medRet": -1.35,
+     "medExcess": -0.23,
      "beat": 47
     },
     "h10": {
@@ -634,21 +634,21 @@
    "dates": 9,
    "fwd": {
     "h5": {
-     "n": 15,
-     "medRet": -6.44,
-     "medExcess": 5.92,
-     "beat": 73
+     "n": 16,
+     "medRet": -6.23,
+     "medExcess": 6.7,
+     "beat": 75
     },
     "h10": {
-     "n": 11,
-     "medRet": -5.23,
-     "medExcess": 5.58,
-     "beat": 64
+     "n": 12,
+     "medRet": -8.9,
+     "medExcess": 4.64,
+     "beat": 58
     },
     "h20": {
-     "n": 1,
-     "medRet": 1.54,
-     "medExcess": 25.07,
+     "n": 2,
+     "medRet": -9.52,
+     "medExcess": 13.78,
      "beat": 100
     }
    },
@@ -754,10 +754,10 @@
    "dates": 11,
    "fwd": {
     "h5": {
-     "n": 11,
-     "medRet": -5.71,
-     "medExcess": -4.23,
-     "beat": 36
+     "n": 12,
+     "medRet": -5.68,
+     "medExcess": -3.52,
+     "beat": 42
     },
     "h10": {
      "n": 11,
@@ -787,6 +787,38 @@
   }
  ],
  "recent": [
+  {
+   "date": "2026-11-09",
+   "code": "INTP",
+   "group": "PRA-BREAKOUT",
+   "status": "WATCH",
+   "source": "live",
+   "repeat": true,
+   "price": 5850,
+   "trigger": 5975,
+   "stop": 5381.25,
+   "target1": 6865.63,
+   "outcome": "MENUNGGU",
+   "R1": null,
+   "ret5": null,
+   "ret10": null
+  },
+  {
+   "date": "2026-11-09",
+   "code": "PRDA",
+   "group": "PRA-BREAKOUT",
+   "status": "WATCH",
+   "source": "live",
+   "repeat": true,
+   "price": 3700,
+   "trigger": 3760,
+   "stop": 3390,
+   "target1": 4315,
+   "outcome": "MENUNGGU",
+   "R1": null,
+   "ret5": null,
+   "ret10": null
+  },
   {
    "date": "2026-11-06",
    "code": "INTP",
@@ -1394,38 +1426,6 @@
    "R1": 1.5,
    "ret5": 51.7,
    "ret10": 36.6
-  },
-  {
-   "date": "2026-09-29",
-   "code": "MMIX",
-   "group": "PRA-BREAKOUT",
-   "status": "WATCH",
-   "source": "backfill",
-   "repeat": true,
-   "price": 900,
-   "trigger": 905,
-   "stop": 832.68,
-   "target1": 1013.48,
-   "outcome": "STOP",
-   "R1": -1,
-   "ret5": 3.9,
-   "ret10": 7.8
-  },
-  {
-   "date": "2026-09-28",
-   "code": "ERAA",
-   "group": "PULLBACK",
-   "status": "TRIGGERED",
-   "source": "backfill",
-   "repeat": true,
-   "price": 610,
-   "trigger": 592.9,
-   "stop": 522.36,
-   "target1": 698.7,
-   "outcome": "STOP",
-   "R1": -1,
-   "ret5": 1.6,
-   "ret10": 2.5
   }
  ]
 }

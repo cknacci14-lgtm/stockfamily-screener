@@ -1,6 +1,6 @@
 {
   "success": true,
-  "date": "2026-11-06",
+  "date": "2026-11-09",
   "count": 2,
   "filtered": {
     "considered": 4,
@@ -14,34 +14,34 @@
       "stockName": "Indocement Tunggal Prakarsa Tbk.",
       "setup": "BREAKOUT",
       "status": "WATCH",
-      "price": 5800,
+      "price": 5850,
       "trigger": 5975,
-      "invalidation": 5375,
-      "target1": 6875,
-      "target2": 7475,
+      "invalidation": 5381.25,
+      "target1": 6865.63,
+      "target2": 7459.38,
       "riskReward": 2.5,
       "riskLevel": "HIGH",
-      "entryGapPct": -2.9,
-      "rrFromPrice": 2.53,
+      "entryGapPct": -2.1,
+      "rrFromPrice": 2.17,
       "planStale": false,
       "preBreakout": true,
-      "stopDistancePct": 7.3,
+      "stopDistancePct": 8,
       "stopWide": false,
-      "maxEntry": 6125,
+      "maxEntry": 6123.44,
       "structure": {
         "state": "NEUTRAL",
         "label": "Neutral structure",
         "explanation": "Price structure does not currently show a decisive directional condition."
       },
       "participation": {
-        "state": "NEUTRAL",
-        "label": "Normal participation",
-        "explanation": "Trading activity is not showing a decisive expansion or contraction."
+        "state": "CONTRACTING",
+        "label": "Participation contracting",
+        "explanation": "Multiple trading-activity measures are below their recent baseline."
       },
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": 0.000041528846402653226,
+        "value": 0.000038623264732055585,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
@@ -50,25 +50,25 @@
         "explanation": "One or more execution-quality measures are below the preferred baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-09T23:04:10.211Z"
+      "updatedAt": "2026-11-10T01:21:52.808Z"
     },
     {
       "stockCode": "PRDA",
       "stockName": "Prodia Widyahusada Tbk.",
       "setup": "BREAKOUT",
       "status": "WATCH",
-      "price": 3690,
+      "price": 3700,
       "trigger": 3760,
       "invalidation": 3390,
       "target1": 4315,
       "target2": 4685,
       "riskReward": 2.5,
       "riskLevel": "HIGH",
-      "entryGapPct": -1.9,
-      "rrFromPrice": 2.08,
+      "entryGapPct": -1.6,
+      "rrFromPrice": 1.98,
       "planStale": false,
       "preBreakout": true,
-      "stopDistancePct": 8.1,
+      "stopDistancePct": 8.4,
       "stopWide": false,
       "maxEntry": 3852.5,
       "structure": {
@@ -84,7 +84,7 @@
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": -0.00002863130667990049,
+        "value": -0.00003128836637535689,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
@@ -93,10 +93,10 @@
         "explanation": "Trading activity is materially below the minimum liquidity baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-09T23:04:10.211Z"
+      "updatedAt": "2026-11-10T01:21:52.808Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-11-09T23:04:10.211Z"
+  "generatedAt": "2026-11-10T01:21:52.808Z"
 }
