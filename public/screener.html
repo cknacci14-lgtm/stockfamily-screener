@@ -249,6 +249,21 @@
       </div>
     </section>
 
+    <!-- RIWAYAT 15 HARI -->
+    <section class="mb-10">
+      <div class="mb-3">
+        <h2 class="text-sm font-bold">Riwayat pick 15 hari bursa terakhir</h2>
+        <p class="text-[10px] muted-2 mt-1">
+          Dihitung ulang dengan aturan yang sama untuk tiap hari, lalu dibandingkan dengan hasil hari bursa berikutnya.
+          Aturan dipilih dari data yang sama, jadi ini gambaran, bukan bukti. Catatan forward yang sebenarnya dikumpulkan sejak 9 Nov 2026.
+        </p>
+      </div>
+      <div id="histTopSummary" class="mb-3"></div>
+      <div id="histTop" class="panel rounded-xl p-4 overflow-x-auto">
+        <div class="text-[11px] muted-2">Memuat riwayat...</div>
+      </div>
+    </section>
+
     <!-- ERROR -->
     <section id="errorState" class="empty-state hidden rounded-xl p-10 text-center mb-10">
       <div id="errorTitle" class="text-sm font-semibold">Gagal Memuat Data</div>
@@ -372,6 +387,20 @@
         <div id="watchErrorMessage" class="mt-2 text-[11px] muted-2">Coba refresh beberapa saat lagi.</div>
       </section>
 
+      <section class="mb-10">
+        <div class="mb-3">
+          <h2 class="text-sm font-bold">Riwayat pantau 15 hari bursa terakhir</h2>
+          <p class="text-[10px] muted-2 mt-1">
+            Catatan forward: daftar dicatat apa adanya pada hari itu, lalu dinilai di hari bursa berikutnya. Dimulai 9 Nov 2026, jadi baris bertambah tiap hari.
+            Untuk R3 (hindari), tidak masuk top 20 berarti filter bekerja.
+          </p>
+        </div>
+        <div id="histWatchSummary" class="mb-3"></div>
+        <div id="histWatch" class="panel rounded-xl p-4 overflow-x-auto">
+          <div class="text-[11px] muted-2">Membuka tab ini memuat riwayat...</div>
+        </div>
+      </section>
+
       <section class="panel research-note rounded-xl p-5">
         <div class="text-xs font-bold">Catatan Penting (Eksperimental)</div>
         <ul class="mt-2 text-[11px] muted leading-relaxed max-w-4xl list-disc pl-4 space-y-1">
@@ -473,6 +502,7 @@
     }
 
     async function fetchData() {
+      loadHistory();
       const status = document.getElementById("dataStatus");
       const refresh = document.getElementById("refreshButton");
       const gridA = document.getElementById("gridA");
@@ -524,6 +554,145 @@
       } finally {
         refresh.disabled = false;
         lucide.createIcons();
+      }
+    }
+
+
+    // ---------------------------------------------------------------
+    // RIWAYAT 15 HARI BURSA
+    // ---------------------------------------------------------------
+    function outcomeBadge(pending, susp, hit) {
+      if (pending) return '<span class="muted-2">menunggu</span>';
+      if (susp) return '<span class="negative">Suspensi</span>';
+      return hit ? '<span class="positive font-bold">Masuk top 20</span>' : '<span class="muted">Tidak masuk</span>';
+    }
+
+    function pctTxt(v) {
+      const n = Number(v);
+      if (v === null || v === undefined || v === "" || !Number.isFinite(n)) return "—";
+      return (n >= 0 ? "+" : "") + num(n, 2) + "%";
+    }
+
+    function histSummary(groups) {
+      // groups: { nama: { n, hit, susp } } -> chip ringkas
+      const names = Object.keys(groups).sort();
+      if (!names.length) return '<div class="text-[11px] muted-2">Belum ada hasil yang bisa dinilai.</div>';
+      return '<div class="flex flex-wrap gap-2">' + names.map(function (k) {
+        const g = groups[k];
+        const pr = g.n ? num((100 * g.hit) / g.n, 0) + "%" : "—";
+        return '<span class="panel rounded-lg px-3 py-2 text-[10px] mono">' + esc(k) +
+          ': <b>' + g.hit + "/" + g.n + '</b> masuk top 20 (' + pr + ")" +
+          (g.susp ? ' &middot; <span class="negative">' + g.susp + " suspensi</span>" : "") + "</span>";
+      }).join("") + "</div>";
+    }
+
+    function histTable(rows, cols) {
+      const head = cols.map(function (c) { return '<th class="text-left font-semibold pr-4 py-1 muted-2">' + c + "</th>"; }).join("");
+      return '<table class="w-full text-[11px] mono"><thead><tr>' + head + "</tr></thead><tbody>" + rows + "</tbody></table>";
+    }
+
+    async function loadHistory() {
+      const box = document.getElementById("histTop");
+      const sumBox = document.getElementById("histTopSummary");
+      if (!box) return;
+      try {
+        const res = await fetch("/api/screener-history");
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || "HTTP " + res.status);
+
+        const picks = data.results || [];
+        const days = (data.dates || []).slice().sort().reverse();
+        const byDay = {};
+        const groups = {};
+        picks.forEach(function (r) {
+          const d = String(r.signal_date).slice(0, 10);
+          (byDay[d] = byDay[d] || []).push(r);
+          if (r.target_date) {
+            const g = (groups[r.rule] = groups[r.rule] || { n: 0, hit: 0, susp: 0 });
+            g.n++;
+            if (r.masuk_top20_besok && !r.suspensi_besok) g.hit++;
+            if (r.suspensi_besok) g.susp++;
+          }
+        });
+
+        let empty = 0;
+        const rowsHtml = days.map(function (d) {
+          const list = byDay[String(d).slice(0, 10)] || [];
+          if (!list.length) {
+            empty++;
+            return '<tr class="border-t border-[#171d21]"><td class="pr-4 py-1">' + formatDate(d) + '</td><td colspan="5" class="muted-2">tidak ada pick</td></tr>';
+          }
+          return list.map(function (r, i) {
+            return '<tr class="border-t border-[#171d21]"><td class="pr-4 py-1">' + (i === 0 ? formatDate(d) : "") + "</td>" +
+              '<td class="pr-4"><b>' + esc(r.code) + "</b></td>" +
+              '<td class="pr-4 muted">' + esc(r.rule) + "</td>" +
+              '<td class="pr-4 positive">+' + num(r.naik_pct, 1) + "%</td>" +
+              '<td class="pr-4">' + outcomeBadge(!r.target_date, r.suspensi_besok, r.masuk_top20_besok) + "</td>" +
+              "<td>" + pctTxt(r.ret_besok_pct) + "</td></tr>";
+          }).join("");
+        }).join("");
+
+        sumBox.innerHTML = histSummary(groups) +
+          '<div class="mt-2 text-[10px] muted-2">Tidak ada pick pada ' + empty + " dari " + days.length + " hari bursa.</div>";
+        box.innerHTML = days.length
+          ? histTable(rowsHtml, ["Tanggal", "Kode", "Aturan", "Naik", "Hasil besok", "Ret besok"])
+          : '<div class="text-[11px] muted-2">Belum ada data riwayat.</div>';
+      } catch (err) {
+        console.error("History error:", err);
+        sumBox.innerHTML = "";
+        box.innerHTML = '<div class="text-[11px] muted-2">Riwayat belum bisa dimuat: ' + esc(err && err.message ? err.message : err) + "</div>";
+      }
+    }
+
+    async function loadWatchHistory() {
+      const box = document.getElementById("histWatch");
+      const sumBox = document.getElementById("histWatchSummary");
+      if (!box || !window.chartnalistSupabase) return;
+      try {
+        const q = await window.chartnalistSupabase
+          .from("v_watch_forward_riwayat")
+          .select("*")
+          .order("signal_date", { ascending: false })
+          .order("aturan", { ascending: true })
+          .order("ticker", { ascending: true });
+        if (q.error) throw new Error(q.error.message || "gagal membaca");
+
+        const rows = q.data || [];
+        const groups = {};
+        const byDay = {};
+        const order = [];
+        rows.forEach(function (r) {
+          const d = String(r.signal_date).slice(0, 10);
+          if (!byDay[d]) { byDay[d] = []; order.push(d); }
+          byDay[d].push(r);
+          if (r.selesai) {
+            const g = (groups[r.aturan] = groups[r.aturan] || { n: 0, hit: 0, susp: 0 });
+            g.n++;
+            if (r.masuk_top20_besok && !r.suspensi_besok) g.hit++;
+            if (r.suspensi_besok) g.susp++;
+          }
+        });
+        if (!order.length) {
+          sumBox.innerHTML = "";
+          box.innerHTML = '<div class="text-[11px] muted-2">Belum ada catatan.</div>';
+          return;
+        }
+        sumBox.innerHTML = histSummary(groups);
+        const rowsHtml = order.map(function (d) {
+          return byDay[d].map(function (r, i) {
+            return '<tr class="border-t border-[#171d21]"><td class="pr-4 py-1">' + (i === 0 ? formatDate(d) : "") + "</td>" +
+              '<td class="pr-4"><b>' + esc(r.ticker) + "</b></td>" +
+              '<td class="pr-4 muted">' + esc(r.aturan) + (r.status === "HINDARI" ? " (hindari)" : "") + "</td>" +
+              '<td class="pr-4">' + pctTxt(r.ret_hari_ini) + "</td>" +
+              '<td class="pr-4">' + outcomeBadge(!r.selesai, r.suspensi_besok, r.masuk_top20_besok) + "</td>" +
+              "<td>" + pctTxt(r.ret_besok_pct) + "</td></tr>";
+          }).join("");
+        }).join("");
+        box.innerHTML = histTable(rowsHtml, ["Tanggal", "Kode", "Aturan", "Naik", "Hasil besok", "Ret besok"]);
+      } catch (err) {
+        console.error("Watch history error:", err);
+        sumBox.innerHTML = "";
+        box.innerHTML = '<div class="text-[11px] muted-2">Riwayat belum tersedia: ' + esc(err && err.message ? err.message : err) + "</div>";
       }
     }
 
@@ -650,6 +819,7 @@
 
         watchRows = q.data || [];
         renderWatch();
+        loadWatchHistory();
       } catch (err) {
         console.error("Watchlist error:", err);
         showWatchError("Gagal Memuat Watchlist", "Pesan: " + (err && err.message ? err.message : err));
