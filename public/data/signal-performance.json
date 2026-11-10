@@ -1,6 +1,6 @@
 {
- "generatedAt": "2026-11-10T01:23:19.477Z",
- "marketDate": "2026-11-09",
+ "generatedAt": "2026-11-10T20:32:57.924Z",
+ "marketDate": "2026-11-10",
  "params": {
   "outcomeWindow": 20,
   "triggerWindow": 10,
@@ -17,10 +17,10 @@
  ],
  "sources": {
   "live": {
-   "entries": 92,
-   "shown": 29,
+   "entries": 95,
+   "shown": 30,
    "from": "2026-10-08",
-   "to": "2026-11-09"
+   "to": "2026-11-10"
   },
   "backfill": {
    "entries": 832,
@@ -39,22 +39,22 @@
    "dates": 12,
    "fwd": {
     "h5": {
-     "n": 19,
-     "medRet": -2.79,
-     "medExcess": 4.03,
-     "beat": 84
+     "n": 20,
+     "medRet": -2.77,
+     "medExcess": 3.84,
+     "beat": 80
     },
     "h10": {
-     "n": 15,
-     "medRet": -3.42,
-     "medExcess": 10.66,
-     "beat": 87
+     "n": 16,
+     "medRet": -3.12,
+     "medExcess": 8.96,
+     "beat": 88
     },
     "h20": {
-     "n": 6,
-     "medRet": -14.81,
-     "medExcess": 8.49,
-     "beat": 83
+     "n": 8,
+     "medRet": -16.65,
+     "medExcess": 6.43,
+     "beat": 63
     }
    },
    "trade": {
@@ -79,10 +79,10 @@
    "dates": 6,
    "fwd": {
     "h5": {
-     "n": 9,
-     "medRet": -2.91,
-     "medExcess": 4.03,
-     "beat": 78
+     "n": 10,
+     "medRet": -2.85,
+     "medExcess": 3.19,
+     "beat": 70
     },
     "h10": {
      "n": 6,
@@ -125,9 +125,9 @@
      "beat": 100
     },
     "h10": {
-     "n": 3,
-     "medRet": 0.69,
-     "medExcess": 15.88,
+     "n": 4,
+     "medRet": 0.1,
+     "medExcess": 14.68,
      "beat": 100
     },
     "h20": {
@@ -171,7 +171,10 @@
      "beat": 83
     },
     "h20": {
-     "n": 0
+     "n": 2,
+     "medRet": -30.5,
+     "medExcess": -7.92,
+     "beat": 0
     }
    },
    "trade": {
@@ -202,16 +205,16 @@
      "beat": 68
     },
     "h10": {
-     "n": 15,
-     "medRet": -12.57,
-     "medExcess": 3.69,
-     "beat": 53
+     "n": 16,
+     "medRet": -8.9,
+     "medExcess": 3.93,
+     "beat": 56
     },
     "h20": {
-     "n": 2,
-     "medRet": -9.52,
-     "medExcess": 13.78,
-     "beat": 100
+     "n": 6,
+     "medRet": -15.2,
+     "medExcess": 7.63,
+     "beat": 67
     }
    },
    "trade": {
@@ -242,16 +245,16 @@
      "beat": 71
     },
     "h10": {
-     "n": 13,
-     "medRet": -12.57,
-     "medExcess": 3.69,
-     "beat": 54
+     "n": 14,
+     "medRet": -8.9,
+     "medExcess": 3.93,
+     "beat": 57
     },
     "h20": {
-     "n": 2,
-     "medRet": -9.52,
-     "medExcess": 13.78,
-     "beat": 100
+     "n": 5,
+     "medRet": -20.59,
+     "medExcess": 2.49,
+     "beat": 60
     }
    },
    "trade": {
@@ -288,7 +291,10 @@
      "beat": 50
     },
     "h20": {
-     "n": 0
+     "n": 1,
+     "medRet": -9.82,
+     "medExcess": 12.77,
+     "beat": 100
     }
    },
    "trade": {
@@ -640,16 +646,16 @@
      "beat": 75
     },
     "h10": {
-     "n": 12,
-     "medRet": -8.9,
-     "medExcess": 4.64,
-     "beat": 58
+     "n": 13,
+     "medRet": -5.23,
+     "medExcess": 4.16,
+     "beat": 62
     },
     "h20": {
-     "n": 2,
-     "medRet": -9.52,
-     "medExcess": 13.78,
-     "beat": 100
+     "n": 6,
+     "medRet": -15.2,
+     "medExcess": 7.63,
+     "beat": 67
     }
    },
    "trade": {
@@ -788,6 +794,22 @@
  ],
  "recent": [
   {
+   "date": "2026-11-10",
+   "code": "PRDA",
+   "group": "PRA-BREAKOUT",
+   "status": "WATCH",
+   "source": "live",
+   "repeat": true,
+   "price": 3700,
+   "trigger": 3760,
+   "stop": 3401.07,
+   "target1": 4298.39,
+   "outcome": "MENUNGGU",
+   "R1": null,
+   "ret5": null,
+   "ret10": null
+  },
+  {
    "date": "2026-11-09",
    "code": "INTP",
    "group": "PRA-BREAKOUT",
@@ -896,7 +918,7 @@
    "target1": 4574.29,
    "outcome": "MENUNGGU",
    "R1": null,
-   "ret5": null,
+   "ret5": 0.5,
    "ret10": null
   },
   {
@@ -993,7 +1015,7 @@
    "outcome": "N/A",
    "R1": null,
    "ret5": -2.5,
-   "ret10": null
+   "ret10": -2.8
   },
   {
    "date": "2026-10-23",
@@ -1410,22 +1432,6 @@
    "R1": -1,
    "ret5": -6.4,
    "ret10": -7.7
-  },
-  {
-   "date": "2026-09-29",
-   "code": "MBSS",
-   "group": "PRA-BREAKOUT",
-   "status": "WATCH",
-   "source": "backfill",
-   "repeat": true,
-   "price": 2900,
-   "trigger": 2920,
-   "stop": 2884.29,
-   "target1": 2973.57,
-   "outcome": "T1",
-   "R1": 1.5,
-   "ret5": 51.7,
-   "ret10": 36.6
   }
  ]
 }
