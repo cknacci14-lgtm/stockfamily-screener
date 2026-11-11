@@ -50,10 +50,10 @@
         "explanation": "Trading activity is materially below the minimum liquidity baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-10T20:32:19.032Z"
+      "updatedAt": "2026-11-11T20:17:13.221Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-11-10T20:32:19.032Z"
+  "generatedAt": "2026-11-11T20:17:13.221Z"
 }
