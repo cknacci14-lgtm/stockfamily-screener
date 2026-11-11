@@ -895,6 +895,11 @@ tailwind.config = { darkMode:'class', theme:{ extend:{ colors:{
         </div>
 
         <div class="performance-summary-item">
+          <div class="performance-summary-label" title="Gross Profit dibagi nilai mutlak Gross Loss. Di atas 1 berarti total untung lebih besar dari total rugi. Tidak dihitung bila belum ada signal rugi.">Profit Factor (PF)</div>
+          <div id="perfProfitFactor" class="performance-summary-value">—</div>
+        </div>
+
+        <div class="performance-summary-item">
           <div class="performance-summary-label">Average P/L</div>
           <div id="perfAvgPL" class="performance-summary-value">—</div>
         </div>
@@ -1676,6 +1681,18 @@ document.addEventListener('keydown', function(e) {
       stats.grossLoss >= 0 ? "positive" : "negative"
     );
 
+    (function () {
+      var gp = perfNum(stats.grossProfit), gl = Math.abs(perfNum(stats.grossLoss));
+      if (gl > 0) {
+        var pf = gp / gl;
+        setPerfValue("perfProfitFactor", pf.toFixed(2), pf >= 1 ? "positive" : "negative");
+      } else if (gp > 0) {
+        setPerfValue("perfProfitFactor", "\u221e", "positive");
+      } else {
+        setPerfValue("perfProfitFactor", "\u2014");
+      }
+    })();
+
     setPerfValue(
       "perfAvgPL",
       perfPct(stats.avgPL),
@@ -1690,7 +1707,7 @@ document.addEventListener('keydown', function(e) {
     if (!perfNum(stats.settled)) {
       ["perfTotalPL", "perfAverageRR", "perfAvgMonth", "perfAvgHolding", "perfAverageTP", "perfAverageSL",
        "perfConsecutiveProfit", "perfConsecutiveLoss", "perfAvgWeek", "perfGrossProfit", "perfGrossLoss",
-       "perfAvgPL", "perfTotalR", "perfAvgR"].forEach(function (id) {
+       "perfAvgPL", "perfTotalR", "perfAvgR", "perfProfitFactor"].forEach(function (id) {
         var e = perfEl(id);
         if (e) { e.textContent = "—"; e.className = "performance-summary-value"; }
       });
