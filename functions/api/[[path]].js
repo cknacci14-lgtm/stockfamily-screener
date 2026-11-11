@@ -693,7 +693,62 @@ if (['PUBLISHED', 'ACTIVE', 'CLOSED', 'EXPIRED'].includes(st)) query = 'signals?
     }
     
     const signals = await sbFetch(env, query);
-    return c.json({ success: true, signals: signals || [] });
+    const list = signals || [];
+
+    // Hasil realisasi untuk signal CLOSED (dibekukan di harga keluar, bukan harga live).
+    // Aturan sama dengan getRealizedPct di /api/public/signals/performance: bila diubah, ubah keduanya.
+    try {
+      if (list.some(s => s.status === 'CLOSED')) {
+        const slEv = {};
+        const evs = await sbFetch(env, 'signal_events?select=signal_id,price_at_event&event_type=eq.SL_HIT');
+        (evs || []).forEach(e => {
+          const p = Number(e.price_at_event);
+          if (Number.isFinite(p) && p > 0) slEv[e.signal_id] = p;
+        });
+        const n = v => { const x = Number(v); return Number.isFinite(x) && v !== null && v !== '' ? x : null; };
+        const SCALE = [1 / 3, 1 / 3, 1 / 3];
+        list.forEach(s => {
+          if (s.status !== 'CLOSED' || !['TP1', 'TP2', 'TP3', 'SL'].includes(s.outcome)) return;
+          let entry = n(s.actual_entry_avg || s.entry_avg);
+          const slv = n(s.stop_loss), planned = n(s.entry_avg);
+          if (s.outcome === 'SL' && entry !== null && slv !== null && entry <= slv && planned) entry = planned;
+          if (entry === null || entry <= 0) return;
+          const slExit = () => {
+            const ev = slEv[s.id];
+            return (Number.isFinite(ev) && slv !== null && ev < slv) ? ev : slv;
+          };
+          const k = s.outcome === 'TP1' ? 1 : s.outcome === 'TP2' ? 2 : s.outcome === 'TP3' ? 3 : 0;
+          let pct = null, exitPrice = null;
+          if (k === 0) {
+            exitPrice = slExit();
+            if (exitPrice !== null) pct = ((exitPrice - entry) / entry) * 100;
+          } else {
+            const tpv = [n(s.target_1), n(s.target_2), n(s.target_3)];
+            let sum = 0, ok = true;
+            for (let i = 0; i < k; i++) {
+              if (tpv[i] === null) { ok = false; break; }
+              sum += SCALE[i] * ((tpv[i] - entry) / entry) * 100;
+            }
+            const rest = 1 - SCALE.slice(0, k).reduce((a, b) => a + b, 0);
+            if (ok && rest > 0.0001) {
+              const ex = s.sl_hit_at ? slExit() : tpv[k - 1];
+              if (ex === null) ok = false; else { sum += rest * ((ex - entry) / entry) * 100; exitPrice = ex; }
+            } else if (ok) {
+              exitPrice = tpv[k - 1];
+            }
+            if (ok) pct = sum;
+          }
+          if (pct !== null && Number.isFinite(pct)) {
+            s.realized_pct = Math.round(pct * 100) / 100;
+            s.exit_price = exitPrice;
+          }
+        });
+      }
+    } catch (e) {
+      console.error('[public-signals realized]', e);
+    }
+
+    return c.json({ success: true, signals: list });
   } catch (err) {
     console.error('[public-signals]', err);
     return c.json({ success: false, error: err.message }, 500);
