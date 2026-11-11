@@ -1158,8 +1158,25 @@ function renderPLBlock(s, priceData) {
   }
 }
 
+function renderClosedPL(s, priceData) {
+  var r = Number(s.realized_pct);
+  var cls = r > 0.05 ? 'profit' : (r < -0.05 ? 'loss' : 'neutral');
+  var sign = r >= 0 ? '+' : '';
+  var ex = Number(s.exit_price);
+  var label = (s.outcome === 'SL' ? 'Realized P/L (keluar ' : 'Realized P/L (akhir ') + (ex > 0 ? fmtRp(ex) : '-') + ')';
+  var cp = priceData && Number(priceData.price) > 0 ? Number(priceData.price) : null;
+  return '<div class="pl-block ' + cls + '">' +
+    '<div class="pl-item"><span class="pl-label">Harga kini (info)</span><span class="pl-value muted">' + (cp ? fmtRp(cp) : '—') + '</span></div>' +
+    '<div class="pl-divider"></div>' +
+    '<div class="pl-item"><span class="pl-label">' + label + '</span><span class="pl-value ' + cls + '">' + sign + r.toFixed(2) + '%</span></div>' +
+  '</div>' +
+  '<div style="margin:-4px 0 10px;font-size:11px;color:#9ca3af;">Posisi sudah ditutup. Hasil dibekukan di harga keluar dan tidak berubah mengikuti harga pasar.</div>';
+}
 function renderPLBlockWithWarning(s, priceData) {
-  var html = (sfIsGap(s) && priceData && priceData.price) ? sfGapBlock(s, priceData) : renderPLBlock(s, priceData);
+  if (s.status === 'CLOSED' && s.realized_pct != null && isFinite(Number(s.realized_pct)) && !sfIsGap(s)) {
+    return renderClosedPL(s, priceData);
+  }
+  var html =(sfIsGap(s) && priceData && priceData.price) ? sfGapBlock(s, priceData) : renderPLBlock(s, priceData);
   if (sfIsGap(s)) return html;
   try {
     var pl = computePL(s, priceData ? priceData.price : null);
