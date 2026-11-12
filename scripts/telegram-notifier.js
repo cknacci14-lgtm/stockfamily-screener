@@ -22,6 +22,20 @@ function formatRp(n) {
   return 'Rp ' + Number(n).toLocaleString('id-ID');
 }
 
+// Samakan dengan SCALE di functions/api/[[path]].js (getRealizedPct)
+const TP_SCALE = [1 / 3, 1 / 3, 1 / 3];
+// Realized P/L bila seluruh posisi sudah keluar di T1, T2, T3 (jual bertahap)
+function scaleOutPct(signal, base) {
+  if (!(base > 0)) return null;
+  let sum = 0;
+  for (let i = 0; i < 3; i++) {
+    const t = Number(signal['target_' + (i + 1)]);
+    if (!(t > 0)) return null;
+    sum += TP_SCALE[i] * ((t - base) / base) * 100;
+  }
+  return sum;
+}
+
 function formatPct(n) {
   const sign = n >= 0 ? '+' : '';
   return sign + Number(n).toFixed(1).replace('.', ',') + '%';
@@ -72,7 +86,11 @@ function buildMessage(signal, event, price) {
     const tgt = priceNum || Number(signal['target_' + k]);
     const pct = base && tgt ? ((tgt - base) / base) * 100 : null;
     lines.push('🎯 <b>' + ticker + ' kena Target ' + k + '</b>');
-    lines.push('Signal ' + ticker + ' mencapai Target ' + k + (pct != null ? ' (' + formatPct(pct) + ')' : ''));
+    lines.push('Signal ' + ticker + ' mencapai Target ' + k + (pct != null ? ' (' + formatPct(pct) + ' dari entry)' : ''));
+    if (k === '3') {
+      const rp = scaleOutPct(signal, base);
+      if (rp != null) lines.push('Realized P/L (jual 1/3 per target): ' + formatPct(rp));
+    }
   } else if (event === 'SL_HIT') {
     const slLevel = Number(signal.stop_loss);
     const isGap = priceNum > 0 && slLevel > 0 && priceNum < slLevel;
