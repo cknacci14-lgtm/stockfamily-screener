@@ -1,6 +1,6 @@
 {
   "success": true,
-  "date": "2026-11-10",
+  "date": "2026-11-11",
   "count": 1,
   "filtered": {
     "considered": 3,
@@ -14,20 +14,20 @@
       "stockName": "Prodia Widyahusada Tbk.",
       "setup": "BREAKOUT",
       "status": "WATCH",
-      "price": 3700,
+      "price": 3680,
       "trigger": 3760,
-      "invalidation": 3401.07,
-      "target1": 4298.39,
-      "target2": 4657.32,
+      "invalidation": 3442.14,
+      "target1": 4236.79,
+      "target2": 4554.64,
       "riskReward": 2.5,
       "riskLevel": "HIGH",
-      "entryGapPct": -1.6,
-      "rrFromPrice": 2,
+      "entryGapPct": -2.1,
+      "rrFromPrice": 2.34,
       "planStale": false,
       "preBreakout": true,
-      "stopDistancePct": 8.1,
+      "stopDistancePct": 6.5,
       "stopWide": false,
-      "maxEntry": 3849.73,
+      "maxEntry": 3839.47,
       "structure": {
         "state": "NEUTRAL",
         "label": "Neutral structure",
@@ -41,7 +41,7 @@
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": -0.00003221387293681031,
+        "value": -0.00003098786939459143,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
@@ -50,10 +50,10 @@
         "explanation": "Trading activity is materially below the minimum liquidity baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-11T20:17:13.221Z"
+      "updatedAt": "2026-11-12T01:08:15.549Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-11-11T20:17:13.221Z"
+  "generatedAt": "2026-11-12T01:08:15.549Z"
 }

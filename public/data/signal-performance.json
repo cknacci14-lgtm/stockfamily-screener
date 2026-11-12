@@ -1,6 +1,6 @@
 {
- "generatedAt": "2026-11-11T20:17:59.803Z",
- "marketDate": "2026-11-10",
+ "generatedAt": "2026-11-12T01:09:02.713Z",
+ "marketDate": "2026-11-11",
  "params": {
   "outcomeWindow": 20,
   "triggerWindow": 10,
@@ -17,10 +17,10 @@
  ],
  "sources": {
   "live": {
-   "entries": 95,
-   "shown": 30,
+   "entries": 98,
+   "shown": 31,
    "from": "2026-10-08",
-   "to": "2026-11-10"
+   "to": "2026-11-11"
   },
   "backfill": {
    "entries": 832,
@@ -45,16 +45,16 @@
      "beat": 80
     },
     "h10": {
-     "n": 16,
-     "medRet": -3.12,
-     "medExcess": 8.96,
-     "beat": 88
+     "n": 19,
+     "medRet": -3.42,
+     "medExcess": 6.82,
+     "beat": 84
     },
     "h20": {
-     "n": 8,
-     "medRet": -16.65,
-     "medExcess": 6.43,
-     "beat": 63
+     "n": 9,
+     "medRet": -15.15,
+     "medExcess": 7.93,
+     "beat": 67
     }
    },
    "trade": {
@@ -64,8 +64,8 @@
     "expPct": 0,
     "avgR1": -0.75,
     "avgR2": -1,
-    "trigPct": 38,
-    "pending": 6,
+    "trigPct": 33,
+    "pending": 5,
     "t1Late": 0
    },
    "verdict": "BELUM CUKUP DATA"
@@ -85,10 +85,10 @@
      "beat": 70
     },
     "h10": {
-     "n": 6,
-     "medRet": -5.28,
-     "medExcess": 9.23,
-     "beat": 83
+     "n": 9,
+     "medRet": -6.1,
+     "medExcess": 6.34,
+     "beat": 78
     },
     "h20": {
      "n": 5,
@@ -104,8 +104,8 @@
     "expPct": 0,
     "avgR1": -1,
     "avgR2": -1,
-    "trigPct": 38,
-    "pending": 3,
+    "trigPct": 33,
+    "pending": 2,
     "t1Late": 0
    },
    "verdict": "BELUM CUKUP DATA"
@@ -131,9 +131,9 @@
      "beat": 100
     },
     "h20": {
-     "n": 1,
-     "medRet": 5.85,
-     "medExcess": 29.38,
+     "n": 2,
+     "medRet": -1.24,
+     "medExcess": 21.77,
      "beat": 100
     }
    },
@@ -207,7 +207,7 @@
     "h10": {
      "n": 16,
      "medRet": -8.9,
-     "medExcess": 3.93,
+     "medExcess": 3.91,
      "beat": 56
     },
     "h20": {
@@ -247,7 +247,7 @@
     "h10": {
      "n": 14,
      "medRet": -8.9,
-     "medExcess": 3.93,
+     "medExcess": 3.91,
      "beat": 57
     },
     "h20": {
@@ -493,7 +493,7 @@
     "h20": {
      "n": 2,
      "medRet": 2.12,
-     "medExcess": 16.27,
+     "medExcess": 16.31,
      "beat": 100
     }
    },
@@ -574,7 +574,7 @@
      "n": 226,
      "medRet": -5.37,
      "medExcess": 0.4,
-     "beat": 50
+     "beat": 51
     }
    },
    "trade": {
@@ -648,7 +648,7 @@
     "h10": {
      "n": 13,
      "medRet": -5.23,
-     "medExcess": 4.16,
+     "medExcess": 4.14,
      "beat": 62
     },
     "h20": {
@@ -734,7 +734,7 @@
      "n": 286,
      "medRet": -4.35,
      "medExcess": 1.18,
-     "beat": 53
+     "beat": 54
     }
    },
    "trade": {
@@ -793,6 +793,22 @@
   }
  ],
  "recent": [
+  {
+   "date": "2026-11-11",
+   "code": "PRDA",
+   "group": "PRA-BREAKOUT",
+   "status": "WATCH",
+   "source": "live",
+   "repeat": true,
+   "price": 3680,
+   "trigger": 3760,
+   "stop": 3442.14,
+   "target1": 4236.79,
+   "outcome": "MENUNGGU",
+   "R1": null,
+   "ret5": null,
+   "ret10": null
+  },
   {
    "date": "2026-11-10",
    "code": "PRDA",
@@ -951,7 +967,7 @@
    "outcome": "GAGAL_SEBELUM_TRIGGER",
    "R1": null,
    "ret5": -6.5,
-   "ret10": null
+   "ret10": -6.1
   },
   {
    "date": "2026-10-28",
@@ -964,10 +980,10 @@
    "trigger": 5275,
    "stop": 4804.46,
    "target1": 5980.8,
-   "outcome": "MENUNGGU",
+   "outcome": "TIDAK_TERPICU",
    "R1": null,
    "ret5": -2.9,
-   "ret10": null
+   "ret10": -2.4
   },
   {
    "date": "2026-10-28",
@@ -983,7 +999,7 @@
    "outcome": "STOP",
    "R1": -1,
    "ret5": -12.4,
-   "ret10": null
+   "ret10": -9
   },
   {
    "date": "2026-10-28",
@@ -999,7 +1015,7 @@
    "outcome": "MENUNGGU",
    "R1": null,
    "ret5": -2.4,
-   "ret10": null
+   "ret10": -2.4
   },
   {
    "date": "2026-10-27",
@@ -1416,22 +1432,6 @@
    "R1": -1,
    "ret5": 3.3,
    "ret10": 7.1
-  },
-  {
-   "date": "2026-09-30",
-   "code": "UNTR",
-   "group": "BREAKOUT",
-   "status": "TRIGGERED",
-   "source": "backfill",
-   "repeat": false,
-   "price": 27075,
-   "trigger": 26975,
-   "stop": 25198.21,
-   "target1": 29640.18,
-   "outcome": "STOP",
-   "R1": -1,
-   "ret5": -6.4,
-   "ret10": -7.7
   }
  ]
 }
