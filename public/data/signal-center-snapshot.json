@@ -1,37 +1,37 @@
 {
   "success": true,
-  "date": "2026-11-11",
-  "count": 1,
+  "date": "2026-11-12",
+  "count": 3,
   "filtered": {
-    "considered": 3,
+    "considered": 6,
     "noTrade": 2,
-    "lateEntry": 0,
+    "lateEntry": 1,
     "wideStop": 0
   },
   "signals": [
     {
-      "stockCode": "PRDA",
-      "stockName": "Prodia Widyahusada Tbk.",
+      "stockCode": "INTP",
+      "stockName": "Indocement Tunggal Prakarsa Tbk.",
       "setup": "BREAKOUT",
       "status": "WATCH",
-      "price": 3680,
-      "trigger": 3760,
-      "invalidation": 3442.14,
-      "target1": 4236.79,
-      "target2": 4554.64,
+      "price": 5825,
+      "trigger": 5975,
+      "invalidation": 5408.04,
+      "target1": 6825.45,
+      "target2": 7392.41,
       "riskReward": 2.5,
       "riskLevel": "HIGH",
-      "entryGapPct": -2.1,
-      "rrFromPrice": 2.34,
+      "entryGapPct": -2.5,
+      "rrFromPrice": 2.4,
       "planStale": false,
       "preBreakout": true,
-      "stopDistancePct": 6.5,
+      "stopDistancePct": 7.2,
       "stopWide": false,
-      "maxEntry": 3839.47,
+      "maxEntry": 6116.75,
       "structure": {
-        "state": "NEUTRAL",
-        "label": "Neutral structure",
-        "explanation": "Price structure does not currently show a decisive directional condition."
+        "state": "IMPROVING",
+        "label": "Structure improving",
+        "explanation": "Price remains above the main short/intermediate trend references with increasing price activity."
       },
       "participation": {
         "state": "CONTRACTING",
@@ -41,19 +41,105 @@
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": -0.00003098786939459143,
+        "value": 0.00003711344273476344,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
-        "state": "THIN",
-        "label": "Thin liquidity",
-        "explanation": "Trading activity is materially below the minimum liquidity baseline."
+        "state": "HIGH_RISK",
+        "label": "Elevated liquidity risk",
+        "explanation": "One or more execution-quality measures are below the preferred baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-12T01:08:15.549Z"
+      "updatedAt": "2026-11-12T20:52:35.624Z"
+    },
+    {
+      "stockCode": "MPMX",
+      "stockName": "Mitra Pinasthika Mustika Tbk.",
+      "setup": "BREAKOUT",
+      "status": "WATCH",
+      "price": 1080,
+      "trigger": 1100,
+      "invalidation": 1046.43,
+      "target1": 1180.36,
+      "target2": 1233.93,
+      "riskReward": 2.5,
+      "riskLevel": "MEDIUM",
+      "entryGapPct": -1.8,
+      "rrFromPrice": 2.99,
+      "planStale": false,
+      "preBreakout": true,
+      "stopDistancePct": 3.1,
+      "stopWide": false,
+      "maxEntry": 1113.4,
+      "structure": {
+        "state": "BULLISH",
+        "label": "Bullish structure",
+        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
+      },
+      "participation": {
+        "state": "CONTRACTING",
+        "label": "Participation contracting",
+        "explanation": "Multiple trading-activity measures are below their recent baseline."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": 0.0000951354198289238,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HIGH_RISK",
+        "label": "Elevated liquidity risk",
+        "explanation": "One or more execution-quality measures are below the preferred baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-11-12T20:52:35.624Z"
+    },
+    {
+      "stockCode": "PRDA",
+      "stockName": "Prodia Widyahusada Tbk.",
+      "setup": "BREAKOUT",
+      "status": "WATCH",
+      "price": 3620,
+      "trigger": 3760,
+      "invalidation": 3445.71,
+      "target1": 4231.43,
+      "target2": 4545.71,
+      "riskReward": 2.5,
+      "riskLevel": "HIGH",
+      "entryGapPct": -3.7,
+      "rrFromPrice": 3.51,
+      "planStale": false,
+      "preBreakout": true,
+      "stopDistancePct": 4.8,
+      "stopWide": false,
+      "maxEntry": 3838.57,
+      "structure": {
+        "state": "NEUTRAL",
+        "label": "Neutral structure",
+        "explanation": "Price structure does not currently show a decisive directional condition."
+      },
+      "participation": {
+        "state": "NEUTRAL",
+        "label": "Normal participation",
+        "explanation": "Trading activity is not showing a decisive expansion or contraction."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": -0.00002676181117626173,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HIGH_RISK",
+        "label": "Elevated liquidity risk",
+        "explanation": "One or more execution-quality measures are below the preferred baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-11-12T20:52:35.624Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-11-12T01:08:15.549Z"
+  "generatedAt": "2026-11-12T20:52:35.624Z"
 }
