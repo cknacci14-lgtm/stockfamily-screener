@@ -50,7 +50,7 @@
         "explanation": "One or more execution-quality measures are below the preferred baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-12T20:52:35.624Z"
+      "updatedAt": "2026-11-13T20:37:43.649Z"
     },
     {
       "stockCode": "MPMX",
@@ -93,7 +93,7 @@
         "explanation": "One or more execution-quality measures are below the preferred baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-12T20:52:35.624Z"
+      "updatedAt": "2026-11-13T20:37:43.649Z"
     },
     {
       "stockCode": "PRDA",
@@ -136,10 +136,10 @@
         "explanation": "One or more execution-quality measures are below the preferred baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-12T20:52:35.624Z"
+      "updatedAt": "2026-11-13T20:37:43.649Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-11-12T20:52:35.624Z"
+  "generatedAt": "2026-11-13T20:37:43.650Z"
 }
