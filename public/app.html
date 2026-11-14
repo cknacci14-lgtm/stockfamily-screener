@@ -1644,90 +1644,10 @@
       </div>
       <!-- Catatan internal dihapus -->
     </div>
-    <div class="p-3 border-b border-idx-border shrink-0">
-      <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between cursor-pointer select-none" onclick="togglePanel('brokerPanel', this)">
-        <span class="flex items-center gap-1.5"><i class="fa-solid fa-building-columns"></i> Broker Summary <span id="brokerDateLabel" class="text-slate-500 font-normal normal-case">--</span></span>
-        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
-      </h2>
-      <div id="brokerPanel" class="text-[11px]"><div id="brokerBody" style="color:#8b93a7">Memuat...</div></div>
-    </div>
 
-    <div class="p-3 border-b border-idx-border shrink-0">
-      <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between cursor-pointer select-none" onclick="togglePanel('radarPanel', this)">
-        <span class="flex items-center gap-1.5"><i class="fa-solid fa-satellite-dish"></i> Broker Radar <span id="radarDateLabel" class="text-slate-500 font-normal normal-case"></span></span>
-        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
-      </h2>
-      <div id="radarPanel" class="text-[11px]"><div id="radarBody" style="color:#8b93a7">Memuat...</div></div>
-    </div>
 
-    <!-- GEM Score Panel -->
-    <div class="p-3 border-b border-idx-border shrink-0">
-      <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between cursor-pointer select-none" onclick="togglePanel('gemPanel', this)">
-        <span class="flex items-center gap-1.5"><i class="fa-solid fa-gem"></i> GEM Score <span id="gemDateLabel" class="text-slate-500 font-normal normal-case">--</span></span>
-        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
-      </h2>
-      <div id="gemPanel" class="space-y-1.5">
-        <div class="p-2 rounded bg-idx-panel/60 border border-idx-border">
-          <div class="flex justify-between items-center">
-            <span class="text-slate-400">Score</span>
-            <span id="gemScoreValue" class="font-bold text-lg">--</span>
-          </div>
-          <div class="gauge-container mt-1.5">
-            <div class="gauge-fill" id="gem-score-gauge"></div>
-          </div>
-        </div>
-        <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border">
-          <span class="text-slate-400">Signal</span>
-          <span id="gemSignalValue" class="font-bold">--</span>
-        </div>
-        <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border">
-          <span class="text-slate-400">Vol Ratio</span>
-          <span id="gemVolRatio" class="font-bold text-slate-300">--</span>
-        </div>
-        <div class="flex justify-between p-2 rounded bg-idx-panel/60 border border-idx-border">
-          <span class="text-slate-400">Foreign Net 20D</span>
-          <span id="gemForeignNet" class="font-bold">--</span>
-        </div>
-      </div>
-      <p class="text-[10px] text-slate-500 mt-1.5 italic">Quiet Accumulation Indicator (skor 0-100). Warna skor: hijau 75 ke atas, cyan 60 ke atas, kuning 45 ke atas, abu di bawah 45. Garis bantu di sub-chart pada 75, 60, 45, dan 30. Memakai antara lain rasio volume dan net asing 20 hari. Informasi, bukan sinyal beli atau jual.</p>
-    </div>        
     
 
-    <div class="p-3 border-b border-idx-border shrink-0">
-      <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between gap-1.5">
-        <span class="flex items-center gap-1.5">
-          <i class="fa-solid fa-book"></i> Bid / Offer 
-          <span class="text-slate-500 font-normal normal-case" id="bidOfferSource">(IDX EOD)</span>
-        </span>
-        <span id="bidOfferDate" class="text-slate-500 font-normal normal-case text-[9px]">--</span>
-      </h2>
-      <div class="grid grid-cols-2 gap-1.5">
-        <div class="p-2 rounded bg-idx-green/10 border border-idx-green/30">
-          <div class="text-slate-400 text-[10px]">BID</div>
-          <div id="bidPrice" class="font-bold text-idx-green">--</div>
-          <div id="bidVolume" class="text-[10px] text-slate-500">vol --</div>
-        </div>
-        <div class="p-2 rounded bg-idx-red/10 border border-idx-red/30">
-          <div class="text-slate-400 text-[10px]">OFFER</div>
-          <div id="offerPrice" class="font-bold text-idx-red">--</div>
-          <div id="offerVolume" class="text-[10px] text-slate-500">vol --</div>
-        </div>
-      </div>
-      <div id="bidOfferRatioContainer" class="mt-2 hidden">
-        <div class="flex justify-between text-[9px] mb-1">
-          <span id="bidPctLabel" class="text-idx-green">--</span>
-          <span id="offerPctLabel" class="text-idx-red">--</span>
-        </div>
-        <div class="h-1.5 rounded-full bg-idx-panel border border-idx-border relative overflow-hidden flex">
-          <div id="bidRatioBar" class="h-full bg-idx-green" style="width:50%"></div>
-          <div id="offerRatioBar" class="h-full bg-idx-red" style="width:50%"></div>
-        </div>
-        <div class="mt-1.5 text-center text-[10px]">
-          <span id="bidOfferPressure" class="font-bold text-slate-400">--</span>
-        </div>
-      </div>
-      <p class="text-[10px] text-slate-500 mt-1.5 italic">Data dari IDX (EOD).</p>
-    </div>
 
     <div class="p-3 border-b border-idx-border shrink-0">
       <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mb-2 flex items-center gap-1.5">
@@ -1741,37 +1661,6 @@
       </div>
     </div>
 
-    <div class="p-3 border-b border-idx-border shrink-0">
-      <h2 class="sf-panel-title text-idx-cyan uppercase tracking-wider mb-2 flex items-center justify-between gap-1.5">
-        <span class="flex items-center gap-1.5">
-          <i class="fa-solid fa-chart-pie"></i> Rasio Fundamental
-          <span class="text-slate-500 font-normal normal-case text-[9px]">(IDX EOD)</span>
-        </span>
-        <span id="fundDate" class="text-slate-500 font-normal normal-case text-[9px]">--</span>
-      </h2>
-      <div class="grid grid-cols-2 gap-1.5 text-[10px]">
-        <div class="p-1.5 rounded bg-idx-panel/60 border border-idx-border">
-          <div class="text-slate-500 text-[9px]">Market Cap</div>
-          <div id="fundMarketCap" class="font-bold text-idx-cyan">--</div>
-        </div>
-        <div class="p-1.5 rounded bg-idx-panel/60 border border-idx-border">
-          <div class="text-slate-500 text-[9px]">Free Float</div>
-          <div id="fundFreeFloat" class="font-bold">--</div>
-        </div>
-        <div class="p-1.5 rounded bg-idx-panel/60 border border-idx-border">
-          <div class="text-slate-500 text-[9px]">Listed Shares</div>
-          <div id="fundListed" class="font-bold">--</div>
-        </div>
-        <div class="p-1.5 rounded bg-idx-panel/60 border border-idx-border">
-          <div class="text-slate-500 text-[9px]">Tradeable</div>
-          <div id="fundTradeable" class="font-bold">--</div>
-        </div>
-      </div>
-      <div class="mt-1.5 flex justify-between items-center px-1.5 py-1 rounded bg-idx-panel/40 border border-idx-border text-[10px]">
-        <span class="text-slate-500">Turnover</span>
-        <span id="fundTurnover" class="font-bold">--</span>
-      </div>
-    </div>
 
     <!-- === BLOCK TRADE INTELLIGENCE PANEL === -->
     <div class="p-3 border-b border-idx-border shrink-0">
@@ -2257,87 +2146,6 @@
       }
     }
   });
-  // === RASIO FUNDAMENTAL ===
-  async function loadFundamental(code) {
-    try {
-      const data = await apiGet('/api/fundamental/' + encodeURIComponent(code));
-      if (!data.success) throw new Error(data.error || 'Unknown');
-
-      const fmtBig = (n) => {
-        if (n >= 1e12) return (n/1e12).toFixed(2) + ' T';
-        if (n >= 1e9) return (n/1e9).toFixed(2) + ' B';
-        if (n >= 1e6) return (n/1e6).toFixed(1) + ' M';
-        if (n >= 1e3) return (n/1e3).toFixed(1) + ' K';
-        return String(n);
-      };
-
-      const fmtNum = (n) => {
-        if (n >= 1e12) return (n/1e12).toFixed(1) + ' T';
-        if (n >= 1e9) return (n/1e9).toFixed(1) + ' B';
-        if (n >= 1e6) return (n/1e6).toFixed(0) + ' M';
-        return Number(n).toLocaleString('id-ID');
-      };
-
-      document.getElementById('fundDate').textContent = data.trade_date || '--';
-      document.getElementById('fundMarketCap').textContent = 'Rp ' + fmtBig(data.market_cap);
-      document.getElementById('fundListed').textContent = fmtNum(data.listed_shares);
-      document.getElementById('fundTradeable').textContent = fmtNum(data.tradeable_shares);
-
-      const ff = Number(data.free_float_pct);
-      const ffNA = !isFinite(ff) || ff >= 99.5;
-      const ffEl = document.getElementById('fundFreeFloat');
-      ffEl.textContent = ffNA ? 'n/a' : ff.toFixed(1) + '%';
-      ffEl.style.color = ffNA ? '#64748B' : ff < 15 ? '#FFB300' : ff < 30 ? '#00E5FF' : '#00E676';
-      ffEl.title = ffNA ? 'Data IDX: Tradeble Shares = Listed Shares, bukan free float sebenarnya' : ff < 15 ? 'Free float sangat rendah, rentan manipulasi' : '';
-
-      const to = data.turnover_pct || 0;
-      const toEl = document.getElementById('fundTurnover');
-      toEl.textContent = to.toFixed(3) + '%';
-      toEl.style.color = to < 0.05 ? '#64748B' : to < 0.2 ? '#FFB300' : '#00E676';
-
-    } catch (err) {
-      console.error('[loadFundamental]', code, err);
-      ['fundMarketCap','fundFreeFloat','fundListed','fundTradeable','fundTurnover'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = '--';
-      });
-    }
-  }
-  // === BID/OFFER FROM SUPABASE ===
-  async function loadBidOfferFromSupabase(code) {
-    try {
-      const data = await apiGet('/api/bid-offer?code=' + encodeURIComponent(code));
-      if (!data.success) throw new Error(data.error || 'Unknown error');
-
-      document.getElementById('bidPrice').textContent = 'Rp ' + Number(data.bid).toLocaleString('id-ID');
-      document.getElementById('bidVolume').textContent = 'vol ' + Number(data.bid_volume).toLocaleString('id-ID');
-      document.getElementById('offerPrice').textContent = 'Rp ' + Number(data.offer).toLocaleString('id-ID');
-      document.getElementById('offerVolume').textContent = 'vol ' + Number(data.offer_volume).toLocaleString('id-ID');
-
-      const dateEl = document.getElementById('bidOfferDate');
-      if (dateEl) dateEl.textContent = data.trade_date || '';
-
-      const ratioContainer = document.getElementById('bidOfferRatioContainer');
-      if (ratioContainer) {
-        ratioContainer.classList.remove('hidden');
-        const bidPct = data.bid_pct || 50;
-        const offerPct = data.offer_pct || 50;
-        document.getElementById('bidPctLabel').textContent = bidPct.toFixed(1) + '%';
-        document.getElementById('offerPctLabel').textContent = offerPct.toFixed(1) + '%';
-        document.getElementById('bidRatioBar').style.width = bidPct + '%';
-        document.getElementById('offerRatioBar').style.width = offerPct + '%';
-        const pressureEl = document.getElementById('bidOfferPressure');
-        pressureEl.textContent = (data.ratio >= 1.2 ? 'Bid dominan' : data.ratio <= 0.8 ? 'Offer dominan' : 'Seimbang') + ' ' + data.ratio.toFixed(1) + 'x \u2022 snapshot EOD ' + (data.trade_date || '');
-        pressureEl.style.color = data.pressure_color;
-      }
-    } catch (err) {
-      console.error('[loadBidOfferFromSupabase]', code, err);
-      const ids = ['bidPrice', 'bidVolume', 'offerPrice', 'offerVolume'];
-      ids.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = id.includes('Volume') ? 'vol --' : '--'; });
-      const rc = document.getElementById('bidOfferRatioContainer');
-      if (rc) rc.classList.add('hidden');
-    }
-  }
   // === HISTORICAL BLOCK TRADE CHART ===
   async function loadHistoricalBT(code) {
     const chartArea = document.getElementById('btChartArea');
@@ -2750,8 +2558,6 @@
       vwapSeries.setData(vwapData);
       loadBlockTradeMarkers(code);
       loadHistoricalBT(code);
-      loadBidOfferFromSupabase(code);
-      loadFundamental(code);
 
       chart.priceScale('right').applyOptions({ autoScale: true });
       chart.applyOptions({ localization: { priceFormatter: function (p) { return p < 0 ? '' : p.toFixed(2); } } });
@@ -2818,10 +2624,6 @@
         changeEl.className = `text-sm font-bold px-1.5 py-0.5 rounded ${change >= 0 ? 'text-idx-green bg-idx-green/10' : 'text-idx-red bg-idx-red/10'}`;
       }
 
-      document.getElementById('bidPrice').innerText = q.bid ? fmtRp(q.bid) : '--';
-      document.getElementById('bidVolume').innerText = `vol ${fmtNum(q.bidSize)}`;
-      document.getElementById('offerPrice').innerText = q.ask ? fmtRp(q.ask) : '--';
-      document.getElementById('offerVolume').innerText = `vol ${fmtNum(q.askSize)}`;
 
       // 52W range diisi oleh loadBandarmology()
       // dari EOD Supabase agar definisinya konsisten.
@@ -3219,231 +3021,9 @@ function renderSummaryBase() {
     set('tpStatus', 'Level teknikal untuk manajemen risiko, bukan sinyal beli. Pasang stop sebelum entry.' + (rr < 1.5 ? ' R/R tipis.' : ''));
   }
 }
-  function bkEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]; }); }
-  function bkRp(n) {
-    n = Math.abs(Number(n) || 0);
-    if (n >= 1e12) return 'Rp ' + (n / 1e12).toLocaleString('id-ID', { maximumFractionDigits: 2 }) + ' T';
-    if (n >= 1e9) return 'Rp ' + (n / 1e9).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' M';
-    return 'Rp ' + Math.round(n / 1e6).toLocaleString('id-ID') + ' jt';
-  }
-  function bkShort(n) { return String(n || '').replace(/^PT\s+/i, '').replace(/\s*SEKURITAS( INDONESIA)?/i, '').replace(/\s+INDONESIA$/i, '').trim().slice(0, 20); }
-  async function bkToken() {
-    for (let i = 0; i < 12; i++) {
-      const sb = window.chartnalistSupabase;
-      if (sb && sb.auth && sb.auth.getSession) {
-        const r = await sb.auth.getSession();
-        return r && r.data && r.data.session ? r.data.session.access_token : null;
-      }
-      await new Promise(function (r) { setTimeout(r, 250); });
-    }
-    return null;
-  }
-  function bkRow(b, side, px) {
-    const avg = side === 'buy' ? b.bavg : b.savg;
-    const diff = (px && avg) ? (avg / px - 1) * 100 : null;
-    const col = side === 'buy' ? '#00E676' : '#FF5252';
-    return '<div style="display:flex;justify-content:space-between;gap:6px;padding:3px 0;border-top:1px solid rgba(100,116,139,.2)" title="' + bkEsc(b.n) + '">' +
-      '<span><b>' + bkEsc(b.c) + '</b> <span style="opacity:.6;font-size:9px">' + bkEsc(bkShort(b.n)) + '</span></span>' +
-      '<span style="text-align:right;color:' + col + '">' + (side === 'buy' ? '+' : '-') + bkRp(b.nval) +
-      '<br><span style="opacity:.65;font-size:9px;color:#CBD5E1">rata-rata ' + (avg ? Math.round(avg).toLocaleString('id-ID') : '-') +
-      (diff != null ? ' (' + (diff >= 0 ? '+' : '') + diff.toFixed(1).replace('.', ',') + '%)' : '') + '</span></span></div>';
-  }
-  function bkRender() {
-    const el = document.getElementById('brokerBody');
-    const dl = document.getElementById('brokerDateLabel');
-    const d = window._bk;
-    if (!el || !d) return;
-    const r = d.row;
-    if (!r) {
-      el.innerHTML = '<div style="color:#8b93a7">Belum ada data broker untuk saham ini (saat ini hanya 200 saham paling likuid).</div>';
-      if (dl) dl.textContent = '';
-      return;
-    }
-    if (dl) dl.textContent = 'EOD ' + r.trade_date;
-    const tv = Number(r.total_value) || 0;
-    const pb = tv > 0 ? Number(r.top3_buy_net) / tv * 100 : null;
-    const ps = tv > 0 ? Math.abs(Number(r.top3_sell_net)) / tv * 100 : null;
-    const px = (window._sf && String(window._sf.code).toUpperCase() === String(d.code).toUpperCase()) ? window._sf.close : null;
-    el.style.color = '';
-    el.innerHTML = '<div style="font-size:10px;color:#8b93a7;margin-bottom:4px">Nilai transaksi ' + bkRp(tv) + ' &middot; ' + (r.broker_count || 0) + ' broker</div>' +
-      '<div style="font-size:10px;color:#00E676;font-weight:700">Net beli terbesar</div>' +
-      (r.top_buyers || []).slice(0, 5).map(function (b) { return bkRow(b, 'buy', px); }).join('') +
-      '<div style="font-size:10px;color:#FF5252;font-weight:700;margin-top:6px">Net jual terbesar</div>' +
-      (r.top_sellers || []).slice(0, 5).map(function (b) { return bkRow(b, 'sell', px); }).join('') +
-      '<div style="font-size:10px;margin-top:6px;color:#CBD5E1">3 teratas: beli ' + bkRp(r.top3_buy_net) + (pb != null ? ' (' + pb.toFixed(1).replace('.', ',') + '% dari nilai)' : '') +
-      ' &middot; jual ' + bkRp(r.top3_sell_net) + (ps != null ? ' (' + ps.toFixed(1).replace('.', ',') + '%)' : '') + '</div>' +
-      '<div style="font-size:9px;color:#64748B;margin-top:4px;font-style:italic">Data broker EOD dari penyedia pihak ketiga. Informasi, bukan sinyal beli atau jual.</div>';
-    if (px == null) {
-      setTimeout(function () { if (window._bk === d && window._sf && String(window._sf.code).toUpperCase() === String(d.code).toUpperCase()) bkRender(); }, 1500);
-    }
-  }
-  async function loadBrokerSummary(code) {
-    const el = document.getElementById('brokerBody');
-    if (!el) return;
-    el.style.color = '#8b93a7';
-    el.innerHTML = 'Memuat...';
-    try {
-      const token = await bkToken();
-      if (!token) { el.innerHTML = `<div style="padding:14px 12px;border:1px solid rgba(0,208,132,.25);border-radius:10px;background:rgba(0,208,132,.06);text-align:center"><div style="font-size:12px;color:#94a3b8;margin-bottom:10px">Login untuk melihat data broker.</div><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><a href="/register" style="padding:8px 12px;border-radius:8px;background:#00d084;color:#050607;font-weight:700;font-size:12px;text-decoration:none">Create account</a><a href="/login" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.15);color:#e2e8f0;font-weight:600;font-size:12px;text-decoration:none">Sign in</a></div></div>`; return; }
-      const res = await fetch('/api/broker/' + encodeURIComponent(code), { headers: { Authorization: 'Bearer ' + token } });
-      const j = await res.json();
-      if (!res.ok || !j.success) throw new Error(j.error || ('HTTP ' + res.status));
-      if (String(code).toUpperCase() !== String(activeCode).toUpperCase()) return;
-      window._bk = { code: code, row: (j.rows && j.rows[0]) || null };
-      bkRender();
-    } catch (err) {
-      el.style.color = '#FF5252';
-      el.innerHTML = 'Gagal memuat: ' + bkEsc(err.message);
-    }
-  }
 
-  window._bkMore = false;
-  function bkToggle() { window._bkMore = !window._bkMore; bkRender(); }
-  function bkRefPrice(r, d) {
-    const s = window._sf;
-    if (!s || String(s.code).toUpperCase() !== String(d.code).toUpperCase()) return { px: null, label: '' };
-    if (Array.isArray(s.candles)) {
-      for (let i = s.candles.length - 1; i >= 0; i--) {
-        const c = s.candles[i];
-        if (new Date((Number(c.time) + 7 * 3600) * 1000).toISOString().slice(0, 10) === r.trade_date) return { px: Number(c.close), label: 'penutupan ' + r.trade_date };
-      }
-    }
-    return { px: Number(s.close), label: 'harga sekarang' };
-  }
-  function bkRow(b, side, px) {
-    const avg = side === 'buy' ? b.bavg : b.savg;
-    const diff = (px && avg) ? (avg / px - 1) * 100 : null;
-    const col = side === 'buy' ? '#00E676' : '#FF5252';
-    return '<div style="display:flex;justify-content:space-between;gap:6px;padding:2px 0;border-top:1px solid rgba(100,116,139,.2);white-space:nowrap" title="' + bkEsc(b.n) + (avg ? ' | rata-rata ' + Math.round(avg).toLocaleString('id-ID') : '') + '">' +
-      '<span style="overflow:hidden;text-overflow:ellipsis"><b>' + bkEsc(b.c) + '</b> <span style="opacity:.6;font-size:9px">' + bkEsc(bkShort(b.n)) + '</span></span>' +
-      '<span style="color:' + col + '">' + (side === 'buy' ? '+' : '-') + bkRp(b.nval).replace('Rp ', '') +
-      ' <span style="opacity:.75;font-size:9px;color:#CBD5E1">@' + (avg ? Math.round(avg).toLocaleString('id-ID') : '-') + (diff != null ? ' ' + (diff >= 0 ? '+' : '') + diff.toFixed(1).replace('.', ',') + '%' : '') + '</span></span></div>';
-  }
-  function bkRender() {
-    const el = document.getElementById('brokerBody');
-    const dl = document.getElementById('brokerDateLabel');
-    const d = window._bk;
-    if (!el || !d) return;
-    const r = d.row;
-    if (!r) {
-      el.innerHTML = '<div style="color:#8b93a7">Belum ada data broker untuk saham ini (saat ini hanya 200 saham paling likuid).</div>';
-      if (dl) dl.textContent = '';
-      return;
-    }
-    if (dl) dl.textContent = 'EOD ' + r.trade_date;
-    const n = window._bkMore ? 5 : 3;
-    const tv = Number(r.total_value) || 0;
-    const pb = tv > 0 ? Number(r.top3_buy_net) / tv * 100 : null;
-    const ps = tv > 0 ? Math.abs(Number(r.top3_sell_net)) / tv * 100 : null;
-    const ref = bkRefPrice(r, d);
-    const btn = 'width:100%;margin-top:4px;padding:2px 4px;border-radius:3px;cursor:pointer;font-size:9px;font-weight:600;border:1px solid rgba(100,116,139,.3);background:rgba(100,116,139,.15);color:#94A3B8';
-    el.style.color = '';
-    el.innerHTML = '<div style="font-size:10px;color:#8b93a7;margin-bottom:4px">Nilai transaksi ' + bkRp(tv) + ' &middot; ' + (r.broker_count || 0) + ' broker</div>' +
-      '<div style="font-size:10px;color:#00E676;font-weight:700">Net beli terbesar</div>' +
-      (r.top_buyers || []).slice(0, n).map(function (b) { return bkRow(b, 'buy', ref.px); }).join('') +
-      '<div style="font-size:10px;color:#FF5252;font-weight:700;margin-top:6px">Net jual terbesar</div>' +
-      (r.top_sellers || []).slice(0, n).map(function (b) { return bkRow(b, 'sell', ref.px); }).join('') +
-      '<button onclick="bkToggle()" style="' + btn + '">' + (window._bkMore ? 'Ringkas' : 'Tampilkan 5 teratas') + '</button>' +
-      '<div style="font-size:10px;margin-top:6px;color:#CBD5E1">3 teratas: beli ' + bkRp(r.top3_buy_net) + (pb != null ? ' (' + pb.toFixed(1).replace('.', ',') + '%)' : '') +
-      ' &middot; jual ' + bkRp(r.top3_sell_net) + (ps != null ? ' (' + ps.toFixed(1).replace('.', ',') + '%)' : '') + ' dari nilai</div>' +
-      (ref.px ? '<div style="font-size:9px;color:#64748B;margin-top:3px">% = rata-rata dibanding ' + ref.label + ' (Rp ' + Math.round(ref.px).toLocaleString('id-ID') + ')</div>' : '') +
-      '<div style="font-size:9px;color:#64748B;margin-top:4px;font-style:italic">Data broker EOD dari penyedia pihak ketiga. Informasi, bukan sinyal beli atau jual.</div>';
-    if (ref.px == null) {
-      setTimeout(function () { if (window._bk === d && window._sf && String(window._sf.code).toUpperCase() === String(d.code).toUpperCase()) bkRender(); }, 1500);
-    }
-  }
 
-  function radarRow(x, side) {
-    const col = side === 'acc' ? '#00E676' : '#FF5252';
-    const sc = Number(x.score) || 0;
-    return '<div class="cn-radar-row" data-code="' + bkEsc(x.stock_code) + '" style="display:flex;justify-content:space-between;gap:6px;padding:3px 0;border-top:1px solid rgba(100,116,139,.2);cursor:pointer;white-space:nowrap" title="Pembeli terbesar ' + bkEsc(x.top_buyer || '-') + ', penjual terbesar ' + bkEsc(x.top_seller || '-') + '">' +
-      '<span><b>' + bkEsc(x.stock_code) + '</b> <span style="opacity:.6;font-size:9px">' + bkEsc(x.top_buyer || '-') + '/' + bkEsc(x.top_seller || '-') + '</span></span>' +
-      '<span style="color:' + col + '">' + (sc >= 0 ? '+' : '') + sc.toFixed(1).replace('.', ',') + '% <span style="opacity:.75;font-size:9px;color:#CBD5E1">' + bkRp(x.top3_buy_net).replace('Rp ', '') + ' vs ' + bkRp(x.top3_sell_net).replace('Rp ', '') + '</span></span></div>';
-  }
-  function radarRender() {
-    const el = document.getElementById('radarBody');
-    const dl = document.getElementById('radarDateLabel');
-    const d = window._radar;
-    if (!el || !d) return;
-    if (dl) dl.textContent = d.date ? 'EOD ' + d.date : '';
-    const list = function (arr, side) {
-      return (arr && arr.length) ? arr.map(function (x) { return radarRow(x, side); }).join('') : '<div style="color:#8b93a7;font-size:10px">Tidak ada.</div>';
-    };
-    el.style.color = '';
-    el.innerHTML = '<div style="font-size:10px;color:#00E676;font-weight:700">Akumulasi terkonsentrasi</div>' + list(d.acc, 'acc') +
-      '<div style="font-size:10px;color:#FF5252;font-weight:700;margin-top:6px">Distribusi terkonsentrasi</div>' + list(d.dist, 'dist') +
-      '<div style="font-size:9px;color:#64748B;margin-top:6px;line-height:1.4">Skor = (net 3 pembeli teratas &minus; net 3 penjual teratas) &divide; nilai transaksi. Positif: pembeli besar menyerap dari banyak penjual kecil; negatif: sebaliknya. Dari ' + (d.universe || 0) + ' saham dengan nilai transaksi minimal Rp 25 M. Klik baris untuk membuka saham. Informasi, bukan sinyal beli atau jual, dan belum teruji prediksinya.</div>';
-    el.querySelectorAll('.cn-radar-row').forEach(function (n) {
-      n.addEventListener('click', function () { if (typeof selectTicker === 'function') selectTicker(n.getAttribute('data-code')); });
-    });
-  }
-  async function loadBrokerRadar() {
-    const el = document.getElementById('radarBody');
-    if (!el) return;
-    try {
-      const token = await bkToken();
-      if (!token) { el.innerHTML = `<div style="padding:14px 12px;border:1px solid rgba(0,208,132,.25);border-radius:10px;background:rgba(0,208,132,.06);text-align:center"><div style="font-size:12px;color:#94a3b8;margin-bottom:10px">Login untuk melihat radar broker.</div><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><a href="/register" style="padding:8px 12px;border-radius:8px;background:#00d084;color:#050607;font-weight:700;font-size:12px;text-decoration:none">Create account</a><a href="/login" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.15);color:#e2e8f0;font-weight:600;font-size:12px;text-decoration:none">Sign in</a></div></div>`; return; }
-      const res = await fetch('/api/broker-radar', { headers: { Authorization: 'Bearer ' + token } });
-      const j = await res.json();
-      if (!res.ok || !j.success) throw new Error(j.error || ('HTTP ' + res.status));
-      window._radar = j.data;
-      radarRender();
-    } catch (err) {
-      el.style.color = '#FF5252';
-      el.innerHTML = 'Gagal memuat: ' + bkEsc(err.message);
-    }
-  }
 
-  async function loadBrokerSummary(code) {
-    const el = document.getElementById('brokerBody');
-    const dl = document.getElementById('brokerDateLabel');
-    if (!el) return;
-    el.style.color = '#8b93a7';
-    el.innerHTML = 'Memuat...';
-    try {
-      const token = await bkToken();
-      if (!token) { el.innerHTML = `<div style="padding:14px 12px;border:1px solid rgba(0,208,132,.25);border-radius:10px;background:rgba(0,208,132,.06);text-align:center"><div style="font-size:12px;color:#94a3b8;margin-bottom:10px">Login untuk melihat data broker.</div><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><a href="/register" style="padding:8px 12px;border-radius:8px;background:#00d084;color:#050607;font-weight:700;font-size:12px;text-decoration:none">Create account</a><a href="/login" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.15);color:#e2e8f0;font-weight:600;font-size:12px;text-decoration:none">Sign in</a></div></div>`; return; }
-      const head = { Authorization: 'Bearer ' + token };
-      const get = async function () {
-        const res = await fetch('/api/broker/' + encodeURIComponent(code), { headers: head, cache: 'no-store' });
-        const j = await res.json();
-        if (!res.ok || !j.success) throw new Error(j.error || ('HTTP ' + res.status));
-        return (j.rows && j.rows[0]) || null;
-      };
-      let row = await get();
-      let note = '';
-      const ref = window._radar && window._radar.date;
-      const ageDays = row ? (Date.now() - new Date(row.trade_date + 'T00:00:00Z').getTime()) / 86400000 : null;
-      const stale = row && ((ref && row.trade_date < ref) || ageDays > 1);
-      if (!row || stale) {
-        el.innerHTML = 'Mengambil data broker...';
-        const fr = await fetch('/api/broker-fill/' + encodeURIComponent(code), { method: 'POST', headers: head });
-        const fj = await fr.json().catch(function () { return {}; });
-        if (fr.ok && fj.success && (fj.filled || fj.cached)) row = await get();
-        else if (fj.unavailable) note = 'Data broker tanggal terbaru belum tersedia dari penyedia.';
-        else if (!fr.ok && fj.error) note = fj.error;
-      }
-      if (String(code).toUpperCase() !== String(activeCode).toUpperCase()) return;
-      const usable = row && Number(row.broker_count) > 0;
-      if (usable && note) {
-        setTimeout(function () {
-          const b = document.getElementById('brokerBody');
-          if (b && window._bk && window._bk.code === code) b.insertAdjacentHTML('beforeend', '<div style="font-size:9px;color:#FFB300;margin-top:4px">' + bkEsc(note) + ' Menampilkan data ' + bkEsc(row.trade_date) + '.</div>');
-        }, 0);
-      }
-      window._bk = { code: code, row: usable ? row : null };
-      if (!usable) {
-        if (dl) dl.textContent = '';
-        el.style.color = '#8b93a7';
-        el.innerHTML = bkEsc(note || (row ? 'Tidak ada transaksi broker untuk saham ini pada tanggal terbaru.' : 'Belum ada data broker untuk saham ini.'));
-        return;
-      }
-      bkRender();
-    } catch (err) {
-      el.style.color = '#FF5252';
-      el.innerHTML = 'Gagal memuat: ' + bkEsc(err.message);
-    }
-  }
 
   async function loadBandarmology(code) {
     try {
@@ -3746,11 +3326,6 @@ function selectTicker(code) {
     loadHistory(activeCode);
     loadQuoteHeader(activeCode);
     loadBandarmology(activeCode);
-    loadGemScore(activeCode);
-    loadBrokerSummary(activeCode);
-    if (!window._radarLoaded) { window._radarLoaded = true; loadBrokerRadar(); }
-    loadBidOfferFromSupabase(activeCode);
-    loadFundamental(activeCode);
     loadHistoricalBT(activeCode);
     loadWatchlist();
   }
@@ -3826,53 +3401,6 @@ function selectTicker(code) {
   selectTicker(activeCode);
   loadMarketOverview();
 
-// ===== GEM Score =====
-async function loadGemScore(code) {
-  if (!code) return;
-  const scoreEl = document.getElementById('gemScoreValue');
-  const signalEl = document.getElementById('gemSignalValue');
-  const volEl = document.getElementById('gemVolRatio');
-  const foreignEl = document.getElementById('gemForeignNet');
-  const dateEl = document.getElementById('gemDateLabel');
-  if (!scoreEl) return;
-
-  try {
-    const res = await fetch('/api/gem-score/latest?codes=' + encodeURIComponent(code));
-    const json = await res.json();
-    if (!json.success || !json.data || !json.data.length) {
-      scoreEl.textContent = '--';
-      if (signalEl) signalEl.textContent = '--';
-      if (volEl) volEl.textContent = '--';
-      if (foreignEl) foreignEl.textContent = '--';
-      if (dateEl) dateEl.textContent = '--';
-      return;
-    }
-    const d = json.data[0];
-    scoreEl.textContent = d.gem_score ?? '--';
-    if (signalEl) signalEl.textContent = d.gem_signal ?? '--';
-    if (volEl) volEl.textContent = d.vol_ratio ?? '--';
-    if (foreignEl) { const fn = d.foreign_net20 != null ? Number(d.foreign_net20) : null; foreignEl.textContent = fn == null ? '--' : (fn > 0 ? '+' : '') + (fn / 1e6).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' jt lbr'; foreignEl.style.color = fn == null ? '' : (fn >= 0 ? '#00E676' : '#FF5252'); }
-    if (dateEl) dateEl.textContent = d.trade_date || '--';
-
-    scoreEl.className = 'font-bold text-lg';
-    if (signalEl) signalEl.className = 'font-bold';
-    if (d.gem_score >= 75) {
-      scoreEl.classList.add('text-idx-green');
-      if (signalEl) signalEl.classList.add('text-idx-green');
-    } else if (d.gem_score >= 60) {
-      scoreEl.classList.add('text-idx-cyan');
-      if (signalEl) signalEl.classList.add('text-idx-cyan');
-    } else if (d.gem_score >= 45) {
-      scoreEl.classList.add('text-idx-amber');
-      if (signalEl) signalEl.classList.add('text-idx-amber');
-    } else {
-      scoreEl.classList.add('text-slate-400');
-      if (signalEl) signalEl.classList.add('text-slate-400');
-    }
-  } catch (err) {
-    console.error('[GEM]', err);
-  }
-}
 
 // ============================================================
 // COLLAPSIBLE PANELS
@@ -5263,7 +4791,6 @@ function togglePanel(panelId, headerEl) {
     }
     function init() {
         bindObserver('bandarScore', 'bandarmology-gauge');
-        bindObserver('gemScoreValue', 'gem-score-gauge');
     }
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() { setTimeout(init, 1500); });
