@@ -1,37 +1,37 @@
 {
   "success": true,
-  "date": "2026-11-12",
-  "count": 3,
+  "date": "2026-11-13",
+  "count": 4,
   "filtered": {
-    "considered": 6,
+    "considered": 8,
     "noTrade": 2,
     "lateEntry": 1,
-    "wideStop": 0
+    "wideStop": 1
   },
   "signals": [
     {
-      "stockCode": "INTP",
-      "stockName": "Indocement Tunggal Prakarsa Tbk.",
+      "stockCode": "BTPS",
+      "stockName": "Bank BTPN Syariah Tbk.",
       "setup": "BREAKOUT",
       "status": "WATCH",
-      "price": 5825,
-      "trigger": 5975,
-      "invalidation": 5408.04,
-      "target1": 6825.45,
-      "target2": 7392.41,
+      "price": 1035,
+      "trigger": 1050,
+      "invalidation": 967.86,
+      "target1": 1173.21,
+      "target2": 1255.36,
       "riskReward": 2.5,
       "riskLevel": "HIGH",
-      "entryGapPct": -2.5,
-      "rrFromPrice": 2.4,
+      "entryGapPct": -1.4,
+      "rrFromPrice": 2.06,
       "planStale": false,
       "preBreakout": true,
-      "stopDistancePct": 7.2,
+      "stopDistancePct": 6.5,
       "stopWide": false,
-      "maxEntry": 6116.75,
+      "maxEntry": 1070.54,
       "structure": {
-        "state": "IMPROVING",
-        "label": "Structure improving",
-        "explanation": "Price remains above the main short/intermediate trend references with increasing price activity."
+        "state": "NEUTRAL",
+        "label": "Neutral structure",
+        "explanation": "Price structure does not currently show a decisive directional condition."
       },
       "participation": {
         "state": "CONTRACTING",
@@ -41,7 +41,7 @@
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": 0.00003711344273476344,
+        "value": -0.00025343046158683973,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
@@ -50,27 +50,27 @@
         "explanation": "One or more execution-quality measures are below the preferred baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-13T20:37:43.649Z"
+      "updatedAt": "2026-11-14T01:40:00.069Z"
     },
     {
-      "stockCode": "MPMX",
-      "stockName": "Mitra Pinasthika Mustika Tbk.",
+      "stockCode": "DEWI",
+      "stockName": "Dewi Shri Farmindo Tbk.",
       "setup": "BREAKOUT",
       "status": "WATCH",
-      "price": 1080,
-      "trigger": 1100,
-      "invalidation": 1046.43,
-      "target1": 1180.36,
-      "target2": 1233.93,
+      "price": 250,
+      "trigger": 252,
+      "invalidation": 214.86,
+      "target1": 307.71,
+      "target2": 344.86,
       "riskReward": 2.5,
-      "riskLevel": "MEDIUM",
-      "entryGapPct": -1.8,
-      "rrFromPrice": 2.99,
+      "riskLevel": "HIGH",
+      "entryGapPct": -0.8,
+      "rrFromPrice": 1.64,
       "planStale": false,
       "preBreakout": true,
-      "stopDistancePct": 3.1,
+      "stopDistancePct": 14.1,
       "stopWide": false,
-      "maxEntry": 1113.4,
+      "maxEntry": 261.28,
       "structure": {
         "state": "BULLISH",
         "label": "Bullish structure",
@@ -84,7 +84,7 @@
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": 0.0000951354198289238,
+        "value": -0.000011016499712575004,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
@@ -93,41 +93,41 @@
         "explanation": "One or more execution-quality measures are below the preferred baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-13T20:37:43.649Z"
+      "updatedAt": "2026-11-14T01:40:00.069Z"
     },
     {
-      "stockCode": "PRDA",
-      "stockName": "Prodia Widyahusada Tbk.",
+      "stockCode": "MPMX",
+      "stockName": "Mitra Pinasthika Mustika Tbk.",
       "setup": "BREAKOUT",
       "status": "WATCH",
-      "price": 3620,
-      "trigger": 3760,
-      "invalidation": 3445.71,
-      "target1": 4231.43,
-      "target2": 4545.71,
+      "price": 1075,
+      "trigger": 1100,
+      "invalidation": 1046.43,
+      "target1": 1180.36,
+      "target2": 1233.93,
       "riskReward": 2.5,
-      "riskLevel": "HIGH",
-      "entryGapPct": -3.7,
-      "rrFromPrice": 3.51,
+      "riskLevel": "MEDIUM",
+      "entryGapPct": -2.3,
+      "rrFromPrice": 3.69,
       "planStale": false,
       "preBreakout": true,
-      "stopDistancePct": 4.8,
+      "stopDistancePct": 2.7,
       "stopWide": false,
-      "maxEntry": 3838.57,
+      "maxEntry": 1113.4,
       "structure": {
         "state": "NEUTRAL",
         "label": "Neutral structure",
         "explanation": "Price structure does not currently show a decisive directional condition."
       },
       "participation": {
-        "state": "NEUTRAL",
-        "label": "Normal participation",
-        "explanation": "Trading activity is not showing a decisive expansion or contraction."
+        "state": "CONTRACTING",
+        "label": "Participation contracting",
+        "explanation": "Multiple trading-activity measures are below their recent baseline."
       },
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": -0.00002676181117626173,
+        "value": 0.00011082488264704719,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
@@ -136,10 +136,53 @@
         "explanation": "One or more execution-quality measures are below the preferred baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-13T20:37:43.649Z"
+      "updatedAt": "2026-11-14T01:40:00.069Z"
+    },
+    {
+      "stockCode": "ULTJ",
+      "stockName": "Ultrajaya Milk Industry & Trading Company Tbk.",
+      "setup": "BREAKOUT",
+      "status": "WATCH",
+      "price": 2090,
+      "trigger": 2140,
+      "invalidation": 2043.57,
+      "target1": 2284.64,
+      "target2": 2381.07,
+      "riskReward": 2.5,
+      "riskLevel": "MEDIUM",
+      "entryGapPct": -2.3,
+      "rrFromPrice": 4.19,
+      "planStale": false,
+      "preBreakout": true,
+      "stopDistancePct": 2.2,
+      "stopWide": false,
+      "maxEntry": 2164.11,
+      "structure": {
+        "state": "BULLISH",
+        "label": "Bullish structure",
+        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
+      },
+      "participation": {
+        "state": "CONTRACTING",
+        "label": "Participation contracting",
+        "explanation": "Multiple trading-activity measures are below their recent baseline."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": -0.00013353121367359628,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HIGH_RISK",
+        "label": "Elevated liquidity risk",
+        "explanation": "One or more execution-quality measures are below the preferred baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-11-14T01:40:00.069Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-11-13T20:37:43.650Z"
+  "generatedAt": "2026-11-14T01:40:00.069Z"
 }
