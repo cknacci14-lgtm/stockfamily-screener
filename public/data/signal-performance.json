@@ -1,6 +1,6 @@
 {
- "generatedAt": "2026-11-14T01:40:48.583Z",
- "marketDate": "2026-11-13",
+ "generatedAt": "2026-11-16T22:59:58.325Z",
+ "marketDate": "2026-11-16",
  "params": {
   "outcomeWindow": 20,
   "triggerWindow": 10,
@@ -17,10 +17,10 @@
  ],
  "sources": {
   "live": {
-   "entries": 112,
-   "shown": 38,
+   "entries": 122,
+   "shown": 46,
    "from": "2026-10-08",
-   "to": "2026-11-13"
+   "to": "2026-11-16"
   },
   "backfill": {
    "entries": 832,
@@ -34,9 +34,9 @@
    "source": "live",
    "shown": true,
    "group": "SEMUA",
-   "n": 25,
-   "stocks": 19,
-   "dates": 14,
+   "n": 29,
+   "stocks": 22,
+   "dates": 15,
    "fwd": {
     "h5": {
      "n": 21,
@@ -64,8 +64,8 @@
     "expPct": 0,
     "avgR1": -0.75,
     "avgR2": -0.65,
-    "trigPct": 45,
-    "pending": 9,
+    "trigPct": 54,
+    "pending": 13,
     "t1Late": 0
    },
    "verdict": "BELUM CUKUP DATA"
@@ -74,9 +74,9 @@
    "source": "live",
    "shown": true,
    "group": "PRA-BREAKOUT",
-   "n": 15,
-   "stocks": 14,
-   "dates": 8,
+   "n": 18,
+   "stocks": 17,
+   "dates": 9,
    "fwd": {
     "h5": {
      "n": 11,
@@ -104,8 +104,8 @@
     "expPct": 0,
     "avgR1": -1,
     "avgR2": -1,
-    "trigPct": 45,
-    "pending": 6,
+    "trigPct": 54,
+    "pending": 9,
     "t1Late": 0
    },
    "verdict": "BELUM CUKUP DATA"
@@ -114,9 +114,9 @@
    "source": "live",
    "shown": true,
    "group": "BREAKOUT",
-   "n": 4,
-   "stocks": 4,
-   "dates": 4,
+   "n": 5,
+   "stocks": 5,
+   "dates": 5,
    "fwd": {
     "h5": {
      "n": 4,
@@ -145,7 +145,7 @@
     "avgR1": 0.01,
     "avgR2": 0.41,
     "trigPct": null,
-    "pending": 0,
+    "pending": 1,
     "t1Late": 0
    },
    "verdict": "BELUM CUKUP DATA"
@@ -205,10 +205,10 @@
      "beat": 68
     },
     "h10": {
-     "n": 16,
-     "medRet": -8.9,
-     "medExcess": 3.91,
-     "beat": 56
+     "n": 17,
+     "medRet": -5.23,
+     "medExcess": 3.69,
+     "beat": 59
     },
     "h20": {
      "n": 9,
@@ -245,10 +245,10 @@
      "beat": 71
     },
     "h10": {
-     "n": 14,
-     "medRet": -8.9,
-     "medExcess": 3.91,
-     "beat": 57
+     "n": 15,
+     "medRet": -5.23,
+     "medExcess": 3.69,
+     "beat": 60
     },
     "h20": {
      "n": 8,
@@ -525,9 +525,9 @@
      "beat": 49
     },
     "h10": {
-     "n": 297,
-     "medRet": -1.83,
-     "medExcess": 0,
+     "n": 298,
+     "medRet": -1.8,
+     "medExcess": 0.04,
      "beat": 50
     },
     "h20": {
@@ -565,9 +565,9 @@
      "beat": 47
     },
     "h10": {
-     "n": 227,
-     "medRet": -2.14,
-     "medExcess": -0.52,
+     "n": 228,
+     "medRet": -2,
+     "medExcess": -0.51,
      "beat": 48
     },
     "h20": {
@@ -646,10 +646,10 @@
      "beat": 75
     },
     "h10": {
-     "n": 13,
-     "medRet": -5.23,
-     "medExcess": 4.14,
-     "beat": 62
+     "n": 14,
+     "medRet": -5.14,
+     "medExcess": 3.91,
+     "beat": 64
     },
     "h20": {
      "n": 7,
@@ -769,10 +769,10 @@
      "beat": 42
     },
     "h10": {
-     "n": 11,
-     "medRet": -7.5,
-     "medExcess": -6.56,
-     "beat": 36
+     "n": 12,
+     "medRet": -7.32,
+     "medExcess": -4.95,
+     "beat": 42
     },
     "h20": {
      "n": 10,
@@ -796,6 +796,134 @@
   }
  ],
  "recent": [
+  {
+   "date": "2026-11-16",
+   "code": "AALI",
+   "group": "PRA-BREAKOUT",
+   "status": "WATCH",
+   "source": "live",
+   "repeat": false,
+   "price": 9900,
+   "trigger": 10025,
+   "stop": 9319.64,
+   "target1": 11083.04,
+   "outcome": "MENUNGGU",
+   "R1": null,
+   "ret5": null,
+   "ret10": null
+  },
+  {
+   "date": "2026-11-16",
+   "code": "ASGR",
+   "group": "PRA-BREAKOUT",
+   "status": "WATCH",
+   "source": "live",
+   "repeat": false,
+   "price": 2470,
+   "trigger": 2570,
+   "stop": 2341.43,
+   "target1": 2912.86,
+   "outcome": "MENUNGGU",
+   "R1": null,
+   "ret5": null,
+   "ret10": null
+  },
+  {
+   "date": "2026-11-16",
+   "code": "BTPS",
+   "group": "PRA-BREAKOUT",
+   "status": "WATCH",
+   "source": "live",
+   "repeat": true,
+   "price": 1035,
+   "trigger": 1050,
+   "stop": 968.75,
+   "target1": 1171.88,
+   "outcome": "MENUNGGU",
+   "R1": null,
+   "ret5": null,
+   "ret10": null
+  },
+  {
+   "date": "2026-11-16",
+   "code": "BUKA",
+   "group": "BREAKOUT",
+   "status": "TRIGGERED",
+   "source": "live",
+   "repeat": false,
+   "price": 121,
+   "trigger": 118,
+   "stop": 105.14,
+   "target1": 137.29,
+   "outcome": "MENUNGGU",
+   "R1": null,
+   "ret5": null,
+   "ret10": null
+  },
+  {
+   "date": "2026-11-16",
+   "code": "DEWI",
+   "group": "PRA-BREAKOUT",
+   "status": "WATCH",
+   "source": "live",
+   "repeat": true,
+   "price": 246,
+   "trigger": 252,
+   "stop": 215.57,
+   "target1": 306.64,
+   "outcome": "MENUNGGU",
+   "R1": null,
+   "ret5": null,
+   "ret10": null
+  },
+  {
+   "date": "2026-11-16",
+   "code": "LPPF",
+   "group": "PRA-BREAKOUT",
+   "status": "WATCH",
+   "source": "live",
+   "repeat": false,
+   "price": 1650,
+   "trigger": 1665,
+   "stop": 1592.68,
+   "target1": 1773.48,
+   "outcome": "MENUNGGU",
+   "R1": null,
+   "ret5": null,
+   "ret10": null
+  },
+  {
+   "date": "2026-11-16",
+   "code": "MPMX",
+   "group": "PRA-BREAKOUT",
+   "status": "WATCH",
+   "source": "live",
+   "repeat": true,
+   "price": 1065,
+   "trigger": 1100,
+   "stop": 1047.32,
+   "target1": 1179.02,
+   "outcome": "MENUNGGU",
+   "R1": null,
+   "ret5": null,
+   "ret10": null
+  },
+  {
+   "date": "2026-11-16",
+   "code": "ULTJ",
+   "group": "PRA-BREAKOUT",
+   "status": "WATCH",
+   "source": "live",
+   "repeat": true,
+   "price": 2120,
+   "trigger": 2140,
+   "stop": 2043.57,
+   "target1": 2284.64,
+   "outcome": "MENUNGGU",
+   "R1": null,
+   "ret5": null,
+   "ret10": null
+  },
   {
    "date": "2026-11-13",
    "code": "BTPS",
@@ -903,7 +1031,7 @@
    "trigger": 3760,
    "stop": 3445.71,
    "target1": 4231.43,
-   "outcome": "MENUNGGU",
+   "outcome": "GAGAL_SEBELUM_TRIGGER",
    "R1": null,
    "ret5": null,
    "ret10": null
@@ -919,8 +1047,8 @@
    "trigger": 3760,
    "stop": 3442.14,
    "target1": 4236.79,
-   "outcome": "MENUNGGU",
-   "R1": null,
+   "outcome": "STOP",
+   "R1": -1,
    "ret5": null,
    "ret10": null
   },
@@ -935,8 +1063,8 @@
    "trigger": 3760,
    "stop": 3401.07,
    "target1": 4298.39,
-   "outcome": "MENUNGGU",
-   "R1": null,
+   "outcome": "STOP",
+   "R1": -1,
    "ret5": null,
    "ret10": null
   },
@@ -953,7 +1081,7 @@
    "target1": 6865.63,
    "outcome": "MENUNGGU",
    "R1": null,
-   "ret5": null,
+   "ret5": 1.7,
    "ret10": null
   },
   {
@@ -967,9 +1095,9 @@
    "trigger": 3760,
    "stop": 3390,
    "target1": 4315,
-   "outcome": "MENUNGGU",
-   "R1": null,
-   "ret5": null,
+   "outcome": "STOP",
+   "R1": -1,
+   "ret5": -10,
    "ret10": null
   },
   {
@@ -999,8 +1127,8 @@
    "trigger": 3760,
    "stop": 3390,
    "target1": 4315,
-   "outcome": "MENUNGGU",
-   "R1": null,
+   "outcome": "STOP",
+   "R1": -1,
    "ret5": -3.3,
    "ret10": null
   },
@@ -1031,8 +1159,8 @@
    "trigger": 3760,
    "stop": 3390,
    "target1": 4315,
-   "outcome": "MENUNGGU",
-   "R1": null,
+   "outcome": "STOP",
+   "R1": -1,
    "ret5": -0.8,
    "ret10": null
   },
@@ -1307,134 +1435,6 @@
    "R1": null,
    "ret5": -6.7,
    "ret10": -7.3
-  },
-  {
-   "date": "2026-10-12",
-   "code": "STAA",
-   "group": "PRA-BREAKOUT",
-   "status": "WATCH",
-   "source": "live",
-   "repeat": false,
-   "price": 1240,
-   "trigger": 1265,
-   "stop": 1174.82,
-   "target1": 1400.27,
-   "outcome": "GAGAL_SEBELUM_TRIGGER",
-   "R1": null,
-   "ret5": -19.4,
-   "ret10": -13.7
-  },
-  {
-   "date": "2026-10-12",
-   "code": "ULTJ",
-   "group": "PRA-BREAKOUT",
-   "status": "WATCH",
-   "source": "live",
-   "repeat": true,
-   "price": 2130,
-   "trigger": 2190,
-   "stop": 2072.14,
-   "target1": 2366.79,
-   "outcome": "GAGAL_SEBELUM_TRIGGER",
-   "R1": null,
-   "ret5": -6.1,
-   "ret10": -1.9
-  },
-  {
-   "date": "2026-10-08",
-   "code": "BSML",
-   "group": "PRA-BREAKOUT",
-   "status": "WATCH",
-   "source": "live",
-   "repeat": false,
-   "price": 560,
-   "trigger": 575,
-   "stop": 535.71,
-   "target1": 633.93,
-   "outcome": "STOP",
-   "R1": -1,
-   "ret5": -1.8,
-   "ret10": -7.1
-  },
-  {
-   "date": "2026-10-08",
-   "code": "MPMX",
-   "group": "BREAKOUT",
-   "status": "INVALIDATED",
-   "source": "live",
-   "repeat": false,
-   "price": 1025,
-   "trigger": 1060,
-   "stop": 1027.86,
-   "target1": 1108.21,
-   "outcome": "N/A",
-   "R1": null,
-   "ret5": -0.5,
-   "ret10": -0.5
-  },
-  {
-   "date": "2026-10-08",
-   "code": "SGER",
-   "group": "PRA-BREAKOUT",
-   "status": "WATCH",
-   "source": "live",
-   "repeat": false,
-   "price": 760,
-   "trigger": 785,
-   "stop": 694.82,
-   "target1": 920.27,
-   "outcome": "STOP",
-   "R1": -1,
-   "ret5": 1.3,
-   "ret10": 5.3
-  },
-  {
-   "date": "2026-10-08",
-   "code": "ULTJ",
-   "group": "PRA-BREAKOUT",
-   "status": "WATCH",
-   "source": "live",
-   "repeat": false,
-   "price": 2150,
-   "trigger": 2190,
-   "stop": 2059.64,
-   "target1": 2385.54,
-   "outcome": "GAGAL_SEBELUM_TRIGGER",
-   "R1": null,
-   "ret5": -2.8,
-   "ret10": -2.3
-  },
-  {
-   "date": "2026-10-07",
-   "code": "SGER",
-   "group": "PRA-BREAKOUT",
-   "status": "WATCH",
-   "source": "backfill",
-   "repeat": true,
-   "price": 765,
-   "trigger": 785,
-   "stop": 694.82,
-   "target1": 920.27,
-   "outcome": "STOP",
-   "R1": -1,
-   "ret5": 2,
-   "ret10": -1.3
-  },
-  {
-   "date": "2026-10-07",
-   "code": "ULTJ",
-   "group": "ACCUMULATION",
-   "status": "WATCH",
-   "source": "backfill",
-   "repeat": false,
-   "price": 2070,
-   "trigger": null,
-   "stop": 1908.39,
-   "target1": 2312.41,
-   "outcome": "STOP",
-   "R1": -1,
-   "ret5": 1.4,
-   "ret10": 1.4
   }
  ]
 }

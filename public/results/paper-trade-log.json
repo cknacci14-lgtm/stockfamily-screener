@@ -2235,6 +2235,18 @@
       "return_pct": null,
       "status": "PENDING",
       "created_at": "2026-11-14T01:37:11.025Z"
+    },
+    "LOPI_2026-11-16": {
+      "ticker": "LOPI",
+      "signal_date": "2026-11-16",
+      "signal_close": 36,
+      "entry_price": null,
+      "entry_date": null,
+      "exit_price": null,
+      "exit_date": null,
+      "return_pct": null,
+      "status": "PENDING",
+      "created_at": "2026-11-16T22:56:06.159Z"
     }
   },
   "runs": [
@@ -2477,7 +2489,13 @@
       "new_signals": 1,
       "completed": 0,
       "total_entries": 160
+    },
+    {
+      "timestamp": "2026-11-16T22:56:09.881Z",
+      "new_signals": 1,
+      "completed": 0,
+      "total_entries": 161
     }
   ],
-  "last_run": "2026-11-14T01:37:13.535Z"
+  "last_run": "2026-11-16T22:56:09.881Z"
 }
