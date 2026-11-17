@@ -2247,6 +2247,42 @@
       "return_pct": null,
       "status": "PENDING",
       "created_at": "2026-11-16T22:56:06.159Z"
+    },
+    "LOPI_2026-11-17": {
+      "ticker": "LOPI",
+      "signal_date": "2026-11-17",
+      "signal_close": 39,
+      "entry_price": null,
+      "entry_date": null,
+      "exit_price": null,
+      "exit_date": null,
+      "return_pct": null,
+      "status": "PENDING",
+      "created_at": "2026-11-17T21:47:31.416Z"
+    },
+    "CHIP_2026-11-17": {
+      "ticker": "CHIP",
+      "signal_date": "2026-11-17",
+      "signal_close": 560,
+      "entry_price": null,
+      "entry_date": null,
+      "exit_price": null,
+      "exit_date": null,
+      "return_pct": null,
+      "status": "PENDING",
+      "created_at": "2026-11-17T21:47:31.417Z"
+    },
+    "VINS_2026-11-17": {
+      "ticker": "VINS",
+      "signal_date": "2026-11-17",
+      "signal_close": 119,
+      "entry_price": null,
+      "entry_date": null,
+      "exit_price": null,
+      "exit_date": null,
+      "return_pct": null,
+      "status": "PENDING",
+      "created_at": "2026-11-17T21:47:31.417Z"
     }
   },
   "runs": [
@@ -2495,7 +2531,13 @@
       "new_signals": 1,
       "completed": 0,
       "total_entries": 161
+    },
+    {
+      "timestamp": "2026-11-17T21:47:35.395Z",
+      "new_signals": 3,
+      "completed": 0,
+      "total_entries": 164
     }
   ],
-  "last_run": "2026-11-16T22:56:09.881Z"
+  "last_run": "2026-11-17T21:47:35.395Z"
 }
