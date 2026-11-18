@@ -50,7 +50,7 @@
         "explanation": "One or more execution-quality measures are below the preferred baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-17T21:49:42.642Z"
+      "updatedAt": "2026-11-18T21:34:27.886Z"
     },
     {
       "stockCode": "ASGR",
@@ -93,7 +93,7 @@
         "explanation": "One or more execution-quality measures are below the preferred baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-17T21:49:42.642Z"
+      "updatedAt": "2026-11-18T21:34:27.886Z"
     },
     {
       "stockCode": "DEWI",
@@ -136,7 +136,7 @@
         "explanation": "One or more execution-quality measures are below the preferred baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-17T21:49:42.642Z"
+      "updatedAt": "2026-11-18T21:34:27.886Z"
     },
     {
       "stockCode": "MPMX",
@@ -179,10 +179,10 @@
         "explanation": "One or more execution-quality measures are below the preferred baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-17T21:49:42.642Z"
+      "updatedAt": "2026-11-18T21:34:27.886Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-11-17T21:49:42.642Z"
+  "generatedAt": "2026-11-18T21:34:27.886Z"
 }
