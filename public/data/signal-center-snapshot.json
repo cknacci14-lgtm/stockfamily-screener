@@ -1,9 +1,9 @@
 {
   "success": true,
-  "date": "2026-11-17",
-  "count": 4,
+  "date": "2026-11-18",
+  "count": 2,
   "filtered": {
-    "considered": 7,
+    "considered": 5,
     "noTrade": 2,
     "lateEntry": 1,
     "wideStop": 0
@@ -14,20 +14,20 @@
       "stockName": "Astra Agro Lestari Tbk.",
       "setup": "BREAKOUT",
       "status": "WATCH",
-      "price": 9975,
-      "trigger": 10025,
-      "invalidation": 9337.5,
-      "target1": 11056.25,
-      "target2": 11743.75,
+      "price": 9925,
+      "trigger": 10100,
+      "invalidation": 9452.68,
+      "target1": 11070.98,
+      "target2": 11718.3,
       "riskReward": 2.5,
       "riskLevel": "MEDIUM",
-      "entryGapPct": -0.5,
-      "rrFromPrice": 1.7,
+      "entryGapPct": -1.7,
+      "rrFromPrice": 2.43,
       "planStale": false,
       "preBreakout": true,
-      "stopDistancePct": 6.4,
+      "stopDistancePct": 4.8,
       "stopWide": false,
-      "maxEntry": 10196.88,
+      "maxEntry": 10261.83,
       "structure": {
         "state": "NEUTRAL",
         "label": "Neutral structure",
@@ -41,7 +41,7 @@
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": 0.0000029238232434799475,
+        "value": 0.0000035770676662521395,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
@@ -50,70 +50,27 @@
         "explanation": "One or more execution-quality measures are below the preferred baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-18T21:34:27.886Z"
-    },
-    {
-      "stockCode": "ASGR",
-      "stockName": "Astra Graphia Tbk.",
-      "setup": "BREAKOUT",
-      "status": "WATCH",
-      "price": 2510,
-      "trigger": 2570,
-      "invalidation": 2357.5,
-      "target1": 2888.75,
-      "target2": 3101.25,
-      "riskReward": 2.5,
-      "riskLevel": "HIGH",
-      "entryGapPct": -2.3,
-      "rrFromPrice": 2.48,
-      "planStale": false,
-      "preBreakout": true,
-      "stopDistancePct": 6.1,
-      "stopWide": false,
-      "maxEntry": 2623.13,
-      "structure": {
-        "state": "NEUTRAL",
-        "label": "Neutral structure",
-        "explanation": "Price structure does not currently show a decisive directional condition."
-      },
-      "participation": {
-        "state": "CONTRACTING",
-        "label": "Participation contracting",
-        "explanation": "Multiple trading-activity measures are below their recent baseline."
-      },
-      "flow": {
-        "state": "NEUTRAL",
-        "label": "Foreign flow neutral",
-        "value": 0.000007725003714469651,
-        "explanation": "Foreign activity does not provide a decisive contextual signal."
-      },
-      "liquidity": {
-        "state": "HIGH_RISK",
-        "label": "Elevated liquidity risk",
-        "explanation": "One or more execution-quality measures are below the preferred baseline."
-      },
-      "signalDate": null,
-      "updatedAt": "2026-11-18T21:34:27.886Z"
+      "updatedAt": "2026-11-19T21:35:42.414Z"
     },
     {
       "stockCode": "DEWI",
       "stockName": "Dewi Shri Farmindo Tbk.",
       "setup": "BREAKOUT",
       "status": "WATCH",
-      "price": 248,
+      "price": 250,
       "trigger": 254,
-      "invalidation": 217.57,
-      "target1": 308.64,
-      "target2": 345.07,
+      "invalidation": 226,
+      "target1": 296,
+      "target2": 324,
       "riskReward": 2.5,
       "riskLevel": "HIGH",
-      "entryGapPct": -2.4,
-      "rrFromPrice": 1.99,
+      "entryGapPct": -1.6,
+      "rrFromPrice": 1.92,
       "planStale": false,
       "preBreakout": true,
-      "stopDistancePct": 12.3,
+      "stopDistancePct": 9.6,
       "stopWide": false,
-      "maxEntry": 263.11,
+      "maxEntry": 261,
       "structure": {
         "state": "BULLISH",
         "label": "Bullish structure",
@@ -127,7 +84,7 @@
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": -0.000014905711551634368,
+        "value": 0.000015346355260982123,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
@@ -136,53 +93,10 @@
         "explanation": "One or more execution-quality measures are below the preferred baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-18T21:34:27.886Z"
-    },
-    {
-      "stockCode": "MPMX",
-      "stockName": "Mitra Pinasthika Mustika Tbk.",
-      "setup": "BREAKOUT",
-      "status": "WATCH",
-      "price": 1065,
-      "trigger": 1100,
-      "invalidation": 1047.32,
-      "target1": 1179.02,
-      "target2": 1231.7,
-      "riskReward": 2.5,
-      "riskLevel": "MEDIUM",
-      "entryGapPct": -3.2,
-      "rrFromPrice": 6.45,
-      "planStale": false,
-      "preBreakout": true,
-      "stopDistancePct": 1.7,
-      "stopWide": false,
-      "maxEntry": 1113.17,
-      "structure": {
-        "state": "NEUTRAL",
-        "label": "Neutral structure",
-        "explanation": "Price structure does not currently show a decisive directional condition."
-      },
-      "participation": {
-        "state": "CONTRACTING",
-        "label": "Participation contracting",
-        "explanation": "Multiple trading-activity measures are below their recent baseline."
-      },
-      "flow": {
-        "state": "NEUTRAL",
-        "label": "Foreign flow neutral",
-        "value": 0.00012362389236334858,
-        "explanation": "Foreign activity does not provide a decisive contextual signal."
-      },
-      "liquidity": {
-        "state": "HIGH_RISK",
-        "label": "Elevated liquidity risk",
-        "explanation": "One or more execution-quality measures are below the preferred baseline."
-      },
-      "signalDate": null,
-      "updatedAt": "2026-11-18T21:34:27.886Z"
+      "updatedAt": "2026-11-19T21:35:42.414Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-11-18T21:34:27.886Z"
+  "generatedAt": "2026-11-19T21:35:42.415Z"
 }
