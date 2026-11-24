@@ -2283,6 +2283,18 @@
       "return_pct": null,
       "status": "PENDING",
       "created_at": "2026-11-17T21:47:31.417Z"
+    },
+    "DGIK_2026-11-23": {
+      "ticker": "DGIK",
+      "signal_date": "2026-11-23",
+      "signal_close": 166,
+      "entry_price": null,
+      "entry_date": null,
+      "exit_price": null,
+      "exit_date": null,
+      "return_pct": null,
+      "status": "PENDING",
+      "created_at": "2026-11-24T23:03:01.228Z"
     }
   },
   "runs": [
@@ -2561,7 +2573,13 @@
       "new_signals": 0,
       "completed": 0,
       "total_entries": 164
+    },
+    {
+      "timestamp": "2026-11-24T23:03:06.620Z",
+      "new_signals": 1,
+      "completed": 0,
+      "total_entries": 165
     }
   ],
-  "last_run": "2026-11-24T00:51:45.990Z"
+  "last_run": "2026-11-24T23:03:06.620Z"
 }
