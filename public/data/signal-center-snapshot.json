@@ -50,7 +50,7 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-20T21:13:00.663Z"
+      "updatedAt": "2026-11-24T00:54:03.573Z"
     },
     {
       "stockCode": "MPMX",
@@ -93,7 +93,7 @@
         "explanation": "One or more execution-quality measures are below the preferred baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-20T21:13:00.663Z"
+      "updatedAt": "2026-11-24T00:54:03.573Z"
     },
     {
       "stockCode": "PGAS",
@@ -136,10 +136,10 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-20T21:13:00.663Z"
+      "updatedAt": "2026-11-24T00:54:03.573Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-11-20T21:13:00.663Z"
+  "generatedAt": "2026-11-24T00:54:03.573Z"
 }
