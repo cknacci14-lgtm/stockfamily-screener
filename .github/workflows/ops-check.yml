@@ -1,0 +1,54 @@
+name: Ops Check
+
+on:
+  schedule:
+    # 09:15 WIB (02:15 UTC), Senin-Sabtu: ringkasan harian
+    - cron: '15 2 * * 1-6'
+    # 23:30 WIB (16:30 UTC), Senin-Jumat: hanya kirim bila ada masalah
+    - cron: '30 16 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      digest:
+        description: 'Kirim ringkasan walau semua normal (true/false)'
+        required: false
+        default: 'true'
+
+concurrency:
+  group: ops-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: '1'
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: '1'
+        run: npm install --omit=dev --no-audit --no-fund --ignore-scripts
+
+      - name: Run ops check
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SCHEDULE_NAME: ${{ github.event.schedule }}
+          DIGEST_INPUT: ${{ github.event.inputs.digest }}
+        run: |
+          if [ "$SCHEDULE_NAME" = "15 2 * * 1-6" ] || [ "$DIGEST_INPUT" = "true" ]; then
+            node scripts/ops-check.js --digest
+          else
+            node scripts/ops-check.js
+          fi
