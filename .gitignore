@@ -77,3 +77,23 @@ scripts/backtest-capitulation-*.js
 
 
 public/*.p4-backup
+
+.cache/
+
+cache-daily-stock.json
+spec-v2-baris.csv
+spec-v2-hasil.txt
+
+spec-v3-baris.csv
+spec-v3-hasil.txt
+
+audit-output.txt
+chartnalist-audit.ps1
+
+audit-output-2.txt
+chartnalist-audit-2.ps1
+supabase-schema-audit.sql
+*-hasil.txt
+reports/
+Chartnalist_A1_A4_Script_Audit.txt
+public/* - Copy*.html
