@@ -16,7 +16,8 @@
         "scrape:excel": "node src/scrapers/idxExcel.js",
         "notify": "node src/notifier.js",
         "db:migrate": "node src/database/migrateLegacy.js",
-        "db:import-excel": "node src/database/importExcelHistory.js"
+        "db:import-excel": "node src/database/importExcelHistory.js",
+        "test": "node tests/indicators.test.js && node tests/replay.test.js"
     },
     "keywords": [
         "screener",
