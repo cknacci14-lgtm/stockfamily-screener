@@ -2288,13 +2288,25 @@
       "ticker": "DGIK",
       "signal_date": "2026-11-23",
       "signal_close": 166,
+      "entry_price": 170,
+      "entry_date": "2026-11-24",
+      "exit_price": null,
+      "exit_date": null,
+      "return_pct": null,
+      "status": "PENDING",
+      "created_at": "2026-11-24T23:03:01.228Z"
+    },
+    "MANG_2026-11-25": {
+      "ticker": "MANG",
+      "signal_date": "2026-11-25",
+      "signal_close": 60,
       "entry_price": null,
       "entry_date": null,
       "exit_price": null,
       "exit_date": null,
       "return_pct": null,
       "status": "PENDING",
-      "created_at": "2026-11-24T23:03:01.228Z"
+      "created_at": "2026-11-25T22:33:24.268Z"
     }
   },
   "runs": [
@@ -2579,7 +2591,13 @@
       "new_signals": 1,
       "completed": 0,
       "total_entries": 165
+    },
+    {
+      "timestamp": "2026-11-25T22:33:29.186Z",
+      "new_signals": 1,
+      "completed": 0,
+      "total_entries": 166
     }
   ],
-  "last_run": "2026-11-24T23:03:06.620Z"
+  "last_run": "2026-11-25T22:33:29.186Z"
 }

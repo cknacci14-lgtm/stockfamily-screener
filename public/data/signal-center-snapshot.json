@@ -1,57 +1,14 @@
 {
   "success": true,
-  "date": "2026-11-23",
+  "date": "2026-11-25",
   "count": 4,
   "filtered": {
-    "considered": 6,
+    "considered": 8,
     "noTrade": 1,
-    "lateEntry": 1,
+    "lateEntry": 3,
     "wideStop": 0
   },
   "signals": [
-    {
-      "stockCode": "BTPS",
-      "stockName": "Bank BTPN Syariah Tbk.",
-      "setup": "BREAKOUT",
-      "status": "WATCH",
-      "price": 1065,
-      "trigger": 1070,
-      "invalidation": 1010,
-      "target1": 1160,
-      "target2": 1220,
-      "riskReward": 2.5,
-      "riskLevel": "MEDIUM",
-      "entryGapPct": -0.5,
-      "rrFromPrice": 1.73,
-      "planStale": false,
-      "preBreakout": true,
-      "stopDistancePct": 5.2,
-      "stopWide": false,
-      "maxEntry": 1085,
-      "structure": {
-        "state": "BULLISH",
-        "label": "Bullish structure",
-        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
-      },
-      "participation": {
-        "state": "NEUTRAL",
-        "label": "Normal participation",
-        "explanation": "Trading activity is not showing a decisive expansion or contraction."
-      },
-      "flow": {
-        "state": "NEUTRAL",
-        "label": "Foreign flow neutral",
-        "value": -0.00023463024241391484,
-        "explanation": "Foreign activity does not provide a decisive contextual signal."
-      },
-      "liquidity": {
-        "state": "HIGH_RISK",
-        "label": "Elevated liquidity risk",
-        "explanation": "One or more execution-quality measures are below the preferred baseline."
-      },
-      "signalDate": null,
-      "updatedAt": "2026-11-24T23:06:04.978Z"
-    },
     {
       "stockCode": "DEWI",
       "stockName": "Dewi Shri Farmindo Tbk.",
@@ -84,7 +41,7 @@
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": 0.000015945948345532526,
+        "value": -0.000006137425412889771,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
@@ -93,70 +50,27 @@
         "explanation": "One or more execution-quality measures are below the preferred baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-24T23:06:04.978Z"
+      "updatedAt": "2026-11-25T22:37:00.123Z"
     },
     {
       "stockCode": "MPMX",
       "stockName": "Mitra Pinasthika Mustika Tbk.",
       "setup": "BREAKOUT",
       "status": "WATCH",
-      "price": 1070,
+      "price": 1075,
       "trigger": 1100,
-      "invalidation": 1055,
-      "target1": 1167.5,
-      "target2": 1212.5,
+      "invalidation": 1060.71,
+      "target1": 1158.93,
+      "target2": 1198.21,
       "riskReward": 2.5,
       "riskLevel": "MEDIUM",
-      "entryGapPct": -2.7,
-      "rrFromPrice": 6.5,
+      "entryGapPct": -2.3,
+      "rrFromPrice": 5.87,
       "planStale": false,
       "preBreakout": true,
-      "stopDistancePct": 1.4,
+      "stopDistancePct": 1.3,
       "stopWide": false,
-      "maxEntry": 1111.25,
-      "structure": {
-        "state": "BULLISH",
-        "label": "Bullish structure",
-        "explanation": "Price is above SMA20/SMA50 and positioned near a recent or 52-week high."
-      },
-      "participation": {
-        "state": "CONTRACTING",
-        "label": "Participation contracting",
-        "explanation": "Multiple trading-activity measures are below their recent baseline."
-      },
-      "flow": {
-        "state": "NEUTRAL",
-        "label": "Foreign flow neutral",
-        "value": 0.00009096881065571172,
-        "explanation": "Foreign activity does not provide a decisive contextual signal."
-      },
-      "liquidity": {
-        "state": "THIN",
-        "label": "Thin liquidity",
-        "explanation": "Trading activity is materially below the minimum liquidity baseline."
-      },
-      "signalDate": null,
-      "updatedAt": "2026-11-24T23:06:04.978Z"
-    },
-    {
-      "stockCode": "PGAS",
-      "stockName": "Perusahaan Gas Negara (Persero) Tbk.",
-      "setup": "BREAKOUT",
-      "status": "WATCH",
-      "price": 1520,
-      "trigger": 1570,
-      "invalidation": 1475,
-      "target1": 1712.5,
-      "target2": 1807.5,
-      "riskReward": 2.5,
-      "riskLevel": "MEDIUM",
-      "entryGapPct": -3.2,
-      "rrFromPrice": 4.28,
-      "planStale": false,
-      "preBreakout": true,
-      "stopDistancePct": 3,
-      "stopWide": false,
-      "maxEntry": 1593.75,
+      "maxEntry": 1109.82,
       "structure": {
         "state": "NEUTRAL",
         "label": "Neutral structure",
@@ -170,7 +84,50 @@
       "flow": {
         "state": "NEUTRAL",
         "label": "Foreign flow neutral",
-        "value": -0.000008070840414694155,
+        "value": 0.00009858871657655395,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HIGH_RISK",
+        "label": "Elevated liquidity risk",
+        "explanation": "One or more execution-quality measures are below the preferred baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-11-25T22:37:00.123Z"
+    },
+    {
+      "stockCode": "PGAS",
+      "stockName": "Perusahaan Gas Negara (Persero) Tbk.",
+      "setup": "BREAKOUT",
+      "status": "WATCH",
+      "price": 1520,
+      "trigger": 1570,
+      "invalidation": 1500,
+      "target1": 1675,
+      "target2": 1745,
+      "riskReward": 2.5,
+      "riskLevel": "MEDIUM",
+      "entryGapPct": -3.2,
+      "rrFromPrice": 7.75,
+      "planStale": false,
+      "preBreakout": true,
+      "stopDistancePct": 1.3,
+      "stopWide": false,
+      "maxEntry": 1587.5,
+      "structure": {
+        "state": "NEUTRAL",
+        "label": "Neutral structure",
+        "explanation": "Price structure does not currently show a decisive directional condition."
+      },
+      "participation": {
+        "state": "CONTRACTING",
+        "label": "Participation contracting",
+        "explanation": "Multiple trading-activity measures are below their recent baseline."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": 0.00002167078474831301,
         "explanation": "Foreign activity does not provide a decisive contextual signal."
       },
       "liquidity": {
@@ -179,10 +136,53 @@
         "explanation": "Trading value, frequency, volume, and available history meet the minimum execution-quality baseline."
       },
       "signalDate": null,
-      "updatedAt": "2026-11-24T23:06:04.978Z"
+      "updatedAt": "2026-11-25T22:37:00.123Z"
+    },
+    {
+      "stockCode": "PKPK",
+      "stockName": "Paragon Karya Perkasa Tbk.",
+      "setup": "BREAKOUT",
+      "status": "WATCH",
+      "price": 7050,
+      "trigger": 7325,
+      "invalidation": 6320.54,
+      "target1": 8831.7,
+      "target2": 9836.16,
+      "riskReward": 2.5,
+      "riskLevel": "HIGH",
+      "entryGapPct": -3.8,
+      "rrFromPrice": 2.44,
+      "planStale": false,
+      "preBreakout": true,
+      "stopDistancePct": 10.3,
+      "stopWide": false,
+      "maxEntry": 7576.12,
+      "structure": {
+        "state": "NEUTRAL",
+        "label": "Neutral structure",
+        "explanation": "Price structure does not currently show a decisive directional condition."
+      },
+      "participation": {
+        "state": "NEUTRAL",
+        "label": "Normal participation",
+        "explanation": "Trading activity is not showing a decisive expansion or contraction."
+      },
+      "flow": {
+        "state": "NEUTRAL",
+        "label": "Foreign flow neutral",
+        "value": -0.000014253075812259925,
+        "explanation": "Foreign activity does not provide a decisive contextual signal."
+      },
+      "liquidity": {
+        "state": "HIGH_RISK",
+        "label": "Elevated liquidity risk",
+        "explanation": "One or more execution-quality measures are below the preferred baseline."
+      },
+      "signalDate": null,
+      "updatedAt": "2026-11-25T22:37:00.123Z"
     }
   ],
   "source": "Signal Engine → Smartwatchlist Adapter",
   "mode": "SIGNAL_MONITOR",
-  "generatedAt": "2026-11-24T23:06:04.978Z"
+  "generatedAt": "2026-11-25T22:37:00.123Z"
 }
